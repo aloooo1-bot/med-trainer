@@ -58,7 +58,7 @@ interface CaseData {
 }
 
 interface ScoreDimension {
-  score: number    // 0-20
+  score: number    // 0-25
   feedback: string
 }
 
@@ -68,7 +68,6 @@ interface GradingResult {
   summary: string
   dimensions: {
     historyInterview: ScoreDimension
-    physicalExamReview: ScoreDimension
     testOrdering: ScoreDimension
     diagnosisAccuracy: ScoreDimension
     diagnosisCompleteness: ScoreDimension
@@ -390,26 +389,24 @@ Grading instructions:
 - Read the FULL interview transcript carefully for each dimension.
 - Credit the trainee if the patient's response conveyed the clinical information, even through differently worded questions.
 - Only mark information as missed if it was truly never surfaced.
-- Score each dimension 0-20. Total must equal the sum of all five dimensions.
+- Score each dimension 0-25. Total must equal the sum of all four dimensions.
 
-Score these five dimensions (each 0-20):
+Score these four dimensions (each 0-25):
 1. historyInterview: Did the trainee ask about key symptoms, timeline, severity, associated symptoms, relevant risk factors, and pertinent negatives?
-2. physicalExamReview: Did the trainee review the physical exam findings relevant to this case?
-3. testOrdering: Were the ordered tests appropriate and targeted (right tests ordered, no major gaps, minimal unnecessary tests)?
-4. diagnosisAccuracy: Is the submitted diagnosis correct or clinically equivalent to the correct diagnosis?
-5. diagnosisCompleteness: Is the diagnosis fully specified — correct aetiology, context, severity, or subtype where clinically important?
+2. testOrdering: Were the ordered tests appropriate and targeted (right tests ordered, no major gaps, minimal unnecessary tests)?
+3. diagnosisAccuracy: Is the submitted diagnosis correct or clinically equivalent to the correct diagnosis?
+4. diagnosisCompleteness: Is the diagnosis fully specified — correct aetiology, context, severity, or subtype where clinically important?
 
 Return:
 {
-  "total": <sum of all five dimension scores, integer 0-100>,
+  "total": <sum of all four dimension scores, integer 0-100>,
   "correct": <true if diagnosis is correct or clinically equivalent, false otherwise>,
   "summary": "<1-2 sentences of direct, constructive overall feedback>",
   "dimensions": {
-    "historyInterview":     { "score": <0-20>, "feedback": "<1 sentence: what they did well or missed>" },
-    "physicalExamReview":   { "score": <0-20>, "feedback": "<1 sentence>" },
-    "testOrdering":         { "score": <0-20>, "feedback": "<1 sentence>" },
-    "diagnosisAccuracy":    { "score": <0-20>, "feedback": "<1 sentence>" },
-    "diagnosisCompleteness":{ "score": <0-20>, "feedback": "<1 sentence>" }
+    "historyInterview":     { "score": <0-25>, "feedback": "<1 sentence: what they did well or missed>" },
+    "testOrdering":         { "score": <0-25>, "feedback": "<1 sentence>" },
+    "diagnosisAccuracy":    { "score": <0-25>, "feedback": "<1 sentence>" },
+    "diagnosisCompleteness":{ "score": <0-25>, "feedback": "<1 sentence>" }
   },
   "missedQuestions": ["<only information genuinely never elicited>", ...omit anything the trainee did uncover],
   "teachingPoints": ${JSON.stringify(caseData.teachingPoints)},
@@ -739,16 +736,15 @@ Return:
                     <div className="space-y-4">
                       {([
                         ['historyInterview',      'History & Interview'],
-                        ['physicalExamReview',    'Physical Exam Review'],
                         ['testOrdering',          'Test Ordering'],
                         ['diagnosisAccuracy',     'Diagnosis Accuracy'],
                         ['diagnosisCompleteness', 'Diagnosis Completeness'],
                       ] as const).map(([key, label]) => {
                         const dim = gradingResult.dimensions[key]
                         if (!dim) return null
-                        const pct = (dim.score / 20) * 100
-                        const barColor = dim.score >= 16 ? 'bg-green-500' : dim.score >= 11 ? 'bg-yellow-500' : 'bg-red-500'
-                        const scoreColor = dim.score >= 16 ? 'text-green-400' : dim.score >= 11 ? 'text-yellow-400' : 'text-red-400'
+                        const pct = (dim.score / 25) * 100
+                        const barColor = dim.score >= 20 ? 'bg-green-500' : dim.score >= 13 ? 'bg-yellow-500' : 'bg-red-500'
+                        const scoreColor = dim.score >= 20 ? 'text-green-400' : dim.score >= 13 ? 'text-yellow-400' : 'text-red-400'
                         return (
                           <div key={key}>
                             <div className="flex items-center gap-3 mb-1">
@@ -756,7 +752,7 @@ Return:
                               <div className="flex-1 h-2 rounded-full bg-gray-700 overflow-hidden">
                                 <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
                               </div>
-                              <span className={`w-12 text-right text-sm font-bold tabular-nums ${scoreColor}`}>{dim.score}/20</span>
+                              <span className={`w-12 text-right text-sm font-bold tabular-nums ${scoreColor}`}>{dim.score}/25</span>
                             </div>
                             <p className="pl-44 text-xs text-gray-400">{dim.feedback}</p>
                           </div>
