@@ -200,7 +200,33 @@ export default function MedTrainer() {
     const claudeSystem = `You are a medical education case generator. Generate realistic, detailed clinical cases.
 Return ONLY valid JSON. No markdown, no code fences, no explanation. Just the raw JSON object.`
 
-    const prompt = `Generate a realistic ${resolvedSystem} clinical case appropriate for a ${difficulty} level learner.
+    const difficultyRules: Record<string, string> = {
+      Foundations: `DIFFICULTY — FOUNDATIONS:
+- Common, high-prevalence diagnosis
+- Classic textbook symptom presentation
+- No significant comorbidities
+- Lab values clearly point toward diagnosis
+- 1-2 obvious differentials
+- Output required: Diagnosis only`,
+      Clinical: `DIFFICULTY — CLINICAL:
+- Moderate prevalence diagnosis
+- 1-2 atypical or missing classic features
+- One comorbidity that adds complexity
+- Some lab values are ambiguous or mildly misleading
+- 3-4 differentials worth considering
+- Output required: SOAP note + Diagnosis`,
+      Advanced: `DIFFICULTY — ADVANCED:
+- Uncommon or rare diagnosis
+- Atypical presentation with red herrings
+- Multiple comorbidities
+- Lab/imaging findings require synthesis
+- Must justify top 3 differentials with evidence
+- Output required: SOAP note + Diagnosis + Differential justification`,
+    }
+
+    const prompt = `Generate a realistic ${resolvedSystem} clinical case. Strictly follow the difficulty rules below.
+
+${difficultyRules[difficulty] ?? difficultyRules['Foundations']}
 
 Return this exact JSON structure with all fields populated. For labResults, every panel must list every individual analyte as a separate component (e.g. CBC must expand into WBC, Hemoglobin, Hematocrit, Platelets, etc.). Single-value tests also use a one-item components array.
 {
