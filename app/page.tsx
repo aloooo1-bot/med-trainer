@@ -38,7 +38,11 @@ interface CaseData {
   physicalExam: Record<string, string>
   availableLabs: string[]
   availableImaging: string[]
-  labResults: Record<string, { value: string; unit: string; referenceRange: string; status: 'normal' | 'abnormal' | 'critical'; result?: string }>
+  labResults: Record<string, {
+    components: Array<{ name: string; value: string; unit: string; referenceRange: string; status: 'normal' | 'abnormal' | 'critical' }>
+    // legacy fallback fields
+    result?: string; value?: string; unit?: string; referenceRange?: string; status?: string
+  }>
   imagingResults: Record<string, string>
   hiddenHistory: {
     socialHistory: string
@@ -199,7 +203,7 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation. Just the ra
 
     const prompt = `Generate a realistic ${resolvedSystem} clinical case appropriate for a ${difficulty} level learner.
 
-Return this exact JSON structure with all fields populated:
+Return this exact JSON structure with all fields populated. For labResults, every panel must list every individual analyte as a separate component (e.g. CBC must expand into WBC, Hemoglobin, Hematocrit, Platelets, etc.). Single-value tests also use a one-item components array.
 {
   "patientInfo": {
     "name": "First Last",
@@ -241,7 +245,12 @@ Return this exact JSON structure with all fields populated:
   "availableLabs": ["<lab name>", "<lab name>", ...include 10-14 relevant and distractor labs],
   "availableImaging": ["<study name>", ...include 3-5 relevant and distractor studies],
   "labResults": {
-    "<each lab from availableLabs>": { "value": "<numeric value only e.g. 14.2>", "unit": "<unit only e.g. g/dL>", "referenceRange": "<range without units e.g. 13.5-17.5 or M: 13.5-17.5; F: 12.0-16.0>", "status": "<normal|abnormal|critical>" }
+    "<panel name from availableLabs e.g. Complete Blood Count (CBC)>": {
+      "components": [
+        { "name": "<analyte e.g. WBC>", "value": "<numeric value e.g. 7.2>", "unit": "<unit e.g. x10³/µL>", "referenceRange": "<range e.g. 4.5-11.0>", "status": "<normal|abnormal|critical>" },
+        { "name": "<analyte e.g. Hemoglobin>", "value": "...", "unit": "...", "referenceRange": "...", "status": "..." }
+      ]
+    }
   },
   "imagingResults": {
     "<each study from availableImaging>": "<radiology-style report impression, 2-3 sentences>"
@@ -341,10 +350,13 @@ Rules:
 
     const orderedLabResults = Array.from(orderedTests)
       .filter(t => caseData.labResults[t])
-      .map(t => {
+      .flatMap(t => {
         const r = caseData.labResults[t]
-        const display = r.value ? `${r.value} ${r.unit}`.trim() : (r.result ?? '')
-        return `${t}: ${display} (ref: ${r.referenceRange}) [${r.status}]`
+        if (Array.isArray(r?.components) && r.components.length > 0) {
+          return [`${t}:\n` + r.components.map(c => `  ${c.name}: ${c.value} ${c.unit} (ref: ${c.referenceRange}) [${c.status}]`).join('\n')]
+        }
+        const display = r?.value ? `${r.value} ${r.unit ?? ''}`.trim() : (r?.result ?? '')
+        return [`${t}: ${display} (ref: ${r?.referenceRange ?? '—'}) [${r?.status ?? 'unknown'}]`]
       })
       .join('\n')
     const orderedImagingResults = Array.from(orderedTests)
@@ -612,31 +624,41 @@ Return:
                       </tr>
                     </thead>
                     <tbody>
-                      {orderedLabs.map((lab, i) => {
+                      {orderedLabs.map(lab => {
                         const raw = caseData.labResults[lab]
-                        const isObj = raw && typeof raw === 'object'
-                        // Support new {value, unit} format and old {result} format
-                        const hasNewFormat = isObj && 'value' in raw
-                        const value = hasNewFormat ? raw.value : (isObj ? (raw as {result:string}).result : (raw as unknown as string))
-                        const unit = hasNewFormat ? raw.unit : ''
-                        const referenceRange = isObj ? raw.referenceRange : '—'
-                        const status = isObj ? raw.status : (/abnormal|high|low|elevated|decreased|positive|critical/i.test(value) ? 'abnormal' : 'normal')
-                        const isCritical = status === 'critical'
-                        const isAbnormal = status === 'abnormal' || isCritical
-                        return (
-                          <tr key={lab} className={`border-b border-gray-700/50 last:border-0 ${i % 2 === 0 ? 'bg-gray-800' : 'bg-gray-800/50'}`}>
-                            <td className="px-4 py-3 font-medium text-gray-200">{lab}</td>
-                            <td className={`px-4 py-3 font-semibold tabular-nums ${isCritical ? 'text-red-400' : isAbnormal ? 'text-yellow-300' : 'text-gray-100'}`}>
-                              {value}
-                            </td>
-                            <td className="px-4 py-3 w-12">
-                              {isCritical && <span className="text-red-400 font-bold text-xs">CRIT</span>}
-                              {status === 'abnormal' && <span className="text-yellow-300 font-bold text-xs">A</span>}
-                            </td>
-                            <td className="px-4 py-3 text-gray-400">{unit}</td>
-                            <td className="px-4 py-3 text-gray-400">{referenceRange}</td>
-                          </tr>
-                        )
+                        // Normalise to components array regardless of data vintage
+                        const components: Array<{ name: string; value: string; unit: string; referenceRange: string; status: string }> =
+                          Array.isArray(raw?.components) && raw.components.length > 0
+                            ? raw.components
+                            : raw?.value
+                              ? [{ name: lab, value: raw.value, unit: raw.unit ?? '', referenceRange: raw.referenceRange ?? '—', status: raw.status ?? 'normal' }]
+                              : raw?.result
+                                ? [{ name: lab, value: raw.result, unit: '', referenceRange: raw.referenceRange ?? '—', status: raw.status ?? 'normal' }]
+                                : []
+                        const panelAbnormal = components.some(c => c.status === 'abnormal' || c.status === 'critical')
+                        return [
+                          // Panel header row
+                          <tr key={`${lab}-header`} className={`border-b border-gray-600 ${panelAbnormal ? 'bg-gray-700/80' : 'bg-gray-700/60'}`}>
+                            <td colSpan={5} className="px-4 py-1.5 text-xs font-semibold uppercase tracking-wide text-gray-300">{lab}</td>
+                          </tr>,
+                          // One row per analyte
+                          ...components.map((c, j) => {
+                            const isCritical = c.status === 'critical'
+                            const isAbnormal = c.status === 'abnormal' || isCritical
+                            return (
+                              <tr key={`${lab}-${j}`} className={`border-b border-gray-700/40 last:border-0 ${j % 2 === 0 ? 'bg-gray-800' : 'bg-gray-800/60'}`}>
+                                <td className="pl-7 pr-4 py-2.5 text-gray-300">{c.name}</td>
+                                <td className={`px-4 py-2.5 font-semibold tabular-nums ${isCritical ? 'text-red-400' : isAbnormal ? 'text-yellow-300' : 'text-gray-100'}`}>{c.value}</td>
+                                <td className="px-4 py-2.5 w-12 text-xs font-bold">
+                                  {isCritical && <span className="text-red-400">CRIT</span>}
+                                  {c.status === 'abnormal' && <span className="text-yellow-300">A</span>}
+                                </td>
+                                <td className="px-4 py-2.5 text-gray-400">{c.unit}</td>
+                                <td className="px-4 py-2.5 text-gray-400">{c.referenceRange}</td>
+                              </tr>
+                            )
+                          }),
+                        ]
                       })}
                     </tbody>
                   </table>
