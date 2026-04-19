@@ -38,7 +38,7 @@ interface CaseData {
   physicalExam: Record<string, string>
   availableLabs: string[]
   availableImaging: string[]
-  labResults: Record<string, { result: string; referenceRange: string; status: 'normal' | 'abnormal' | 'critical' }>
+  labResults: Record<string, { value: string; unit: string; referenceRange: string; status: 'normal' | 'abnormal' | 'critical'; result?: string }>
   imagingResults: Record<string, string>
   hiddenHistory: {
     socialHistory: string
@@ -229,7 +229,7 @@ Return this exact JSON structure with all fields populated:
   "availableLabs": ["<lab name>", "<lab name>", ...include 10-14 relevant and distractor labs],
   "availableImaging": ["<study name>", ...include 3-5 relevant and distractor studies],
   "labResults": {
-    "<each lab from availableLabs>": { "result": "<value with units e.g. 14.2 g/dL>", "referenceRange": "<normal range with units e.g. 13.5-17.5 g/dL>", "status": "<normal|abnormal|critical>" }
+    "<each lab from availableLabs>": { "value": "<numeric value only e.g. 14.2>", "unit": "<unit only e.g. g/dL>", "referenceRange": "<range without units e.g. 13.5-17.5 or M: 13.5-17.5; F: 12.0-16.0>", "status": "<normal|abnormal|critical>" }
   },
   "imagingResults": {
     "<each study from availableImaging>": "<radiology-style report impression, 2-3 sentences>"
@@ -572,29 +572,37 @@ Return:
                 <div className="overflow-hidden rounded-md border border-gray-700">
                   <table className="w-full text-sm border-collapse">
                     <thead>
-                      <tr className="bg-gray-900">
-                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400 border-b border-gray-700">Parameter</th>
-                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400 border-b border-gray-700">Result</th>
-                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400 border-b border-gray-700">Reference Range</th>
+                      <tr className="bg-gray-900 border-b border-gray-700">
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">Test</th>
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">Result</th>
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">Flag</th>
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">Unit</th>
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">Reference Range</th>
                       </tr>
                     </thead>
                     <tbody>
                       {orderedLabs.map((lab, i) => {
                         const raw = caseData.labResults[lab]
                         const isObj = raw && typeof raw === 'object'
-                        const result = isObj ? (raw as {result:string}).result : (raw as unknown as string)
-                        const referenceRange = isObj ? (raw as {referenceRange:string}).referenceRange : '—'
-                        const status = isObj ? (raw as {status:string}).status : (/abnormal|high|low|elevated|decreased|positive|critical/i.test(result) ? 'abnormal' : 'normal')
+                        // Support new {value, unit} format and old {result} format
+                        const hasNewFormat = isObj && 'value' in raw
+                        const value = hasNewFormat ? raw.value : (isObj ? (raw as {result:string}).result : (raw as unknown as string))
+                        const unit = hasNewFormat ? raw.unit : ''
+                        const referenceRange = isObj ? raw.referenceRange : '—'
+                        const status = isObj ? raw.status : (/abnormal|high|low|elevated|decreased|positive|critical/i.test(value) ? 'abnormal' : 'normal')
                         const isCritical = status === 'critical'
                         const isAbnormal = status === 'abnormal' || isCritical
                         return (
-                          <tr key={lab} className={`border-b border-gray-700/50 last:border-0 ${i % 2 === 0 ? 'bg-gray-800' : 'bg-gray-800/50'} ${isAbnormal ? 'bg-red-950/30' : ''}`}>
+                          <tr key={lab} className={`border-b border-gray-700/50 last:border-0 ${i % 2 === 0 ? 'bg-gray-800' : 'bg-gray-800/50'}`}>
                             <td className="px-4 py-3 font-medium text-gray-200">{lab}</td>
-                            <td className={`px-4 py-3 font-semibold ${isCritical ? 'text-red-400' : isAbnormal ? 'text-yellow-300' : 'text-gray-100'}`}>
-                              {result}
-                              {isCritical && <Badge text="Critical" color="red" />}
-                              {status === 'abnormal' && <span className="ml-2"><Badge text="Abnormal" color="yellow" /></span>}
+                            <td className={`px-4 py-3 font-semibold tabular-nums ${isCritical ? 'text-red-400' : isAbnormal ? 'text-yellow-300' : 'text-gray-100'}`}>
+                              {value}
                             </td>
+                            <td className="px-4 py-3 w-12">
+                              {isCritical && <span className="text-red-400 font-bold text-xs">CRIT</span>}
+                              {status === 'abnormal' && <span className="text-yellow-300 font-bold text-xs">A</span>}
+                            </td>
+                            <td className="px-4 py-3 text-gray-400">{unit}</td>
                             <td className="px-4 py-3 text-gray-400">{referenceRange}</td>
                           </tr>
                         )
