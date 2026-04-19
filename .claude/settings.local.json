@@ -1,0 +1,29 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(curl *)",
+      "Bash(pkill -f \"next dev\")",
+      "Bash(npm run *)",
+      "Bash(taskkill /PID 34904 /F)",
+      "Bash(cmd *)",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); print\\('OK:', d['content'][0]['text'][:50]\\)\")",
+      "Bash(winget install *)",
+      "Bash(gh *)",
+      "Bash(where.exe gh *)",
+      "Bash(find /c /d -name \"gh.exe\")",
+      "Bash(pip install *)",
+      "Bash(python -)",
+      "Bash(python3 -c \"import kagglehub; print\\('found'\\)\")",
+      "Bash(python -c \"import kagglehub; print\\('found'\\)\")",
+      "Bash(where.exe python *)",
+      "Bash(/c/Users/jorel/AppData/Local/Python/bin/python.exe -c 'import kagglehub; print\\('\\\\''kagglehub found'\\\\''\\)')",
+      "Bash(/c/Users/jorel/AppData/Local/Python/bin/python.exe --version)",
+      "Bash($PYEXE *)",
+      "Bash(\"/c/Users/jorel/AppData/Local/Python/bin/python.exe\" -)",
+      "Bash(/c/Users/jorel/AppData/Local/Python/bin/python.exe *)",
+      "Bash(\"/c/Users/jorel/AppData/Local/Python/bin/python.exe\" scripts/build_imaging_lookup.py)",
+      "Bash(git *)"
+    ]
+  }
+}
