@@ -892,7 +892,7 @@ Return:
           {generating ? (
             <div className="flex h-full flex-col items-center justify-center gap-3 text-gray-500">
               <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-700 border-t-blue-500" />
-              <p className="text-sm">Generating {system === 'Any' ? 'random' : system} case ({difficulty})...</p>
+              <p className="text-sm">Generating {system === 'Any' ? 'random' : system} case...</p>
             </div>
           ) : !caseData ? (
             <div className="flex h-full flex-col items-center justify-center gap-4 text-center">
