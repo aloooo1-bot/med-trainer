@@ -53,10 +53,22 @@ interface CaseData {
   keyQuestions: string[]
 }
 
-interface GradingResult {
-  score: number
-  correct: boolean
+interface ScoreDimension {
+  score: number    // 0-20
   feedback: string
+}
+
+interface GradingResult {
+  total: number
+  correct: boolean
+  summary: string
+  dimensions: {
+    historyInterview: ScoreDimension
+    physicalExamReview: ScoreDimension
+    testOrdering: ScoreDimension
+    diagnosisAccuracy: ScoreDimension
+    diagnosisCompleteness: ScoreDimension
+  }
   missedQuestions: string[]
   teachingPoints: string[]
   differentials: string[]
@@ -329,7 +341,11 @@ Rules:
 
     const orderedLabResults = Array.from(orderedTests)
       .filter(t => caseData.labResults[t])
-      .map(t => `${t}: ${caseData.labResults[t].result} (ref: ${caseData.labResults[t].referenceRange}) [${caseData.labResults[t].status}]`)
+      .map(t => {
+        const r = caseData.labResults[t]
+        const display = r.value ? `${r.value} ${r.unit}`.trim() : (r.result ?? '')
+        return `${t}: ${display} (ref: ${r.referenceRange}) [${r.status}]`
+      })
       .join('\n')
     const orderedImagingResults = Array.from(orderedTests)
       .filter(t => caseData.imagingResults[t])
@@ -359,16 +375,31 @@ Teaching points: ${caseData.teachingPoints.join(' | ')}
 Differentials: ${caseData.differentials.join(', ')}
 
 Grading instructions:
-- For each piece of key clinical information above, carefully read the FULL interview transcript to determine whether the trainee obtained that information — regardless of how they phrased the question. Credit should be given if the patient's response conveyed the same clinical information, even through a different question.
-- Only mark information as missed if it was truly never surfaced in the interview.
-- Do NOT penalise the trainee for asking a different question if the answer revealed the same clinical finding.
+- Read the FULL interview transcript carefully for each dimension.
+- Credit the trainee if the patient's response conveyed the clinical information, even through differently worded questions.
+- Only mark information as missed if it was truly never surfaced.
+- Score each dimension 0-20. Total must equal the sum of all five dimensions.
+
+Score these five dimensions (each 0-20):
+1. historyInterview: Did the trainee ask about key symptoms, timeline, severity, associated symptoms, relevant risk factors, and pertinent negatives?
+2. physicalExamReview: Did the trainee review the physical exam findings relevant to this case?
+3. testOrdering: Were the ordered tests appropriate and targeted (right tests ordered, no major gaps, minimal unnecessary tests)?
+4. diagnosisAccuracy: Is the submitted diagnosis correct or clinically equivalent to the correct diagnosis?
+5. diagnosisCompleteness: Is the diagnosis fully specified — correct aetiology, context, severity, or subtype where clinically important?
 
 Return:
 {
-  "score": <integer 0-100>,
+  "total": <sum of all five dimension scores, integer 0-100>,
   "correct": <true if diagnosis is correct or clinically equivalent, false otherwise>,
-  "feedback": "<2-3 sentences of direct, constructive feedback on their overall performance>",
-  "missedQuestions": ["<only information that was genuinely never elicited during the interview>", ...omit anything the trainee did uncover],
+  "summary": "<1-2 sentences of direct, constructive overall feedback>",
+  "dimensions": {
+    "historyInterview":     { "score": <0-20>, "feedback": "<1 sentence: what they did well or missed>" },
+    "physicalExamReview":   { "score": <0-20>, "feedback": "<1 sentence>" },
+    "testOrdering":         { "score": <0-20>, "feedback": "<1 sentence>" },
+    "diagnosisAccuracy":    { "score": <0-20>, "feedback": "<1 sentence>" },
+    "diagnosisCompleteness":{ "score": <0-20>, "feedback": "<1 sentence>" }
+  },
+  "missedQuestions": ["<only information genuinely never elicited>", ...omit anything the trainee did uncover],
   "teachingPoints": ${JSON.stringify(caseData.teachingPoints)},
   "differentials": ["<dx>: <1 sentence explanation of why it's on the differential and how to distinguish>", ...]
 }`
@@ -660,14 +691,14 @@ Return:
               </SectionCard>
             ) : (
               <div className="space-y-4">
-                {/* Score card */}
+                {/* Header */}
                 <div className={`rounded-lg border p-5 ${gradingResult.correct ? 'border-green-700 bg-green-950/30' : 'border-red-700 bg-red-950/30'}`}>
                   <div className="flex items-center justify-between mb-3">
                     <h3 className="text-lg font-bold text-gray-100">
                       {gradingResult.correct ? '✓ Correct Diagnosis' : '✗ Incorrect Diagnosis'}
                     </h3>
-                    <div className={`text-3xl font-bold ${gradingResult.score >= 70 ? 'text-green-400' : gradingResult.score >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
-                      {gradingResult.score}/100
+                    <div className={`text-3xl font-bold tabular-nums ${gradingResult.total >= 70 ? 'text-green-400' : gradingResult.total >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
+                      {gradingResult.total}/100
                     </div>
                   </div>
                   <div className="mb-3 flex flex-wrap gap-2 text-sm">
@@ -677,8 +708,41 @@ Return:
                     <span className="text-gray-400">Correct:</span>
                     <span className="font-medium text-green-300">{caseData.diagnosis}</span>
                   </div>
-                  <p className="text-sm leading-relaxed text-gray-300">{gradingResult.feedback}</p>
+                  <p className="text-sm leading-relaxed text-gray-300">{gradingResult.summary}</p>
                 </div>
+
+                {/* Scorecard */}
+                {gradingResult.dimensions && (
+                  <SectionCard title="Scorecard">
+                    <div className="space-y-4">
+                      {([
+                        ['historyInterview',      'History & Interview'],
+                        ['physicalExamReview',    'Physical Exam Review'],
+                        ['testOrdering',          'Test Ordering'],
+                        ['diagnosisAccuracy',     'Diagnosis Accuracy'],
+                        ['diagnosisCompleteness', 'Diagnosis Completeness'],
+                      ] as const).map(([key, label]) => {
+                        const dim = gradingResult.dimensions[key]
+                        if (!dim) return null
+                        const pct = (dim.score / 20) * 100
+                        const barColor = dim.score >= 16 ? 'bg-green-500' : dim.score >= 11 ? 'bg-yellow-500' : 'bg-red-500'
+                        const scoreColor = dim.score >= 16 ? 'text-green-400' : dim.score >= 11 ? 'text-yellow-400' : 'text-red-400'
+                        return (
+                          <div key={key}>
+                            <div className="flex items-center gap-3 mb-1">
+                              <span className="w-44 flex-shrink-0 text-sm font-medium text-gray-200">{label}</span>
+                              <div className="flex-1 h-2 rounded-full bg-gray-700 overflow-hidden">
+                                <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
+                              </div>
+                              <span className={`w-12 text-right text-sm font-bold tabular-nums ${scoreColor}`}>{dim.score}/20</span>
+                            </div>
+                            <p className="pl-44 text-xs text-gray-400">{dim.feedback}</p>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </SectionCard>
+                )}
 
                 {/* Missed questions */}
                 {gradingResult.missedQuestions?.length > 0 && (
