@@ -57,6 +57,7 @@ interface GradingResult {
   score: number
   correct: boolean
   feedback: string
+  strengths: string[]
   missedQuestions: string[]
   teachingPoints: string[]
   differentials: string[]
@@ -420,17 +421,32 @@ Key clinical information that should have been elicited: ${caseData.keyQuestions
 Teaching points: ${caseData.teachingPoints.join(' | ')}
 Differentials: ${caseData.differentials.join(', ')}
 
-Grading instructions:
-- For each piece of key clinical information above, carefully read the FULL interview transcript to determine whether the trainee obtained that information — regardless of how they phrased the question. Credit should be given if the patient's response conveyed the same clinical information, even through a different question.
-- Only mark information as missed if it was truly never surfaced in the interview.
-- Do NOT penalise the trainee for asking a different question if the answer revealed the same clinical finding.
+SCORING WEIGHTS (must sum to 100):
+- History & Interview: 25 points — credit for efficient, targeted questioning that surfaced clinically relevant findings
+- Test Ordering: 25 points — credit for ordering tests that were necessary to confirm or exclude the diagnosis
+- Diagnosis Accuracy: 35 points — full credit if correct or clinically equivalent; partial credit for a diagnosis in the right category
+- Diagnosis Completeness: 15 points — credit for specifying etiology, acuity, or subtype where clinically meaningful (e.g. "pneumonia secondary to S. pneumoniae" vs "pneumonia")
+
+SCORING PHILOSOPHY:
+- Reward efficient targeted questioning over exhaustive checklists — a trainee who asked 5 precise questions and got the diagnosis scores higher than one who asked 20 scattered questions
+- Do NOT penalise for skipping history questions if the same information was already apparent from the physical examination findings or was already revealed in the HPI
+- Do NOT penalise for skipping redundant tests when the diagnosis was already clear from the tests that were ordered
+- Reserve scores below 75 for cases where the primary diagnosis is wrong OR critically important tests (that would change management) were never ordered
+- A correct diagnosis with the core confirmatory tests ordered should score minimum 80/100 even if minor history gaps exist
+- For the interview transcript: credit any question whose answer conveyed the same clinical information, regardless of exact phrasing
+
+MISSED QUESTIONS — only list a question if ALL of the following are true:
+1. The answer was not already available from the physical exam or HPI
+2. Asking it would have meaningfully changed the diagnosis or management (not just completeness)
+3. The trainee genuinely never surfaced the information through any question
 
 Return:
 {
-  "score": <integer 0-100>,
+  "score": <integer 0-100 computed from the four weighted components above>,
   "correct": <true if diagnosis is correct or clinically equivalent, false otherwise>,
-  "feedback": "<2-3 sentences of direct, constructive feedback on their overall performance>",
-  "missedQuestions": ["<only information that was genuinely never elicited during the interview>", ...omit anything the trainee did uncover],
+  "feedback": "<2-3 sentences of direct, constructive feedback on overall performance>",
+  "strengths": ["<specific thing the trainee did well or efficiently>", "<another strength>", ...2-4 items],
+  "missedQuestions": ["<question that would have meaningfully changed dx or management, not already covered by exam/HPI>", ...omit anything already available or not management-changing],
   "teachingPoints": ${JSON.stringify(caseData.teachingPoints)},
   "differentials": ["<dx>: <1 sentence explanation of why it's on the differential and how to distinguish>", ...]
 }`
@@ -901,6 +917,9 @@ Return:
                       className="w-full rounded-md border border-gray-600 bg-gray-900 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 focus:border-blue-500 focus:outline-none"
                     />
                   </div>
+                  <p className="text-xs text-gray-500 italic">
+                    Tip: Consider including the underlying cause in your diagnosis (e.g. &quot;X secondary to Y&quot;)
+                  </p>
                   <button
                     onClick={() => submitDiagnosis()}
                     disabled={!userDiagnosis.trim() || gradingLoading}
@@ -937,9 +956,23 @@ Return:
                   <p className="text-sm leading-relaxed text-gray-300">{gradingResult.feedback}</p>
                 </div>
 
+                {/* What you did well */}
+                {gradingResult.strengths?.length > 0 && (
+                  <SectionCard title="What You Did Well">
+                    <ul className="space-y-2">
+                      {gradingResult.strengths.map((s, i) => (
+                        <li key={i} className="flex gap-2 text-sm text-gray-300">
+                          <span className="text-green-400 flex-shrink-0">✓</span>
+                          {s}
+                        </li>
+                      ))}
+                    </ul>
+                  </SectionCard>
+                )}
+
                 {/* Missed questions */}
                 {gradingResult.missedQuestions?.length > 0 && (
-                  <SectionCard title="Key Questions You Should Have Asked">
+                  <SectionCard title="Questions That Would Have Changed Management">
                     <ul className="space-y-2">
                       {gradingResult.missedQuestions.map((q, i) => (
                         <li key={i} className="flex gap-2 text-sm text-gray-300">
