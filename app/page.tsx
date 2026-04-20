@@ -22,7 +22,6 @@ const DIFFICULTIES = ['Foundations', 'Clinical', 'Advanced']
 
 const NAV = [
   { id: 'hpi', label: 'History of Present Illness' },
-  { id: 'vitals', label: 'Vitals' },
   { id: 'ros', label: 'Review of Systems' },
   { id: 'exam', label: 'Physical Examination' },
   { id: 'order', label: 'Order Tests' },
@@ -45,6 +44,7 @@ interface CaseData {
   }>
   imagingResults: Record<string, string>
   hiddenHistory: {
+    fullHistory: string
     socialHistory: string
     familyHistory: string
     medications: string
@@ -79,6 +79,11 @@ interface GradingResult {
 
 interface ChatMessage {
   role: 'user' | 'assistant'
+  content: string
+}
+
+interface TerminalLine {
+  type: 'input' | 'output' | 'error' | 'success' | 'info'
   content: string
 }
 
@@ -175,14 +180,29 @@ export default function MedTrainer() {
   const [gradingLoading, setGradingLoading] = useState(false)
   const [revealed, setRevealed] = useState(false)
 
+  const [caseDifficulty, setCaseDifficulty] = useState<string>('')
+
+  const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([
+    { type: 'info', content: 'MedTrainer Terminal — type "help" for commands' },
+  ])
+  const [terminalInput, setTerminalInput] = useState('')
+  const [showTerminal, setShowTerminal] = useState(false)
+  const [terminalLoading, setTerminalLoading] = useState(false)
+
   const chatEndRef = useRef<HTMLDivElement>(null)
   const chatInputRef = useRef<HTMLInputElement>(null)
+  const terminalEndRef = useRef<HTMLDivElement>(null)
+  const terminalInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' })
   }, [chatMessages])
 
-  const generateCase = async () => {
+  useEffect(() => {
+    terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' })
+  }, [terminalLines])
+
+  const generateCase = async (overrideSystem?: string, overrideDifficulty?: string): Promise<CaseData | null> => {
     setGenerating(true)
     setCaseData(null)
     setOrderedTests(new Set())
@@ -193,9 +213,13 @@ export default function MedTrainer() {
     setUserDiagnosis('')
     setActiveSection('hpi')
 
-    const resolvedSystem = system === 'Any'
+    const baseSystem = overrideSystem ?? system
+    const resolvedSystem = baseSystem === 'Any'
       ? SYSTEMS.filter(s => s !== 'Any')[Math.floor(Math.random() * (SYSTEMS.length - 1))]
-      : system
+      : baseSystem
+    const resolvedDifficulty = overrideDifficulty ?? difficulty
+
+    setCaseDifficulty(resolvedDifficulty)
 
     const claudeSystem = `You are a medical education case generator. Generate realistic, detailed clinical cases.
 Return ONLY valid JSON. No markdown, no code fences, no explanation. Just the raw JSON object.`
@@ -224,6 +248,13 @@ Return ONLY valid JSON. No markdown, no code fences, no explanation. Just the ra
 - Output required: SOAP note + Diagnosis + Differential justification`,
     }
 
+    const hpiSpec =
+      resolvedDifficulty === 'Foundations'
+        ? '"<detailed 4-5 sentence HPI: onset, duration, character, radiation, associated symptoms, timing, exacerbating/relieving factors>"'
+        : resolvedDifficulty === 'Clinical'
+        ? '"<2-3 sentences ONLY. State age, sex, primary symptom, and duration. STOP THERE. Do NOT include associated symptoms, characterization, radiation, pertinent positives or negatives — all additional detail belongs in hiddenHistory.fullHistory>"'
+        : '"<1-2 sentences ONLY. State age and sex. Include ONE non-specific symptom with NO duration or characterization. Add ONE misleading or incidental detail that does NOT point toward the primary diagnosis. Include nothing else>"'
+
     const prompt = `Generate a realistic ${resolvedSystem} clinical case. Strictly follow the difficulty rules below.
 
 ${difficultyRules[difficulty] ?? difficultyRules['Foundations']}
@@ -236,7 +267,7 @@ Return this exact JSON structure with all fields populated. For labResults, ever
     "gender": "Male or Female",
     "chiefComplaint": "<brief chief complaint>"
   },
-  "hpi": "<detailed 4-5 sentence HPI including onset, duration, character, radiation, associated symptoms, timing, exacerbating/relieving factors>",
+  "hpi": ${hpiSpec},
   "vitals": {
     "bp": "<systolic/diastolic mmHg>",
     "hr": <beats per minute>,
@@ -281,6 +312,13 @@ Return this exact JSON structure with all fields populated. For labResults, ever
     "<each study from availableImaging>": "<radiology-style report impression, 2-3 sentences>"
   },
   "hiddenHistory": {
+    "fullHistory": "${
+      resolvedDifficulty === 'Foundations'
+        ? 'N/A'
+        : resolvedDifficulty === 'Clinical'
+        ? '<Full detailed clinical history withheld from HPI: all associated symptoms, true onset, duration, character, radiation, aggravating/relieving factors, pertinent positives, pertinent negatives. Reveal only when the physician asks directly about each specific finding.>'
+        : '<Complete clinical history withheld from the vague HPI: all associated symptoms including the most pathognomonic finding, B-symptoms if present, any symptom that significantly narrows the differential. Gate the most diagnostic finding — only reveal it if the physician asks about it specifically by name or direct description.>'
+    }",
     "socialHistory": "<smoking pack-years, alcohol drinks/week, recreational drugs, occupation, living situation, recent travel>",
     "familyHistory": "<relevant family history with relationships and conditions>",
     "medications": "<current medications with doses and frequencies>",
@@ -303,10 +341,13 @@ Return this exact JSON structure with all fields populated. For labResults, ever
       const text = await callClaude(claudeSystem, [{ role: 'user', content: prompt }], 6000)
       const match = text.match(/\{[\s\S]*\}/)
       if (!match) throw new Error('No JSON in response')
-      setCaseData(JSON.parse(match[0]) as CaseData)
+      const parsed = JSON.parse(match[0]) as CaseData
+      setCaseData(parsed)
+      return parsed
     } catch (e) {
       console.error('Case generation failed:', e)
       alert('Failed to generate case. Check your API key and try again.')
+      return null
     } finally {
       setGenerating(false)
     }
@@ -331,46 +372,67 @@ Return this exact JSON structure with all fields populated. For labResults, ever
     setActiveSection('results')
   }
 
-  const sendChat = async () => {
-    if (!chatInput.trim() || !caseData || chatLoading) return
-    const msg = chatInput.trim()
+  const sendChat = async (overrideMessage?: string): Promise<string | undefined> => {
+    const msg = (overrideMessage !== undefined ? overrideMessage : chatInput).trim()
+    if (!msg || !caseData || chatLoading) return
     setChatMessages(prev => [...prev, { role: 'user', content: msg }])
-    setChatInput('')
+    if (overrideMessage === undefined) setChatInput('')
     setChatLoading(true)
+
+    const isGated = caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced'
+    const fullHistorySection = isGated && caseData.hiddenHistory.fullHistory !== 'N/A'
+      ? `\nYour complete history (only reveal specific details when the physician asks about that finding directly — do NOT volunteer these proactively):\n${caseData.hiddenHistory.fullHistory}`
+      : ''
+
+    const behaviorRules = caseDifficulty === 'Advanced'
+      ? `- You have NOT shared most of your symptoms — only mention what's in your presenting story above
+- Answer ONLY the specific question asked; never add related details unprompted
+- Occasionally be hesitant or uncertain: "I'm not sure", "maybe", "I think so" — as a real patient would
+- Sometimes give a slightly incomplete or redirected answer, as patients do when they don't realise something is important
+- Never volunteer information; wait to be asked directly`
+      : caseDifficulty === 'Clinical'
+      ? `- You have only told them your chief complaint so far — do not volunteer anything else
+- Answer ONLY the specific question asked; do not add context, related symptoms, or background unprompted
+- Respond conversationally, not clinically — use lay terms`
+      : `- Be naturally forthcoming; you may mention a related detail if it feels organic`
 
     const system = `You are roleplaying as a patient named ${caseData.patientInfo.name}, a ${caseData.patientInfo.age}-year-old ${caseData.patientInfo.gender} who came to the clinic/ED with "${caseData.patientInfo.chiefComplaint}".
 
-Your presenting story: ${caseData.hpi}
+What you have told them so far: ${caseData.hpi}${fullHistorySection}
 
-Hidden information — only reveal if the physician asks directly:
+Other information — only reveal if the physician asks directly about that specific topic:
 - Social history: ${caseData.hiddenHistory.socialHistory}
 - Family history: ${caseData.hiddenHistory.familyHistory}
 - Current medications: ${caseData.hiddenHistory.medications}
 - Allergies: ${caseData.hiddenHistory.allergies}
-- Additional symptoms (if asked): ${caseData.hiddenHistory.hiddenSymptoms}
+- Additional symptoms if asked: ${caseData.hiddenHistory.hiddenSymptoms}
 
 Rules:
 - Respond naturally as a patient, NOT as a medical expert
-- Do not volunteer hidden information unless directly asked about that specific topic
-- Be realistic: slightly anxious, use lay terms, may downplay or overemphasize symptoms
+- Use lay terms; be slightly anxious or uncertain as a real patient would
 - Keep answers concise (2-4 sentences)
-- Stay in character at all times`
+- Stay in character at all times
+${behaviorRules}`
 
     const history = [...chatMessages, { role: 'user' as const, content: msg }]
 
     try {
       const reply = await callClaude(system, history, 300)
       setChatMessages(prev => [...prev, { role: 'assistant', content: reply }])
+      return reply
     } catch {
       setChatMessages(prev => [...prev, { role: 'assistant', content: "I'm sorry, I'm not feeling well enough to answer right now." }])
+      return undefined
     } finally {
       setChatLoading(false)
       chatInputRef.current?.focus()
     }
   }
 
-  const submitDiagnosis = async () => {
-    if (!userDiagnosis.trim() || !caseData || gradingLoading) return
+  const submitDiagnosis = async (overrideDiagnosis?: string): Promise<GradingResult | null> => {
+    const diagnosisToGrade = (overrideDiagnosis !== undefined ? overrideDiagnosis : userDiagnosis).trim()
+    if (!diagnosisToGrade || !caseData || gradingLoading) return null
+    if (overrideDiagnosis !== undefined) setUserDiagnosis(overrideDiagnosis)
     setGradingLoading(true)
 
     const orderedLabResults = Array.from(orderedTests)
@@ -405,7 +467,7 @@ ${orderedImagingResults || '(no imaging ordered)'}
 Patient interview transcript:
 ${chatSummary || '(physician did not interview the patient)'}
 
-Trainee's submitted diagnosis: "${userDiagnosis}"
+Trainee's submitted diagnosis: "${diagnosisToGrade}"
 Correct diagnosis: "${caseData.diagnosis}"
 Key clinical information that should have been elicited: ${caseData.keyQuestions.join(' | ')}
 Teaching points: ${caseData.teachingPoints.join(' | ')}
@@ -443,11 +505,204 @@ Return:
       const text = await callClaude(system, [{ role: 'user', content: prompt }], 2000)
       const match = text.match(/\{[\s\S]*\}/)
       if (!match) throw new Error('No JSON')
-      setGradingResult(JSON.parse(match[0]) as GradingResult)
+      const result = JSON.parse(match[0]) as GradingResult
+      setGradingResult(result)
+      return result
     } catch {
       alert('Failed to grade. Please try again.')
+      return null
     } finally {
       setGradingLoading(false)
+    }
+  }
+
+  const addTerminalLines = (...lines: TerminalLine[]) => {
+    setTerminalLines(prev => [...prev, ...lines])
+  }
+
+  const processCommand = async (raw: string) => {
+    const trimmed = raw.trim()
+    if (!trimmed) return
+
+    addTerminalLines({ type: 'input', content: `> ${trimmed}` })
+
+    const spaceIdx = trimmed.indexOf(' ')
+    const cmd = (spaceIdx === -1 ? trimmed : trimmed.slice(0, spaceIdx)).toLowerCase()
+    const args = spaceIdx === -1 ? '' : trimmed.slice(spaceIdx + 1).trim()
+
+    switch (cmd) {
+      case 'help':
+        addTerminalLines(
+          { type: 'info', content: 'Commands:' },
+          { type: 'output', content: '  generate [system] [difficulty] — new case' },
+          { type: 'output', content: '  status                        — current case info' },
+          { type: 'output', content: '  hpi | vitals | ros | exam     — clinical data' },
+          { type: 'output', content: '  labs | imaging                 — available tests' },
+          { type: 'output', content: '  order <test>                   — order a test' },
+          { type: 'output', content: '  results                        — ordered test results' },
+          { type: 'output', content: '  ask <question>                 — interview patient' },
+          { type: 'output', content: '  diagnose <diagnosis>           — submit diagnosis' },
+          { type: 'output', content: '  clear                          — clear terminal' },
+        )
+        break
+
+      case 'generate': {
+        const words = args.split(/\s+/).filter(Boolean)
+        const diffMatch = words.find(w => DIFFICULTIES.map(d => d.toLowerCase()).includes(w.toLowerCase()))
+        const diff = diffMatch ? DIFFICULTIES.find(d => d.toLowerCase() === diffMatch.toLowerCase()) : undefined
+        const sysWords = words.filter(w => w.toLowerCase() !== (diffMatch?.toLowerCase() ?? ''))
+        const sysInput = sysWords.join(' ').toLowerCase()
+        const sys = sysInput
+          ? (SYSTEMS.find(s => s.toLowerCase().includes(sysInput)) ?? undefined)
+          : undefined
+        addTerminalLines({ type: 'info', content: `Generating ${sys ?? system} case (${diff ?? difficulty})…` })
+        setTerminalLoading(true)
+        const result = await generateCase(sys, diff)
+        setTerminalLoading(false)
+        if (result) {
+          addTerminalLines({ type: 'success', content: `Case ready: ${result.patientInfo.name}, ${result.patientInfo.age}yo ${result.patientInfo.gender} — "${result.patientInfo.chiefComplaint}"` })
+        } else {
+          addTerminalLines({ type: 'error', content: 'Case generation failed.' })
+        }
+        break
+      }
+
+      case 'status':
+        if (!caseData) {
+          addTerminalLines({ type: 'error', content: 'No case loaded. Run "generate" first.' })
+        } else {
+          addTerminalLines(
+            { type: 'success', content: `${caseData.patientInfo.name} · ${caseData.patientInfo.age}yo ${caseData.patientInfo.gender}` },
+            { type: 'output', content: `CC: ${caseData.patientInfo.chiefComplaint}` },
+            { type: 'output', content: `Tests ordered: ${orderedTests.size}  |  Chat messages: ${chatMessages.length}` },
+            { type: 'output', content: gradingResult ? `Score: ${gradingResult.score}/100 (${gradingResult.correct ? 'Correct' : 'Incorrect'})` : 'Diagnosis: not yet submitted' },
+          )
+        }
+        break
+
+      case 'hpi':
+        if (!caseData) addTerminalLines({ type: 'error', content: 'No case loaded.' })
+        else addTerminalLines(
+          { type: 'info', content: 'HISTORY OF PRESENT ILLNESS' },
+          { type: 'output', content: caseData.hpi },
+        )
+        break
+
+      case 'vitals':
+        if (!caseData) addTerminalLines({ type: 'error', content: 'No case loaded.' })
+        else {
+          const v = caseData.vitals
+          addTerminalLines(
+            { type: 'info', content: 'VITAL SIGNS' },
+            { type: 'output', content: `BP ${v.bp}  HR ${v.hr}  RR ${v.rr}  Temp ${v.temp}°F  SpO₂ ${v.spo2}%  Wt ${v.weight}` },
+          )
+        }
+        break
+
+      case 'ros':
+        if (!caseData) addTerminalLines({ type: 'error', content: 'No case loaded.' })
+        else {
+          addTerminalLines({ type: 'info', content: 'REVIEW OF SYSTEMS' })
+          Object.entries(caseData.reviewOfSystems).forEach(([s, val]) =>
+            addTerminalLines({ type: 'output', content: `  ${s.padEnd(18)} ${val}` })
+          )
+        }
+        break
+
+      case 'exam':
+        if (!caseData) addTerminalLines({ type: 'error', content: 'No case loaded.' })
+        else {
+          addTerminalLines({ type: 'info', content: 'PHYSICAL EXAMINATION' })
+          Object.entries(caseData.physicalExam).forEach(([area, val]) =>
+            addTerminalLines({ type: 'output', content: `  ${area.padEnd(18)} ${val}` })
+          )
+        }
+        break
+
+      case 'labs':
+        if (!caseData) addTerminalLines({ type: 'error', content: 'No case loaded.' })
+        else {
+          addTerminalLines({ type: 'info', content: 'AVAILABLE LABORATORY TESTS' })
+          caseData.availableLabs.forEach(lab =>
+            addTerminalLines({ type: 'output', content: `  [${orderedTests.has(lab) ? 'ordered' : 'pending'}] ${lab}` })
+          )
+        }
+        break
+
+      case 'imaging':
+        if (!caseData) addTerminalLines({ type: 'error', content: 'No case loaded.' })
+        else {
+          addTerminalLines({ type: 'info', content: 'AVAILABLE IMAGING STUDIES' })
+          caseData.availableImaging.forEach(img =>
+            addTerminalLines({ type: 'output', content: `  [${orderedTests.has(img) ? 'ordered' : 'pending'}] ${img}` })
+          )
+        }
+        break
+
+      case 'order': {
+        if (!caseData) { addTerminalLines({ type: 'error', content: 'No case loaded.' }); break }
+        if (!args) { addTerminalLines({ type: 'error', content: 'Usage: order <test name>' }); break }
+        const allTests = [...caseData.availableLabs, ...caseData.availableImaging]
+        const match = allTests.find(t => t.toLowerCase().includes(args.toLowerCase()))
+        if (!match) {
+          addTerminalLines({ type: 'error', content: `Not found: "${args}". Use "labs" or "imaging" to list tests.` })
+        } else if (orderedTests.has(match)) {
+          addTerminalLines({ type: 'error', content: `Already ordered: ${match}` })
+        } else {
+          setOrderedTests(prev => { const n = new Set(prev); n.add(match); return n })
+          addTerminalLines({ type: 'success', content: `Ordered: ${match}` })
+        }
+        break
+      }
+
+      case 'results': {
+        if (!caseData) { addTerminalLines({ type: 'error', content: 'No case loaded.' }); break }
+        if (orderedTests.size === 0) { addTerminalLines({ type: 'error', content: 'No tests ordered. Use "order <test>" first.' }); break }
+        addTerminalLines({ type: 'info', content: 'TEST RESULTS' })
+        Array.from(orderedTests).forEach(t => {
+          if (caseData.labResults[t]) {
+            const r = caseData.labResults[t]
+            const flag = r.status === 'critical' ? ' [CRITICAL]' : r.status === 'abnormal' ? ' [ABN]' : ''
+            addTerminalLines({ type: r.status === 'normal' ? 'output' : 'error', content: `  ${t}: ${r.result} (${r.referenceRange})${flag}` })
+          } else if (caseData.imagingResults[t]) {
+            addTerminalLines({ type: 'output', content: `  ${t}: ${caseData.imagingResults[t]}` })
+          }
+        })
+        break
+      }
+
+      case 'ask': {
+        if (!caseData) { addTerminalLines({ type: 'error', content: 'No case loaded.' }); break }
+        if (!args) { addTerminalLines({ type: 'error', content: 'Usage: ask <question>' }); break }
+        setTerminalLoading(true)
+        const reply = await sendChat(args)
+        setTerminalLoading(false)
+        if (reply) addTerminalLines({ type: 'success', content: `Patient: ${reply}` })
+        break
+      }
+
+      case 'diagnose': {
+        if (!caseData) { addTerminalLines({ type: 'error', content: 'No case loaded.' }); break }
+        if (!args) { addTerminalLines({ type: 'error', content: 'Usage: diagnose <your diagnosis>' }); break }
+        addTerminalLines({ type: 'info', content: `Grading: "${args}"…` })
+        setTerminalLoading(true)
+        const result = await submitDiagnosis(args)
+        setTerminalLoading(false)
+        if (result) {
+          addTerminalLines(
+            { type: result.correct ? 'success' : 'error', content: `Score: ${result.score}/100 — ${result.correct ? 'CORRECT' : 'INCORRECT'}` },
+            { type: 'output', content: result.feedback },
+          )
+        }
+        break
+      }
+
+      case 'clear':
+        setTerminalLines([{ type: 'info', content: 'MedTrainer Terminal — type "help" for commands' }])
+        break
+
+      default:
+        addTerminalLines({ type: 'error', content: `Unknown command: "${cmd}". Type "help" for available commands.` })
     }
   }
 
@@ -473,52 +728,62 @@ Return:
                 ))}
               </div>
             </SectionCard>
+            <SectionCard title="Vital Signs">
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+                {[
+                  ['BP', caseData.vitals.bp, 'mmHg'],
+                  ['HR', String(caseData.vitals.hr), 'bpm'],
+                  ['RR', String(caseData.vitals.rr), '/min'],
+                  ['Temp', String(caseData.vitals.temp), '°F'],
+                  ['SpO₂', String(caseData.vitals.spo2), '%'],
+                  ['Weight', caseData.vitals.weight, ''],
+                ].map(([label, value, unit]) => {
+                  const isAbnormal =
+                    (label === 'HR' && (Number(value) > 100 || Number(value) < 60)) ||
+                    (label === 'RR' && (Number(value) > 20 || Number(value) < 12)) ||
+                    (label === 'Temp' && (Number(value) > 99.5 || Number(value) < 97)) ||
+                    (label === 'SpO₂' && Number(value) < 95)
+                  return (
+                    <div key={label} className={`rounded-lg p-4 text-center ${isAbnormal ? 'bg-red-950/50 border border-red-800' : 'bg-gray-900'}`}>
+                      <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+                      <div className={`text-2xl font-bold ${isAbnormal ? 'text-red-300' : 'text-gray-100'}`}>{value}</div>
+                      {unit && <div className="text-xs text-gray-600 mt-0.5">{unit}</div>}
+                    </div>
+                  )
+                })}
+              </div>
+            </SectionCard>
             <SectionCard title="History of Present Illness">
               <p className="text-sm leading-relaxed text-gray-300">{caseData.hpi}</p>
             </SectionCard>
           </div>
         )
 
-      case 'vitals':
-        return (
-          <SectionCard title="Vital Signs">
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-              {[
-                ['BP', caseData.vitals.bp, 'mmHg'],
-                ['HR', String(caseData.vitals.hr), 'bpm'],
-                ['RR', String(caseData.vitals.rr), '/min'],
-                ['Temp', String(caseData.vitals.temp), '°F'],
-                ['SpO₂', String(caseData.vitals.spo2), '%'],
-                ['Weight', caseData.vitals.weight, ''],
-              ].map(([label, value, unit]) => {
-                const isAbnormal =
-                  (label === 'HR' && (Number(value) > 100 || Number(value) < 60)) ||
-                  (label === 'RR' && (Number(value) > 20 || Number(value) < 12)) ||
-                  (label === 'Temp' && (Number(value) > 99.5 || Number(value) < 97)) ||
-                  (label === 'SpO₂' && Number(value) < 95)
-                return (
-                  <div key={label} className={`rounded-lg p-4 text-center ${isAbnormal ? 'bg-red-950/50 border border-red-800' : 'bg-gray-900'}`}>
-                    <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
-                    <div className={`text-2xl font-bold ${isAbnormal ? 'text-red-300' : 'text-gray-100'}`}>{value}</div>
-                    {unit && <div className="text-xs text-gray-600 mt-0.5">{unit}</div>}
-                  </div>
-                )
-              })}
-            </div>
-          </SectionCard>
-        )
-
       case 'ros':
         return (
           <SectionCard title="Review of Systems">
-            <div className="space-y-3">
-              {Object.entries(caseData.reviewOfSystems).map(([system, findings]) => (
-                <div key={system} className="flex gap-3 rounded-md bg-gray-900 p-3">
-                  <span className="w-36 flex-shrink-0 text-xs font-semibold text-blue-400 uppercase tracking-wide pt-0.5">{system}</span>
-                  <span className="text-sm text-gray-300">{findings}</span>
-                </div>
-              ))}
-            </div>
+            {(caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') ? (
+              <div className="flex flex-col items-center gap-3 py-8 text-center">
+                <svg className="h-10 w-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                <p className="text-sm text-gray-400">
+                  Review of systems must be elicited through the patient interview.
+                </p>
+                <p className="text-xs text-gray-600">
+                  Ask the patient directly about each system in the interview panel.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {Object.entries(caseData.reviewOfSystems).map(([system, findings]) => (
+                  <div key={system} className="flex gap-3 rounded-md bg-gray-900 p-3">
+                    <span className="w-36 flex-shrink-0 text-xs font-semibold text-blue-400 uppercase tracking-wide pt-0.5">{system}</span>
+                    <span className="text-sm text-gray-300">{findings}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </SectionCard>
         )
 
@@ -721,7 +986,7 @@ Return:
                     />
                   </div>
                   <button
-                    onClick={submitDiagnosis}
+                    onClick={() => submitDiagnosis()}
                     disabled={!userDiagnosis.trim() || gradingLoading}
                     className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
                   >
@@ -868,19 +1133,31 @@ Return:
           {DIFFICULTIES.map(d => <option key={d}>{d}</option>)}
         </select>
         <button
-          onClick={generateCase}
+          onClick={() => generateCase()}
           disabled={generating}
           className="ml-1 rounded-md bg-blue-600 px-4 py-1.5 text-xs font-semibold text-white hover:bg-blue-500 disabled:opacity-60 disabled:cursor-not-allowed transition-colors"
         >
           {generating ? 'Generating...' : 'Generate Case'}
         </button>
-        {caseData && (
-          <div className="ml-auto flex items-center gap-2">
-            <span className="text-xs text-gray-500">{caseData.patientInfo.name}</span>
-            <Badge text={`${caseData.patientInfo.age}yo ${caseData.patientInfo.gender}`} color="blue" />
-            <Badge text={system === 'Any' ? 'Random' : system} color="purple" />
-          </div>
-        )}
+        <div className="ml-auto flex items-center gap-2">
+          {caseData && (
+            <>
+              <span className="text-xs text-gray-500">{caseData.patientInfo.name}</span>
+              <Badge text={`${caseData.patientInfo.age}yo ${caseData.patientInfo.gender}`} color="blue" />
+              <Badge text={system === 'Any' ? 'Random' : system} color="purple" />
+            </>
+          )}
+          <button
+            onClick={() => setShowTerminal(v => !v)}
+            className={`ml-2 rounded-md border px-3 py-1.5 font-mono text-xs transition-colors ${
+              showTerminal
+                ? 'border-green-600 bg-green-900/30 text-green-400'
+                : 'border-gray-600 bg-gray-800 text-gray-400 hover:border-gray-400 hover:text-gray-200'
+            }`}
+          >
+            {'> _'}
+          </button>
+        </div>
       </header>
 
       {/* Body */}
@@ -924,7 +1201,7 @@ Return:
                 <p className="mt-1 text-sm text-gray-500">Select a system and difficulty, then generate a clinical case to begin.</p>
               </div>
               <button
-                onClick={generateCase}
+                onClick={() => generateCase()}
                 className="rounded-md bg-blue-600 px-6 py-2.5 text-sm font-semibold text-white hover:bg-blue-500 transition-colors"
               >
                 Generate Your First Case
@@ -1002,7 +1279,7 @@ Return:
                 className="flex-1 rounded-md border border-gray-700 bg-gray-800 px-3 py-2 text-xs text-gray-200 placeholder-gray-600 focus:border-blue-500 focus:outline-none disabled:cursor-not-allowed disabled:opacity-50"
               />
               <button
-                onClick={sendChat}
+                onClick={() => sendChat()}
                 disabled={!caseData || chatLoading || !chatInput.trim()}
                 className="rounded-md bg-blue-600 px-3 py-2 text-xs font-medium text-white hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
               >
@@ -1017,6 +1294,62 @@ Return:
           </div>
         </aside>
       </div>
+
+      {/* Command terminal panel */}
+      {showTerminal && (
+        <div className="flex h-56 flex-shrink-0 flex-col border-t border-green-900 bg-gray-950 font-mono">
+          <div className="flex items-center justify-between border-b border-gray-800 px-3 py-1.5">
+            <span className="text-xs text-green-500 font-semibold tracking-widest uppercase">Terminal</span>
+            {terminalLoading && (
+              <span className="text-xs text-yellow-500 animate-pulse">processing…</span>
+            )}
+            <button
+              onClick={() => setShowTerminal(false)}
+              className="text-gray-600 hover:text-gray-300 text-xs px-1"
+            >
+              ✕
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto p-3 space-y-0.5 text-xs leading-relaxed">
+            {terminalLines.map((line, i) => (
+              <div
+                key={i}
+                className={
+                  line.type === 'input'   ? 'text-gray-400' :
+                  line.type === 'error'   ? 'text-red-400' :
+                  line.type === 'success' ? 'text-green-400' :
+                  line.type === 'info'    ? 'text-cyan-400' :
+                  'text-gray-200'
+                }
+              >
+                {line.content}
+              </div>
+            ))}
+            <div ref={terminalEndRef} />
+          </div>
+          <div className="flex items-center gap-2 border-t border-gray-800 px-3 py-2">
+            <span className="text-green-500 text-xs select-none">{'>'}</span>
+            <input
+              ref={terminalInputRef}
+              type="text"
+              value={terminalInput}
+              onChange={e => setTerminalInput(e.target.value)}
+              onKeyDown={async e => {
+                if (e.key === 'Enter' && !terminalLoading) {
+                  const val = terminalInput
+                  setTerminalInput('')
+                  await processCommand(val)
+                  terminalInputRef.current?.focus()
+                }
+              }}
+              disabled={terminalLoading}
+              placeholder="type a command…"
+              className="flex-1 bg-transparent text-xs text-gray-200 placeholder-gray-700 focus:outline-none disabled:opacity-50"
+              autoFocus
+            />
+          </div>
+        </div>
+      )}
     </div>
   )
 }
