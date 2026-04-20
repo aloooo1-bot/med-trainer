@@ -22,7 +22,6 @@ const DIFFICULTIES = ['Foundations', 'Clinical', 'Advanced']
 
 const NAV = [
   { id: 'hpi', label: 'History of Present Illness' },
-  { id: 'vitals', label: 'Vitals' },
   { id: 'ros', label: 'Review of Systems' },
   { id: 'exam', label: 'Physical Examination' },
   { id: 'order', label: 'Order Tests' },
@@ -663,39 +662,35 @@ Return:
                 ))}
               </div>
             </SectionCard>
+            <SectionCard title="Vital Signs">
+              <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
+                {[
+                  ['BP', caseData.vitals.bp, 'mmHg'],
+                  ['HR', String(caseData.vitals.hr), 'bpm'],
+                  ['RR', String(caseData.vitals.rr), '/min'],
+                  ['Temp', String(caseData.vitals.temp), '°F'],
+                  ['SpO₂', String(caseData.vitals.spo2), '%'],
+                  ['Weight', caseData.vitals.weight, ''],
+                ].map(([label, value, unit]) => {
+                  const isAbnormal =
+                    (label === 'HR' && (Number(value) > 100 || Number(value) < 60)) ||
+                    (label === 'RR' && (Number(value) > 20 || Number(value) < 12)) ||
+                    (label === 'Temp' && (Number(value) > 99.5 || Number(value) < 97)) ||
+                    (label === 'SpO₂' && Number(value) < 95)
+                  return (
+                    <div key={label} className={`rounded-lg p-4 text-center ${isAbnormal ? 'bg-red-950/50 border border-red-800' : 'bg-gray-900'}`}>
+                      <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
+                      <div className={`text-2xl font-bold ${isAbnormal ? 'text-red-300' : 'text-gray-100'}`}>{value}</div>
+                      {unit && <div className="text-xs text-gray-600 mt-0.5">{unit}</div>}
+                    </div>
+                  )
+                })}
+              </div>
+            </SectionCard>
             <SectionCard title="History of Present Illness">
               <p className="text-sm leading-relaxed text-gray-300">{caseData.hpi}</p>
             </SectionCard>
           </div>
-        )
-
-      case 'vitals':
-        return (
-          <SectionCard title="Vital Signs">
-            <div className="grid grid-cols-3 gap-3 sm:grid-cols-6">
-              {[
-                ['BP', caseData.vitals.bp, 'mmHg'],
-                ['HR', String(caseData.vitals.hr), 'bpm'],
-                ['RR', String(caseData.vitals.rr), '/min'],
-                ['Temp', String(caseData.vitals.temp), '°F'],
-                ['SpO₂', String(caseData.vitals.spo2), '%'],
-                ['Weight', caseData.vitals.weight, ''],
-              ].map(([label, value, unit]) => {
-                const isAbnormal =
-                  (label === 'HR' && (Number(value) > 100 || Number(value) < 60)) ||
-                  (label === 'RR' && (Number(value) > 20 || Number(value) < 12)) ||
-                  (label === 'Temp' && (Number(value) > 99.5 || Number(value) < 97)) ||
-                  (label === 'SpO₂' && Number(value) < 95)
-                return (
-                  <div key={label} className={`rounded-lg p-4 text-center ${isAbnormal ? 'bg-red-950/50 border border-red-800' : 'bg-gray-900'}`}>
-                    <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{label}</div>
-                    <div className={`text-2xl font-bold ${isAbnormal ? 'text-red-300' : 'text-gray-100'}`}>{value}</div>
-                    {unit && <div className="text-xs text-gray-600 mt-0.5">{unit}</div>}
-                  </div>
-                )
-              })}
-            </div>
-          </SectionCard>
         )
 
       case 'ros':
