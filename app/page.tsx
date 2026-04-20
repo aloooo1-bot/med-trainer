@@ -37,6 +37,7 @@ interface CaseData {
   physicalExam: Record<string, string>
   availableLabs: string[]
   availableImaging: string[]
+  labGroups: Array<{ name: string; tests: string[] }>
   labResults: Record<string, { result: string; referenceRange: string; status: 'normal' | 'abnormal' | 'critical' }>
   imagingResults: Record<string, string>
   hiddenHistory: {
@@ -167,6 +168,7 @@ export default function MedTrainer() {
   const [revealed, setRevealed] = useState(false)
 
   const [caseDifficulty, setCaseDifficulty] = useState<string>('')
+  const [collapsedPanels, setCollapsedPanels] = useState<Set<string>>(new Set())
 
   const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([
     { type: 'info', content: 'MedTrainer Terminal — type "help" for commands' },
@@ -198,6 +200,7 @@ export default function MedTrainer() {
     setRevealed(false)
     setUserDiagnosis('')
     setActiveSection('hpi')
+    setCollapsedPanels(new Set())
 
     const baseSystem = overrideSystem ?? system
     const resolvedSystem = baseSystem === 'Any'
@@ -260,6 +263,10 @@ Return this exact JSON structure with all fields populated:
   },
   "availableLabs": ["<lab name>", "<lab name>", ...include 10-14 relevant and distractor labs],
   "availableImaging": ["<study name>", ...include 3-5 relevant and distractor studies],
+  "labGroups": [
+    { "name": "<panel name e.g. Complete Blood Count (CBC)>", "tests": ["<exact lab name from availableLabs>", ...] },
+    ...group every lab from availableLabs into a named panel; standalone tests get their own single-item group
+  ],
   "labResults": {
     "<each lab from availableLabs>": { "result": "<value with units e.g. 14.2 g/dL>", "referenceRange": "<normal range with units e.g. 13.5-17.5 g/dL>", "status": "<normal|abnormal|critical>" }
   },
@@ -854,32 +861,76 @@ Return:
                   <table className="w-full text-sm border-collapse">
                     <thead>
                       <tr className="bg-gray-900">
-                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400 border-b border-gray-700">Parameter</th>
+                        <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400 border-b border-gray-700">Test</th>
                         <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400 border-b border-gray-700">Result</th>
                         <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400 border-b border-gray-700">Reference Range</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {orderedLabs.map((lab, i) => {
-                        const raw = caseData.labResults[lab]
-                        const isObj = raw && typeof raw === 'object'
-                        const result = isObj ? (raw as {result:string}).result : (raw as unknown as string)
-                        const referenceRange = isObj ? (raw as {referenceRange:string}).referenceRange : '—'
-                        const status = isObj ? (raw as {status:string}).status : (/abnormal|high|low|elevated|decreased|positive|critical/i.test(result) ? 'abnormal' : 'normal')
-                        const isCritical = status === 'critical'
-                        const isAbnormal = status === 'abnormal' || isCritical
-                        return (
-                          <tr key={lab} className={`border-b border-gray-700/50 last:border-0 ${i % 2 === 0 ? 'bg-gray-800' : 'bg-gray-800/50'} ${isAbnormal ? 'bg-red-950/30' : ''}`}>
-                            <td className="px-4 py-3 font-medium text-gray-200">{lab}</td>
-                            <td className={`px-4 py-3 font-semibold ${isCritical ? 'text-red-400' : isAbnormal ? 'text-yellow-300' : 'text-gray-100'}`}>
-                              {result}
-                              {isCritical && <Badge text="Critical" color="red" />}
-                              {status === 'abnormal' && <span className="ml-2"><Badge text="Abnormal" color="yellow" /></span>}
-                            </td>
-                            <td className="px-4 py-3 text-gray-400">{referenceRange}</td>
-                          </tr>
-                        )
-                      })}
+                      {(() => {
+                        const groups: Array<{ name: string; tests: string[] }> =
+                          caseData.labGroups?.length
+                            ? caseData.labGroups.map(g => ({ ...g, tests: g.tests.filter(t => orderedLabs.includes(t)) })).filter(g => g.tests.length > 0)
+                            : [{ name: '', tests: orderedLabs }]
+
+                        return groups.map(group => {
+                          const isCollapsed = collapsedPanels.has(group.name)
+                          const groupAbnormals = group.tests.filter(t => {
+                            const s = caseData.labResults[t]?.status
+                            return s === 'abnormal' || s === 'critical'
+                          })
+                          const hasCritical = group.tests.some(t => caseData.labResults[t]?.status === 'critical')
+                          const hasAbnormal = groupAbnormals.length > 0
+
+                          return (
+                            <>
+                              {group.name && (
+                                <tr
+                                  key={`group-${group.name}`}
+                                  className="bg-gray-900/80 cursor-pointer select-none hover:bg-gray-900"
+                                  onClick={() => setCollapsedPanels(prev => {
+                                    const next = new Set(prev)
+                                    next.has(group.name) ? next.delete(group.name) : next.add(group.name)
+                                    return next
+                                  })}
+                                >
+                                  <td colSpan={3} className="px-4 py-2">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-gray-500 text-xs w-3">{isCollapsed ? '▶' : '▼'}</span>
+                                      <span className="text-xs font-semibold uppercase tracking-wider text-gray-300">{group.name}</span>
+                                      {isCollapsed && hasAbnormal && (
+                                        <span className={`text-xs font-semibold ${hasCritical ? 'text-red-400' : 'text-yellow-400'}`}>
+                                          {groupAbnormals.length} {hasCritical ? 'critical' : 'abnormal'}
+                                        </span>
+                                      )}
+                                    </div>
+                                  </td>
+                                </tr>
+                              )}
+                              {!isCollapsed && group.tests.map((lab, i) => {
+                                const raw = caseData.labResults[lab]
+                                const isObj = raw && typeof raw === 'object'
+                                const result = isObj ? (raw as {result:string}).result : (raw as unknown as string)
+                                const referenceRange = isObj ? (raw as {referenceRange:string}).referenceRange : '—'
+                                const status = isObj ? (raw as {status:string}).status : (/abnormal|high|low|elevated|decreased|positive|critical/i.test(result) ? 'abnormal' : 'normal')
+                                const isCritical = status === 'critical'
+                                const isAbnormal = status === 'abnormal' || isCritical
+                                return (
+                                  <tr key={lab} className={`border-b border-gray-700/50 last:border-0 ${i % 2 === 0 ? 'bg-gray-800' : 'bg-gray-800/50'} ${isAbnormal ? 'bg-red-950/30' : ''}`}>
+                                    <td className={`py-3 font-medium text-gray-200 ${group.name ? 'pl-8 pr-4' : 'px-4'}`}>{lab}</td>
+                                    <td className={`px-4 py-3 font-semibold ${isCritical ? 'text-red-400' : isAbnormal ? 'text-yellow-300' : 'text-gray-100'}`}>
+                                      {result}
+                                      {isCritical && <span className="ml-2"><Badge text="Critical" color="red" /></span>}
+                                      {status === 'abnormal' && <span className="ml-2"><Badge text="Abnormal" color="yellow" /></span>}
+                                    </td>
+                                    <td className="px-4 py-3 text-gray-400">{referenceRange}</td>
+                                  </tr>
+                                )
+                              })}
+                            </>
+                          )
+                        })
+                      })()}
                     </tbody>
                   </table>
                 </div>
