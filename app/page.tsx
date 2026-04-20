@@ -41,6 +41,7 @@ interface CaseData {
   labResults: Record<string, { result: string; referenceRange: string; status: 'normal' | 'abnormal' | 'critical' }>
   imagingResults: Record<string, string>
   hiddenHistory: {
+    fullHistory: string
     socialHistory: string
     familyHistory: string
     medications: string
@@ -165,6 +166,8 @@ export default function MedTrainer() {
   const [gradingLoading, setGradingLoading] = useState(false)
   const [revealed, setRevealed] = useState(false)
 
+  const [caseDifficulty, setCaseDifficulty] = useState<string>('')
+
   const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([
     { type: 'info', content: 'MedTrainer Terminal — type "help" for commands' },
   ])
@@ -202,8 +205,17 @@ export default function MedTrainer() {
       : baseSystem
     const resolvedDifficulty = overrideDifficulty ?? difficulty
 
+    setCaseDifficulty(resolvedDifficulty)
+
     const claudeSystem = `You are a medical education case generator. Generate realistic, detailed clinical cases.
 Return ONLY valid JSON. No markdown, no code fences, no explanation. Just the raw JSON object.`
+
+    const hpiSpec =
+      resolvedDifficulty === 'Foundations'
+        ? '"<detailed 4-5 sentence HPI: onset, duration, character, radiation, associated symptoms, timing, exacerbating/relieving factors>"'
+        : resolvedDifficulty === 'Clinical'
+        ? '"<2-3 sentences ONLY. State age, sex, primary symptom, and duration. STOP THERE. Do NOT include associated symptoms, characterization, radiation, pertinent positives or negatives — all additional detail belongs in hiddenHistory.fullHistory>"'
+        : '"<1-2 sentences ONLY. State age and sex. Include ONE non-specific symptom with NO duration or characterization. Add ONE misleading or incidental detail that does NOT point toward the primary diagnosis. Include nothing else>"'
 
     const prompt = `Generate a realistic ${resolvedSystem} clinical case appropriate for a ${resolvedDifficulty} level learner.
 
@@ -215,7 +227,7 @@ Return this exact JSON structure with all fields populated:
     "gender": "Male or Female",
     "chiefComplaint": "<brief chief complaint>"
   },
-  "hpi": "<detailed 4-5 sentence HPI including onset, duration, character, radiation, associated symptoms, timing, exacerbating/relieving factors>",
+  "hpi": ${hpiSpec},
   "vitals": {
     "bp": "<systolic/diastolic mmHg>",
     "hr": <beats per minute>,
@@ -255,6 +267,13 @@ Return this exact JSON structure with all fields populated:
     "<each study from availableImaging>": "<radiology-style report impression, 2-3 sentences>"
   },
   "hiddenHistory": {
+    "fullHistory": "${
+      resolvedDifficulty === 'Foundations'
+        ? 'N/A'
+        : resolvedDifficulty === 'Clinical'
+        ? '<Full detailed clinical history withheld from HPI: all associated symptoms, true onset, duration, character, radiation, aggravating/relieving factors, pertinent positives, pertinent negatives. Reveal only when the physician asks directly about each specific finding.>'
+        : '<Complete clinical history withheld from the vague HPI: all associated symptoms including the most pathognomonic finding, B-symptoms if present, any symptom that significantly narrows the differential. Gate the most diagnostic finding — only reveal it if the physician asks about it specifically by name or direct description.>'
+    }",
     "socialHistory": "<smoking pack-years, alcohol drinks/week, recreational drugs, occupation, living situation, recent travel>",
     "familyHistory": "<relevant family history with relationships and conditions>",
     "medications": "<current medications with doses and frequencies>",
@@ -315,23 +334,40 @@ Return this exact JSON structure with all fields populated:
     if (overrideMessage === undefined) setChatInput('')
     setChatLoading(true)
 
+    const isGated = caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced'
+    const fullHistorySection = isGated && caseData.hiddenHistory.fullHistory !== 'N/A'
+      ? `\nYour complete history (only reveal specific details when the physician asks about that finding directly — do NOT volunteer these proactively):\n${caseData.hiddenHistory.fullHistory}`
+      : ''
+
+    const behaviorRules = caseDifficulty === 'Advanced'
+      ? `- You have NOT shared most of your symptoms — only mention what's in your presenting story above
+- Answer ONLY the specific question asked; never add related details unprompted
+- Occasionally be hesitant or uncertain: "I'm not sure", "maybe", "I think so" — as a real patient would
+- Sometimes give a slightly incomplete or redirected answer, as patients do when they don't realise something is important
+- Never volunteer information; wait to be asked directly`
+      : caseDifficulty === 'Clinical'
+      ? `- You have only told them your chief complaint so far — do not volunteer anything else
+- Answer ONLY the specific question asked; do not add context, related symptoms, or background unprompted
+- Respond conversationally, not clinically — use lay terms`
+      : `- Be naturally forthcoming; you may mention a related detail if it feels organic`
+
     const system = `You are roleplaying as a patient named ${caseData.patientInfo.name}, a ${caseData.patientInfo.age}-year-old ${caseData.patientInfo.gender} who came to the clinic/ED with "${caseData.patientInfo.chiefComplaint}".
 
-Your presenting story: ${caseData.hpi}
+What you have told them so far: ${caseData.hpi}${fullHistorySection}
 
-Hidden information — only reveal if the physician asks directly:
+Other information — only reveal if the physician asks directly about that specific topic:
 - Social history: ${caseData.hiddenHistory.socialHistory}
 - Family history: ${caseData.hiddenHistory.familyHistory}
 - Current medications: ${caseData.hiddenHistory.medications}
 - Allergies: ${caseData.hiddenHistory.allergies}
-- Additional symptoms (if asked): ${caseData.hiddenHistory.hiddenSymptoms}
+- Additional symptoms if asked: ${caseData.hiddenHistory.hiddenSymptoms}
 
 Rules:
 - Respond naturally as a patient, NOT as a medical expert
-- Do not volunteer hidden information unless directly asked about that specific topic
-- Be realistic: slightly anxious, use lay terms, may downplay or overemphasize symptoms
+- Use lay terms; be slightly anxious or uncertain as a real patient would
 - Keep answers concise (2-4 sentences)
-- Stay in character at all times`
+- Stay in character at all times
+${behaviorRules}`
 
     const history = [...chatMessages, { role: 'user' as const, content: msg }]
 
@@ -665,14 +701,28 @@ Return:
       case 'ros':
         return (
           <SectionCard title="Review of Systems">
-            <div className="space-y-3">
-              {Object.entries(caseData.reviewOfSystems).map(([system, findings]) => (
-                <div key={system} className="flex gap-3 rounded-md bg-gray-900 p-3">
-                  <span className="w-36 flex-shrink-0 text-xs font-semibold text-blue-400 uppercase tracking-wide pt-0.5">{system}</span>
-                  <span className="text-sm text-gray-300">{findings}</span>
-                </div>
-              ))}
-            </div>
+            {(caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') ? (
+              <div className="flex flex-col items-center gap-3 py-8 text-center">
+                <svg className="h-10 w-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+                </svg>
+                <p className="text-sm text-gray-400">
+                  Review of systems must be elicited through the patient interview.
+                </p>
+                <p className="text-xs text-gray-600">
+                  Ask the patient directly about each system in the interview panel.
+                </p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {Object.entries(caseData.reviewOfSystems).map(([system, findings]) => (
+                  <div key={system} className="flex gap-3 rounded-md bg-gray-900 p-3">
+                    <span className="w-36 flex-shrink-0 text-xs font-semibold text-blue-400 uppercase tracking-wide pt-0.5">{system}</span>
+                    <span className="text-sm text-gray-300">{findings}</span>
+                  </div>
+                ))}
+              </div>
+            )}
           </SectionCard>
         )
 
