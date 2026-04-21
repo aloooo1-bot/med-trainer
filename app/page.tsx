@@ -1,6 +1,15 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import {
+  ROS_CATEGORIES,
+  type ROSCategory,
+  type ROSState,
+  makeInitialROSState,
+  scanMessageForROS,
+  looksClinical,
+  classifyFinding,
+} from './lib/rosDetector'
 
 const SYSTEMS = [
   'Any',
@@ -169,6 +178,7 @@ export default function MedTrainer() {
 
   const [caseDifficulty, setCaseDifficulty] = useState<string>('')
   const [collapsedPanels, setCollapsedPanels] = useState<Set<string>>(new Set())
+  const [rosState, setRosState] = useState<ROSState>(makeInitialROSState())
 
   const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([
     { type: 'info', content: 'MedTrainer Terminal — type "help" for commands' },
@@ -201,6 +211,7 @@ export default function MedTrainer() {
     setUserDiagnosis('')
     setActiveSection('hpi')
     setCollapsedPanels(new Set())
+    setRosState(makeInitialROSState())
 
     const baseSystem = overrideSystem ?? system
     const resolvedSystem = baseSystem === 'Any'
@@ -240,15 +251,19 @@ Return this exact JSON structure with all fields populated:
     "weight": "<lbs>"
   },
   "reviewOfSystems": {
-    "Constitutional": "<positive and negative findings>",
-    "Cardiovascular": "<positive and negative findings>",
-    "Pulmonary": "<positive and negative findings>",
-    "GI": "<positive and negative findings>",
-    "GU": "<positive and negative findings>",
-    "Musculoskeletal": "<positive and negative findings>",
-    "Neurological": "<positive and negative findings>",
-    "Skin": "<positive and negative findings>",
-    "Psychiatric": "<positive and negative findings>"
+    "Constitutional":          "<explicit findings — state positives first, then denials. e.g. 'Fatigue present. Denies fever, chills, night sweats, weight loss.'>",
+    "HEENT":                   "<explicit findings — state positives first, then denials>",
+    "Cardiovascular":          "<explicit findings — state positives first, then denials>",
+    "Respiratory":             "<explicit findings — state positives first, then denials>",
+    "Gastrointestinal":        "<explicit findings — state positives first, then denials>",
+    "Genitourinary":           "<explicit findings — state positives first, then denials>",
+    "Musculoskeletal":         "<explicit findings — state positives first, then denials>",
+    "Neurological":            "<explicit findings — state positives first, then denials>",
+    "Psychiatric":             "<explicit findings — state positives first, then denials>",
+    "Integumentary":           "<explicit findings — state positives first, then denials>",
+    "Endocrine":               "<explicit findings — state positives first, then denials>",
+    "Hematologic/Lymphatic":   "<explicit findings — state positives first, then denials>",
+    "Allergic/Immunologic":    "<explicit findings — state positives first, then denials>"
   },
   "physicalExam": {
     "General": "<appearance and demeanor>",
@@ -374,6 +389,7 @@ Rules:
 - Use lay terms; be slightly anxious or uncertain as a real patient would
 - Keep answers concise (2-4 sentences)
 - Stay in character at all times
+- Answer only what the student directly asks you about. Do not volunteer symptoms or findings from body systems the student has not yet asked about. Never summarize your full symptom list unprompted.
 ${behaviorRules}`
 
     const history = [...chatMessages, { role: 'user' as const, content: msg }]
@@ -381,6 +397,44 @@ ${behaviorRules}`
     try {
       const reply = await callClaude(system, history, 300)
       setChatMessages(prev => [...prev, { role: 'assistant', content: reply }])
+
+      // ROS gating: scan the student's message for body systems
+      const unlockROS = (categories: ROSCategory[]) => {
+        if (!categories.length) return
+        setRosState(prev => {
+          const next = { ...prev }
+          for (const cat of categories) {
+            if (next[cat]?.status === 'locked') {
+              const finding = caseData.reviewOfSystems[cat] ?? 'No findings documented for this system.'
+              next[cat] = { status: classifyFinding(finding), finding }
+            }
+          }
+          return next
+        })
+      }
+
+      const keywordMatches = scanMessageForROS(msg)
+      if (keywordMatches.length > 0) {
+        unlockROS(keywordMatches)
+      } else if (looksClinical(msg)) {
+        // AI fallback: classify via Claude when keywords don't match
+        try {
+          const classifierPrompt = `You are a clinical NLP classifier for a medical training app.
+Given the following student message from a patient interview, identify which Review of Systems (ROS) categories were addressed. Return ONLY a JSON array of matched categories from this list:
+["Constitutional","HEENT","Cardiovascular","Respiratory","Gastrointestinal","Genitourinary","Musculoskeletal","Neurological","Psychiatric","Integumentary","Endocrine","Hematologic/Lymphatic","Allergic/Immunologic"]
+Rules:
+- Only include a category if the student ASKED about it
+- If no ROS category was addressed, return []
+- Return raw JSON only, no explanation, no markdown
+Student message: "${msg}"`
+          const raw = await callClaude('You are a JSON-only ROS classifier.', [{ role: 'user', content: classifierPrompt }], 100)
+          const aiMatches = JSON.parse(raw.trim()) as ROSCategory[]
+          unlockROS(aiMatches.filter(c => (ROS_CATEGORIES as readonly string[]).includes(c)))
+        } catch {
+          // classifier failure is non-fatal
+        }
+      }
+
       return reply
     } catch {
       setChatMessages(prev => [...prev, { role: 'assistant', content: "I'm sorry, I'm not feeling well enough to answer right now." }])
@@ -716,33 +770,68 @@ Return:
           </div>
         )
 
-      case 'ros':
+      case 'ros': {
+        const isGatedDifficulty = caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced'
+        if (isGatedDifficulty) {
+          const unlockedCount = ROS_CATEGORIES.filter(c => rosState[c].status !== 'locked').length
+          return (
+            <SectionCard title="Review of Systems">
+              <div className="mb-3 flex items-center justify-between">
+                <span className="text-xs text-gray-500">
+                  {unlockedCount} / {ROS_CATEGORIES.length} systems reviewed
+                </span>
+                {unlockedCount === 0 && (
+                  <span className="text-xs text-gray-600 italic">Ask the patient about each system to reveal findings</span>
+                )}
+              </div>
+              <div className="space-y-1.5">
+                {ROS_CATEGORIES.map(cat => {
+                  const entry = rosState[cat]
+                  const isLocked = entry.status === 'locked'
+                  const isPositive = entry.status === 'positive'
+                  return (
+                    <div
+                      key={cat}
+                      className={`flex gap-3 rounded-md px-3 py-2.5 ${
+                        isLocked
+                          ? 'bg-gray-900/40'
+                          : isPositive
+                          ? 'bg-yellow-950/30 border border-yellow-900/50'
+                          : 'bg-gray-900'
+                      }`}
+                    >
+                      <span className={`w-44 flex-shrink-0 text-xs font-semibold uppercase tracking-wide pt-0.5 ${
+                        isLocked ? 'text-gray-600' : isPositive ? 'text-yellow-400' : 'text-blue-400'
+                      }`}>
+                        {cat}
+                      </span>
+                      {isLocked ? (
+                        <span className="text-gray-600 text-sm select-none">—</span>
+                      ) : (
+                        <span className={`text-sm leading-relaxed ${isPositive ? 'text-yellow-100' : 'text-gray-400'}`}>
+                          {entry.finding}
+                        </span>
+                      )}
+                    </div>
+                  )
+                })}
+              </div>
+            </SectionCard>
+          )
+        }
         return (
           <SectionCard title="Review of Systems">
-            {(caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') ? (
-              <div className="flex flex-col items-center gap-3 py-8 text-center">
-                <svg className="h-10 w-10 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
-                </svg>
-                <p className="text-sm text-gray-400">
-                  Review of systems must be elicited through the patient interview.
-                </p>
-                <p className="text-xs text-gray-600">
-                  Ask the patient directly about each system in the interview panel.
-                </p>
-              </div>
-            ) : (
-              <div className="space-y-3">
-                {Object.entries(caseData.reviewOfSystems).map(([system, findings]) => (
-                  <div key={system} className="flex gap-3 rounded-md bg-gray-900 p-3">
-                    <span className="w-36 flex-shrink-0 text-xs font-semibold text-blue-400 uppercase tracking-wide pt-0.5">{system}</span>
-                    <span className="text-sm text-gray-300">{findings}</span>
-                  </div>
-                ))}
-              </div>
-            )}
+            <div className="space-y-1.5">
+              {Object.entries(caseData.reviewOfSystems).map(([cat, findings]) => (
+                <div key={cat} className="flex gap-3 rounded-md bg-gray-900 px-3 py-2.5">
+                  <span className="w-44 flex-shrink-0 text-xs font-semibold text-blue-400 uppercase tracking-wide pt-0.5">{cat}</span>
+                  <span className="text-sm text-gray-300">{findings}</span>
+                </div>
+              ))}
+            </div>
           </SectionCard>
         )
+      }
 
       case 'exam':
         return (
