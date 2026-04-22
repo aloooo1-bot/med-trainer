@@ -63,6 +63,13 @@ interface CaseData {
   keyQuestions: string[]
 }
 
+interface PresentationScores {
+  accuracy: number
+  completeness: number
+  conciseness: number
+  safety: number
+}
+
 interface GradingResult {
   score: number
   correct: boolean
@@ -71,6 +78,14 @@ interface GradingResult {
   missedQuestions: string[]
   teachingPoints: string[]
   differentials: string[]
+  presentation?: {
+    reasoningScore?: number
+    reasoningFeedback?: string
+    scores?: PresentationScores
+    presentationTotal?: number
+    presentationFeedback?: string
+    criticalMisses?: string[]
+  }
 }
 
 interface ChatMessage {
@@ -179,6 +194,7 @@ export default function MedTrainer() {
   const [caseDifficulty, setCaseDifficulty] = useState<string>('')
   const [collapsedPanels, setCollapsedPanels] = useState<Set<string>>(new Set())
   const [rosState, setRosState] = useState<ROSState>(makeInitialROSState())
+  const [userPresentation, setUserPresentation] = useState('')
 
   const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([
     { type: 'info', content: 'MedTrainer Terminal — type "help" for commands' },
@@ -209,6 +225,7 @@ export default function MedTrainer() {
     setGradingResult(null)
     setRevealed(false)
     setUserDiagnosis('')
+    setUserPresentation('')
     setActiveSection('hpi')
     setCollapsedPanels(new Set())
     setRosState(makeInitialROSState())
@@ -445,7 +462,7 @@ Student message: "${msg}"`
     }
   }
 
-  const submitDiagnosis = async (overrideDiagnosis?: string): Promise<GradingResult | null> => {
+  const submitDiagnosis = async (overrideDiagnosis?: string, overridePresentation?: string): Promise<GradingResult | null> => {
     const diagnosisToGrade = (overrideDiagnosis !== undefined ? overrideDiagnosis : userDiagnosis).trim()
     if (!diagnosisToGrade || !caseData || gradingLoading) return null
     if (overrideDiagnosis !== undefined) setUserDiagnosis(overrideDiagnosis)
@@ -463,7 +480,7 @@ Student message: "${msg}"`
       .map(m => `${m.role === 'user' ? 'Physician' : 'Patient'}: ${m.content}`)
       .join('\n')
 
-    const system = `You are a medical education evaluator grading a trainee's diagnostic performance.
+    const gradingSystem = `You are a medical education evaluator grading a trainee's diagnostic performance.
 Return ONLY valid JSON. No markdown, no code fences, no explanation.`
 
     const prompt = `Case: ${caseData.patientInfo.age}yo ${caseData.patientInfo.gender}, CC: "${caseData.patientInfo.chiefComplaint}"
@@ -513,10 +530,97 @@ Return:
 }`
 
     try {
-      const text = await callClaude(system, [{ role: 'user', content: prompt }], 2000)
+      const text = await callClaude(gradingSystem, [{ role: 'user', content: prompt }], 2000)
       const match = text.match(/\{[\s\S]*\}/)
       if (!match) throw new Error('No JSON')
       const result = JSON.parse(match[0]) as GradingResult
+
+      // Additional grading for Clinical and Advanced difficulties
+      const presentationText = (overridePresentation !== undefined ? overridePresentation : userPresentation).trim()
+
+      if (caseDifficulty === 'Clinical' && presentationText) {
+        try {
+          const reasoningPrompt = `You are a clinical educator grading a medical trainee's written clinical reasoning.
+
+Case: ${caseData.patientInfo.age}yo ${caseData.patientInfo.gender}, CC: "${caseData.patientInfo.chiefComplaint}"
+Correct diagnosis: "${caseData.diagnosis}"
+Trainee's submitted diagnosis: "${diagnosisToGrade}"
+
+Trainee's clinical reasoning:
+"""
+${presentationText}
+"""
+
+Grade the clinical reasoning on a scale of 0-10. Consider:
+- Did the trainee articulate why the evidence supports this diagnosis?
+- Did they acknowledge and reason through key differentials?
+- Is the reasoning logically sound and clinically appropriate?
+- Is the conclusion consistent with the evidence they presented?
+
+Return ONLY valid JSON:
+{
+  "reasoningScore": <integer 0-10>,
+  "reasoningFeedback": "<2-3 sentences of specific, constructive feedback on the quality of the clinical reasoning>"
+}`
+          const rText = await callClaude(gradingSystem, [{ role: 'user', content: reasoningPrompt }], 500)
+          const rMatch = rText.match(/\{[\s\S]*\}/)
+          if (rMatch) {
+            const rData = JSON.parse(rMatch[0])
+            result.presentation = {
+              reasoningScore: rData.reasoningScore,
+              reasoningFeedback: rData.reasoningFeedback,
+            }
+          }
+        } catch {
+          // reasoning grading failure is non-fatal
+        }
+      } else if (caseDifficulty === 'Advanced' && presentationText) {
+        try {
+          const oralPrompt = `You are an attending physician evaluating a trainee's oral case presentation.
+
+Case: ${caseData.patientInfo.age}yo ${caseData.patientInfo.gender}, CC: "${caseData.patientInfo.chiefComplaint}"
+Correct diagnosis: "${caseData.diagnosis}"
+Key clinical information: ${caseData.keyQuestions.join(' | ')}
+
+Trainee's oral presentation:
+"""
+${presentationText}
+"""
+
+Grade on four axes (each 0-25 points, total /100):
+1. Accuracy (0-25): Are clinical facts, findings, and the diagnosis correct and free of errors?
+2. Completeness (0-25): Are all key positive and pertinent negative findings included? Is the assessment and plan addressed?
+3. Conciseness (0-25): Is the presentation appropriately brief — signal over noise, no unnecessary repetition?
+4. Safety (0-25): Would this presentation prompt safe, appropriate management? Are critical findings flagged? Are dangerous diagnoses appropriately excluded?
+
+Return ONLY valid JSON:
+{
+  "scores": {
+    "accuracy": <integer 0-25>,
+    "completeness": <integer 0-25>,
+    "conciseness": <integer 0-25>,
+    "safety": <integer 0-25>
+  },
+  "presentationTotal": <sum of the four scores>,
+  "presentationFeedback": "<3-4 sentences of direct narrative feedback on the overall presentation quality>",
+  "criticalMisses": ["<critical finding or safety issue that was omitted or misrepresented>", ...or empty array if none]
+}`
+          const oText = await callClaude(gradingSystem, [{ role: 'user', content: oralPrompt }], 600)
+          const oMatch = oText.match(/\{[\s\S]*\}/)
+          if (oMatch) {
+            const oData = JSON.parse(oMatch[0])
+            result.presentation = {
+              scores: oData.scores,
+              presentationTotal: oData.presentationTotal,
+              presentationFeedback: oData.presentationFeedback,
+              criticalMisses: oData.criticalMisses,
+            }
+          }
+        } catch {
+          // oral grading failure is non-fatal
+        }
+      }
+
       setGradingResult(result)
       return result
     } catch {
@@ -1046,23 +1150,61 @@ Return:
                 <div className="space-y-4">
                   <div>
                     <label className="mb-2 block text-sm text-gray-400">
-                      Enter your primary diagnosis:
+                      Primary diagnosis:
                     </label>
                     <input
                       type="text"
                       value={userDiagnosis}
                       onChange={e => setUserDiagnosis(e.target.value)}
-                      onKeyDown={e => e.key === 'Enter' && submitDiagnosis()}
+                      onKeyDown={e => e.key === 'Enter' && caseDifficulty === 'Foundations' && submitDiagnosis()}
                       placeholder="e.g., Acute ST-elevation myocardial infarction"
                       className="w-full rounded-md border border-gray-600 bg-gray-900 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 focus:border-blue-500 focus:outline-none"
                     />
                   </div>
+
+                  {caseDifficulty === 'Clinical' && (
+                    <div>
+                      <label className="mb-2 block text-sm text-gray-400">
+                        Clinical Reasoning <span className="text-gray-600">(required)</span>
+                      </label>
+                      <textarea
+                        value={userPresentation}
+                        onChange={e => setUserPresentation(e.target.value)}
+                        placeholder="Explain why the evidence supports your diagnosis. Discuss how you weighed the history, exam, and test results. Acknowledge key differentials and why you ruled them out."
+                        rows={5}
+                        className="w-full rounded-md border border-gray-600 bg-gray-900 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 focus:border-blue-500 focus:outline-none resize-y"
+                      />
+                    </div>
+                  )}
+
+                  {caseDifficulty === 'Advanced' && (
+                    <div>
+                      <label className="mb-2 flex items-center justify-between text-sm text-gray-400">
+                        <span>Oral Presentation <span className="text-gray-600">(required)</span></span>
+                        <span className={`text-xs tabular-nums ${userPresentation.trim().split(/\s+/).filter(Boolean).length < 50 ? 'text-gray-600' : 'text-gray-400'}`}>
+                          {userPresentation.trim() === '' ? 0 : userPresentation.trim().split(/\s+/).filter(Boolean).length} words
+                        </span>
+                      </label>
+                      <textarea
+                        value={userPresentation}
+                        onChange={e => setUserPresentation(e.target.value)}
+                        placeholder={`Structure your presentation:\n\n"[Name] is a [age]yo [gender] presenting with [chief complaint]..."\n\nInclude: HPI summary → pertinent positives/negatives → relevant PMH/meds/allergies → vitals → exam findings → labs/imaging → assessment with reasoning → plan"`}
+                        rows={8}
+                        className="w-full rounded-md border border-gray-600 bg-gray-900 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 focus:border-blue-500 focus:outline-none resize-y font-mono leading-relaxed"
+                      />
+                    </div>
+                  )}
+
                   <p className="text-xs text-gray-500 italic">
                     Tip: Consider including the underlying cause in your diagnosis (e.g. &quot;X secondary to Y&quot;)
                   </p>
                   <button
                     onClick={() => submitDiagnosis()}
-                    disabled={!userDiagnosis.trim() || gradingLoading}
+                    disabled={
+                      !userDiagnosis.trim() ||
+                      gradingLoading ||
+                      ((caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') && !userPresentation.trim())
+                    }
                     className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
                   >
                     {gradingLoading ? 'Grading...' : 'Submit Diagnosis'}
@@ -1095,6 +1237,79 @@ Return:
                   </div>
                   <p className="text-sm leading-relaxed text-gray-300">{gradingResult.feedback}</p>
                 </div>
+
+                {/* Clinical Reasoning feedback (Clinical difficulty) */}
+                {gradingResult.presentation?.reasoningScore !== undefined && (
+                  <SectionCard title="Clinical Reasoning">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className={`text-2xl font-bold ${gradingResult.presentation.reasoningScore >= 7 ? 'text-green-400' : gradingResult.presentation.reasoningScore >= 5 ? 'text-yellow-400' : 'text-red-400'}`}>
+                        {gradingResult.presentation.reasoningScore}/10
+                      </div>
+                      <div className="flex-1 rounded-full bg-gray-700 h-2">
+                        <div
+                          className={`h-2 rounded-full transition-all ${gradingResult.presentation.reasoningScore >= 7 ? 'bg-green-500' : gradingResult.presentation.reasoningScore >= 5 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                          style={{ width: `${gradingResult.presentation.reasoningScore * 10}%` }}
+                        />
+                      </div>
+                    </div>
+                    {gradingResult.presentation.reasoningFeedback && (
+                      <p className="text-sm leading-relaxed text-gray-300">{gradingResult.presentation.reasoningFeedback}</p>
+                    )}
+                  </SectionCard>
+                )}
+
+                {/* Oral Presentation feedback (Advanced difficulty) */}
+                {gradingResult.presentation?.scores && (
+                  <SectionCard title="Oral Presentation">
+                    <div className="mb-4 flex items-center gap-3">
+                      <div className={`text-2xl font-bold ${(gradingResult.presentation.presentationTotal ?? 0) >= 70 ? 'text-green-400' : (gradingResult.presentation.presentationTotal ?? 0) >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
+                        {gradingResult.presentation.presentationTotal ?? 0}/100
+                      </div>
+                      <span className="text-xs text-gray-500">Overall Presentation Score</span>
+                    </div>
+                    <div className="grid grid-cols-2 gap-3 mb-4">
+                      {(
+                        [
+                          ['Accuracy', gradingResult.presentation.scores.accuracy],
+                          ['Completeness', gradingResult.presentation.scores.completeness],
+                          ['Conciseness', gradingResult.presentation.scores.conciseness],
+                          ['Safety', gradingResult.presentation.scores.safety],
+                        ] as [string, number][]
+                      ).map(([axis, score]) => (
+                        <div key={axis} className="rounded-md bg-gray-900 p-3">
+                          <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{axis}</div>
+                          <div className="flex items-center gap-2">
+                            <span className={`text-lg font-bold ${score >= 18 ? 'text-green-400' : score >= 12 ? 'text-yellow-400' : 'text-red-400'}`}>
+                              {score}/25
+                            </span>
+                            <div className="flex-1 rounded-full bg-gray-700 h-1.5">
+                              <div
+                                className={`h-1.5 rounded-full ${score >= 18 ? 'bg-green-500' : score >= 12 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                                style={{ width: `${(score / 25) * 100}%` }}
+                              />
+                            </div>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {gradingResult.presentation.presentationFeedback && (
+                      <p className="text-sm leading-relaxed text-gray-300 mb-3">{gradingResult.presentation.presentationFeedback}</p>
+                    )}
+                    {gradingResult.presentation.criticalMisses && gradingResult.presentation.criticalMisses.length > 0 && (
+                      <div className="mt-3 rounded-md border border-red-800 bg-red-950/30 p-3">
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-red-400">Critical Misses</div>
+                        <ul className="space-y-1">
+                          {gradingResult.presentation.criticalMisses.map((miss, i) => (
+                            <li key={i} className="flex gap-2 text-sm text-red-300">
+                              <span className="flex-shrink-0">!</span>
+                              {miss}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </SectionCard>
+                )}
 
                 {/* What you did well */}
                 {gradingResult.strengths?.length > 0 && (
@@ -1155,6 +1370,7 @@ Return:
                   onClick={() => {
                     setGradingResult(null)
                     setUserDiagnosis('')
+                    setUserPresentation('')
                   }}
                   className="w-full rounded-md border border-gray-600 px-4 py-2 text-sm text-gray-400 hover:border-gray-400 hover:text-gray-200 transition-colors"
                 >
