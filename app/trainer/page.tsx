@@ -4258,7 +4258,7 @@ Student message: "${msg}"`
               <div className="flex h-full flex-col items-center justify-center gap-5 text-center">
                 <div className="h-20 w-20 rounded-full bg-surface-2 flex items-center justify-center text-4xl border border-surface-4">🏥</div>
                 <div>
-                  <h1 className="font-serif text-2xl font-semibold text-ink-primary">Medical Diagnosis Trainer</h1>
+                  <h1 className="font-serif text-2xl font-semibold text-ink-primary">MedTrainer</h1>
                   <p className="mt-2 text-[13px] text-ink-secondary max-w-md">Select a system and difficulty, then generate a clinical case to begin your diagnostic journey.</p>
                 </div>
                 <button

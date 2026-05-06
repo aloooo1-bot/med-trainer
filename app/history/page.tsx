@@ -1,8 +1,11 @@
 'use client'
 
 import { useState, useEffect, useMemo, Fragment } from 'react'
-import { type CaseSessionRecord, loadSessionRecords } from '../lib/analytics'
+import '@/app/dashboard.css'
+import { type CaseSessionRecord, type APICallRecord, loadSessionRecords } from '../lib/analytics'
 import type { GradingResult } from '../grading/types'
+import { createClient } from '../lib/supabase/client'
+import Sidebar from '@/app/components/dashboard/Sidebar'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -19,24 +22,16 @@ function fmtElapsed(s: number): string {
   return sec > 0 ? `${m}m ${sec}s` : `${m}m`
 }
 
-function scoreColor(score: number, max = 100): string {
-  const pct = score / max
-  if (pct >= 0.8) return 'text-green-400'
-  if (pct >= 0.6) return 'text-yellow-400'
-  return 'text-red-400'
-}
-
-function barColor(score: number, max: number): string {
-  const pct = score / max
-  if (pct >= 0.8) return 'bg-green-500'
-  if (pct >= 0.6) return 'bg-yellow-500'
-  return 'bg-red-500'
+function scoreColorVar(score: number): string {
+  if (score >= 75) return 'var(--green)'
+  if (score >= 60) return 'var(--amber)'
+  return 'var(--red)'
 }
 
 const DIFFICULTY_COLOR: Record<string, string> = {
-  Foundations: 'text-green-400',
-  Clinical: 'text-yellow-400',
-  Advanced: 'text-red-400',
+  Foundations: 'var(--green)',
+  Clinical: 'var(--amber)',
+  Advanced: 'var(--red)',
 }
 
 const DIM_META: { key: keyof NonNullable<GradingResult['dimensions']>; label: string; max: number }[] = [
@@ -47,70 +42,66 @@ const DIM_META: { key: keyof NonNullable<GradingResult['dimensions']>; label: st
   { key: 'clinicalReasoning',     label: 'Clinical Reasoning',     max: 14 },
 ]
 
-// ── Scorecard detail (expanded row) ──────────────────────────────────────────
+// ── Scorecard detail ──────────────────────────────────────────────────────────
 
-function ScoreDetail({ session }: { session: CaseSessionRecord }) {
+function ScoreDetail({ session, isPro }: { session: CaseSessionRecord; isPro: boolean }) {
   const gr = session.gradingResult
 
   if (!gr) {
     return (
-      <p className="text-xs text-gray-600 italic">
-        Detailed scorecard not available for this session — recorded before scorecard storage was added.
+      <p style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic' }}>
+        Detailed scorecard not available for this session.
       </p>
     )
   }
 
   return (
-    <div className="grid gap-5 md:grid-cols-2">
+    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
 
-      {/* Left column: feedback + dimensions */}
-      <div className="space-y-4">
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {gr.feedback && (
-          <p className="text-sm text-gray-300 leading-relaxed">{gr.feedback}</p>
+          <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>{gr.feedback}</p>
         )}
 
         {gr.dimensions && (
-          <div className="space-y-3">
-            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">Scorecard</div>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>
+              Scorecard
+            </div>
             {DIM_META.map(({ key, label, max }) => {
               const dim = gr.dimensions![key]
+              const pct = (dim.score / max) * 100
               return (
-                <div key={key} className="space-y-1">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-gray-400">{label}</span>
-                    <span className={`tabular-nums font-semibold ${scoreColor(dim.score, max)}`}>
-                      {dim.score}<span className="text-gray-600">/{max}</span>
+                <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                    <span style={{ color: 'var(--text-secondary)' }}>{label}</span>
+                    <span style={{ fontWeight: 600, fontFamily: 'DM Mono, monospace', color: scoreColorVar(dim.score / max * 100) }}>
+                      {dim.score}<span style={{ color: 'var(--muted)' }}>/{max}</span>
                     </span>
                   </div>
-                  <div className="h-1.5 rounded-full bg-gray-700 overflow-hidden">
-                    <div
-                      className={`h-full rounded-full ${barColor(dim.score, max)}`}
-                      style={{ width: `${(dim.score / max) * 100}%` }}
-                    />
+                  <div style={{ height: 6, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                    <div style={{ height: '100%', width: `${pct}%`, borderRadius: 3, background: scoreColorVar(pct) }} />
                   </div>
                   {dim.feedback && (
-                    <p className="text-xs text-gray-500 leading-snug">{dim.feedback}</p>
+                    <p style={{ margin: 0, fontSize: 11, color: 'var(--muted)', lineHeight: 1.4 }}>{dim.feedback}</p>
                   )}
                 </div>
               )
             })}
 
             {gr.efficiency && gr.efficiency.score > 0 && (
-              <div className="space-y-1">
-                <div className="flex items-center justify-between text-xs">
-                  <span className="text-gray-400">Efficiency</span>
-                  <span className={`tabular-nums font-semibold ${scoreColor(gr.efficiency.score, 10)}`}>
-                    {gr.efficiency.score}<span className="text-gray-600">/10</span>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                  <span style={{ color: 'var(--text-secondary)' }}>Efficiency</span>
+                  <span style={{ fontWeight: 600, fontFamily: 'DM Mono, monospace', color: scoreColorVar(gr.efficiency.score * 10) }}>
+                    {gr.efficiency.score}<span style={{ color: 'var(--muted)' }}>/10</span>
                   </span>
                 </div>
-                <div className="h-1.5 rounded-full bg-gray-700 overflow-hidden">
-                  <div
-                    className={`h-full rounded-full ${barColor(gr.efficiency.score, 10)}`}
-                    style={{ width: `${(gr.efficiency.score / 10) * 100}%` }}
-                  />
+                <div style={{ height: 6, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                  <div style={{ height: '100%', width: `${gr.efficiency.score * 10}%`, borderRadius: 3, background: scoreColorVar(gr.efficiency.score * 10) }} />
                 </div>
                 {gr.efficiency.feedback && (
-                  <p className="text-xs text-gray-500 leading-snug">{gr.efficiency.feedback}</p>
+                  <p style={{ margin: 0, fontSize: 11, color: 'var(--muted)', lineHeight: 1.4 }}>{gr.efficiency.feedback}</p>
                 )}
               </div>
             )}
@@ -118,238 +109,333 @@ function ScoreDetail({ session }: { session: CaseSessionRecord }) {
         )}
       </div>
 
-      {/* Right column: strengths, missed, teaching points */}
-      <div className="space-y-4">
-        {(gr.strengths?.length ?? 0) > 0 && (
-          <div className="space-y-1">
-            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">Strengths</div>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        {isPro && (gr.strengths?.length ?? 0) > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Strengths</div>
             {gr.strengths.map((s, i) => (
-              <div key={i} className="flex items-start gap-2 text-xs text-green-400">
-                <span className="mt-px shrink-0 text-green-600">✓</span>
-                <span>{s}</span>
+              <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--green)' }}>
+                <span style={{ flexShrink: 0 }}>✓</span><span>{s}</span>
               </div>
             ))}
           </div>
         )}
 
-        {(gr.missedQuestions?.length ?? 0) > 0 && (
-          <div className="space-y-1">
-            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">Missed Questions</div>
+        {isPro && (gr.missedQuestions?.length ?? 0) > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Missed Questions</div>
             {gr.missedQuestions.map((q, i) => (
-              <div key={i} className="flex items-start gap-2 text-xs text-yellow-400">
-                <span className="mt-px shrink-0 text-yellow-700">·</span>
-                <span>{q}</span>
+              <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--amber)' }}>
+                <span style={{ flexShrink: 0 }}>·</span><span>{q}</span>
               </div>
             ))}
           </div>
         )}
 
-        {(gr.teachingPoints?.length ?? 0) > 0 && (
-          <div className="space-y-1">
-            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">Teaching Points</div>
+        {isPro && (gr.teachingPoints?.length ?? 0) > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Teaching Points</div>
             {gr.teachingPoints.map((tp, i) => (
-              <div key={i} className="flex items-start gap-2 text-xs text-blue-300">
-                <span className="mt-px shrink-0 text-blue-700">·</span>
-                <span>{tp}</span>
+              <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--accent)' }}>
+                <span style={{ flexShrink: 0 }}>·</span><span>{tp}</span>
               </div>
             ))}
           </div>
         )}
 
-        {(gr.differentials?.length ?? 0) > 0 && (
-          <div className="space-y-1">
-            <div className="text-xs font-semibold uppercase tracking-wider text-gray-500">Differentials</div>
+        {isPro && (gr.differentials?.length ?? 0) > 0 && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Differentials</div>
             {gr.differentials.map((d, i) => (
-              <div key={i} className="flex items-start gap-2 text-xs text-gray-400">
-                <span className="mt-px shrink-0 text-gray-600">·</span>
-                <span>{d}</span>
+              <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--text-secondary)' }}>
+                <span style={{ flexShrink: 0, color: 'var(--muted)' }}>·</span><span>{d}</span>
               </div>
             ))}
           </div>
         )}
 
-        <div className="flex flex-wrap gap-3 text-xs text-gray-600 pt-1 border-t border-gray-800/60">
+        {!isPro && (
+          <div style={{ borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', padding: 12, textAlign: 'center' }}>
+            <p style={{ margin: 0, fontSize: 12, color: 'var(--muted)' }}>Teaching points, strengths &amp; differentials available on Pro.</p>
+          </div>
+        )}
+
+        <div style={{ display: 'flex', gap: 16, fontSize: 11, color: 'var(--muted)', paddingTop: 8, borderTop: '1px solid var(--border)' }}>
           <span>Time: {fmtElapsed(session.elapsedSeconds)}</span>
-          <span>Questions asked: {session.questionCount}</span>
+          <span>Questions: {session.questionCount}</span>
         </div>
       </div>
     </div>
   )
 }
 
+// ── Supabase row → CaseSessionRecord ─────────────────────────────────────────
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function rowToRecord(row: any): CaseSessionRecord {
+  return {
+    id: row.id,
+    startedAt: new Date(row.started_at).getTime(),
+    completedAt: new Date(row.completed_at).getTime(),
+    system: row.system,
+    difficulty: row.difficulty,
+    diagnosis: row.diagnosis,
+    userDiagnosis: row.user_diagnosis,
+    correct: row.correct,
+    score: row.score,
+    questionCount: row.question_count,
+    elapsedSeconds: row.elapsed_seconds,
+    totalCostUSD: row.total_cost_usd ?? 0,
+    totalInputTokens: row.total_input_tokens ?? 0,
+    totalOutputTokens: row.total_output_tokens ?? 0,
+    apiCalls: (row.api_calls as APICallRecord[]) ?? [],
+    gradingResult: row.grading_result as GradingResult | undefined,
+  }
+}
+
 // ── Main page ─────────────────────────────────────────────────────────────────
 
+const DIFF_FILTERS = ['All', 'Foundations', 'Clinical', 'Advanced'] as const
+type DiffFilter = typeof DIFF_FILTERS[number]
+
 export default function HistoryPage() {
-  const [sessions, setSessions] = useState<CaseSessionRecord[]>([])
-  const [loaded, setLoaded] = useState(false)
+  const [sessions, setSessions]     = useState<CaseSessionRecord[]>([])
+  const [loaded, setLoaded]         = useState(false)
   const [expandedId, setExpandedId] = useState<string | null>(null)
+  const [source, setSource]         = useState<'cloud' | 'local'>('local')
+  const [isPro, setIsPro]           = useState(false)
+  const [diffFilter, setDiffFilter] = useState<DiffFilter>('All')
+  const [displayName, setDisplayName] = useState('User')
+  const [tier, setTier]             = useState('free')
 
   useEffect(() => {
-    const all = loadSessionRecords()
-    setSessions([...all].reverse().slice(0, 50))
-    setLoaded(true)
+    async function load() {
+      const supabase = createClient()
+      const { data: { user } } = await supabase.auth.getUser()
+
+      if (user) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data: profile } = await (supabase as any).from('profiles').select('tier, display_name').eq('id', user.id).single()
+        setIsPro(profile?.tier === 'pro')
+        setTier(profile?.tier ?? 'free')
+        setDisplayName(profile?.display_name ?? user.email?.split('@')[0] ?? 'User')
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const { data } = await (supabase as any)
+          .from('case_sessions')
+          .select('*')
+          .order('completed_at', { ascending: false })
+          .limit(50)
+        if (data && data.length > 0) {
+          setSessions(data.map(rowToRecord))
+          setSource('cloud')
+          setLoaded(true)
+          return
+        }
+      }
+
+      const all = loadSessionRecords()
+      setSessions([...all].reverse().slice(0, 50))
+      setSource('local')
+      setLoaded(true)
+    }
+    load()
   }, [])
 
-  const stats = useMemo(() => {
-    if (sessions.length === 0) return null
-    const correct = sessions.filter(s => s.correct).length
-    const avgScore = sessions.reduce((a, s) => a + s.score, 0) / sessions.length
-    const sysCount: Record<string, number> = {}
-    for (const s of sessions) sysCount[s.system] = (sysCount[s.system] ?? 0) + 1
-    const mostPracticed = Object.entries(sysCount).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—'
-    return { total: sessions.length, correct, accuracy: correct / sessions.length, avgScore, mostPracticed }
+  useEffect(() => {
+    if (!loaded || !sessions.length) return
+    const target = new URLSearchParams(window.location.search).get('expand')
+    if (!target || !sessions.some(s => s.id === target)) return
+    setExpandedId(target)
+    requestAnimationFrame(() =>
+      document.getElementById(`session-${target}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    )
+  }, [loaded, sessions.length])
+
+  const filtered = useMemo(
+    () => diffFilter === 'All' ? sessions : sessions.filter(s => s.difficulty === diffFilter),
+    [sessions, diffFilter]
+  )
+
+  const diffCounts = useMemo(() => {
+    const counts: Record<string, number> = {}
+    for (const s of sessions) counts[s.difficulty] = (counts[s.difficulty] ?? 0) + 1
+    return counts
   }, [sessions])
+
+  const stats = useMemo(() => {
+    if (filtered.length === 0) return null
+    const avgScore = filtered.reduce((a, s) => a + s.score, 0) / filtered.length
+    const sysCount: Record<string, number> = {}
+    for (const s of filtered) sysCount[s.system] = (sysCount[s.system] ?? 0) + 1
+    const mostPracticed = Object.entries(sysCount).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—'
+    return { total: filtered.length, avgScore, mostPracticed }
+  }, [filtered])
 
   if (!loaded) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center text-gray-500 text-sm">
-        Loading…
+      <div className="dx-root" style={{ alignItems: 'center', justifyContent: 'center' }}>
+        <Sidebar displayName={displayName} tier={tier} activePage="case-history" />
+        <div className="dx-main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ color: 'var(--muted)', fontSize: 14 }}>Loading…</span>
+        </div>
       </div>
     )
   }
 
   if (sessions.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
-        <div className="text-center">
-          <div className="text-4xl mb-4">📋</div>
-          <p className="text-gray-400 text-sm mb-1">No completed cases yet.</p>
-          <p className="text-gray-600 text-xs mb-6">
-            Generate a case and submit your diagnosis to start building your history.
-          </p>
-          <a href="/" className="text-xs text-blue-400 hover:text-blue-300 underline">
-            ← Back to trainer
-          </a>
+      <div className="dx-root">
+        <Sidebar displayName={displayName} tier={tier} activePage="case-history" />
+        <div className="dx-main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 4px' }}>No completed cases yet.</p>
+            <p style={{ color: 'var(--muted)', fontSize: 12, margin: '0 0 24px' }}>
+              Complete a case to start building your history.
+            </p>
+            <a href="/trainer" style={{ fontSize: 13, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>
+              Start a case →
+            </a>
+          </div>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-200">
-      <header className="border-b border-gray-800 bg-gray-900 px-6 py-4 flex items-center justify-between">
-        <div>
-          <h1 className="text-base font-bold text-gray-100">Case History</h1>
-          <p className="text-xs text-gray-500 mt-0.5">
-            {sessions.length === 50 ? 'Last 50 completed cases' : `${sessions.length} completed case${sessions.length !== 1 ? 's' : ''}`}
-          </p>
-        </div>
-        <a
-          href="/"
-          className="text-xs text-gray-500 hover:text-gray-300 border border-gray-700 rounded px-3 py-1.5 transition-colors"
-        >
-          ← Trainer
-        </a>
-      </header>
+    <div className="dx-root">
+      <Sidebar displayName={displayName} tier={tier} activePage="case-history" />
 
-      <main className="max-w-5xl mx-auto p-6 space-y-6">
+      <div className="dx-main">
+        <div className="dx-content" style={{ paddingTop: 32 }}>
 
-        {/* Summary stats */}
-        {stats && (
-          <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
-            {[
-              { label: 'Cases completed', value: stats.total.toString() },
-              { label: 'Average score', value: `${stats.avgScore.toFixed(1)} / 100` },
-              { label: 'Accuracy', value: `${(stats.accuracy * 100).toFixed(0)}%` },
-              { label: 'Most practiced', value: stats.mostPracticed },
-            ].map(({ label, value }) => (
-              <div key={label} className="rounded-lg border border-gray-800 bg-gray-900 p-4">
-                <div className="text-xs text-gray-500 mb-1">{label}</div>
-                <div className="text-lg font-bold text-gray-100 leading-tight">{value}</div>
-              </div>
-            ))}
+          {/* Page title */}
+          <div style={{ marginBottom: 24 }}>
+            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'DM Serif Display, serif' }}>
+              Case History
+            </h1>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--muted)' }}>
+              {sessions.length === 50 ? 'Last 50 completed cases' : `${sessions.length} completed case${sessions.length !== 1 ? 's' : ''}`}
+            </p>
           </div>
-        )}
 
-        {/* Cases table */}
-        <div className="rounded-lg border border-gray-800 bg-gray-900 overflow-hidden">
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-800 text-xs text-gray-500 uppercase tracking-wide">
-                <th className="px-4 py-3 text-left font-medium">Date</th>
-                <th className="px-3 py-3 text-left font-medium">System</th>
-                <th className="px-3 py-3 text-left font-medium">Level</th>
-                <th className="px-3 py-3 text-right font-medium">Score</th>
-                <th className="px-3 py-3 text-left font-medium">Result</th>
-                <th className="px-3 py-3 text-left font-medium hidden sm:table-cell">Your Diagnosis</th>
-                <th className="px-4 py-3 text-left font-medium hidden sm:table-cell">Correct Diagnosis</th>
-                <th className="px-3 py-3 w-6" />
-              </tr>
-            </thead>
-            <tbody>
-              {sessions.map(session => {
+          {/* Stats row */}
+          {stats && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+              {[
+                { label: 'Completed', value: stats.total.toString() },
+                { label: 'Avg Score', value: stats.avgScore.toFixed(1), color: scoreColorVar(stats.avgScore) },
+                { label: 'Most Practiced', value: stats.mostPracticed },
+              ].map(({ label, value, color }) => (
+                <div key={label} className="dx-card" style={{ padding: '16px 20px' }}>
+                  <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</div>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: color ?? 'var(--text-primary)', fontFamily: 'DM Mono, monospace' }}>{value}</div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* Difficulty filter chips */}
+          <div className="dx-filter-chips" style={{ marginBottom: 20 }}>
+            {DIFF_FILTERS.map(d => {
+              const count = d === 'All' ? sessions.length : (diffCounts[d] ?? 0)
+              return (
+                <button
+                  key={d}
+                  className={`dx-chip${diffFilter === d ? ' active' : ''}`}
+                  onClick={() => { setDiffFilter(d); setExpandedId(null) }}
+                >
+                  {d}{count > 0 && ` (${count})`}
+                </button>
+              )
+            })}
+          </div>
+
+          {/* Table */}
+          {filtered.length === 0 ? (
+            <div className="dx-card" style={{ padding: 32, textAlign: 'center' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 8px' }}>No {diffFilter} cases yet.</p>
+              <a href={`/trainer?difficulty=${encodeURIComponent(diffFilter)}`}
+                style={{ fontSize: 13, color: 'var(--accent)', textDecoration: 'none' }}>
+                Start a {diffFilter} case →
+              </a>
+            </div>
+          ) : (
+            <div className="dx-card" style={{ padding: 0, overflow: 'hidden' }}>
+              {/* Table header */}
+              <div className="dx-table-header">
+                <span>Date</span>
+                <span>System</span>
+                <span>Level</span>
+                <span>Score</span>
+                <span>Result</span>
+                <span>Your Diagnosis</span>
+                <span>Correct Diagnosis</span>
+                <span />
+              </div>
+
+              {filtered.map(session => {
                 const isExpanded = expandedId === session.id
                 return (
                   <Fragment key={session.id}>
-                    <tr
+                    <div
+                      id={`session-${session.id}`}
+                      className="dx-table-row"
                       onClick={() => setExpandedId(isExpanded ? null : session.id)}
-                      className={`border-b border-gray-800/50 cursor-pointer select-none transition-colors ${
-                        isExpanded ? 'bg-gray-800/40' : 'hover:bg-gray-800/20'
-                      }`}
                     >
-                      <td className="px-4 py-3 text-xs text-gray-500 whitespace-nowrap">
+                      <span style={{ color: 'var(--muted)', fontSize: 12, whiteSpace: 'nowrap' }}>
                         {fmtDate(session.startedAt)}
-                      </td>
-                      <td className="px-3 py-3 text-xs text-gray-400 max-w-[90px] truncate">
+                      </span>
+                      <span style={{ fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {session.system}
-                      </td>
-                      <td className={`px-3 py-3 text-xs font-semibold ${DIFFICULTY_COLOR[session.difficulty] ?? 'text-gray-400'}`}>
-                        {session.difficulty.slice(0, 4)}
-                      </td>
-                      <td className={`px-3 py-3 text-right text-sm font-bold tabular-nums ${scoreColor(session.score)}`}>
+                      </span>
+                      <span>
+                        <span style={{
+                          fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
+                          color: DIFFICULTY_COLOR[session.difficulty] ?? 'var(--text-secondary)',
+                          background: 'var(--border)',
+                        }}>
+                          {session.difficulty.slice(0, 4)}
+                        </span>
+                      </span>
+                      <span style={{ fontFamily: 'DM Mono, monospace', fontWeight: 700, color: scoreColorVar(session.score) }}>
                         {session.score}
-                      </td>
-                      <td className="px-3 py-3">
-                        <span className={`inline-block rounded px-2 py-0.5 text-xs font-semibold ${
-                          session.correct
-                            ? 'bg-green-900/40 text-green-400'
-                            : 'bg-red-900/40 text-red-400'
-                        }`}>
+                      </span>
+                      <span>
+                        <span className={`dx-result-badge ${session.correct ? 'correct' : 'incorrect'}`}>
                           {session.correct ? 'Correct' : 'Incorrect'}
                         </span>
-                      </td>
-                      <td className="px-3 py-3 text-xs text-gray-300 max-w-[160px] truncate hidden sm:table-cell"
-                          title={session.userDiagnosis}>
-                        {session.userDiagnosis}
-                      </td>
-                      <td className="px-4 py-3 text-xs text-gray-500 max-w-[160px] truncate hidden sm:table-cell"
-                          title={session.diagnosis}>
-                        {session.diagnosis}
-                      </td>
-                      <td className="px-3 py-3 text-gray-600 text-xs text-right">
+                      </span>
+                      <span className="dx-diagnosis-cell">{session.userDiagnosis}</span>
+                      <span className="dx-diagnosis-cell">{session.diagnosis}</span>
+                      <button
+                        className={`dx-expand-btn${isExpanded ? ' open' : ''}`}
+                        onClick={e => { e.stopPropagation(); setExpandedId(isExpanded ? null : session.id) }}
+                      >
                         {isExpanded ? '▲' : '▼'}
-                      </td>
-                    </tr>
+                      </button>
+                    </div>
 
                     {isExpanded && (
-                      <tr className="border-b border-gray-800/50 bg-gray-800/10">
-                        <td colSpan={8} className="px-5 py-5">
-                          {/* Show full diagnosis strings on mobile where columns are hidden */}
-                          <div className="sm:hidden mb-4 space-y-1 text-xs">
-                            <div>
-                              <span className="text-gray-500">Your diagnosis: </span>
-                              <span className="text-gray-300">{session.userDiagnosis}</span>
-                            </div>
-                            <div>
-                              <span className="text-gray-500">Correct diagnosis: </span>
-                              <span className="text-gray-400">{session.diagnosis}</span>
-                            </div>
-                          </div>
-                          <ScoreDetail session={session} />
-                        </td>
-                      </tr>
+                      <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)' }}>
+                        <ScoreDetail session={session} isPro={isPro} />
+                      </div>
                     )}
                   </Fragment>
                 )
               })}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          )}
 
-        <p className="text-[10px] text-gray-700 pb-2 text-center">
-          Showing completed cases stored in browser localStorage · History is local to this device
-        </p>
-      </main>
+          <p style={{ textAlign: 'center', fontSize: 11, color: 'var(--muted)', marginTop: 16, opacity: 0.6 }}>
+            {source === 'cloud'
+              ? 'Showing your saved cases from all devices'
+              : 'Showing cases stored in this browser · Sign in to sync across devices'
+            }
+          </p>
+        </div>
+      </div>
     </div>
   )
 }
