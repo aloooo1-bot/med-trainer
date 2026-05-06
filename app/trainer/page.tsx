@@ -432,20 +432,20 @@ function Badge({ text, color = 'blue' }: { text: string; color?: 'blue' | 'green
 function NotesResultPanel({ content }: { content: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="rounded-lg border border-yellow-900/50 bg-yellow-950/20">
+    <div className="rounded-lg border border-caution-border bg-caution-bg">
       <button
         onClick={() => setOpen(v => !v)}
         className="flex w-full items-center justify-between px-5 py-3 text-left"
       >
-        <span className="text-sm font-semibold text-yellow-400">Your Case Notes</span>
-        <svg className={`w-4 h-4 text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <span className="text-sm font-semibold text-caution">Your Case Notes</span>
+        <svg className={`w-4 h-4 text-ink-tertiary transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
       {open && (
-        <div className="border-t border-yellow-900/30 px-5 py-4">
-          <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-gray-300">{content}</pre>
-          <p className="mt-3 text-xs text-gray-500 italic border-t border-gray-800 pt-3">
+        <div className="border-t border-caution-border px-5 py-4">
+          <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-ink-secondary">{content}</pre>
+          <p className="mt-3 text-xs text-ink-tertiary italic border-t border-surface-4 pt-3">
             Compare your notes with the teaching points and differential discussion above to identify gaps in your reasoning.
           </p>
         </div>
@@ -545,8 +545,8 @@ function MicButton({
       title={listening ? 'Stop recording' : 'Dictate'}
       className={`flex-shrink-0 rounded-md border px-2 transition-colors disabled:opacity-40 disabled:cursor-not-allowed ${
         listening
-          ? 'border-red-600 bg-red-900/30 text-red-400 animate-pulse'
-          : 'border-gray-700 bg-gray-800 text-gray-500 hover:border-gray-500 hover:text-gray-300'
+          ? 'border-critical bg-critical-bg text-critical animate-pulse'
+          : 'border-surface-4 bg-surface-2 text-ink-tertiary hover:border-surface-4 hover:text-ink-secondary'
       } ${className}`}
     >
       <svg className="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
@@ -705,11 +705,11 @@ function ECGPanel({ ecgFindings, aiReport, image, diagnosisSubmitted, onZoom }: 
 
   if (image === null) {
     return (
-      <div className="bg-gray-900 px-4 py-5">
-        <div className="mb-4 flex h-48 items-center justify-center rounded bg-gray-800 text-xs text-gray-600 animate-pulse">
+      <div className="bg-surface-1 px-4 py-5">
+        <div className="mb-4 flex h-48 items-center justify-center rounded bg-surface-2 text-xs text-ink-tertiary animate-pulse">
           Loading ECG…
         </div>
-        {diagnosisSubmitted && <p className="text-sm leading-relaxed text-gray-300">{machineRead}</p>}
+        {diagnosisSubmitted && <p className="text-sm leading-relaxed text-ink-secondary">{machineRead}</p>}
       </div>
     )
   }
@@ -718,9 +718,9 @@ function ECGPanel({ ecgFindings, aiReport, image, diagnosisSubmitted, onZoom }: 
     // No library image — student has nothing to interpret visually, so show the report
     // so they aren't blocked. (Mirrors the no-image fallback in ImagingPanel.)
     return (
-      <div className="bg-gray-900 px-4 py-4 space-y-2">
-        <p className="text-sm leading-relaxed text-gray-300">{machineRead}</p>
-        <p className="text-xs italic text-gray-500">
+      <div className="bg-surface-1 px-4 py-4 space-y-2">
+        <p className="text-sm leading-relaxed text-ink-secondary">{machineRead}</p>
+        <p className="text-xs italic text-ink-tertiary">
           Reference ECG image for this rhythm pattern is not yet in our library. Use the interpretation above to guide your reasoning.
         </p>
       </div>
@@ -729,9 +729,9 @@ function ECGPanel({ ecgFindings, aiReport, image, diagnosisSubmitted, onZoom }: 
 
   const isStemi = image.path.includes('/stemi/')
   return (
-    <div className="bg-gray-900 px-4 py-4 space-y-3">
+    <div className="bg-surface-1 px-4 py-4 space-y-3">
       <div
-        className="overflow-hidden rounded border border-gray-700 cursor-zoom-in"
+        className="overflow-hidden rounded border border-surface-4 cursor-zoom-in"
         onClick={() => onZoom?.(image.path, '12-lead ECG')}
         title="Click to enlarge"
       >
@@ -742,33 +742,33 @@ function ECGPanel({ ecgFindings, aiReport, image, diagnosisSubmitted, onZoom }: 
         />
       </div>
       {!diagnosisSubmitted ? (
-        <p className="text-sm italic text-gray-500">
+        <p className="text-sm italic text-ink-tertiary">
           Interpret the ECG yourself. The machine read and clinical interpretation will appear after you submit your diagnosis.
         </p>
       ) : (
       <div className="space-y-2">
         <div>
-          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-gray-500">Machine Read</p>
-          <p className="text-sm leading-relaxed text-gray-300">{machineRead}</p>
+          <p className="mb-1 text-xs font-semibold uppercase tracking-wide text-ink-tertiary">Machine Read</p>
+          <p className="text-sm leading-relaxed text-ink-secondary">{machineRead}</p>
         </div>
-        <p className="text-xs text-yellow-600 italic">
+        <p className="text-xs text-caution italic">
           Note: this ECG is a representative tracing from the PTB-XL public dataset, selected by category. The specific leads, acuity, or morphology shown may not exactly match the findings described in this case&rsquo;s report. Trust the report above as the authoritative ground truth.
         </p>
         {isStemi && (
-          <p className="text-xs text-yellow-600 italic">
+          <p className="text-xs text-caution italic">
             STEMI specifically: PTB-XL recordings vary in acuity — some represent chronic or old MI patterns rather than hyperacute changes.
           </p>
         )}
         {image.report && (
           <div>
             <button
-              className="text-xs text-gray-500 hover:text-gray-300 transition-colors underline underline-offset-2"
+              className="text-xs text-ink-tertiary hover:text-ink-secondary transition-colors underline underline-offset-2"
               onClick={() => setSourceOpen(v => !v)}
             >
               {sourceOpen ? 'Hide' : 'View'} original cardiologist report ↕
             </button>
             {sourceOpen && (
-              <p className="mt-1 text-xs leading-relaxed text-gray-600 italic border-l-2 border-gray-700 pl-3">
+              <p className="mt-1 text-xs leading-relaxed text-ink-tertiary italic border-l-2 border-surface-4 pl-3">
                 PTB-XL dataset report (original language preserved — may be German, Portuguese, or English): {image.report}
               </p>
             )}
@@ -776,13 +776,13 @@ function ECGPanel({ ecgFindings, aiReport, image, diagnosisSubmitted, onZoom }: 
         )}
       </div>
       )}
-      <div className="text-xs text-gray-700 border-t border-gray-800 pt-2">
+      <div className="text-xs text-ink-tertiary border-t border-surface-4 pt-2">
         ECG image from{' '}
         <a
           href="https://physionet.org/content/ptb-xl/1.0.3/"
           target="_blank"
           rel="noopener noreferrer"
-          className="text-gray-600 hover:text-gray-400 transition-colors underline"
+          className="text-ink-tertiary hover:text-ink-secondary transition-colors underline"
         >
           PTB-XL dataset (PhysioNet)
         </a>
@@ -807,11 +807,11 @@ function ImagingPanel({ report, results, diagnosisSubmitted }: {
 
   if (results === null) {
     return (
-      <div className="bg-gray-900 px-4 py-5">
-        <div className="mb-4 flex h-48 items-center justify-center rounded bg-gray-800 text-xs text-gray-600 animate-pulse">
+      <div className="bg-surface-1 px-4 py-5">
+        <div className="mb-4 flex h-48 items-center justify-center rounded bg-surface-2 text-xs text-ink-tertiary animate-pulse">
           Loading imaging…
         </div>
-        {diagnosisSubmitted && <p className="text-sm leading-relaxed text-gray-300">{report}</p>}
+        {diagnosisSubmitted && <p className="text-sm leading-relaxed text-ink-secondary">{report}</p>}
       </div>
     )
   }
@@ -823,27 +823,27 @@ function ImagingPanel({ report, results, diagnosisSubmitted }: {
     const noImagesFound = results.length === 0
     const canTryNext = results.length > 1
     return (
-      <div className="bg-gray-900 px-4 py-4">
+      <div className="bg-surface-1 px-4 py-4">
         {noImagesFound ? (
           // No images in the database for this study — show report immediately so students aren't blocked
           <>
-            <p className="mb-3 text-xs italic text-gray-500">No representative image available in the database for this study.</p>
-            <p className="text-sm leading-relaxed text-gray-300">{report}</p>
+            <p className="mb-3 text-xs italic text-ink-tertiary">No representative image available in the database for this study.</p>
+            <p className="text-sm leading-relaxed text-ink-secondary">{report}</p>
           </>
         ) : (
           <>
             <div className="mb-2 flex items-center gap-3">
-              <p className="text-xs italic text-gray-600">Image failed to load.</p>
+              <p className="text-xs italic text-ink-tertiary">Image failed to load.</p>
               {canTryNext && (
                 <button
                   onClick={() => { setSelectedIdx(nextIdx); setImgError(false) }}
-                  className="text-xs text-blue-500 hover:text-blue-400 transition-colors"
+                  className="text-xs text-primary-400 hover:text-primary-400 transition-colors"
                 >
                   Try next image →
                 </button>
               )}
             </div>
-            <p className="text-sm leading-relaxed text-gray-300">{report}</p>
+            <p className="text-sm leading-relaxed text-ink-secondary">{report}</p>
           </>
         )}
       </div>
@@ -853,7 +853,7 @@ function ImagingPanel({ report, results, diagnosisSubmitted }: {
   const others = results.filter((_, i) => i !== selectedIdx).slice(0, 4)
 
   return (
-    <div className="bg-gray-900 px-4 py-4 space-y-3">
+    <div className="bg-surface-1 px-4 py-4 space-y-3">
       <div className="overflow-hidden rounded bg-black">
         <img
           src={selected.imageUrl}
@@ -868,21 +868,21 @@ function ImagingPanel({ report, results, diagnosisSubmitted }: {
             <button
               key={img.uid}
               onClick={() => { setSelectedIdx(results.indexOf(img)); setImgError(false) }}
-              className="h-14 w-14 flex-shrink-0 overflow-hidden rounded border border-gray-700 bg-black transition-colors hover:border-blue-500"
+              className="h-14 w-14 flex-shrink-0 overflow-hidden rounded border border-surface-4 bg-black transition-colors hover:border-primary-400"
             >
               <img src={img.thumbnailUrl} alt={img.caption} className="h-full w-full object-cover opacity-70 transition-opacity hover:opacity-100" />
             </button>
           ))}
         </div>
       )}
-      <div className="flex items-center justify-between text-xs text-gray-600">
+      <div className="flex items-center justify-between text-xs text-ink-tertiary">
         <div className="flex items-center gap-3">
           {selected.agentVerified ? (
             <span className="flex items-center gap-1.5">
-              <span className="rounded border border-green-700 bg-green-900/40 px-1.5 py-0.5 text-green-400">
+              <span className="rounded border border-confirmed-border bg-confirmed-bg px-1.5 py-0.5 text-confirmed">
                 AI Verified
               </span>
-              <span className="text-gray-600">NIH Open-i / NLM — image verified for this case</span>
+              <span className="text-ink-tertiary">NIH Open-i / NLM — image verified for this case</span>
             </span>
           ) : (
             <span>NIH Open-i / NLM — representative image; findings may vary from this case</span>
@@ -891,7 +891,7 @@ function ImagingPanel({ report, results, diagnosisSubmitted }: {
             href={`https://openi.nlm.nih.gov/detailedresult?img=${selected.uid}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-blue-600 transition-colors hover:text-blue-400"
+            className="text-primary-500 transition-colors hover:text-primary-400"
           >
             View source ↗
           </a>
@@ -899,16 +899,16 @@ function ImagingPanel({ report, results, diagnosisSubmitted }: {
         {results.length > 1 && (
           <button
             onClick={() => { setSelectedIdx(nextIdx); setImgError(false) }}
-            className="text-gray-500 hover:text-blue-400 transition-colors"
+            className="text-ink-tertiary hover:text-primary-400 transition-colors"
           >
             {selectedIdx + 1}/{results.length} — Try next →
           </button>
         )}
       </div>
       {diagnosisSubmitted ? (
-        <p className="border-t border-gray-700 pt-3 text-sm leading-relaxed text-gray-300">{report}</p>
+        <p className="border-t border-surface-4 pt-3 text-sm leading-relaxed text-ink-secondary">{report}</p>
       ) : (
-        <p className="border-t border-gray-700 pt-3 text-xs text-gray-500 italic">Radiology report available after you submit your diagnosis.</p>
+        <p className="border-t border-surface-4 pt-3 text-xs text-ink-tertiary italic">Radiology report available after you submit your diagnosis.</p>
       )}
     </div>
   )
@@ -934,20 +934,20 @@ function SpecialPanel({ modality, report, image, findings, onZoom }: {
 
   if (image === null) {
     return (
-      <div className="bg-gray-900 px-4 py-5">
-        <div className="mb-4 flex h-48 items-center justify-center rounded bg-gray-800 text-xs text-gray-600 animate-pulse">
+      <div className="bg-surface-1 px-4 py-5">
+        <div className="mb-4 flex h-48 items-center justify-center rounded bg-surface-2 text-xs text-ink-tertiary animate-pulse">
           Loading {SPECIAL_LABELS[modality]} image…
         </div>
-        <p className="text-sm leading-relaxed text-gray-300">{displayText}</p>
+        <p className="text-sm leading-relaxed text-ink-secondary">{displayText}</p>
       </div>
     )
   }
 
   if (image === 'none') {
     return (
-      <div className="bg-gray-900 px-4 py-4 space-y-2">
-        <p className="text-sm leading-relaxed text-gray-300">{displayText}</p>
-        <p className="text-xs italic text-gray-500">
+      <div className="bg-surface-1 px-4 py-4 space-y-2">
+        <p className="text-sm leading-relaxed text-ink-secondary">{displayText}</p>
+        <p className="text-xs italic text-ink-tertiary">
           Reference image for this finding is not yet in our library. Use the report above to guide your reasoning.
         </p>
       </div>
@@ -955,9 +955,9 @@ function SpecialPanel({ modality, report, image, findings, onZoom }: {
   }
 
   return (
-    <div className="bg-gray-900 px-4 py-4 space-y-3">
+    <div className="bg-surface-1 px-4 py-4 space-y-3">
       <div
-        className="overflow-hidden rounded border border-gray-700 bg-black cursor-zoom-in"
+        className="overflow-hidden rounded border border-surface-4 bg-black cursor-zoom-in"
         onClick={() => onZoom?.(image.path, image.label || SPECIAL_LABELS[modality])}
         title="Click to enlarge"
       >
@@ -970,19 +970,19 @@ function SpecialPanel({ modality, report, image, findings, onZoom }: {
       <div className="space-y-2">
         {image.source && (
           <button
-            className="text-xs text-gray-500 hover:text-gray-300 transition-colors underline underline-offset-2"
+            className="text-xs text-ink-tertiary hover:text-ink-secondary transition-colors underline underline-offset-2"
             onClick={() => setSourceOpen(v => !v)}
           >
             {sourceOpen ? 'Hide' : 'View'} source attribution ↕
           </button>
         )}
         {sourceOpen && image.source && (
-          <p className="text-xs leading-relaxed text-gray-600 italic border-l-2 border-gray-700 pl-3">
+          <p className="text-xs leading-relaxed text-ink-tertiary italic border-l-2 border-surface-4 pl-3">
             {image.source}
           </p>
         )}
       </div>
-      <p className="border-t border-gray-700 pt-3 text-sm leading-relaxed text-gray-300">{displayText}</p>
+      <p className="border-t border-surface-4 pt-3 text-sm leading-relaxed text-ink-secondary">{displayText}</p>
     </div>
   )
 }
@@ -1182,14 +1182,14 @@ function HelpModal({ section, onClose }: { section: string; onClose: () => void 
       onClick={onClose}
     >
       <div
-        className="mx-4 w-full max-w-md rounded-xl border border-gray-700 bg-gray-900 shadow-2xl"
+        className="mx-4 w-full max-w-md rounded-xl border border-surface-4 bg-surface-1 shadow-2xl"
         onClick={e => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-gray-800 px-5 py-4">
-          <h2 className="text-sm font-semibold text-gray-100">How to use: {content.title}</h2>
+        <div className="flex items-center justify-between border-b border-surface-4 px-5 py-4">
+          <h2 className="text-sm font-semibold text-ink-primary">How to use: {content.title}</h2>
           <button
             onClick={onClose}
-            className="flex h-6 w-6 items-center justify-center rounded text-gray-500 hover:text-gray-200 transition-colors"
+            className="flex h-6 w-6 items-center justify-center rounded text-ink-tertiary hover:text-ink-primary transition-colors"
             aria-label="Close"
           >
             <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1200,13 +1200,13 @@ function HelpModal({ section, onClose }: { section: string; onClose: () => void 
         <div className="max-h-[70vh] overflow-y-auto px-5 py-4 space-y-4">
           {content.sections.map(s => (
             <div key={s.heading}>
-              <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-blue-400">{s.heading}</h3>
-              <p className="text-sm text-gray-300 leading-relaxed">{s.body}</p>
+              <h3 className="mb-1 text-xs font-semibold uppercase tracking-wider text-primary-400">{s.heading}</h3>
+              <p className="text-sm text-ink-secondary leading-relaxed">{s.body}</p>
             </div>
           ))}
-          <div className="rounded-lg border border-blue-800/60 bg-blue-950/40 px-4 py-3">
-            <div className="mb-1 text-xs font-semibold text-blue-400">Pro tip</div>
-            <p className="text-sm text-blue-200 leading-relaxed">{content.tip}</p>
+          <div className="rounded-lg border border-primary-600/60 bg-primary-900/20 px-4 py-3">
+            <div className="mb-1 text-xs font-semibold text-primary-400">Pro tip</div>
+            <p className="text-sm text-primary-200 leading-relaxed">{content.tip}</p>
           </div>
         </div>
       </div>
@@ -2704,9 +2704,9 @@ Student message: "${msg}"`
               <SectionCard title="Background History">
                 {isGatedHPI && (
                   <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs text-gray-500">{unlockedHPICount} / {totalBgFields} background fields reviewed</span>
+                    <span className="text-xs text-ink-tertiary">{unlockedHPICount} / {totalBgFields} background fields reviewed</span>
                     {unlockedHPICount === 0 && (
-                      <span className="text-xs text-gray-600 italic">Ask the patient about their history to reveal fields</span>
+                      <span className="text-xs text-ink-tertiary italic">Ask the patient about their history to reveal fields</span>
                     )}
                   </div>
                 )}
@@ -2745,11 +2745,11 @@ Student message: "${msg}"`
           return (
             <SectionCard title="Review of Systems">
               <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-ink-tertiary">
                   {unlockedCount} / {ROS_CATEGORIES.length} systems reviewed
                 </span>
                 {unlockedCount === 0 && (
-                  <span className="text-xs text-gray-600 italic">Ask the patient about each system to reveal findings</span>
+                  <span className="text-xs text-ink-tertiary italic">Ask the patient about each system to reveal findings</span>
                 )}
               </div>
               <div className="space-y-1.5">
@@ -2762,32 +2762,32 @@ Student message: "${msg}"`
                       key={cat}
                       className={`flex gap-3 rounded-md px-3 py-2.5 ${
                         isLocked
-                          ? 'bg-gray-900/40'
+                          ? 'bg-surface-1/40'
                           : isPositive
-                          ? 'bg-yellow-950/30 border border-yellow-900/50'
-                          : 'bg-gray-900'
+                          ? 'bg-caution-bg border border-caution-border'
+                          : 'bg-surface-1'
                       }`}
                     >
                       <span className={`w-44 flex-shrink-0 text-xs font-semibold uppercase tracking-wide pt-0.5 ${
-                        isLocked ? 'text-gray-600' : isPositive ? 'text-yellow-400' : 'text-blue-400'
+                        isLocked ? 'text-ink-tertiary' : isPositive ? 'text-caution' : 'text-primary-400'
                       }`}>
                         {cat}
                       </span>
                       {isLocked ? (
-                        <span className="text-gray-600 text-sm select-none">—</span>
+                        <span className="text-ink-tertiary text-sm select-none">—</span>
                       ) : entry.derivedFinding === undefined ? (
-                        <span className="text-xs text-gray-500 italic">Recording…</span>
+                        <span className="text-xs text-ink-tertiary italic">Recording…</span>
                       ) : !gradingResult ? (
-                        <span className={`text-sm leading-relaxed ${isPositive ? 'text-yellow-100' : 'text-gray-400'}`}>
+                        <span className={`text-sm leading-relaxed ${isPositive ? 'text-caution' : 'text-ink-secondary'}`}>
                           {entry.derivedFinding}
                         </span>
                       ) : (
                         <div className="flex flex-col gap-1 min-w-0">
-                          <span className={`text-sm leading-relaxed ${isPositive ? 'text-yellow-100' : 'text-gray-300'}`}>
+                          <span className={`text-sm leading-relaxed ${isPositive ? 'text-caution' : 'text-ink-secondary'}`}>
                             {entry.derivedFinding}
                           </span>
-                          <span className="text-xs text-gray-500 italic leading-relaxed">
-                            <span className="not-italic text-gray-600 uppercase tracking-wide mr-1">Full:</span>
+                          <span className="text-xs text-ink-tertiary italic leading-relaxed">
+                            <span className="not-italic text-ink-tertiary uppercase tracking-wide mr-1">Full:</span>
                             {entry.finding}
                           </span>
                         </div>
@@ -2803,9 +2803,9 @@ Student message: "${msg}"`
           <SectionCard title="Review of Systems">
             <div className="space-y-1.5">
               {Object.entries(caseData.reviewOfSystems).map(([cat, findings]) => (
-                <div key={cat} className="flex gap-3 rounded-md bg-gray-900 px-3 py-2.5">
-                  <span className="w-44 flex-shrink-0 text-xs font-semibold text-blue-400 uppercase tracking-wide pt-0.5">{cat}</span>
-                  <span className="text-sm text-gray-300">{findings}</span>
+                <div key={cat} className="flex gap-3 rounded-md bg-surface-1 px-3 py-2.5">
+                  <span className="w-44 flex-shrink-0 text-xs font-semibold text-primary-400 uppercase tracking-wide pt-0.5">{cat}</span>
+                  <span className="text-sm text-ink-secondary">{findings}</span>
                 </div>
               ))}
             </div>
@@ -2818,9 +2818,9 @@ Student message: "${msg}"`
           <SectionCard title="Physical Examination">
             <div className="space-y-3">
               {Object.entries(caseData.physicalExam).map(([system, findings]) => (
-                <div key={system} className="flex gap-3 rounded-md bg-gray-900 p-3">
-                  <span className="w-36 flex-shrink-0 text-xs font-semibold text-blue-400 uppercase tracking-wide pt-0.5">{system}</span>
-                  <span className="text-sm text-gray-300">{findings}</span>
+                <div key={system} className="flex gap-3 rounded-md bg-surface-1 p-3">
+                  <span className="w-36 flex-shrink-0 text-xs font-semibold text-primary-400 uppercase tracking-wide pt-0.5">{system}</span>
+                  <span className="text-sm text-ink-secondary">{findings}</span>
                 </div>
               ))}
             </div>
@@ -2839,9 +2839,9 @@ Student message: "${msg}"`
                     const isOrdered = allOrdered(lab)
                     const isSelected = selectedTests.has(lab)
                     return (
-                      <label key={lab} className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${isOrdered ? 'border-green-700 bg-green-900/20 cursor-default' : isSelected ? 'border-blue-500 bg-blue-900/20' : 'border-gray-700 bg-gray-900 hover:border-gray-500'}`}>
-                        <input type="checkbox" checked={isSelected || isOrdered} disabled={isOrdered} onChange={() => !isOrdered && toggleTest(lab)} className="accent-blue-500" />
-                        <span className="text-sm text-gray-200">{lab}</span>
+                      <label key={lab} className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${isOrdered ? 'border-confirmed-border bg-confirmed-bg cursor-default' : isSelected ? 'border-primary-400 bg-primary-900/20' : 'border-surface-4 bg-surface-1 hover:border-surface-4'}`}>
+                        <input type="checkbox" checked={isSelected || isOrdered} disabled={isOrdered} onChange={() => !isOrdered && toggleTest(lab)} className="accent-primary-500" />
+                        <span className="text-sm text-ink-primary">{lab}</span>
                         {isOrdered && <Badge text="Ordered" color="green" />}
                       </label>
                     )
@@ -2854,17 +2854,17 @@ Student message: "${msg}"`
                     const isOrdered = allOrdered(img)
                     const isSelected = selectedTests.has(img)
                     return (
-                      <label key={img} className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${isOrdered ? 'border-green-700 bg-green-900/20 cursor-default' : isSelected ? 'border-blue-500 bg-blue-900/20' : 'border-gray-700 bg-gray-900 hover:border-gray-500'}`}>
-                        <input type="checkbox" checked={isSelected || isOrdered} disabled={isOrdered} onChange={() => !isOrdered && toggleTest(img)} className="accent-blue-500" />
-                        <span className="text-sm text-gray-200">{img}</span>
+                      <label key={img} className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${isOrdered ? 'border-confirmed-border bg-confirmed-bg cursor-default' : isSelected ? 'border-primary-400 bg-primary-900/20' : 'border-surface-4 bg-surface-1 hover:border-surface-4'}`}>
+                        <input type="checkbox" checked={isSelected || isOrdered} disabled={isOrdered} onChange={() => !isOrdered && toggleTest(img)} className="accent-primary-500" />
+                        <span className="text-sm text-ink-primary">{img}</span>
                         {isOrdered && <Badge text="Ordered" color="green" />}
                       </label>
                     )
                   })}
                 </div>
               </SectionCard>
-              <div className="rounded-lg border border-gray-700 bg-gray-800 p-3">
-                <p className="text-xs text-gray-400 mb-2">Order a custom test not listed above:</p>
+              <div className="rounded-lg border border-surface-4 bg-surface-2 p-3">
+                <p className="text-xs text-ink-secondary mb-2">Order a custom test not listed above:</p>
                 <div className="flex gap-2">
                   <input
                     type="text"
@@ -2872,17 +2872,17 @@ Student message: "${msg}"`
                     onChange={e => setCustomTestInput(e.target.value)}
                     onKeyDown={e => { if (e.key === 'Enter') orderCustomTest() }}
                     placeholder="e.g. Factor VIII Activity, Knee MRI..."
-                    className="flex-1 rounded-md border border-gray-600 bg-gray-900 px-3 py-2 text-sm text-gray-100 placeholder-gray-500 focus:border-blue-500 focus:outline-none"
+                    className="flex-1 rounded-md border border-surface-5 bg-surface-1 px-3 py-2 text-sm text-ink-primary placeholder-ink-tertiary focus:border-primary-400 focus:outline-none"
                   />
-                  <button onClick={orderCustomTest} disabled={!customTestInput.trim()} className="rounded-md bg-blue-600 px-3 py-2 text-sm font-medium text-white hover:bg-blue-500 disabled:opacity-40 transition-colors">
+                  <button onClick={orderCustomTest} disabled={!customTestInput.trim()} className="rounded-md bg-primary-500 px-3 py-2 text-sm font-medium text-white hover:bg-primary-400 disabled:opacity-40 transition-colors">
                     Order
                   </button>
                 </div>
               </div>
               {selectedTests.size > 0 && (
-                <div className="flex items-center justify-between rounded-lg border border-blue-700 bg-blue-900/20 px-4 py-3">
-                  <span className="text-sm text-blue-300">{selectedTests.size} test{selectedTests.size > 1 ? 's' : ''} selected</span>
-                  <button onClick={orderTests} className="rounded-md bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-500 transition-colors">
+                <div className="flex items-center justify-between rounded-lg border border-primary-600 bg-primary-900/20 px-4 py-3">
+                  <span className="text-sm text-primary-300">{selectedTests.size} test{selectedTests.size > 1 ? 's' : ''} selected</span>
+                  <button onClick={orderTests} className="rounded-md bg-primary-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-primary-400 transition-colors">
                     Order Selected Tests
                   </button>
                 </div>
@@ -2902,7 +2902,7 @@ Student message: "${msg}"`
               {/* Search bar — full master list */}
               <div className="relative">
                 <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
-                  <svg className="h-4 w-4 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="h-4 w-4 text-ink-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
@@ -2914,18 +2914,18 @@ Student message: "${msg}"`
                   onBlur={() => setTimeout(() => setShowSearchDropdown(false), 150)}
                   disabled={locked}
                   placeholder={locked ? 'Start the timer to order tests' : 'Search any test or study…'}
-                  className="w-full rounded-lg border border-gray-600 bg-gray-900 py-2.5 pl-9 pr-4 text-sm text-gray-100 placeholder-gray-500 focus:border-blue-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full rounded-lg border border-surface-5 bg-surface-1 py-2.5 pl-9 pr-4 text-sm text-ink-primary placeholder-ink-tertiary focus:border-primary-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 />
                 {testSearchQuery && (
                   <button
                     onMouseDown={() => { setTestSearchQuery(''); setShowSearchDropdown(false) }}
-                    className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-300"
+                    className="absolute inset-y-0 right-3 flex items-center text-ink-tertiary hover:text-ink-secondary"
                   >
                     ✕
                   </button>
                 )}
                 {showSearchDropdown && searchResults.length > 0 && (
-                  <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-700 bg-gray-800 shadow-xl overflow-hidden max-h-60 overflow-y-auto">
+                  <div className="absolute z-10 mt-1 w-full rounded-lg border border-surface-4 bg-surface-2 shadow-xl overflow-hidden max-h-60 overflow-y-auto">
                     {searchResults.slice(0, 10).map(result => {
                       const isOrdered = orderedTests.has(result.name)
                       return (
@@ -2938,10 +2938,10 @@ Student message: "${msg}"`
                             }
                           }}
                           disabled={isOrdered || locked}
-                          className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-sm transition-colors ${isOrdered ? 'opacity-50 cursor-default bg-gray-800' : 'hover:bg-gray-700 cursor-pointer'}`}
+                          className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-sm transition-colors ${isOrdered ? 'opacity-50 cursor-default bg-surface-2' : 'hover:bg-surface-3 cursor-pointer'}`}
                         >
-                          <span className="text-gray-200">{result.name}</span>
-                          <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+                          <span className="text-ink-primary">{result.name}</span>
+                          <span className="text-xs text-ink-tertiary ml-2 flex-shrink-0">
                             {isOrdered ? <Badge text="Ordered" color="green" /> : result.category}
                           </span>
                         </button>
@@ -2950,16 +2950,16 @@ Student message: "${msg}"`
                   </div>
                 )}
                 {showSearchDropdown && testSearchQuery.length >= 2 && searchResults.length === 0 && (
-                  <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-700 bg-gray-800 shadow-xl overflow-hidden">
+                  <div className="absolute z-10 mt-1 w-full rounded-lg border border-surface-4 bg-surface-2 shadow-xl overflow-hidden">
                     <button
                       onMouseDown={() => {
                         const name = testSearchQuery.trim()
                         if (name && !locked) { addOrderedTest(name); setTestSearchQuery(''); setShowSearchDropdown(false) }
                       }}
-                      className="w-full flex items-center justify-between px-4 py-3 text-left text-sm hover:bg-gray-700 transition-colors"
+                      className="w-full flex items-center justify-between px-4 py-3 text-left text-sm hover:bg-surface-3 transition-colors"
                     >
-                      <span className="text-gray-200">Order &ldquo;{testSearchQuery.trim()}&rdquo;</span>
-                      <span className="text-xs text-gray-500 ml-2 flex-shrink-0">custom</span>
+                      <span className="text-ink-primary">Order &ldquo;{testSearchQuery.trim()}&rdquo;</span>
+                      <span className="text-xs text-ink-tertiary ml-2 flex-shrink-0">custom</span>
                     </button>
                   </div>
                 )}
@@ -2970,7 +2970,7 @@ Student message: "${msg}"`
                 <div className="space-y-4">
                   {CLINICAL_CATEGORIES.filter(cat => cat.name !== 'Imaging').map(cat => (
                     <div key={cat.name}>
-                      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-blue-400">{cat.name}</p>
+                      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-primary-400">{cat.name}</p>
                       <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
                         {cat.tests.map(test => {
                           const isOrdered = orderedTests.has(test)
@@ -2981,10 +2981,10 @@ Student message: "${msg}"`
                               disabled={isOrdered || locked}
                               className={`text-left rounded-md border px-3 py-2 text-sm transition-colors ${
                                 isOrdered
-                                  ? 'border-green-700 bg-green-900/20 text-green-300 cursor-default'
+                                  ? 'border-confirmed-border bg-confirmed-bg text-confirmed cursor-default'
                                   : locked
-                                  ? 'border-gray-700 bg-gray-800 text-gray-500 opacity-50 cursor-not-allowed'
-                                  : 'border-gray-700 bg-gray-900 text-gray-200 hover:border-gray-500 hover:bg-gray-800 cursor-pointer'
+                                  ? 'border-surface-4 bg-surface-2 text-ink-tertiary opacity-50 cursor-not-allowed'
+                                  : 'border-surface-4 bg-surface-1 text-ink-primary hover:border-surface-4 hover:bg-surface-2 cursor-pointer'
                               }`}
                             >
                               {test}
@@ -3010,10 +3010,10 @@ Student message: "${msg}"`
                         disabled={isOrdered || locked}
                         className={`text-left rounded-md border px-3 py-2 text-sm transition-colors ${
                           isOrdered
-                            ? 'border-green-700 bg-green-900/20 text-green-300 cursor-default'
+                            ? 'border-confirmed-border bg-confirmed-bg text-confirmed cursor-default'
                             : locked
-                            ? 'border-gray-700 bg-gray-800 text-gray-500 opacity-50 cursor-not-allowed'
-                            : 'border-gray-700 bg-gray-900 text-gray-200 hover:border-gray-500 hover:bg-gray-800 cursor-pointer'
+                            ? 'border-surface-4 bg-surface-2 text-ink-tertiary opacity-50 cursor-not-allowed'
+                            : 'border-surface-4 bg-surface-1 text-ink-primary hover:border-surface-4 hover:bg-surface-2 cursor-pointer'
                         }`}
                       >
                         {study}
@@ -3029,7 +3029,7 @@ Student message: "${msg}"`
                 <SectionCard title={`Ordered Tests (${orderedList.length})`}>
                   <div className="flex flex-wrap gap-2">
                     {orderedList.map(t => (
-                      <span key={t} className="inline-flex items-center gap-1.5 rounded-md border border-green-700 bg-green-900/20 px-2.5 py-1 text-xs text-green-300">
+                      <span key={t} className="inline-flex items-center gap-1.5 rounded-md border border-confirmed-border bg-confirmed-bg px-2.5 py-1 text-xs text-confirmed">
                         {t}
                       </span>
                     ))}
@@ -3050,8 +3050,8 @@ Student message: "${msg}"`
         const orderedList = Array.from(orderedTests)
         return (
           <div className="space-y-4">
-            <div className="rounded-md border border-blue-900/40 bg-blue-950/20 px-4 py-3">
-              <p className="text-xs text-blue-300">
+            <div className="rounded-md border border-primary-700/40 bg-primary-900/10 px-4 py-3">
+              <p className="text-xs text-primary-300">
                 <span className="font-semibold">Advanced difficulty:</span> no pre-listed lab panels — search and type test names from memory. Imaging modalities are listed below for reference.
               </p>
             </div>
@@ -3064,10 +3064,10 @@ Student message: "${msg}"`
                 onBlur={() => setTimeout(() => setShowSearchDropdown(false), 150)}
                 disabled={locked}
                 placeholder={locked ? 'Start the timer to order tests' : 'Search for a test or study...'}
-                className="w-full rounded-lg border border-gray-600 bg-gray-900 px-4 py-3 text-sm text-gray-100 placeholder-gray-500 focus:border-blue-500 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full rounded-lg border border-surface-5 bg-surface-1 px-4 py-3 text-sm text-ink-primary placeholder-ink-tertiary focus:border-primary-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
               />
               {showSearchDropdown && searchResults.length > 0 && (
-                <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-700 bg-gray-800 shadow-xl overflow-hidden">
+                <div className="absolute z-10 mt-1 w-full rounded-lg border border-surface-4 bg-surface-2 shadow-xl overflow-hidden">
                   {searchResults.map(result => {
                     const isOrdered = orderedTests.has(result.name)
                     return (
@@ -3080,10 +3080,10 @@ Student message: "${msg}"`
                           }
                         }}
                         disabled={isOrdered || locked}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-sm transition-colors ${isOrdered ? 'opacity-50 cursor-default bg-gray-800' : 'hover:bg-gray-700 cursor-pointer'}`}
+                        className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-sm transition-colors ${isOrdered ? 'opacity-50 cursor-default bg-surface-2' : 'hover:bg-surface-3 cursor-pointer'}`}
                       >
-                        <span className="text-gray-200">{result.name}</span>
-                        <span className="text-xs text-gray-500 ml-2 flex-shrink-0">
+                        <span className="text-ink-primary">{result.name}</span>
+                        <span className="text-xs text-ink-tertiary ml-2 flex-shrink-0">
                           {isOrdered ? <Badge text="Ordered" color="green" /> : result.category}
                         </span>
                       </button>
@@ -3092,7 +3092,7 @@ Student message: "${msg}"`
                 </div>
               )}
               {showSearchDropdown && testSearchQuery.length >= 2 && searchResults.length === 0 && (
-                <div className="absolute z-10 mt-1 w-full rounded-lg border border-gray-700 bg-gray-800 shadow-xl overflow-hidden">
+                <div className="absolute z-10 mt-1 w-full rounded-lg border border-surface-4 bg-surface-2 shadow-xl overflow-hidden">
                   <button
                     onMouseDown={() => {
                       const name = testSearchQuery.trim()
@@ -3102,10 +3102,10 @@ Student message: "${msg}"`
                         setShowSearchDropdown(false)
                       }
                     }}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left text-sm hover:bg-gray-700 transition-colors"
+                    className="w-full flex items-center justify-between px-4 py-3 text-left text-sm hover:bg-surface-3 transition-colors"
                   >
-                    <span className="text-gray-200">Order &ldquo;{testSearchQuery.trim()}&rdquo;</span>
-                    <span className="text-xs text-gray-500 ml-2 flex-shrink-0">custom</span>
+                    <span className="text-ink-primary">Order &ldquo;{testSearchQuery.trim()}&rdquo;</span>
+                    <span className="text-xs text-ink-tertiary ml-2 flex-shrink-0">custom</span>
                   </button>
                 </div>
               )}
@@ -3122,10 +3122,10 @@ Student message: "${msg}"`
                       disabled={isOrdered || locked}
                       className={`text-left rounded-md border px-3 py-2 text-sm transition-colors ${
                         isOrdered
-                          ? 'border-green-700 bg-green-900/20 text-green-300 cursor-default'
+                          ? 'border-confirmed-border bg-confirmed-bg text-confirmed cursor-default'
                           : locked
-                          ? 'border-gray-700 bg-gray-800 text-gray-500 opacity-50 cursor-not-allowed'
-                          : 'border-gray-700 bg-gray-900 text-gray-200 hover:border-gray-500 hover:bg-gray-800 cursor-pointer'
+                          ? 'border-surface-4 bg-surface-2 text-ink-tertiary opacity-50 cursor-not-allowed'
+                          : 'border-surface-4 bg-surface-1 text-ink-primary hover:border-surface-4 hover:bg-surface-2 cursor-pointer'
                       }`}
                     >
                       {study}
@@ -3140,15 +3140,15 @@ Student message: "${msg}"`
               <SectionCard title={`Ordered Tests (${orderedList.length})`}>
                 <div className="space-y-2">
                   {orderedList.map(t => (
-                    <div key={t} className="flex items-center justify-between rounded-md border border-gray-700 bg-gray-900 px-3 py-2">
-                      <span className="text-sm text-gray-200">{t}</span>
-                      <button onClick={() => removeOrderedTest(t)} className="text-gray-500 hover:text-red-400 text-xs transition-colors ml-3 flex-shrink-0">✕</button>
+                    <div key={t} className="flex items-center justify-between rounded-md border border-surface-4 bg-surface-1 px-3 py-2">
+                      <span className="text-sm text-ink-primary">{t}</span>
+                      <button onClick={() => removeOrderedTest(t)} className="text-ink-tertiary hover:text-critical text-xs transition-colors ml-3 flex-shrink-0">✕</button>
                     </div>
                   ))}
                 </div>
               </SectionCard>
             ) : (
-              <div className="flex flex-col items-center justify-center py-16 text-gray-600">
+              <div className="flex flex-col items-center justify-center py-16 text-ink-tertiary">
                 <p className="text-sm">No tests ordered yet.</p>
                 <p className="text-xs mt-1">Search for a test above to add it.</p>
               </div>
@@ -3198,12 +3198,12 @@ Student message: "${msg}"`
 
         if (orderedTests.size === 0) {
           return (
-            <div className="flex flex-col items-center justify-center py-20 text-gray-500">
+            <div className="flex flex-col items-center justify-center py-20 text-ink-tertiary">
               <svg className="mb-3 h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
               </svg>
               <p className="text-sm">No tests ordered yet.</p>
-              <button onClick={() => setActiveSection('order')} className="mt-2 text-sm text-blue-400 hover:text-blue-300">
+              <button onClick={() => setActiveSection('order')} className="mt-2 text-sm text-primary-400 hover:text-primary-300">
                 Go to Order Tests →
               </button>
             </div>
@@ -3215,7 +3215,7 @@ Student message: "${msg}"`
               <div className="flex justify-end">
                 <button
                   onClick={toggleAllPanels}
-                  className="text-xs text-gray-400 hover:text-gray-200 transition-colors"
+                  className="text-xs text-ink-secondary hover:text-ink-primary transition-colors"
                 >
                   {allCollapsed ? 'Expand all' : 'Collapse all'}
                 </button>
@@ -3239,15 +3239,15 @@ Student message: "${msg}"`
                     const isCollapsed = collapsedPanels.has(lab)
                     const summary = getPanelSummary(components)
                     return (
-                      <div key={lab} className="rounded-md border border-gray-700 overflow-hidden">
+                      <div key={lab} className="rounded-md border border-surface-4 overflow-hidden">
                         <button
-                          className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-700/60 hover:bg-gray-700 transition-colors text-left"
+                          className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
                           onClick={() => togglePanel(lab)}
                         >
-                          <span className={`text-xs font-semibold uppercase tracking-wide ${panelAbnormal ? 'text-yellow-300' : 'text-gray-300'}`}>{lab}</span>
+                          <span className={`text-xs font-semibold uppercase tracking-wide ${panelAbnormal ? 'text-caution' : 'text-ink-secondary'}`}>{lab}</span>
                           <div className="flex items-center gap-3 min-w-0">
-                            {isCollapsed && <span className="text-xs text-gray-500 truncate max-w-xs">{summary}</span>}
-                            <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {isCollapsed && <span className="text-xs text-ink-tertiary truncate max-w-xs">{summary}</span>}
+                            <svg className={`w-4 h-4 text-ink-secondary transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
                           </div>
@@ -3262,12 +3262,12 @@ Student message: "${msg}"`
                               <col className="w-[26%]" />
                             </colgroup>
                             <thead>
-                              <tr className="bg-gray-900 border-b border-gray-700">
-                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">Test</th>
-                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">Result</th>
-                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">Flag</th>
-                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">Unit</th>
-                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-gray-400">Ref Range</th>
+                              <tr className="bg-surface-1 border-b border-surface-4">
+                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-secondary">Test</th>
+                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-secondary">Result</th>
+                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-secondary">Flag</th>
+                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-secondary">Unit</th>
+                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-secondary">Ref Range</th>
                               </tr>
                             </thead>
                             <tbody>
@@ -3276,19 +3276,19 @@ Student message: "${msg}"`
                                 const isAbnormal = c.status === 'abnormal' || isCritical
                                 const direction = isAbnormal ? parseDirection(c.value, c.referenceRange) : null
                                 return (
-                                  <tr key={j} className={`border-b border-gray-700/40 last:border-0 ${j % 2 === 0 ? 'bg-gray-800' : 'bg-gray-800/60'}`}>
-                                    <td className="pl-5 pr-4 py-2.5 text-gray-300">{c.name}</td>
-                                    <td className={`px-4 py-2.5 font-semibold tabular-nums ${isCritical ? 'text-red-400' : isAbnormal ? 'text-yellow-300' : 'text-gray-100'}`}>{c.value}</td>
+                                  <tr key={j} className={`border-b border-surface-4/40 last:border-0 ${j % 2 === 0 ? 'bg-surface-2' : 'bg-surface-2/60'}`}>
+                                    <td className="pl-5 pr-4 py-2.5 text-ink-secondary">{c.name}</td>
+                                    <td className={`px-4 py-2.5 font-semibold tabular-nums ${isCritical ? 'text-critical' : isAbnormal ? 'text-caution' : 'text-ink-primary'}`}>{c.value}</td>
                                     <td className="px-4 py-2.5 w-14 text-sm font-bold">
                                       {isAbnormal && (
-                                        <span className={isCritical ? 'text-red-400' : 'text-yellow-300'}>
+                                        <span className={isCritical ? 'text-critical' : 'text-caution'}>
                                           {direction === 'high' ? '↑' : direction === 'low' ? '↓' : isCritical ? '!' : 'A'}
                                           {isCritical && <span className="ml-1 text-[10px] font-semibold tracking-wide">CRIT</span>}
                                         </span>
                                       )}
                                     </td>
-                                    <td className="px-4 py-2.5 text-gray-400">{c.unit}</td>
-                                    <td className="px-4 py-2.5 text-gray-400">{c.referenceRange}</td>
+                                    <td className="px-4 py-2.5 text-ink-secondary">{c.unit}</td>
+                                    <td className="px-4 py-2.5 text-ink-secondary">{c.referenceRange}</td>
                                   </tr>
                                 )
                               })}
@@ -3299,42 +3299,42 @@ Student message: "${msg}"`
                     )
                   })}
                   {pendingLabs.map(lab => (
-                    <div key={lab} className={`rounded-md border border-gray-700 px-4 py-3 ${diagnosisSubmitted ? 'bg-gray-800/60' : 'bg-yellow-950/10 border-yellow-900/30'}`}>
+                    <div key={lab} className={`rounded-md border border-surface-4 px-4 py-3 ${diagnosisSubmitted ? 'bg-surface-2/60' : 'bg-caution-bg border-caution-border'}`}>
                       {diagnosisSubmitted ? (
                         <>
                           <div className="flex items-start gap-2">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-500">{lab}</span>
-                            <span className="text-xs text-gray-600 italic">(returned after your diagnosis — typically {pendingHours(lab)})</span>
+                            <span className="text-xs font-semibold uppercase tracking-wide text-ink-tertiary">{lab}</span>
+                            <span className="text-xs text-ink-tertiary italic">(returned after your diagnosis — typically {pendingHours(lab)})</span>
                           </div>
-                          <div className="mt-1 text-xs text-gray-400">Result not modeled for this case.</div>
+                          <div className="mt-1 text-xs text-ink-secondary">Result not modeled for this case.</div>
                         </>
                       ) : (
                         <div className="flex items-center gap-2">
-                          <span className="inline-block h-2 w-2 rounded-full bg-yellow-500 animate-pulse flex-shrink-0" />
-                          <span className="text-xs font-semibold uppercase tracking-wide text-yellow-600">{lab}</span>
-                          <span className="text-xs text-gray-600">Result pending — typically available in {pendingHours(lab)}</span>
+                          <span className="inline-block h-2 w-2 rounded-full bg-caution animate-pulse flex-shrink-0" />
+                          <span className="text-xs font-semibold uppercase tracking-wide text-caution">{lab}</span>
+                          <span className="text-xs text-ink-tertiary">Result pending — typically available in {pendingHours(lab)}</span>
                         </div>
                       )}
                     </div>
                   ))}
                   {loadingOnDemand.map(t => (
-                    <div key={t} className="rounded-md border border-blue-900/40 bg-blue-950/20 px-4 py-3">
+                    <div key={t} className="rounded-md border border-primary-700/40 bg-primary-900/10 px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <svg className="w-3.5 h-3.5 animate-spin text-blue-400 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                        <svg className="w-3.5 h-3.5 animate-spin text-primary-400 flex-shrink-0" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                         </svg>
-                        <span className="text-xs font-semibold uppercase tracking-wide text-blue-400">{t}</span>
-                        <span className="text-xs text-gray-500">Generating result...</span>
+                        <span className="text-xs font-semibold uppercase tracking-wide text-primary-400">{t}</span>
+                        <span className="text-xs text-ink-tertiary">Generating result...</span>
                       </div>
                     </div>
                   ))}
                   {orderedArr.filter(t => failedOnDemand.has(t)).map(t => (
-                    <div key={t} className="rounded-md border border-gray-700 bg-gray-800/60 px-4 py-3">
+                    <div key={t} className="rounded-md border border-surface-4 bg-surface-2/60 px-4 py-3">
                       <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-semibold uppercase tracking-wide text-gray-400">{t}</span>
+                        <span className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">{t}</span>
                         <button
-                          className="text-xs text-blue-500 hover:text-blue-400 transition-colors flex-shrink-0"
+                          className="text-xs text-primary-400 hover:text-primary-400 transition-colors flex-shrink-0"
                           onClick={() => {
                             setFailedOnDemand(prev => { const n = new Set(prev); n.delete(t); return n })
                             onDemandQueuedRef.current.delete(t)
@@ -3344,7 +3344,7 @@ Student message: "${msg}"`
                           Retry
                         </button>
                       </div>
-                      <p className="mt-1 text-xs text-gray-500">Result generation failed — this test may not be available for this case.</p>
+                      <p className="mt-1 text-xs text-ink-tertiary">Result generation failed — this test may not be available for this case.</p>
                     </div>
                   ))}
                 </div>
@@ -3362,15 +3362,15 @@ Student message: "${msg}"`
                       const ecgImage = img in ecgCache ? ecgCache[img] : null
                       const ecgSummary = (caseData.ecgFindings ?? report).split(/[.!?]/)[0].trim()
                       return (
-                        <div key={img} className="rounded-md border border-gray-700 overflow-hidden">
+                        <div key={img} className="rounded-md border border-surface-4 overflow-hidden">
                           <button
-                            className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-700/60 hover:bg-gray-700 transition-colors text-left"
+                            className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
                             onClick={() => togglePanel(img)}
                           >
-                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-300">ECG / Electrocardiogram</span>
+                            <span className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">ECG / Electrocardiogram</span>
                             <div className="flex items-center gap-3 min-w-0">
-                              {isCollapsed && diagnosisSubmitted && <span className="text-xs text-gray-500 truncate max-w-xs">ECG | {ecgSummary}</span>}
-                              <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              {isCollapsed && diagnosisSubmitted && <span className="text-xs text-ink-tertiary truncate max-w-xs">ECG | {ecgSummary}</span>}
+                              <svg className={`w-4 h-4 text-ink-secondary transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                               </svg>
                             </div>
@@ -3405,26 +3405,26 @@ Student message: "${msg}"`
                       const firstLine = report.split(/[.\n]/)[0].trim()
                       const isBiopsyGated = specialModality === 'biopsy' && !diagnosisSubmitted
                       return (
-                        <div key={img} className="rounded-md border border-gray-700 overflow-hidden">
+                        <div key={img} className="rounded-md border border-surface-4 overflow-hidden">
                           <button
-                            className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-700/60 hover:bg-gray-700 transition-colors text-left"
+                            className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
                             onClick={() => togglePanel(img)}
                           >
-                            <span className="text-xs font-semibold uppercase tracking-wide text-gray-300">
+                            <span className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">
                               {SPECIAL_LABELS[specialModality]}
-                              {isBiopsyGated && <span className="ml-2 text-xs font-normal text-yellow-600 normal-case">(results after diagnosis)</span>}
+                              {isBiopsyGated && <span className="ml-2 text-xs font-normal text-caution normal-case">(results after diagnosis)</span>}
                             </span>
                             <div className="flex items-center gap-3 min-w-0">
-                              {isCollapsed && <span className="text-xs text-gray-500 truncate max-w-xs">{firstLine}</span>}
-                              <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              {isCollapsed && <span className="text-xs text-ink-tertiary truncate max-w-xs">{firstLine}</span>}
+                              <svg className={`w-4 h-4 text-ink-secondary transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                               </svg>
                             </div>
                           </button>
                           {!isCollapsed && (
                             isBiopsyGated ? (
-                              <div className="bg-gray-900 px-4 py-4">
-                                <p className="text-sm text-gray-500 italic">H&E biopsy results are typically available after clinical assessment. Submit your diagnosis to view pathology findings.</p>
+                              <div className="bg-surface-1 px-4 py-4">
+                                <p className="text-sm text-ink-tertiary italic">H&E biopsy results are typically available after clinical assessment. Submit your diagnosis to view pathology findings.</p>
                               </div>
                             ) : (
                               <SpecialPanel
@@ -3443,15 +3443,15 @@ Student message: "${msg}"`
                     const firstLine = report.split(/[.\n]/)[0].trim()
                     const cachedResults = imagingCache[img] ?? null
                     return (
-                      <div key={img} className="rounded-md border border-gray-700 overflow-hidden">
+                      <div key={img} className="rounded-md border border-surface-4 overflow-hidden">
                         <button
-                          className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-700/60 hover:bg-gray-700 transition-colors text-left"
+                          className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
                           onClick={() => togglePanel(img)}
                         >
-                          <span className="text-xs font-semibold uppercase tracking-wide text-gray-300">{img}</span>
+                          <span className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">{img}</span>
                           <div className="flex items-center gap-3 min-w-0">
-                            {isCollapsed && diagnosisSubmitted && <span className="text-xs text-gray-500 truncate max-w-xs">{firstLine}</span>}
-                            <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {isCollapsed && diagnosisSubmitted && <span className="text-xs text-ink-tertiary truncate max-w-xs">{firstLine}</span>}
+                            <svg className={`w-4 h-4 text-ink-secondary transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
                           </div>
@@ -3468,22 +3468,22 @@ Student message: "${msg}"`
                     const isCollapsed = collapsedPanels.has(proc)
                     const firstLine = report.split(/[.\n]/)[0].trim()
                     return (
-                      <div key={proc} className="rounded-md border border-gray-700 overflow-hidden">
+                      <div key={proc} className="rounded-md border border-surface-4 overflow-hidden">
                         <button
-                          className="w-full flex items-center justify-between px-4 py-2.5 bg-gray-700/60 hover:bg-gray-700 transition-colors text-left"
+                          className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
                           onClick={() => togglePanel(proc)}
                         >
-                          <span className="text-xs font-semibold uppercase tracking-wide text-gray-300">{proc}</span>
+                          <span className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">{proc}</span>
                           <div className="flex items-center gap-3 min-w-0">
-                            {isCollapsed && <span className="text-xs text-gray-500 truncate max-w-xs">{firstLine}</span>}
-                            <svg className={`w-4 h-4 text-gray-400 transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            {isCollapsed && <span className="text-xs text-ink-tertiary truncate max-w-xs">{firstLine}</span>}
+                            <svg className={`w-4 h-4 text-ink-secondary transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                             </svg>
                           </div>
                         </button>
                         {!isCollapsed && (
-                          <div className="rounded-b-md bg-gray-900 px-4 py-3">
-                            <p className="text-sm leading-relaxed text-gray-300">{report}</p>
+                          <div className="rounded-b-md bg-surface-1 px-4 py-3">
+                            <p className="text-sm leading-relaxed text-ink-secondary">{report}</p>
                           </div>
                         )}
                       </div>
@@ -3502,10 +3502,10 @@ Student message: "${msg}"`
             {gradingLoading ? (
               <SectionCard title="Evaluating Diagnosis">
                 <div className="flex flex-col items-center justify-center py-14 gap-4">
-                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-gray-700 border-t-blue-500" />
+                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-surface-4 border-t-primary-400" />
                   <div className="text-center space-y-1">
-                    <p className="text-sm font-medium text-gray-200">Evaluating your diagnosis…</p>
-                    <p className="text-xs text-gray-500">Reviewing history, workup, and clinical reasoning</p>
+                    <p className="text-sm font-medium text-ink-primary">Evaluating your diagnosis…</p>
+                    <p className="text-xs text-ink-tertiary">Reviewing history, workup, and clinical reasoning</p>
                   </div>
                 </div>
               </SectionCard>
@@ -3513,17 +3513,17 @@ Student message: "${msg}"`
               <SectionCard title="Submit Your Diagnosis">
                 <div className="flex flex-col items-center justify-center py-10 gap-4 text-center">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full border border-red-800 bg-red-950/50">
-                    <svg className="h-4 w-4 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-4 w-4 text-critical" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                     </svg>
                   </div>
                   <div>
-                    <p className="text-sm text-red-400 mb-0.5">{gradingError}</p>
-                    <p className="text-xs text-gray-600">Your diagnosis and reasoning are still saved above.</p>
+                    <p className="text-sm text-critical mb-0.5">{gradingError}</p>
+                    <p className="text-xs text-ink-tertiary">Your diagnosis and reasoning are still saved above.</p>
                   </div>
                   <button
                     onClick={() => submitDiagnosis()}
-                    className="rounded-md bg-blue-600 px-5 py-2 text-sm font-semibold text-white hover:bg-blue-500 transition-colors"
+                    className="rounded-md bg-primary-500 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-400 transition-colors"
                   >
                     Retry
                   </button>
@@ -3533,7 +3533,7 @@ Student message: "${msg}"`
               <SectionCard title="Submit Your Diagnosis">
                 <div className="space-y-4">
                   <div>
-                    <label className="mb-2 flex items-center justify-between text-sm text-gray-400">
+                    <label className="mb-2 flex items-center justify-between text-sm text-ink-secondary">
                       <span>Primary diagnosis:</span>
                       <MicButton
                         onTranscript={text => setUserDiagnosis(prev => prev ? prev + ' ' + text : text)}
@@ -3551,8 +3551,8 @@ Student message: "${msg}"`
 
                   {caseDifficulty === 'Clinical' && (
                     <div>
-                      <label className="mb-2 flex items-center justify-between text-sm text-gray-400">
-                        <span>Clinical Reasoning <span className="text-gray-600">(required)</span></span>
+                      <label className="mb-2 flex items-center justify-between text-sm text-ink-secondary">
+                        <span>Clinical Reasoning <span className="text-ink-tertiary">(required)</span></span>
                         <MicButton
                           onTranscript={text => setUserPresentation(prev => prev ? prev + ' ' + text : text)}
                           paused={timerState.status === 'paused' || gradingLoading || locked}
@@ -3565,22 +3565,22 @@ Student message: "${msg}"`
                         disabled={locked}
                         placeholder="Explain what findings support your diagnosis. Reference specific values from the history, exam, or test results that led you to this conclusion."
                         rows={5}
-                        className="w-full rounded-md border border-gray-600 bg-gray-900 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 focus:border-blue-500 focus:outline-none resize-y disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full rounded-md border border-surface-5 bg-surface-1 px-4 py-3 text-sm text-ink-primary placeholder-ink-tertiary focus:border-primary-400 focus:outline-none resize-y disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                   )}
 
                   {caseDifficulty === 'Advanced' && (
                     <div>
-                      <label className="mb-2 flex items-center justify-between text-sm text-gray-400">
-                        <span>Oral Presentation <span className="text-gray-600">(required)</span></span>
+                      <label className="mb-2 flex items-center justify-between text-sm text-ink-secondary">
+                        <span>Oral Presentation <span className="text-ink-tertiary">(required)</span></span>
                         <div className="flex items-center gap-2">
                           <MicButton
                             onTranscript={text => setUserPresentation(prev => prev ? prev + ' ' + text : text)}
                             paused={timerState.status === 'paused' || gradingLoading || locked}
                             className="py-1"
                           />
-                          <span className={`text-xs tabular-nums ${userPresentation.trim().split(/\s+/).filter(Boolean).length < 50 ? 'text-gray-600' : 'text-gray-400'}`}>
+                          <span className={`text-xs tabular-nums ${userPresentation.trim().split(/\s+/).filter(Boolean).length < 50 ? 'text-ink-tertiary' : 'text-ink-secondary'}`}>
                             {userPresentation.trim() === '' ? 0 : userPresentation.trim().split(/\s+/).filter(Boolean).length} words
                           </span>
                         </div>
@@ -3591,20 +3591,20 @@ Student message: "${msg}"`
                         disabled={locked}
                         placeholder={"Patient summary: [Name] is a [age]yo [gender] presenting with [chief complaint].\n\nKey findings: [Most significant positives and pertinent negatives from history, exam, and results — cite actual values.]\n\nAssessment: [Your diagnosis and why the findings support it. Address top differentials and why you ruled them out.]\n\nPlan: [Immediate management steps — treatment, further workup, disposition, safety considerations.]"}
                         rows={10}
-                        className="w-full rounded-md border border-gray-600 bg-gray-900 px-4 py-3 text-sm text-gray-100 placeholder-gray-600 focus:border-blue-500 focus:outline-none resize-y font-mono leading-relaxed disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="w-full rounded-md border border-surface-5 bg-surface-1 px-4 py-3 text-sm text-ink-primary placeholder-ink-tertiary focus:border-primary-400 focus:outline-none resize-y font-mono leading-relaxed disabled:opacity-50 disabled:cursor-not-allowed"
                       />
                     </div>
                   )}
 
-                  <p className="text-xs text-gray-500 italic">
+                  <p className="text-xs text-ink-tertiary italic">
                     {caseDifficulty === 'Advanced'
                       ? 'Tip: Be specific — cite actual values (e.g. "UPCR 5.8", "eGFR 48") rather than general terms.'
                       : 'Tip: Consider including the underlying cause in your diagnosis (e.g. "X secondary to Y").'}
                   </p>
 
                   {/* Pre-submission history checklist — most commonly missed question categories */}
-                  <div className="rounded-md border border-gray-700/60 bg-gray-800/40 px-3 py-2.5">
-                    <p className="text-xs font-medium text-gray-500 mb-1.5">Before submitting — have you asked about:</p>
+                  <div className="rounded-md border border-surface-4/60 bg-surface-2/40 px-3 py-2.5">
+                    <p className="text-xs font-medium text-ink-tertiary mb-1.5">Before submitting — have you asked about:</p>
                     <div className="grid grid-cols-2 gap-x-4 gap-y-1">
                       {[
                         'Family history of similar conditions',
@@ -3612,8 +3612,8 @@ Student message: "${msg}"`
                         'OTC medications, NSAIDs, or supplements',
                         'Recent travel or sick contacts',
                       ].map((q) => (
-                        <div key={q} className="flex items-start gap-1.5 text-xs text-gray-600">
-                          <span className="mt-px flex-shrink-0 text-gray-700">□</span>
+                        <div key={q} className="flex items-start gap-1.5 text-xs text-ink-tertiary">
+                          <span className="mt-px flex-shrink-0 text-ink-tertiary">□</span>
                           <span>{q}</span>
                         </div>
                       ))}
@@ -3628,12 +3628,12 @@ Student message: "${msg}"`
                       locked ||
                       ((caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') && !userPresentation.trim())
                     }
-                    className="w-full rounded-md bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+                    className="w-full rounded-md bg-primary-500 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-400 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
                   >
                     {gradingLoading ? 'Grading...' : 'Submit Diagnosis'}
                   </button>
                   {orderedTests.size === 0 && (
-                    <p className="text-xs text-yellow-500">
+                    <p className="text-xs text-caution">
                       Tip: Order some tests first to improve your workup.
                     </p>
                   )}
@@ -3652,33 +3652,33 @@ Student message: "${msg}"`
                       ? s >= 88 ? 'Excellent' : s >= 72 ? 'Strong pass' : s >= 55 ? 'Pass' : 'Needs review'
                       : s >= 85 ? 'Excellent' : s >= 68 ? 'Strong pass' : s >= 50 ? 'Pass' : 'Needs review'
                   return (
-                    <div className={`rounded-lg border p-5 ${gradingResult.correct ? 'border-green-700 bg-green-950/30' : 'border-red-700 bg-red-950/30'}`}>
+                    <div className={`rounded-lg border p-5 ${gradingResult.correct ? 'border-confirmed-border bg-green-950/30' : 'border-red-700 bg-red-950/30'}`}>
                       <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-bold text-gray-100">
+                        <h3 className="text-lg font-bold text-ink-primary">
                           {gradingResult.correct ? '✓ Correct Diagnosis' : '✗ Incorrect Diagnosis'}
                         </h3>
                         <div className="text-right">
-                          <div className={`text-3xl font-bold tabular-nums ${s >= 70 ? 'text-green-400' : s >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
+                          <div className={`text-3xl font-bold tabular-nums ${s >= 70 ? 'text-confirmed' : s >= 50 ? 'text-caution' : 'text-critical'}`}>
                             {s}/100
                           </div>
-                          <div className={`text-xs mt-0.5 ${s >= 70 ? 'text-green-500' : s >= 50 ? 'text-yellow-500' : 'text-gray-500'}`}>
+                          <div className={`text-xs mt-0.5 ${s >= 70 ? 'text-confirmed' : s >= 50 ? 'text-caution' : 'text-ink-tertiary'}`}>
                             {label}
                           </div>
                         </div>
                       </div>
                       <div className="mb-3 flex flex-wrap gap-2 text-sm">
-                        <span className="text-gray-400">Your diagnosis:</span>
-                        <span className="font-medium text-gray-200">{userDiagnosis}</span>
-                        <span className="text-gray-600">→</span>
-                        <span className="text-gray-400">Correct:</span>
-                        <span className="font-medium text-green-300">{caseData.diagnosis}</span>
+                        <span className="text-ink-secondary">Your diagnosis:</span>
+                        <span className="font-medium text-ink-primary">{userDiagnosis}</span>
+                        <span className="text-ink-tertiary">→</span>
+                        <span className="text-ink-secondary">Correct:</span>
+                        <span className="font-medium text-confirmed">{caseData.diagnosis}</span>
                       </div>
-                      <p className="text-sm leading-relaxed text-gray-300">{gradingResult.feedback}</p>
+                      <p className="text-sm leading-relaxed text-ink-secondary">{gradingResult.feedback}</p>
                       {gradingResult.efficiency && (() => {
                         const eff = gradingResult.efficiency!
                         const total = eff.elapsedSeconds + eff.pausedSeconds
                         return (
-                          <p className="mt-2 text-xs text-gray-600">
+                          <p className="mt-2 text-xs text-ink-tertiary">
                             Active time: {fmtTime(eff.elapsedSeconds)}
                             {eff.pausedSeconds > 0 ? `  |  Paused: ${fmtTime(eff.pausedSeconds)}  |  Total elapsed: ${fmtTime(total)}` : ''}
                           </p>
@@ -3693,20 +3693,20 @@ Student message: "${msg}"`
                   <SectionCard title="What You Did Well">
                     <ul className="space-y-2">
                       {gradingResult.strengths?.map((s, i) => (
-                        <li key={i} className="flex gap-2 text-sm text-gray-300">
-                          <span className="text-green-400 flex-shrink-0">✓</span>
+                        <li key={i} className="flex gap-2 text-sm text-ink-secondary">
+                          <span className="text-confirmed flex-shrink-0">✓</span>
                           {s}
                         </li>
                       ))}
                       {gradingResult.efficiency?.score === 10 && (
-                        <li className="flex gap-2 text-sm text-gray-300">
-                          <span className="text-green-400 flex-shrink-0">✓</span>
+                        <li className="flex gap-2 text-sm text-ink-secondary">
+                          <span className="text-confirmed flex-shrink-0">✓</span>
                           Completed the case efficiently within the allotted time
                         </li>
                       )}
                     </ul>
                     {gradingResult.efficiency?.timedOut && (
-                      <p className="mt-3 text-xs text-gray-500 italic border-t border-gray-700 pt-3">
+                      <p className="mt-3 text-xs text-ink-tertiary italic border-t border-surface-4 pt-3">
                         The case timed out before submission. Time management is a clinical skill that improves with practice. Focus on high-yield questions early and order targeted tests rather than a broad workup.
                       </p>
                     )}
@@ -3727,18 +3727,18 @@ Student message: "${msg}"`
                         const dim = gradingResult.dimensions![key]
                         if (!dim) return null
                         const pct = Math.min(100, (dim.score / max) * 100)
-                        const barColor = pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'
-                        const scoreColor = pct >= 80 ? 'text-green-400' : pct >= 50 ? 'text-yellow-400' : 'text-red-400'
+                        const barColor = pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-caution' : 'bg-red-500'
+                        const scoreColor = pct >= 80 ? 'text-confirmed' : pct >= 50 ? 'text-caution' : 'text-critical'
                         return (
                           <div key={key}>
                             <div className="flex items-center gap-3 mb-1">
-                              <span className="w-44 flex-shrink-0 text-sm font-medium text-gray-200">{label}</span>
-                              <div className="flex-1 h-2 rounded-full bg-gray-700 overflow-hidden">
+                              <span className="w-44 flex-shrink-0 text-sm font-medium text-ink-primary">{label}</span>
+                              <div className="flex-1 h-2 rounded-full bg-surface-4 overflow-hidden">
                                 <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
                               </div>
                               <span className={`w-14 text-right text-sm font-bold tabular-nums ${scoreColor}`}>{dim.score}/{max}</span>
                             </div>
-                            <p className="pl-44 text-xs text-gray-400">{dim.feedback}</p>
+                            <p className="pl-44 text-xs text-ink-secondary">{dim.feedback}</p>
                           </div>
                         )
                       })}
@@ -3754,11 +3754,11 @@ Student message: "${msg}"`
                         const scores = dims.map(([k]) => gradingResult.dimensions![k]?.score ?? 0)
                         const total = scores.reduce((a, b) => a + b, 0)
                         return (
-                          <div className="border-t border-gray-700/60 pt-3 mt-1">
+                          <div className="border-t border-surface-4/60 pt-3 mt-1">
                             <div className="flex items-center gap-3">
-                              <span className="w-44 flex-shrink-0 text-xs text-gray-500">AI-graded subtotal</span>
-                              <span className="text-xs text-gray-600 flex-1">
-                                {scores.join(' + ')} = <span className="text-gray-400 font-semibold">{total}/90</span>
+                              <span className="w-44 flex-shrink-0 text-xs text-ink-tertiary">AI-graded subtotal</span>
+                              <span className="text-xs text-ink-tertiary flex-1">
+                                {scores.join(' + ')} = <span className="text-ink-secondary font-semibold">{total}/90</span>
                               </span>
                             </div>
                           </div>
@@ -3769,23 +3769,23 @@ Student message: "${msg}"`
                       {gradingResult.efficiency && (() => {
                         const eff = gradingResult.efficiency!
                         const pct = (eff.score / 10) * 100
-                        const barColor = pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-yellow-500' : 'bg-red-500'
-                        const scoreColor = pct >= 80 ? 'text-green-400' : pct >= 50 ? 'text-yellow-400' : 'text-red-400'
+                        const barColor = pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-caution' : 'bg-red-500'
+                        const scoreColor = pct >= 80 ? 'text-confirmed' : pct >= 50 ? 'text-caution' : 'text-critical'
                         return (
                           <div>
                             <div className="flex items-center gap-3 mb-1">
-                              <span className="w-44 flex-shrink-0 text-sm font-medium text-gray-200">Efficiency</span>
-                              <div className="flex-1 h-2 rounded-full bg-gray-700 overflow-hidden">
+                              <span className="w-44 flex-shrink-0 text-sm font-medium text-ink-primary">Efficiency</span>
+                              <div className="flex-1 h-2 rounded-full bg-surface-4 overflow-hidden">
                                 <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
                               </div>
                               <span className={`w-14 text-right text-sm font-bold tabular-nums ${scoreColor}`}>{eff.score}/10</span>
                             </div>
-                            <p className="pl-44 text-xs text-gray-400">{eff.feedback}</p>
-                            <p className="pl-44 text-xs text-gray-600 mt-0.5">
+                            <p className="pl-44 text-xs text-ink-secondary">{eff.feedback}</p>
+                            <p className="pl-44 text-xs text-ink-tertiary mt-0.5">
                               Completed in {fmtTime(eff.elapsedSeconds)} active time
                               {eff.pausedSeconds > 0 ? ` (${fmtTime(eff.pausedSeconds)} paused)` : ''}
                             </p>
-                            <p className="pl-44 text-xs text-gray-700 mt-1">
+                            <p className="pl-44 text-xs text-ink-tertiary mt-1">
                               Scoring: {caseDifficulty === 'Clinical'
                                 ? '>9 min left → 10pts | >5 min → 8pts | >2 min → 6pts | <2 min → 4pts | timed out → 2pts'
                                 : '>6 min left → 10pts | >3 min → 8pts | >1 min → 6pts | <1 min → 4pts | timed out → 2pts'}
@@ -3801,10 +3801,10 @@ Student message: "${msg}"`
                 {gradingResult.presentation?.scores && (
                   <SectionCard title="Oral Presentation">
                     <div className="mb-4 flex items-center gap-3">
-                      <div className={`text-2xl font-bold ${(gradingResult.presentation.presentationTotal ?? 0) >= 70 ? 'text-green-400' : (gradingResult.presentation.presentationTotal ?? 0) >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>
+                      <div className={`text-2xl font-bold ${(gradingResult.presentation.presentationTotal ?? 0) >= 70 ? 'text-confirmed' : (gradingResult.presentation.presentationTotal ?? 0) >= 50 ? 'text-caution' : 'text-critical'}`}>
                         {gradingResult.presentation.presentationTotal ?? 0}/100
                       </div>
-                      <span className="text-xs text-gray-500">Presentation Score</span>
+                      <span className="text-xs text-ink-tertiary">Presentation Score</span>
                     </div>
                     <div className="grid grid-cols-2 gap-3 mb-4">
                       {(
@@ -3815,15 +3815,15 @@ Student message: "${msg}"`
                           ['Safety', gradingResult.presentation.scores.safety],
                         ] as [string, number][]
                       ).map(([axis, score]) => (
-                        <div key={axis} className="rounded-md bg-gray-900 p-3">
-                          <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">{axis}</div>
+                        <div key={axis} className="rounded-md bg-surface-1 p-3">
+                          <div className="text-xs text-ink-tertiary uppercase tracking-wider mb-1">{axis}</div>
                           <div className="flex items-center gap-2">
-                            <span className={`text-lg font-bold ${score >= 18 ? 'text-green-400' : score >= 12 ? 'text-yellow-400' : 'text-red-400'}`}>
+                            <span className={`text-lg font-bold ${score >= 18 ? 'text-confirmed' : score >= 12 ? 'text-caution' : 'text-critical'}`}>
                               {score}/25
                             </span>
-                            <div className="flex-1 rounded-full bg-gray-700 h-1.5">
+                            <div className="flex-1 rounded-full bg-surface-4 h-1.5">
                               <div
-                                className={`h-1.5 rounded-full ${score >= 18 ? 'bg-green-500' : score >= 12 ? 'bg-yellow-500' : 'bg-red-500'}`}
+                                className={`h-1.5 rounded-full ${score >= 18 ? 'bg-green-500' : score >= 12 ? 'bg-caution' : 'bg-red-500'}`}
                                 style={{ width: `${(score / 25) * 100}%` }}
                               />
                             </div>
@@ -3832,14 +3832,14 @@ Student message: "${msg}"`
                       ))}
                     </div>
                     {gradingResult.presentation.presentationFeedback && (
-                      <p className="text-sm leading-relaxed text-gray-300 mb-3">{gradingResult.presentation.presentationFeedback}</p>
+                      <p className="text-sm leading-relaxed text-ink-secondary mb-3">{gradingResult.presentation.presentationFeedback}</p>
                     )}
                     {gradingResult.presentation.criticalMisses && gradingResult.presentation.criticalMisses.length > 0 && (
                       <div className="mt-3 rounded-md border border-red-800 bg-red-950/30 p-3">
-                        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-red-400">Critical Misses</div>
+                        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-critical">Critical Misses</div>
                         <ul className="space-y-1">
                           {gradingResult.presentation.criticalMisses.map((miss, i) => (
-                            <li key={i} className="flex gap-2 text-sm text-red-300">
+                            <li key={i} className="flex gap-2 text-sm text-critical">
                               <span className="flex-shrink-0">!</span>
                               {miss}
                             </li>
@@ -3855,8 +3855,8 @@ Student message: "${msg}"`
                   <SectionCard title="Questions That Would Have Changed Management">
                     <ul className="space-y-2">
                       {gradingResult.missedQuestions.map((q, i) => (
-                        <li key={i} className="flex gap-2 text-sm text-gray-300">
-                          <span className="text-yellow-500 flex-shrink-0">•</span>
+                        <li key={i} className="flex gap-2 text-sm text-ink-secondary">
+                          <span className="text-caution flex-shrink-0">•</span>
                           {q}
                         </li>
                       ))}
@@ -3868,8 +3868,8 @@ Student message: "${msg}"`
                 <SectionCard title="Teaching Points">
                   <ul className="space-y-2">
                     {gradingResult.teachingPoints?.map((pt, i) => (
-                      <li key={i} className="flex gap-2 text-sm text-gray-300">
-                        <span className="text-blue-400 flex-shrink-0 font-bold">{i + 1}.</span>
+                      <li key={i} className="flex gap-2 text-sm text-ink-secondary">
+                        <span className="text-primary-400 flex-shrink-0 font-bold">{i + 1}.</span>
                         {pt}
                       </li>
                     ))}
@@ -3882,9 +3882,9 @@ Student message: "${msg}"`
                     {gradingResult.differentials?.map((dx, i) => {
                       const [name, explanation] = dx.includes(':') ? dx.split(/: (.+)/) : [dx, '']
                       return (
-                        <div key={i} className="rounded-md bg-gray-900 p-3">
+                        <div key={i} className="rounded-md bg-surface-1 p-3">
                           <div className="mb-1 text-sm font-semibold text-purple-300">{name}</div>
-                          {explanation && <p className="text-sm text-gray-400">{explanation}</p>}
+                          {explanation && <p className="text-sm text-ink-secondary">{explanation}</p>}
                         </div>
                       )
                     })}
@@ -3929,7 +3929,7 @@ Student message: "${msg}"`
                     <div className="rounded-lg border border-surface-4 bg-surface-1 p-5">
                       <div className="mb-4 text-sm font-semibold text-ink-primary">Rate This Case</div>
                       {feedbackSubmitted ? (
-                        <p className="text-sm text-green-400 text-center py-2">Thank you for your feedback!</p>
+                        <p className="text-sm text-confirmed text-center py-2">Thank you for your feedback!</p>
                       ) : (
                         <>
                           <div className="space-y-3 mb-4">
@@ -3949,7 +3949,7 @@ Student message: "${msg}"`
                                         className="text-xl leading-none transition-colors"
                                         aria-label={`${star} star`}
                                       >
-                                        <span className={(hov || active) >= star ? 'text-yellow-400' : 'text-gray-600'}>
+                                        <span className={(hov || active) >= star ? 'text-caution' : 'text-ink-tertiary'}>
                                           ★
                                         </span>
                                       </button>
@@ -3985,7 +3985,7 @@ Student message: "${msg}"`
                     setUserDiagnosis('')
                     setUserPresentation('')
                   }}
-                  className="w-full rounded-md border border-gray-600 px-4 py-2 text-sm text-gray-400 hover:border-gray-400 hover:text-gray-200 transition-colors"
+                  className="w-full rounded-md border border-surface-5 px-4 py-2 text-sm text-ink-secondary hover:border-surface-5 hover:text-ink-primary transition-colors"
                 >
                   Try Again
                 </button>
@@ -4184,7 +4184,7 @@ Student message: "${msg}"`
               const hIn = caseData.patientInfo.heightInches
               const bmi = hIn && !isNaN(wLbs) && hIn > 0 ? Math.round((wLbs / (hIn * hIn)) * 703 * 10) / 10 : null
               const bmiLabel = bmi === null ? null : bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Normal' : bmi < 30 ? 'Overweight' : 'Obese'
-              const bmiColor = bmi === null ? '' : bmi < 18.5 ? 'text-blue-400' : bmi < 25 ? 'text-green-400' : bmi < 30 ? 'text-yellow-400' : 'text-red-400'
+              const bmiColor = bmi === null ? '' : bmi < 18.5 ? 'text-primary-400' : bmi < 25 ? 'text-confirmed' : bmi < 30 ? 'text-caution' : 'text-critical'
               return (
                 <div className="flex flex-shrink-0 items-center gap-3 border-b border-surface-4 bg-surface-1 px-4 py-2.5 overflow-x-auto">
                   <span className="text-[13px] font-semibold text-ink-primary whitespace-nowrap">{caseData.patientInfo.name}</span>
@@ -4479,11 +4479,11 @@ Student message: "${msg}"`
               <div
                 key={i}
                 className={
-                  line.type === 'input'   ? 'text-gray-400' :
-                  line.type === 'error'   ? 'text-red-400' :
-                  line.type === 'success' ? 'text-green-400' :
+                  line.type === 'input'   ? 'text-ink-secondary' :
+                  line.type === 'error'   ? 'text-critical' :
+                  line.type === 'success' ? 'text-confirmed' :
                   line.type === 'info'    ? 'text-cyan-400' :
-                  'text-gray-200'
+                  'text-ink-primary'
                 }
               >
                 {line.content}
@@ -4491,8 +4491,8 @@ Student message: "${msg}"`
             ))}
             <div ref={terminalEndRef} />
           </div>
-          <div className="flex items-center gap-2 border-t border-gray-800 px-3 py-2">
-            <span className="text-green-500 text-xs select-none">{'>'}</span>
+          <div className="flex items-center gap-2 border-t border-surface-4 px-3 py-2">
+            <span className="text-confirmed text-xs select-none">{'>'}</span>
             <input
               ref={terminalInputRef}
               type="text"
@@ -4508,7 +4508,7 @@ Student message: "${msg}"`
               }}
               disabled={terminalLoading}
               placeholder="type a command…"
-              className="flex-1 bg-transparent text-xs text-gray-200 placeholder-gray-700 focus:outline-none disabled:opacity-50"
+              className="flex-1 bg-transparent text-xs text-ink-primary placeholder-ink-tertiary focus:outline-none disabled:opacity-50"
               autoFocus
             />
           </div>
@@ -4552,7 +4552,7 @@ Student message: "${msg}"`
           <div className="relative max-h-screen max-w-screen-xl p-4" onClick={e => e.stopPropagation()}>
             <button
               onClick={() => setZoomedImage(null)}
-              className="absolute -top-2 -right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-gray-800 text-gray-300 hover:bg-gray-700 hover:text-white transition-colors shadow-lg text-xl leading-none"
+              className="absolute -top-2 -right-2 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-surface-2 text-ink-secondary hover:bg-surface-3 hover:text-white transition-colors shadow-lg text-xl leading-none"
             >
               ×
             </button>
@@ -4561,7 +4561,7 @@ Student message: "${msg}"`
               alt={zoomedImage.alt}
               className="max-h-[90vh] max-w-full rounded-lg object-contain bg-[#fafaf5] shadow-2xl"
             />
-            <p className="mt-2 text-center text-xs text-gray-500">{zoomedImage.alt} — click outside to close</p>
+            <p className="mt-2 text-center text-xs text-ink-tertiary">{zoomedImage.alt} — click outside to close</p>
           </div>
         </div>
       )}
@@ -4598,17 +4598,17 @@ Student message: "${msg}"`
       {/* Case history modal */}
       {showHistory && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setShowHistory(false)}>
-          <div className="mx-4 w-full max-w-xl rounded-xl border border-gray-700 bg-gray-900 shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between border-b border-gray-800 px-5 py-4">
-              <h3 className="text-base font-semibold text-gray-100">Case History</h3>
-              <button onClick={() => setShowHistory(false)} className="text-gray-500 hover:text-gray-300 transition-colors text-xl leading-none">×</button>
+          <div className="mx-4 w-full max-w-xl rounded-xl border border-surface-4 bg-surface-1 shadow-2xl" onClick={e => e.stopPropagation()}>
+            <div className="flex items-center justify-between border-b border-surface-4 px-5 py-4">
+              <h3 className="text-base font-semibold text-ink-primary">Case History</h3>
+              <button onClick={() => setShowHistory(false)} className="text-ink-tertiary hover:text-ink-secondary transition-colors text-xl leading-none">×</button>
             </div>
             <div className="max-h-[60vh] overflow-y-auto">
               {historyEntries.length === 0 ? (
-                <div className="px-5 py-10 text-center text-sm text-gray-600">No cases completed yet. Generate a case to get started.</div>
+                <div className="px-5 py-10 text-center text-sm text-ink-tertiary">No cases completed yet. Generate a case to get started.</div>
               ) : (
                 <table className="w-full text-xs">
-                  <thead className="border-b border-gray-800 text-gray-500 uppercase tracking-wide">
+                  <thead className="border-b border-surface-4 text-ink-tertiary uppercase tracking-wide">
                     <tr>
                       <th className="px-4 py-2.5 text-left font-medium">Date</th>
                       <th className="px-4 py-2.5 text-left font-medium">Difficulty</th>
@@ -4619,18 +4619,18 @@ Student message: "${msg}"`
                   </thead>
                   <tbody>
                     {historyEntries.map(entry => (
-                      <tr key={entry.id} className="border-b border-gray-800/50 hover:bg-gray-800/30 transition-colors">
-                        <td className="px-4 py-2.5 text-gray-500">{new Date(entry.date).toLocaleDateString()}</td>
+                      <tr key={entry.id} className="border-b border-surface-4/50 hover:bg-surface-2/30 transition-colors">
+                        <td className="px-4 py-2.5 text-ink-tertiary">{new Date(entry.date).toLocaleDateString()}</td>
                         <td className="px-4 py-2.5">
-                          <span className={`font-medium ${entry.difficulty === 'Advanced' ? 'text-red-400' : entry.difficulty === 'Clinical' ? 'text-yellow-400' : 'text-green-400'}`}>{entry.difficulty}</span>
+                          <span className={`font-medium ${entry.difficulty === 'Advanced' ? 'text-critical' : entry.difficulty === 'Clinical' ? 'text-caution' : 'text-confirmed'}`}>{entry.difficulty}</span>
                         </td>
                         <td className="px-4 py-2.5">
-                          <span className={`font-bold tabular-nums ${entry.score >= 70 ? 'text-green-400' : entry.score >= 50 ? 'text-yellow-400' : 'text-red-400'}`}>{entry.score}/100</span>
+                          <span className={`font-bold tabular-nums ${entry.score >= 70 ? 'text-confirmed' : entry.score >= 50 ? 'text-caution' : 'text-critical'}`}>{entry.score}/100</span>
                         </td>
                         <td className="px-4 py-2.5">
-                          <span className={entry.correct ? 'text-green-400' : 'text-red-400'}>{entry.correct ? '✓ Correct' : '✗ Incorrect'}</span>
+                          <span className={entry.correct ? 'text-confirmed' : 'text-critical'}>{entry.correct ? '✓ Correct' : '✗ Incorrect'}</span>
                         </td>
-                        <td className="px-4 py-2.5 text-gray-300 max-w-[160px] truncate" title={entry.diagnosis}>{entry.diagnosis}</td>
+                        <td className="px-4 py-2.5 text-ink-secondary max-w-[160px] truncate" title={entry.diagnosis}>{entry.diagnosis}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -4641,10 +4641,10 @@ Student message: "${msg}"`
               const avg = Math.round(historyEntries.reduce((s, entry) => s + entry.score, 0) / historyEntries.length)
               const correctCount = historyEntries.filter(entry => entry.correct).length
               return (
-                <div className="border-t border-gray-800 px-5 py-3 flex gap-6 text-xs text-gray-500">
+                <div className="border-t border-surface-4 px-5 py-3 flex gap-6 text-xs text-ink-tertiary">
                   <span>{historyEntries.length} cases</span>
-                  <span>Avg score: <span className="text-gray-300 font-medium">{avg}/100</span></span>
-                  <span>Accuracy: <span className="text-gray-300 font-medium">{Math.round((correctCount / historyEntries.length) * 100)}%</span></span>
+                  <span>Avg score: <span className="text-ink-secondary font-medium">{avg}/100</span></span>
+                  <span>Accuracy: <span className="text-ink-secondary font-medium">{Math.round((correctCount / historyEntries.length) * 100)}%</span></span>
                 </div>
               )
             })()}
