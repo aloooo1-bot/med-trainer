@@ -1286,11 +1286,21 @@ export default function MedTrainer() {
   const analyticsSessionRef = useRef<ActiveSession | null>(null)
   const activeSectionRef = useRef<string>('hpi')
   const resolvedSystemRef = useRef<string>('')
+  const pendingDiagnosisRef = useRef<string | null>(null)
+  const pendingRedoOfRef = useRef<string | null>(null)
+  const activeRedoOfRef = useRef<string | null>(null)
 
-  // Pre-select system from ?system= query param (e.g. from home page weak-spot CTA)
+  // Pre-select system/difficulty from URL params; capture redo diagnosis and lineage
   useEffect(() => {
-    const s = new URLSearchParams(window.location.search).get('system')
+    const p = new URLSearchParams(window.location.search)
+    const s = p.get('system')
     if (s && SYSTEMS.includes(s)) setSystem(s)
+    const d = p.get('difficulty')
+    if (d === 'Foundations' || d === 'Clinical' || d === 'Advanced') setDifficulty(d)
+    const dx = p.get('diagnosis')
+    if (dx) pendingDiagnosisRef.current = dx
+    const redo = p.get('redoOf')
+    if (redo) pendingRedoOfRef.current = redo
   }, [])
 
   // Gate / tier state
@@ -1619,7 +1629,7 @@ Return ONLY valid JSON — no markdown, no explanation:
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderedTests, caseData])
 
-  const generateCase = async (overrideSystem?: string, overrideDifficulty?: string): Promise<CaseData | null> => {
+  const generateCase = async (overrideSystem?: string, overrideDifficulty?: string, overrideDiagnosis?: string): Promise<CaseData | null> => {
     try {
       const gateRes = await fetch('/api/gate/check', { method: 'POST' })
       const gate = await gateRes.json()
@@ -1674,8 +1684,16 @@ Return ONLY valid JSON — no markdown, no explanation:
     resolvedSystemRef.current = resolvedSystem
     const resolvedDifficulty = overrideDifficulty ?? difficulty
 
-    // 40% of the time: try an image-anchored case (every one has a pre-verified image)
-    if (Math.random() < 0.4) {
+    // Capture pending redo params and clear refs for this generation
+    const overrideDx = overrideDiagnosis ?? pendingDiagnosisRef.current
+    const capturedRedoOf = pendingRedoOfRef.current
+    const isRedo = !!capturedRedoOf
+    pendingDiagnosisRef.current = null
+    pendingRedoOfRef.current = null
+    activeRedoOfRef.current = capturedRedoOf
+
+    // 40% of the time: try an image-anchored case (skip when redo-ing a specific diagnosis)
+    if (!overrideDx && Math.random() < 0.4) {
       try {
         const imgRes = await fetch(
           `/api/cases/image-first?system=${encodeURIComponent(resolvedSystem)}&difficulty=${encodeURIComponent(resolvedDifficulty)}`
@@ -1704,11 +1722,12 @@ Return ONLY valid JSON — no markdown, no explanation:
     }
 
     // Pick a specific diagnosis from the manifest so we can use the Supabase cache
+    // When redo-ing, use the override diagnosis and skip the cache lookup
     const manifestDiagnoses = MANIFEST[resolvedSystem]?.[resolvedDifficulty] ?? []
-    const diagnosis = manifestDiagnoses.length > 0
+    const diagnosis = overrideDx ?? (manifestDiagnoses.length > 0
       ? manifestDiagnoses[Math.floor(Math.random() * manifestDiagnoses.length)]
-      : null
-    const caseId = diagnosis ? makeCaseId(resolvedSystem, resolvedDifficulty, diagnosis, 0) : null
+      : null)
+    const caseId = diagnosis && !overrideDx ? makeCaseId(resolvedSystem, resolvedDifficulty, diagnosis, 0) : null
     setActiveCaseId(caseId)
 
     setCaseDifficulty(resolvedDifficulty)
@@ -1773,7 +1792,8 @@ Invent a completely unique patient name. ${namesClause} Never reuse first names 
         ? '"<2-3 sentences. HARD MAXIMUM 40 WORDS — count every word and cut if over. State ONLY: age, sex, primary symptom(s), and duration. STRICTLY FORBIDDEN: toxin or substance names, ingestion or exposure details, witness accounts, progression timeline, pertinent positives/negatives, characterization, radiation, aggravating/relieving factors, physical findings on arrival. CORRECT EXAMPLE (32 words): A 34-year-old male presents to the emergency department with a 6-hour history of tinnitus, nausea, vomiting, and confusion. His girlfriend reports he has been increasingly agitated since this afternoon. WRONG — anything beyond that.>"'
         : '"<1-2 sentences. HARD MAXIMUM 20 WORDS. State age, sex, and ONE vague non-specific complaint. Do NOT name any substance, specific symptom cluster, or detail that points toward the diagnosis. CORRECT EXAMPLE: A 34-year-old male is brought in by his girlfriend appearing confused and agitated.>"'
 
-    const prompt = `Generate a realistic ${resolvedSystem} clinical case${diagnosis ? ` for the diagnosis: "${diagnosis}"` : ''}. Strictly follow the difficulty rules below.
+    const redoClause = isRedo ? ' Use a fresh patient demographic profile and a different clinical presentation than a typical textbook case for this diagnosis.' : ''
+    const prompt = `Generate a realistic ${resolvedSystem} clinical case${diagnosis ? ` for the diagnosis: "${diagnosis}"` : ''}.${redoClause} Strictly follow the difficulty rules below.
 
 ${difficultyRules[resolvedDifficulty] ?? difficultyRules['Foundations']}
 
@@ -2394,6 +2414,10 @@ Student message: "${msg}"`
           score: result.score ?? 0,
           gradingResult: result,
         })
+        if (activeRedoOfRef.current) {
+          record.parentSessionId = activeRedoOfRef.current
+          activeRedoOfRef.current = null
+        }
         syncSessionToSupabase(record)
         analyticsSessionRef.current = null
       }

@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useMemo, Fragment } from 'react'
+import { useState, useEffect, useMemo, useCallback, Fragment } from 'react'
 import '@/app/dashboard.css'
 import { type CaseSessionRecord, type APICallRecord, loadSessionRecords } from '../lib/analytics'
 import type { GradingResult } from '../grading/types'
@@ -28,6 +28,14 @@ function scoreColorVar(score: number): string {
   return 'var(--red)'
 }
 
+function scoreBucketFor(score: number): string {
+  if (score < 60) return '<60'
+  if (score < 70) return '60-69'
+  if (score < 80) return '70-79'
+  if (score < 90) return '80-89'
+  return '90+'
+}
+
 const DIFFICULTY_COLOR: Record<string, string> = {
   Foundations: 'var(--green)',
   Clinical: 'var(--amber)',
@@ -47,123 +55,136 @@ const DIM_META: { key: keyof NonNullable<GradingResult['dimensions']>; label: st
 function ScoreDetail({ session, isPro }: { session: CaseSessionRecord; isPro: boolean }) {
   const gr = session.gradingResult
 
+  const redoHref = `/trainer?system=${encodeURIComponent(session.system)}&difficulty=${encodeURIComponent(session.difficulty)}&diagnosis=${encodeURIComponent(session.diagnosis)}&redoOf=${session.id}`
+
   if (!gr) {
     return (
-      <p style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic' }}>
-        Detailed scorecard not available for this session.
-      </p>
+      <>
+        <p style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic' }}>
+          Detailed scorecard not available for this session.
+        </p>
+        <div style={{ marginTop: 12 }}>
+          <a className="dx-redo-link" href={redoHref}>↻ Redo this case</a>
+        </div>
+      </>
     )
   }
 
   return (
-    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
+    <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24 }}>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {gr.feedback && (
-          <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>{gr.feedback}</p>
-        )}
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {gr.feedback && (
+            <p style={{ fontSize: 13, color: 'var(--text-secondary)', lineHeight: 1.6, margin: 0 }}>{gr.feedback}</p>
+          )}
 
-        {gr.dimensions && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
-            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>
-              Scorecard
-            </div>
-            {DIM_META.map(({ key, label, max }) => {
-              const dim = gr.dimensions![key]
-              const pct = (dim.score / max) * 100
-              return (
-                <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {gr.dimensions && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+              <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>
+                Scorecard
+              </div>
+              {DIM_META.map(({ key, label, max }) => {
+                const dim = gr.dimensions![key]
+                const pct = (dim.score / max) * 100
+                return (
+                  <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
+                      <span style={{ color: 'var(--text-secondary)' }}>{label}</span>
+                      <span style={{ fontWeight: 600, fontFamily: 'DM Mono, monospace', color: scoreColorVar(dim.score / max * 100) }}>
+                        {dim.score}<span style={{ color: 'var(--muted)' }}>/{max}</span>
+                      </span>
+                    </div>
+                    <div style={{ height: 6, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
+                      <div style={{ height: '100%', width: `${pct}%`, borderRadius: 3, background: scoreColorVar(pct) }} />
+                    </div>
+                    {dim.feedback && (
+                      <p style={{ margin: 0, fontSize: 11, color: 'var(--muted)', lineHeight: 1.4 }}>{dim.feedback}</p>
+                    )}
+                  </div>
+                )
+              })}
+
+              {gr.efficiency && gr.efficiency.score > 0 && (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>{label}</span>
-                    <span style={{ fontWeight: 600, fontFamily: 'DM Mono, monospace', color: scoreColorVar(dim.score / max * 100) }}>
-                      {dim.score}<span style={{ color: 'var(--muted)' }}>/{max}</span>
+                    <span style={{ color: 'var(--text-secondary)' }}>Efficiency</span>
+                    <span style={{ fontWeight: 600, fontFamily: 'DM Mono, monospace', color: scoreColorVar(gr.efficiency.score * 10) }}>
+                      {gr.efficiency.score}<span style={{ color: 'var(--muted)' }}>/10</span>
                     </span>
                   </div>
                   <div style={{ height: 6, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${pct}%`, borderRadius: 3, background: scoreColorVar(pct) }} />
+                    <div style={{ height: '100%', width: `${gr.efficiency.score * 10}%`, borderRadius: 3, background: scoreColorVar(gr.efficiency.score * 10) }} />
                   </div>
-                  {dim.feedback && (
-                    <p style={{ margin: 0, fontSize: 11, color: 'var(--muted)', lineHeight: 1.4 }}>{dim.feedback}</p>
+                  {gr.efficiency.feedback && (
+                    <p style={{ margin: 0, fontSize: 11, color: 'var(--muted)', lineHeight: 1.4 }}>{gr.efficiency.feedback}</p>
                   )}
                 </div>
-              )
-            })}
+              )}
+            </div>
+          )}
+        </div>
 
-            {gr.efficiency && gr.efficiency.score > 0 && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                  <span style={{ color: 'var(--text-secondary)' }}>Efficiency</span>
-                  <span style={{ fontWeight: 600, fontFamily: 'DM Mono, monospace', color: scoreColorVar(gr.efficiency.score * 10) }}>
-                    {gr.efficiency.score}<span style={{ color: 'var(--muted)' }}>/10</span>
-                  </span>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          {isPro && (gr.strengths?.length ?? 0) > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Strengths</div>
+              {gr.strengths.map((s, i) => (
+                <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--green)' }}>
+                  <span style={{ flexShrink: 0 }}>✓</span><span>{s}</span>
                 </div>
-                <div style={{ height: 6, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
-                  <div style={{ height: '100%', width: `${gr.efficiency.score * 10}%`, borderRadius: 3, background: scoreColorVar(gr.efficiency.score * 10) }} />
+              ))}
+            </div>
+          )}
+
+          {isPro && (gr.missedQuestions?.length ?? 0) > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Missed Questions</div>
+              {gr.missedQuestions.map((q, i) => (
+                <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--amber)' }}>
+                  <span style={{ flexShrink: 0 }}>·</span><span>{q}</span>
                 </div>
-                {gr.efficiency.feedback && (
-                  <p style={{ margin: 0, fontSize: 11, color: 'var(--muted)', lineHeight: 1.4 }}>{gr.efficiency.feedback}</p>
-                )}
-              </div>
-            )}
+              ))}
+            </div>
+          )}
+
+          {isPro && (gr.teachingPoints?.length ?? 0) > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Teaching Points</div>
+              {gr.teachingPoints.map((tp, i) => (
+                <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--accent)' }}>
+                  <span style={{ flexShrink: 0 }}>·</span><span>{tp}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {isPro && (gr.differentials?.length ?? 0) > 0 && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Differentials</div>
+              {gr.differentials.map((d, i) => (
+                <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--text-secondary)' }}>
+                  <span style={{ flexShrink: 0, color: 'var(--muted)' }}>·</span><span>{d}</span>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {!isPro && (
+            <div style={{ borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', padding: 12, textAlign: 'center' }}>
+              <p style={{ margin: 0, fontSize: 12, color: 'var(--muted)' }}>Teaching points, strengths &amp; differentials available on Pro.</p>
+            </div>
+          )}
+
+          <div style={{ display: 'flex', gap: 16, fontSize: 11, color: 'var(--muted)', paddingTop: 8, borderTop: '1px solid var(--border)' }}>
+            <span>Time: {fmtElapsed(session.elapsedSeconds)}</span>
+            <span>Questions: {session.questionCount}</span>
           </div>
-        )}
+        </div>
       </div>
 
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        {isPro && (gr.strengths?.length ?? 0) > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Strengths</div>
-            {gr.strengths.map((s, i) => (
-              <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--green)' }}>
-                <span style={{ flexShrink: 0 }}>✓</span><span>{s}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {isPro && (gr.missedQuestions?.length ?? 0) > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Missed Questions</div>
-            {gr.missedQuestions.map((q, i) => (
-              <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--amber)' }}>
-                <span style={{ flexShrink: 0 }}>·</span><span>{q}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {isPro && (gr.teachingPoints?.length ?? 0) > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Teaching Points</div>
-            {gr.teachingPoints.map((tp, i) => (
-              <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--accent)' }}>
-                <span style={{ flexShrink: 0 }}>·</span><span>{tp}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {isPro && (gr.differentials?.length ?? 0) > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
-            <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Differentials</div>
-            {gr.differentials.map((d, i) => (
-              <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--text-secondary)' }}>
-                <span style={{ flexShrink: 0, color: 'var(--muted)' }}>·</span><span>{d}</span>
-              </div>
-            ))}
-          </div>
-        )}
-
-        {!isPro && (
-          <div style={{ borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface)', padding: 12, textAlign: 'center' }}>
-            <p style={{ margin: 0, fontSize: 12, color: 'var(--muted)' }}>Teaching points, strengths &amp; differentials available on Pro.</p>
-          </div>
-        )}
-
-        <div style={{ display: 'flex', gap: 16, fontSize: 11, color: 'var(--muted)', paddingTop: 8, borderTop: '1px solid var(--border)' }}>
-          <span>Time: {fmtElapsed(session.elapsedSeconds)}</span>
-          <span>Questions: {session.questionCount}</span>
-        </div>
+      <div style={{ paddingTop: 12, borderTop: '1px solid var(--border)' }}>
+        <a className="dx-redo-link" href={redoHref}>↻ Redo this case</a>
       </div>
     </div>
   )
@@ -190,6 +211,8 @@ function rowToRecord(row: any): CaseSessionRecord {
     totalOutputTokens: row.total_output_tokens ?? 0,
     apiCalls: (row.api_calls as APICallRecord[]) ?? [],
     gradingResult: row.grading_result as GradingResult | undefined,
+    bookmarked: row.bookmarked ?? false,
+    parentSessionId: row.parent_session_id ?? null,
   }
 }
 
@@ -197,16 +220,26 @@ function rowToRecord(row: any): CaseSessionRecord {
 
 const DIFF_FILTERS = ['All', 'Foundations', 'Clinical', 'Advanced'] as const
 type DiffFilter = typeof DIFF_FILTERS[number]
+const SCORE_BUCKETS = ['<60', '60-69', '70-79', '80-89', '90+'] as const
+type DateRange = 'all' | '7d' | '30d' | '90d'
 
 export default function HistoryPage() {
-  const [sessions, setSessions]     = useState<CaseSessionRecord[]>([])
-  const [loaded, setLoaded]         = useState(false)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
-  const [source, setSource]         = useState<'cloud' | 'local'>('local')
-  const [isPro, setIsPro]           = useState(false)
-  const [diffFilter, setDiffFilter] = useState<DiffFilter>('All')
-  const [displayName, setDisplayName] = useState('User')
-  const [tier, setTier]             = useState('free')
+  const [sessions, setSessions]         = useState<CaseSessionRecord[]>([])
+  const [loaded, setLoaded]             = useState(false)
+  const [expandedId, setExpandedId]     = useState<string | null>(null)
+  const [source, setSource]             = useState<'cloud' | 'local'>('local')
+  const [isPro, setIsPro]               = useState(false)
+  const [diffFilter, setDiffFilter]     = useState<DiffFilter>('All')
+  const [displayName, setDisplayName]   = useState('User')
+  const [tier, setTier]                 = useState('free')
+
+  // Phase 4b: additional filter state
+  const [searchRaw, setSearchRaw]         = useState('')
+  const [searchQuery, setSearchQuery]     = useState('')
+  const [systemFilter, setSystemFilter]   = useState<Set<string>>(new Set())
+  const [scoreBuckets, setScoreBuckets]   = useState<Set<string>>(new Set())
+  const [dateRange, setDateRange]         = useState<DateRange>('all')
+  const [onlyBookmarked, setOnlyBookmarked] = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -242,6 +275,7 @@ export default function HistoryPage() {
     load()
   }, [])
 
+  // Deep-link expand from ?expand=<id>
   useEffect(() => {
     if (!loaded || !sessions.length) return
     const target = new URLSearchParams(window.location.search).get('expand')
@@ -252,10 +286,68 @@ export default function HistoryPage() {
     )
   }, [loaded, sessions.length])
 
-  const filtered = useMemo(
-    () => diffFilter === 'All' ? sessions : sessions.filter(s => s.difficulty === diffFilter),
-    [sessions, diffFilter]
+  // Debounce search input
+  useEffect(() => {
+    const t = setTimeout(() => setSearchQuery(searchRaw.toLowerCase().trim()), 200)
+    return () => clearTimeout(t)
+  }, [searchRaw])
+
+  // Systems list for multi-select chips
+  const systemList = useMemo(
+    () => Array.from(new Set(sessions.map(s => s.system))).sort(),
+    [sessions]
   )
+
+  const dateCutoff = useMemo(() => {
+    if (dateRange === 'all') return 0
+    const days = dateRange === '7d' ? 7 : dateRange === '30d' ? 30 : 90
+    return Date.now() - days * 24 * 60 * 60 * 1000
+  }, [dateRange])
+
+  const filtered = useMemo(() => {
+    const q = searchQuery
+    return sessions.filter(s => {
+      if (diffFilter !== 'All' && s.difficulty !== diffFilter) return false
+      if (systemFilter.size > 0 && !systemFilter.has(s.system)) return false
+      if (scoreBuckets.size > 0 && !scoreBuckets.has(scoreBucketFor(s.score))) return false
+      if (dateCutoff > 0 && s.completedAt < dateCutoff) return false
+      if (onlyBookmarked && !s.bookmarked) return false
+      if (q && !(s.userDiagnosis ?? '').toLowerCase().includes(q) && !s.diagnosis.toLowerCase().includes(q)) return false
+      return true
+    })
+  }, [sessions, diffFilter, systemFilter, scoreBuckets, dateCutoff, onlyBookmarked, searchQuery])
+
+  const isFiltered = diffFilter !== 'All' || systemFilter.size > 0 || scoreBuckets.size > 0 || dateRange !== 'all' || onlyBookmarked || searchQuery.length > 0
+
+  function clearAllFilters() {
+    setDiffFilter('All')
+    setSystemFilter(new Set())
+    setScoreBuckets(new Set())
+    setDateRange('all')
+    setOnlyBookmarked(false)
+    setSearchRaw('')
+    setExpandedId(null)
+  }
+
+  function toggleSystem(sys: string) {
+    setSystemFilter(prev => {
+      const next = new Set(prev)
+      if (next.has(sys)) next.delete(sys)
+      else next.add(sys)
+      return next
+    })
+    setExpandedId(null)
+  }
+
+  function toggleBucket(b: string) {
+    setScoreBuckets(prev => {
+      const next = new Set(prev)
+      if (next.has(b)) next.delete(b)
+      else next.add(b)
+      return next
+    })
+    setExpandedId(null)
+  }
 
   const diffCounts = useMemo(() => {
     const counts: Record<string, number> = {}
@@ -263,14 +355,41 @@ export default function HistoryPage() {
     return counts
   }, [sessions])
 
+  // Phase 4a: recent trend (last 5 vs prior 5)
+  const recentTrend = useMemo(() => {
+    if (sessions.length < 10) return null
+    const avg = (arr: CaseSessionRecord[]) => arr.reduce((a, s) => a + s.score, 0) / arr.length
+    return Math.round(avg(sessions.slice(0, 5)) - avg(sessions.slice(5, 10)))
+  }, [sessions])
+
   const stats = useMemo(() => {
     if (filtered.length === 0) return null
     const avgScore = filtered.reduce((a, s) => a + s.score, 0) / filtered.length
-    const sysCount: Record<string, number> = {}
-    for (const s of filtered) sysCount[s.system] = (sysCount[s.system] ?? 0) + 1
-    const mostPracticed = Object.entries(sysCount).sort((a, b) => b[1] - a[1])[0]?.[0] ?? '—'
-    return { total: filtered.length, avgScore, mostPracticed }
+    return { total: filtered.length, avgScore }
   }, [filtered])
+
+  // Phase 4c: optimistic bookmark toggle
+  const toggleBookmark = useCallback((session: CaseSessionRecord) => {
+    const next = !session.bookmarked
+    setSessions(prev => prev.map(s => s.id === session.id ? { ...s, bookmarked: next } : s))
+    fetch('/api/sessions/bookmark', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: session.id, bookmarked: next }),
+    }).then(r => {
+      if (!r.ok) setSessions(prev => prev.map(s => s.id === session.id ? { ...s, bookmarked: !next } : s))
+    }).catch(() => {
+      setSessions(prev => prev.map(s => s.id === session.id ? { ...s, bookmarked: !next } : s))
+    })
+  }, [])
+
+  // Phase 4d: scroll to parent session
+  const scrollToParent = useCallback((parentId: string) => {
+    setExpandedId(parentId)
+    requestAnimationFrame(() =>
+      document.getElementById(`session-${parentId}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+    )
+  }, [])
 
   if (!loaded) {
     return (
@@ -323,48 +442,135 @@ export default function HistoryPage() {
           {/* Stats row */}
           {stats && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
-              {[
-                { label: 'Completed', value: stats.total.toString() },
-                { label: 'Avg Score', value: stats.avgScore.toFixed(1), color: scoreColorVar(stats.avgScore) },
-                { label: 'Most Practiced', value: stats.mostPracticed },
-              ].map(({ label, value, color }) => (
-                <div key={label} className="dx-card" style={{ padding: '16px 20px' }}>
-                  <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{label}</div>
-                  <div style={{ fontSize: 22, fontWeight: 700, color: color ?? 'var(--text-primary)', fontFamily: 'DM Mono, monospace' }}>{value}</div>
-                </div>
-              ))}
+              <div className="dx-card" style={{ padding: '16px 20px' }}>
+                <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Completed</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'DM Mono, monospace' }}>{stats.total}</div>
+              </div>
+              <div className="dx-card" style={{ padding: '16px 20px' }}>
+                <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Avg Score</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: scoreColorVar(stats.avgScore), fontFamily: 'DM Mono, monospace' }}>{stats.avgScore.toFixed(1)}</div>
+              </div>
+              <div className="dx-card" style={{ padding: '16px 20px' }}>
+                <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Recent trend</div>
+                {recentTrend === null ? (
+                  <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--muted)', fontFamily: 'DM Mono, monospace' }}>
+                    —<span style={{ fontSize: 11, marginLeft: 6, fontWeight: 400 }}>(need 10)</span>
+                  </div>
+                ) : (
+                  <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'DM Mono, monospace', color: recentTrend > 0 ? 'var(--green)' : recentTrend < 0 ? 'var(--red)' : 'var(--muted)' }}>
+                    {recentTrend > 0 ? `+${recentTrend}` : recentTrend} pts
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
-          {/* Difficulty filter chips */}
-          <div className="dx-filter-chips" style={{ marginBottom: 20 }}>
-            {DIFF_FILTERS.map(d => {
-              const count = d === 'All' ? sessions.length : (diffCounts[d] ?? 0)
-              return (
-                <button
-                  key={d}
-                  className={`dx-chip${diffFilter === d ? ' active' : ''}`}
-                  onClick={() => { setDiffFilter(d); setExpandedId(null) }}
-                >
-                  {d}{count > 0 && ` (${count})`}
+          {/* Filter bar */}
+          <div className="dx-history-filters">
+            {/* Search + bookmarked + clear */}
+            <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
+              <input
+                className="dx-search"
+                type="search"
+                placeholder="Search by diagnosis…"
+                value={searchRaw}
+                onChange={e => setSearchRaw(e.target.value)}
+                style={{ flex: '1 1 200px', minWidth: 0 }}
+              />
+              <button
+                className={`dx-chip${onlyBookmarked ? ' active' : ''}`}
+                onClick={() => { setOnlyBookmarked(v => !v); setExpandedId(null) }}
+              >
+                {onlyBookmarked ? '★' : '☆'} Bookmarked
+              </button>
+              {isFiltered && (
+                <button className="dx-chip" onClick={clearAllFilters} style={{ color: 'var(--muted)' }}>
+                  Clear filters
                 </button>
-              )
-            })}
+              )}
+            </div>
+
+            {/* Difficulty chips */}
+            <div className="dx-filter-chips">
+              {DIFF_FILTERS.map(d => {
+                const count = d === 'All' ? sessions.length : (diffCounts[d] ?? 0)
+                return (
+                  <button
+                    key={d}
+                    className={`dx-chip${diffFilter === d ? ' active' : ''}`}
+                    onClick={() => { setDiffFilter(d); setExpandedId(null) }}
+                  >
+                    {d}{count > 0 && ` (${count})`}
+                  </button>
+                )
+              })}
+            </div>
+
+            {/* System chips (multi-select) */}
+            {systemList.length > 1 && (
+              <div className="dx-filter-chips">
+                {systemList.map(sys => (
+                  <button
+                    key={sys}
+                    className={`dx-chip${systemFilter.has(sys) ? ' active' : ''}`}
+                    onClick={() => toggleSystem(sys)}
+                  >
+                    {sys}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {/* Score buckets + date range */}
+            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+              <div className="dx-filter-chips">
+                {SCORE_BUCKETS.map(b => (
+                  <button
+                    key={b}
+                    className={`dx-chip${scoreBuckets.has(b) ? ' active' : ''}`}
+                    onClick={() => toggleBucket(b)}
+                  >
+                    {b}
+                  </button>
+                ))}
+              </div>
+              <div className="dx-filter-chips">
+                {(['all', '7d', '30d', '90d'] as const).map(r => (
+                  <button
+                    key={r}
+                    className={`dx-chip${dateRange === r ? ' active' : ''}`}
+                    onClick={() => { setDateRange(r); setExpandedId(null) }}
+                  >
+                    {r === 'all' ? 'All time' : `Last ${r}`}
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* Table */}
           {filtered.length === 0 ? (
             <div className="dx-card" style={{ padding: 32, textAlign: 'center' }}>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 8px' }}>No {diffFilter} cases yet.</p>
-              <a href={`/trainer?difficulty=${encodeURIComponent(diffFilter)}`}
-                style={{ fontSize: 13, color: 'var(--accent)', textDecoration: 'none' }}>
-                Start a {diffFilter} case →
-              </a>
+              <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 8px' }}>
+                {isFiltered ? 'No cases match the current filters.' : `No ${diffFilter} cases yet.`}
+              </p>
+              {!isFiltered && (
+                <a href={`/trainer?difficulty=${encodeURIComponent(diffFilter)}`}
+                  style={{ fontSize: 13, color: 'var(--accent)', textDecoration: 'none' }}>
+                  Start a {diffFilter} case →
+                </a>
+              )}
+              {isFiltered && (
+                <button className="dx-chip" onClick={clearAllFilters} style={{ color: 'var(--accent)' }}>
+                  Clear filters
+                </button>
+              )}
             </div>
           ) : (
             <div className="dx-card" style={{ padding: 0, overflow: 'hidden' }}>
               {/* Table header */}
               <div className="dx-table-header">
+                <span />
                 <span>Date</span>
                 <span>System</span>
                 <span>Level</span>
@@ -384,12 +590,36 @@ export default function HistoryPage() {
                       className="dx-table-row"
                       onClick={() => setExpandedId(isExpanded ? null : session.id)}
                     >
+                      {/* Bookmark star */}
+                      <button
+                        className={`dx-bookmark-btn${session.bookmarked ? ' bookmarked' : ''}`}
+                        onClick={e => { e.stopPropagation(); toggleBookmark(session) }}
+                        title={session.bookmarked ? 'Remove bookmark' : 'Bookmark'}
+                        aria-label={session.bookmarked ? 'Remove bookmark' : 'Bookmark'}
+                      >
+                        {session.bookmarked ? '★' : '☆'}
+                      </button>
+
                       <span style={{ color: 'var(--muted)', fontSize: 12, whiteSpace: 'nowrap' }}>
                         {fmtDate(session.startedAt)}
                       </span>
-                      <span style={{ fontSize: 13, fontWeight: 600, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
-                        {session.system}
+
+                      {/* System + redo badge */}
+                      <span style={{ display: 'flex', alignItems: 'center', gap: 6, overflow: 'hidden' }}>
+                        <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 600 }}>
+                          {session.system}
+                        </span>
+                        {session.parentSessionId && (
+                          <button
+                            className="dx-redo-badge"
+                            onClick={e => { e.stopPropagation(); scrollToParent(session.parentSessionId!) }}
+                            title="Show original"
+                          >
+                            ↻ redo
+                          </button>
+                        )}
                       </span>
+
                       <span>
                         <span style={{
                           fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4,

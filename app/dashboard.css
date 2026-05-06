@@ -956,6 +956,71 @@
   margin: 0;
 }
 
+/* ── Phase 4: Case History improvements ── */
+
+/* Updated table grid: 28px star + original 8 cols */
+.dx-table-header,
+.dx-table-row {
+  grid-template-columns: 28px 140px 1fr 90px 70px 90px 1fr 1fr 40px;
+}
+
+.dx-bookmark-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  width: 20px;
+  height: 20px;
+  font-size: 15px;
+  color: var(--muted);
+  cursor: pointer;
+  border-radius: 3px;
+  transition: color 0.15s;
+  line-height: 1;
+}
+.dx-bookmark-btn:hover { color: var(--text); }
+.dx-bookmark-btn.bookmarked { color: #f59e0b; }
+
+.dx-redo-badge {
+  flex-shrink: 0;
+  background: var(--surface3);
+  border: none;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: color 0.15s, background 0.15s;
+}
+.dx-redo-badge:hover { background: var(--surface2); color: var(--text); }
+
+.dx-redo-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--surface2);
+  transition: background 0.15s, border-color 0.15s;
+}
+.dx-redo-link:hover { background: var(--surface3); border-color: var(--border2); }
+
+.dx-history-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
 /* ── Phase 3: Progress page ── */
 
 .dx-progress-locked {

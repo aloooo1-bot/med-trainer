@@ -53,6 +53,8 @@ export interface CaseSessionRecord {
   totalOutputTokens: number
   elapsedSeconds: number
   gradingResult?: GradingResult
+  bookmarked?: boolean
+  parentSessionId?: string | null
 }
 
 // Held in a React ref during a live case; never persisted until submitDiagnosis
@@ -124,6 +126,38 @@ export function recordToSession(session: ActiveSession, record: APICallRecord): 
   session.totalOutputTokens += record.outputTokens
 }
 
+// ── Feedback / ratings ────────────────────────────────────────────────────────
+
+export interface FeedbackRecord {
+  id: string
+  timestamp: number
+  diagnosis: string
+  system: string
+  difficulty: string
+  patientName: string
+  ratings: Record<string, number>   // dim key → 1-5
+  comment: string
+}
+
+const FEEDBACK_KEY = 'medtrainer_feedback'
+const MAX_FEEDBACK = 2000
+
+export function loadFeedbackRecords(): FeedbackRecord[] {
+  try { return JSON.parse(localStorage.getItem(FEEDBACK_KEY) ?? '[]') as FeedbackRecord[] } catch { return [] }
+}
+
+export function saveFeedbackRecord(rec: FeedbackRecord): void {
+  try {
+    const existing = loadFeedbackRecords()
+    existing.push(rec)
+    localStorage.setItem(FEEDBACK_KEY, JSON.stringify(existing.slice(-MAX_FEEDBACK)))
+  } catch {}
+}
+
+export function clearFeedbackRecords(): void {
+  try { localStorage.removeItem(FEEDBACK_KEY) } catch {}
+}
+
 // ── localStorage ──────────────────────────────────────────────────────────────
 
 const ANALYTICS_KEY = 'medtrainer_analytics'
@@ -169,18 +203,28 @@ export function recordAbandonedSession(active: ActiveSession, tabAtAbandon: stri
 export function finalizeSession(
   active: ActiveSession,
   outcome: Pick<CaseSessionRecord, 'diagnosis' | 'userDiagnosis' | 'correct' | 'score'> & { gradingResult?: GradingResult }
-): void {
+): CaseSessionRecord {
+  const completedAt = Date.now()
+  const record: CaseSessionRecord = {
+    ...active,
+    completedAt,
+    elapsedSeconds: Math.round((completedAt - active.startedAt) / 1000),
+    ...outcome,
+  }
   try {
-    const completedAt = Date.now()
-    const record: CaseSessionRecord = {
-      ...active,
-      completedAt,
-      elapsedSeconds: Math.round((completedAt - active.startedAt) / 1000),
-      ...outcome,
-    }
     const existing = loadSessionRecords()
     existing.push(record)
-    const trimmed = existing.slice(-MAX_SESSIONS)
-    localStorage.setItem(ANALYTICS_KEY, JSON.stringify(trimmed))
+    localStorage.setItem(ANALYTICS_KEY, JSON.stringify(existing.slice(-MAX_SESSIONS)))
+  } catch {}
+  return record
+}
+
+export async function syncSessionToSupabase(record: CaseSessionRecord): Promise<void> {
+  try {
+    await fetch('/api/sessions/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(record),
+    })
   } catch {}
 }
