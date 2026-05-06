@@ -12,7 +12,7 @@ ALTER TABLE cases DROP COLUMN IF EXISTS patient_name;
 
 -- ── Migration: Phase 4 — bookmark flag + redo lineage on case_sessions ────────
 ALTER TABLE case_sessions ADD COLUMN IF NOT EXISTS bookmarked        BOOLEAN NOT NULL DEFAULT FALSE;
-ALTER TABLE case_sessions ADD COLUMN IF NOT EXISTS parent_session_id UUID    REFERENCES case_sessions(id) ON DELETE SET NULL;
+ALTER TABLE case_sessions ADD COLUMN IF NOT EXISTS parent_session_id TEXT    REFERENCES case_sessions(id) ON DELETE SET NULL;
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- ── Cases library ─────────────────────────────────────────────────────────────
