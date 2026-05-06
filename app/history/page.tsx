@@ -6,6 +6,7 @@ import { type CaseSessionRecord, type APICallRecord, loadSessionRecords } from '
 import type { GradingResult } from '../grading/types'
 import { createClient } from '../lib/supabase/client'
 import Sidebar from '@/app/components/dashboard/Sidebar'
+import ReportCaseModal from '@/app/components/dashboard/ReportCaseModal'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -52,10 +53,22 @@ const DIM_META: { key: keyof NonNullable<GradingResult['dimensions']>; label: st
 
 // ── Scorecard detail ──────────────────────────────────────────────────────────
 
-function ScoreDetail({ session, isPro }: { session: CaseSessionRecord; isPro: boolean }) {
+function ScoreDetail({
+  session, isPro, onNotesChange,
+}: {
+  session: CaseSessionRecord
+  isPro: boolean
+  onNotesChange: (id: string, notes: string) => void
+}) {
   const gr = session.gradingResult
+  const [localNotes, setLocalNotes] = useState(session.notes ?? '')
+  const [showReport, setShowReport] = useState(false)
 
   const redoHref = `/trainer?system=${encodeURIComponent(session.system)}&difficulty=${encodeURIComponent(session.difficulty)}&diagnosis=${encodeURIComponent(session.diagnosis)}&redoOf=${session.id}`
+
+  function saveNotes() {
+    onNotesChange(session.id, localNotes)
+  }
 
   if (!gr) {
     return (
@@ -63,9 +76,29 @@ function ScoreDetail({ session, isPro }: { session: CaseSessionRecord; isPro: bo
         <p style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic' }}>
           Detailed scorecard not available for this session.
         </p>
-        <div style={{ marginTop: 12 }}>
-          <a className="dx-redo-link" href={redoHref}>↻ Redo this case</a>
+        <div className="dx-notes-section" style={{ marginTop: 12 }}>
+          <div className="dx-notes-label">Your notes</div>
+          <textarea
+            className="dx-notes-textarea"
+            placeholder="Add notes about this case…"
+            value={localNotes}
+            onChange={e => setLocalNotes(e.target.value)}
+            onBlur={saveNotes}
+            rows={2}
+          />
         </div>
+        <div style={{ marginTop: 12, display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          <a className="dx-redo-link" href={redoHref}>↻ Redo this case</a>
+          <button className="dx-report-link" onClick={() => setShowReport(true)}>⚑ Report this case</button>
+        </div>
+        <ReportCaseModal
+          open={showReport}
+          onClose={() => setShowReport(false)}
+          sessionId={session.id}
+          system={session.system}
+          difficulty={session.difficulty}
+          diagnosis={session.diagnosis}
+        />
       </>
     )
   }
@@ -183,9 +216,33 @@ function ScoreDetail({ session, isPro }: { session: CaseSessionRecord; isPro: bo
         </div>
       </div>
 
-      <div style={{ paddingTop: 12, borderTop: '1px solid var(--border)' }}>
-        <a className="dx-redo-link" href={redoHref}>↻ Redo this case</a>
+      {/* Notes */}
+      <div className="dx-notes-section">
+        <div className="dx-notes-label">Your notes</div>
+        <textarea
+          className="dx-notes-textarea"
+          placeholder="Add notes about this case…"
+          value={localNotes}
+          onChange={e => setLocalNotes(e.target.value)}
+          onBlur={saveNotes}
+          rows={3}
+        />
       </div>
+
+      {/* Actions */}
+      <div style={{ paddingTop: 12, borderTop: '1px solid var(--border)', display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+        <a className="dx-redo-link" href={redoHref}>↻ Redo this case</a>
+        <button className="dx-report-link" onClick={() => setShowReport(true)}>⚑ Report this case</button>
+      </div>
+
+      <ReportCaseModal
+        open={showReport}
+        onClose={() => setShowReport(false)}
+        sessionId={session.id}
+        system={session.system}
+        difficulty={session.difficulty}
+        diagnosis={session.diagnosis}
+      />
     </div>
   )
 }
@@ -213,6 +270,7 @@ function rowToRecord(row: any): CaseSessionRecord {
     gradingResult: row.grading_result as GradingResult | undefined,
     bookmarked: row.bookmarked ?? false,
     parentSessionId: row.parent_session_id ?? null,
+    notes: row.notes ?? '',
   }
 }
 
@@ -312,7 +370,7 @@ export default function HistoryPage() {
       if (scoreBuckets.size > 0 && !scoreBuckets.has(scoreBucketFor(s.score))) return false
       if (dateCutoff > 0 && s.completedAt < dateCutoff) return false
       if (onlyBookmarked && !s.bookmarked) return false
-      if (q && !(s.userDiagnosis ?? '').toLowerCase().includes(q) && !s.diagnosis.toLowerCase().includes(q)) return false
+      if (q && !(s.userDiagnosis ?? '').toLowerCase().includes(q) && !s.diagnosis.toLowerCase().includes(q) && !(s.notes ?? '').toLowerCase().includes(q)) return false
       return true
     })
   }, [sessions, diffFilter, systemFilter, scoreBuckets, dateCutoff, onlyBookmarked, searchQuery])
@@ -381,6 +439,18 @@ export default function HistoryPage() {
     }).catch(() => {
       setSessions(prev => prev.map(s => s.id === session.id ? { ...s, bookmarked: !next } : s))
     })
+  }, [])
+
+  // Phase 7e: notes auto-save
+  const handleNotesChange = useCallback((id: string, notes: string) => {
+    setSessions(prev => prev.map(s => s.id === id ? { ...s, notes } : s))
+    fetch('/api/sessions/notes', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, notes }),
+    }).then(r => {
+      if (!r.ok) setSessions(prev => prev.map(s => s.id === id ? { ...s, notes: s.notes } : s))
+    }).catch(() => {})
   }, [])
 
   // Phase 4d: scroll to parent session
@@ -472,7 +542,7 @@ export default function HistoryPage() {
               <input
                 className="dx-search"
                 type="search"
-                placeholder="Search by diagnosis…"
+                placeholder="Search by diagnosis or notes…"
                 value={searchRaw}
                 onChange={e => setSearchRaw(e.target.value)}
                 style={{ flex: '1 1 200px', minWidth: 0 }}
@@ -649,7 +719,7 @@ export default function HistoryPage() {
 
                     {isExpanded && (
                       <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)' }}>
-                        <ScoreDetail session={session} isPro={isPro} />
+                        <ScoreDetail session={session} isPro={isPro} onNotesChange={handleNotesChange} />
                       </div>
                     )}
                   </Fragment>

@@ -55,6 +55,7 @@ export interface CaseSessionRecord {
   gradingResult?: GradingResult
   bookmarked?: boolean
   parentSessionId?: string | null
+  notes?: string
 }
 
 // Held in a React ref during a live case; never persisted until submitDiagnosis

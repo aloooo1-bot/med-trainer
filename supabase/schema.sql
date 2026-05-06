@@ -13,6 +13,35 @@ ALTER TABLE cases DROP COLUMN IF EXISTS patient_name;
 -- ── Migration: Phase 4 — bookmark flag + redo lineage on case_sessions ────────
 ALTER TABLE case_sessions ADD COLUMN IF NOT EXISTS bookmarked        BOOLEAN NOT NULL DEFAULT FALSE;
 ALTER TABLE case_sessions ADD COLUMN IF NOT EXISTS parent_session_id TEXT    REFERENCES case_sessions(id) ON DELETE SET NULL;
+
+-- ── Migration: Phase 7 — notes, profile settings, case_reports ───────────────
+ALTER TABLE case_sessions ADD COLUMN IF NOT EXISTS notes TEXT NOT NULL DEFAULT '';
+
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS email_case_reminders BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS email_weekly_summary BOOLEAN NOT NULL DEFAULT TRUE;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS rest_days             TEXT[];
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS weekly_volume         INT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS difficulty_mix        TEXT;
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS default_system        TEXT;
+
+CREATE TABLE IF NOT EXISTS case_reports (
+  id           UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id      UUID        NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
+  session_id   TEXT,
+  case_id      TEXT,
+  system       TEXT        NOT NULL,
+  difficulty   TEXT        NOT NULL,
+  diagnosis    TEXT        NOT NULL,
+  category     TEXT        NOT NULL CHECK (category IN ('incorrect-grading','inaccurate-content','confusing-ui','other')),
+  comment      TEXT        NOT NULL DEFAULT '',
+  status       TEXT        NOT NULL DEFAULT 'open' CHECK (status IN ('open','resolved','dismissed')),
+  created_at   TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS case_reports_status     ON case_reports (status);
+CREATE INDEX IF NOT EXISTS case_reports_created_at ON case_reports (created_at DESC);
+ALTER TABLE  case_reports ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "case_reports_own_insert" ON case_reports FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "case_reports_own_read"   ON case_reports FOR SELECT USING (auth.uid() = user_id);
 -- ─────────────────────────────────────────────────────────────────────────────
 
 -- ── Cases library ─────────────────────────────────────────────────────────────

@@ -80,6 +80,7 @@ export default async function HomePage() {
       casesLeft={casesLeft ?? null}
       streakDays={streakDays ?? 0}
       sessions={sessions ?? []}
+      firstCaseDone={profile?.first_case_completed ?? false}
     />
   )
 }

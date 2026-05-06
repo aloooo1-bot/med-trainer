@@ -42,6 +42,12 @@ export interface Database {
           cases_today_reset_at: string
           first_case_completed: boolean
           created_at: string
+          email_case_reminders: boolean
+          email_weekly_summary: boolean
+          rest_days: string[] | null
+          weekly_volume: number | null
+          difficulty_mix: string | null
+          default_system: string | null
         }
         Insert: {
           id: string
@@ -52,6 +58,12 @@ export interface Database {
           cases_today_reset_at?: string
           first_case_completed?: boolean
           created_at?: string
+          email_case_reminders?: boolean
+          email_weekly_summary?: boolean
+          rest_days?: string[] | null
+          weekly_volume?: number | null
+          difficulty_mix?: string | null
+          default_system?: string | null
         }
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>
       }
@@ -76,6 +88,7 @@ export interface Database {
           grading_result: Json | null
           bookmarked: boolean
           parent_session_id: string | null
+          notes: string
           created_at: string
         }
         Insert: {
@@ -98,9 +111,39 @@ export interface Database {
           grading_result?: Json | null
           bookmarked?: boolean
           parent_session_id?: string | null
+          notes?: string
           created_at?: string
         }
         Update: Partial<Database['public']['Tables']['case_sessions']['Insert']>
+      }
+      case_reports: {
+        Row: {
+          id: string
+          user_id: string
+          session_id: string | null
+          case_id: string | null
+          system: string
+          difficulty: string
+          diagnosis: string
+          category: 'incorrect-grading' | 'inaccurate-content' | 'confusing-ui' | 'other'
+          comment: string
+          status: 'open' | 'resolved' | 'dismissed'
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          user_id: string
+          session_id?: string | null
+          case_id?: string | null
+          system: string
+          difficulty: string
+          diagnosis: string
+          category: 'incorrect-grading' | 'inaccurate-content' | 'confusing-ui' | 'other'
+          comment?: string
+          status?: 'open' | 'resolved' | 'dismissed'
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['case_reports']['Insert']>
       }
       ratings: {
         Row: {
@@ -144,6 +187,7 @@ export interface Database {
 export type Tables<T extends keyof Database['public']['Tables']> =
   Database['public']['Tables'][T]['Row']
 
-export type CaseRow    = Tables<'cases'>
-export type ProfileRow = Tables<'profiles'>
-export type RatingRow  = Tables<'ratings'>
+export type CaseRow        = Tables<'cases'>
+export type ProfileRow     = Tables<'profiles'>
+export type RatingRow      = Tables<'ratings'>
+export type CaseReportRow  = Tables<'case_reports'>
