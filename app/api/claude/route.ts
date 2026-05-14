@@ -4,9 +4,10 @@ import { claudeRatelimit } from "@/app/lib/ratelimit";
 
 export const dynamic = 'force-dynamic';
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 75_000 });
 
 export async function POST(req: Request) {
+  console.log('[/api/claude] request received');
   const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'anonymous';
   const { success, limit, reset, remaining } = await claudeRatelimit.limit(ip);
 
@@ -26,12 +27,15 @@ export async function POST(req: Request) {
 
   try {
     const { messages, system, max_tokens } = await req.json();
-    const response = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: max_tokens || 1000,
-      system,
-      messages,
-    });
+    const response = await client.messages.create(
+      {
+        model: "claude-sonnet-4-6",
+        max_tokens: max_tokens || 1000,
+        system,
+        messages,
+      },
+      { signal: AbortSignal.timeout(75_000) }
+    );
     return Response.json(response);
   } catch (err) {
     Sentry.captureException(err, { extra: { route: '/api/claude' } });

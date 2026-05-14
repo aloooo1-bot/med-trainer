@@ -9,11 +9,18 @@ import type { OpenIResult } from '@/app/lib/imagingSearch'
 export async function GET(req: NextRequest) {
   const system     = req.nextUrl.searchParams.get('system')
   const difficulty = req.nextUrl.searchParams.get('difficulty')
+  console.log('[/api/cases/image-first] system=', system, 'difficulty=', difficulty)
   if (!system || !difficulty) return NextResponse.json({ status: 'miss' })
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ status: 'miss' })
 
   const authClient = await createClient()
-  const { data: { user } } = await authClient.auth.getUser()
+  const userResult = await Promise.race([
+    authClient.auth.getUser(),
+    new Promise<{ data: { user: null } }>(resolve =>
+      setTimeout(() => resolve({ data: { user: null } }), 8_000)
+    ),
+  ])
+  const user = userResult.data.user
   if (!user) return NextResponse.json({ status: 'miss' }, { status: 401 })
 
   try {
@@ -21,7 +28,7 @@ export async function GET(req: NextRequest) {
 
     // Fetch a pool of up to 20 matching image-first cases, then pick randomly.
     // This avoids exposing ORDER BY RANDOM() to Postgres on every request.
-    const { data, error } = await supabase
+    const queryPromise = supabase
       .from('cases')
       .select('id, case_data, verified_images')
       .eq('system', system)
@@ -29,7 +36,13 @@ export async function GET(req: NextRequest) {
       .like('id', 'img-%')
       .not('verified_images', 'is', null)
       .eq('is_generated', true)
-      .limit(20) as unknown as {
+      .limit(20)
+    const { data, error } = await Promise.race([
+      queryPromise,
+      new Promise<{ data: null; error: { message: string } }>(resolve =>
+        setTimeout(() => resolve({ data: null, error: { message: 'image-first-timeout' } }), 8_000)
+      ),
+    ]) as unknown as {
         data: Array<{
           id: string
           case_data: Record<string, unknown>

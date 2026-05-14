@@ -7,22 +7,35 @@ import { createClient } from '@/app/lib/supabase/server'
 // status: 'error' = Supabase unreachable or query failed (do NOT fall back to Claude)
 export async function GET(req: NextRequest) {
   const id = req.nextUrl.searchParams.get('id')
+  console.log('[/api/cases/lookup] id=', id)
   if (!id) return NextResponse.json({ status: 'miss' })
 
   // If Supabase isn't configured, treat as miss so the app still works without it
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ status: 'miss' })
 
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const userResult = await Promise.race([
+    supabase.auth.getUser(),
+    new Promise<{ data: { user: null } }>(resolve =>
+      setTimeout(() => resolve({ data: { user: null } }), 8_000)
+    ),
+  ])
+  const user = userResult.data.user
   if (!user) return NextResponse.json({ status: 'miss' }, { status: 401 })
 
   try {
     const supabase = createAdminClient()
-    const { data, error } = await supabase
+    const queryPromise = supabase
       .from('cases')
       .select('case_data, is_generated, imaging_cache, verified_images')
       .eq('id', id)
-      .single() as unknown as {
+      .single()
+    const { data, error } = await Promise.race([
+      queryPromise,
+      new Promise<{ data: null; error: { message: string } }>(resolve =>
+        setTimeout(() => resolve({ data: null, error: { message: 'lookup-timeout' } }), 8_000)
+      ),
+    ]) as unknown as {
         data: {
           case_data: Record<string, unknown> | null
           is_generated: boolean
@@ -35,6 +48,11 @@ export async function GET(req: NextRequest) {
     if (error) {
       // Row not found (PGRST116) means the slot was never seeded — treat as miss
       if (error.message.includes('PGRST116') || error.message.toLowerCase().includes('no rows')) {
+        return NextResponse.json({ status: 'miss' })
+      }
+      // Timeout — fall through to live generation
+      if (error.message === 'lookup-timeout') {
+        console.warn('cases/lookup timed out — returning miss')
         return NextResponse.json({ status: 'miss' })
       }
       console.error('cases/lookup:', error.message)
