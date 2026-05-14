@@ -300,14 +300,12 @@ export default function HistoryPage() {
       const { data: { user } } = await supabase.auth.getUser()
 
       if (user) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data: profile } = await (supabase as any).from('profiles').select('tier, display_name').eq('id', user.id).single()
+        const { data: profile } = await supabase.from('profiles').select('tier, display_name').eq('id', user.id).single()
         setIsPro(profile?.tier === 'pro')
         setTier(profile?.tier ?? 'free')
         setDisplayName(profile?.display_name ?? user.email?.split('@')[0] ?? 'User')
 
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const { data } = await (supabase as any)
+        const { data } = await supabase
           .from('case_sessions')
           .select('*')
           .order('completed_at', { ascending: false })

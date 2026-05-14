@@ -17,15 +17,13 @@ async function getHomeData() {
     return { user: null, profile: null, stats: null, anonUsed }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: profile } = await (supabase as any)
+  const { data: profile } = await supabase
     .from('profiles')
     .select('display_name, tier, cases_used_today, cases_today_reset_at, first_case_completed')
     .eq('id', user.id)
     .single()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: sessions } = await (supabase as any)
+  const { data: sessions } = await supabase
     .from('case_sessions')
     .select('id, score, correct, system, difficulty, completed_at, user_diagnosis, diagnosis, grading_result')
     .eq('user_id', user.id)

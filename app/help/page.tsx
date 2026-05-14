@@ -57,9 +57,8 @@ export default function HelpPage() {
     const supabase = createClient()
     supabase.auth.getUser().then(({ data: { user } }) => {
       if (!user) return
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(supabase as any).from('profiles').select('display_name,tier').eq('id', user.id).single()
-        .then(({ data: p }: { data: { display_name?: string; tier?: string } | null }) => {
+      supabase.from('profiles').select('display_name,tier').eq('id', user.id).single()
+        .then(({ data: p }) => {
           if (!p) return
           setDisplayName(p.display_name ?? user.email?.split('@')[0] ?? 'User')
           setTier(p.tier ?? 'free')

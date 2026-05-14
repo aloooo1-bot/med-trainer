@@ -1,4 +1,5 @@
 import { createClient } from '@/app/lib/supabase/server'
+import type { ProfileRow } from '@/app/lib/types'
 
 export async function PATCH(req: Request) {
   const supabase = await createClient()
@@ -18,7 +19,7 @@ export async function PATCH(req: Request) {
     default_system?: string
   }
 
-  const updates: Record<string, unknown> = {}
+  const updates: Partial<ProfileRow> = {}
   if (body.display_name        !== undefined) updates.display_name        = body.display_name
   if (body.email_case_reminders !== undefined) updates.email_case_reminders = body.email_case_reminders
   if (body.email_weekly_summary !== undefined) updates.email_weekly_summary = body.email_weekly_summary
@@ -31,8 +32,7 @@ export async function PATCH(req: Request) {
     return Response.json({ error: 'No fields to update' }, { status: 400 })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('profiles')
     .update(updates)
     .eq('id', user.id)

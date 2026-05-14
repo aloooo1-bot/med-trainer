@@ -1,9 +1,10 @@
-type Json = string | number | boolean | null | { [key: string]: Json } | Json[]
+export type Json = string | number | boolean | null | { [key: string]: Json } | Json[]
 
 export interface Database {
   public: {
     Tables: {
       cases: {
+        Relationships: []
         Row: {
           id: string
           system: string
@@ -33,6 +34,7 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['cases']['Insert']>
       }
       profiles: {
+        Relationships: []
         Row: {
           id: string
           display_name: string | null
@@ -68,6 +70,7 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['profiles']['Insert']>
       }
       case_sessions: {
+        Relationships: []
         Row: {
           id: string
           user_id: string
@@ -117,6 +120,7 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['case_sessions']['Insert']>
       }
       case_reports: {
+        Relationships: []
         Row: {
           id: string
           user_id: string
@@ -146,6 +150,7 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['case_reports']['Insert']>
       }
       ratings: {
+        Relationships: []
         Row: {
           id: string
           user_id: string | null
@@ -181,6 +186,8 @@ export interface Database {
         Update: Partial<Database['public']['Tables']['ratings']['Insert']>
       }
     }
+    Views: Record<string, never>
+    Functions: Record<string, never>
   }
 }
 

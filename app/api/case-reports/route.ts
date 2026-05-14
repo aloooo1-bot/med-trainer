@@ -14,12 +14,11 @@ export async function POST(req: Request) {
     system: string
     difficulty: string
     diagnosis: string
-    category: string
+    category: 'incorrect-grading' | 'inaccurate-content' | 'confusing-ui' | 'other'
     comment?: string
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any)
+  const { error } = await supabase
     .from('case_reports')
     .insert({
       user_id:    user.id,

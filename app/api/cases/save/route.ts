@@ -25,8 +25,7 @@ export async function POST(req: NextRequest) {
       : caseData
 
     const supabase = createAdminClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('cases')
       .upsert({
         id,

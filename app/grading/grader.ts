@@ -1,5 +1,6 @@
 import type { GradingInput, GradingResult } from './types'
 import { GRADING_SYSTEM_PROMPT, buildRubricPrompt, buildOralPrompt, getRubric } from './rubric'
+import { GradingResultSchema } from './schemas'
 import type { RawUsage } from '../lib/analytics'
 
 async function callClaudeGrading(
@@ -55,7 +56,7 @@ export async function gradeCase(
   )
   const match = text.match(/\{[\s\S]*\}/)
   if (!match) throw new Error('No JSON in grading response')
-  const result = JSON.parse(match[0]) as GradingResult
+  const result = GradingResultSchema.parse(JSON.parse(match[0])) as GradingResult
 
   // Clamp dimension scores before summing — model can return out-of-range values
   clampDimensions(result, input.difficulty)

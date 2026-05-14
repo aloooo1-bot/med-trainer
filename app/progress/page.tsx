@@ -39,11 +39,9 @@ export default function ProgressPage() {
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) { setLoaded(true); return }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const sb = supabase as any
       const [{ data: p }, { data: rows }] = await Promise.all([
-        sb.from('profiles').select('display_name,tier').eq('id', user.id).single(),
-        sb.from('case_sessions')
+        supabase.from('profiles').select('display_name,tier').eq('id', user.id).single(),
+        supabase.from('case_sessions')
           .select('id, score, correct, system, difficulty, completed_at, elapsed_seconds, grading_result')
           .eq('user_id', user.id)
           .order('completed_at', { ascending: false }),
@@ -52,7 +50,7 @@ export default function ProgressPage() {
         setDisplayName(p.display_name ?? user.email?.split('@')[0] ?? 'User')
         setTier(p.tier ?? 'free')
       }
-      setSessions(rows ?? [])
+      setSessions((rows ?? []) as Session[])
       setLoaded(true)
     })
   }, [])
