@@ -1,6 +1,6 @@
-﻿'use client'
+'use client'
 
-import { useState, useTransition } from 'react'
+import { useState, useTransition, useRef } from 'react'
 import { useRouter } from 'next/navigation'
 
 type Mode = 'idle' | 'editing' | 'confirm-delete' | 'regenerating'
@@ -18,6 +18,11 @@ export default function CaseActions({ caseId, caseData, source }: Props) {
   const [jsonError, setJsonError] = useState('')
   const [statusMsg, setStatusMsg] = useState('')
   const [isPending, startTransition] = useTransition()
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  function stopPolling() {
+    if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
+  }
 
   function openEdit() {
     setEditJson(JSON.stringify(caseData ?? {}, null, 2))
@@ -77,7 +82,9 @@ export default function CaseActions({ caseId, caseData, source }: Props) {
 
   async function regenerate() {
     setMode('regenerating')
-    setStatusMsg('Generating with Claude…')
+    setStatusMsg('Starting generation…')
+
+    let jobId: string
     try {
       const res = await fetch(`/api/admin/cases/${encodeURIComponent(caseId)}/regenerate`, {
         method: 'POST',
@@ -86,16 +93,56 @@ export default function CaseActions({ caseId, caseData, source }: Props) {
         const body = await res.json().catch(() => ({}))
         throw new Error((body as { error?: string }).error ?? `HTTP ${res.status}`)
       }
-      setStatusMsg('Done — reloading…')
-      startTransition(() => {
-        router.refresh()
-        setMode('idle')
-        setStatusMsg('')
-      })
+      const body = await res.json() as { jobId: string }
+      jobId = body.jobId
     } catch (e) {
       setStatusMsg((e as Error).message)
       setMode('idle')
+      return
     }
+
+    setStatusMsg('Generating with Claude…')
+
+    // Safety cutoff: stop polling after 10 minutes
+    const deadline = Date.now() + 10 * 60 * 1000
+    let polls = 0
+
+    pollRef.current = setInterval(async () => {
+      polls++
+      if (Date.now() > deadline) {
+        stopPolling()
+        setStatusMsg('Timed out — check the case_regeneration_jobs table in Supabase.')
+        setMode('idle')
+        return
+      }
+
+      try {
+        const res = await fetch(
+          `/api/admin/cases/${encodeURIComponent(caseId)}/regenerate/${encodeURIComponent(jobId)}`
+        )
+        if (!res.ok) return
+        const body = await res.json() as { status: string; error?: string; diagnosis?: string }
+
+        if (body.status === 'done') {
+          stopPolling()
+          setStatusMsg('Done — reloading…')
+          startTransition(() => {
+            router.refresh()
+            setMode('idle')
+            setStatusMsg('')
+          })
+        } else if (body.status === 'error') {
+          stopPolling()
+          setStatusMsg(body.error ?? 'Generation failed')
+          setMode('idle')
+        } else {
+          // still pending or running — update status every ~10 polls (~20s)
+          if (polls % 10 === 0) setStatusMsg(`Still generating… (${Math.round((Date.now() - (deadline - 10*60*1000)) / 1000)}s)`)
+        }
+      } catch {
+        // transient network error — keep polling
+      }
+    }, 2000)
   }
 
   if (mode === 'editing') {
@@ -158,7 +205,7 @@ export default function CaseActions({ caseId, caseData, source }: Props) {
     return (
       <div className="rounded-lg border border-surface-3 bg-surface-1 p-5">
         <p className="text-sm text-ink-secondary">{statusMsg}</p>
-        <p className="text-xs text-ink-tertiary mt-1">This may take 30–60 seconds. Do not navigate away.</p>
+        <p className="text-xs text-ink-tertiary mt-1">This may take 30–60 seconds. You can safely navigate away — the job runs in the background.</p>
       </div>
     )
   }

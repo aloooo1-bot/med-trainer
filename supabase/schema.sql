@@ -73,6 +73,37 @@ CREATE TABLE IF NOT EXISTS cases (
 CREATE INDEX IF NOT EXISTS cases_system_difficulty ON cases (system, difficulty);
 CREATE INDEX IF NOT EXISTS cases_is_generated      ON cases (is_generated);
 
+-- ── Migration: F.2 — atomic imaging-cache writes via Postgres function ────────
+-- Replaces the read-merge-write in app/api/cases/cache-imaging/route.ts.
+-- The UPDATE takes a row-level lock so concurrent calls serialize correctly.
+CREATE OR REPLACE FUNCTION cache_imaging_test(
+  p_case_id   TEXT,
+  p_test_name TEXT,
+  p_results   JSONB
+) RETURNS VOID LANGUAGE SQL AS $$
+  UPDATE cases
+     SET imaging_cache     = COALESCE(imaging_cache, '{}'::jsonb)
+                             || jsonb_build_object(p_test_name, p_results),
+         imaging_cached_at = NOW()
+   WHERE id = p_case_id;
+$$;
+
+-- ── Migration: F.1 — async case regeneration job tracking ────────────────────
+CREATE TABLE IF NOT EXISTS case_regeneration_jobs (
+  id               UUID        PRIMARY KEY DEFAULT gen_random_uuid(),
+  case_id          TEXT        NOT NULL REFERENCES cases(id) ON DELETE CASCADE,
+  status           TEXT        NOT NULL DEFAULT 'pending'
+                               CHECK (status IN ('pending','running','done','error')),
+  started_at       TIMESTAMPTZ,
+  completed_at     TIMESTAMPTZ,
+  error            TEXT,
+  result_diagnosis TEXT,
+  created_at       TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+CREATE INDEX IF NOT EXISTS case_regen_jobs_case_id ON case_regeneration_jobs (case_id);
+ALTER TABLE case_regeneration_jobs ENABLE ROW LEVEL SECURITY;
+-- Service role bypasses RLS — no client policies needed for this table.
+
 -- ── User profiles ─────────────────────────────────────────────────────────────
 -- Extends auth.users. Auto-created by trigger on signup.
 
