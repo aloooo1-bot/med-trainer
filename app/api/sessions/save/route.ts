@@ -1,3 +1,4 @@
+import { revalidateTag } from 'next/cache'
 import { createClient } from '@/app/lib/supabase/server'
 import type { CaseSessionRecord } from '@/app/lib/analytics'
 import type { Json } from '@/app/lib/supabase/types'
@@ -40,5 +41,6 @@ export async function POST(req: Request) {
     return Response.json({ error: error.message }, { status: 500 })
   }
 
+  revalidateTag(`session:${user.id}`, 'max')
   return Response.json({ ok: true })
 }

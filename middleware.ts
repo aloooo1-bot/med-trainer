@@ -23,12 +23,11 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Refresh the session — required for Server Components that read auth state.
-  // Do NOT add business logic here between createServerClient and getUser().
-  const { data: { user } } = await supabase.auth.getUser()
+  const isAdminPath = request.nextUrl.pathname.startsWith('/admin')
 
-  // Protect all /admin/* — only emails in ADMIN_EMAILS env var may access.
-  if (request.nextUrl.pathname.startsWith('/admin')) {
+  if (isAdminPath) {
+    // Admin paths: verify JWT with Auth server (network call) to prevent spoofed tokens.
+    const { data: { user } } = await supabase.auth.getUser()
     if (!user) {
       const url = request.nextUrl.clone()
       url.pathname = '/auth/login'
@@ -40,6 +39,9 @@ export async function middleware(request: NextRequest) {
     if (!user.email || !adminList.includes(user.email)) {
       return NextResponse.redirect(new URL('/', request.url))
     }
+  } else {
+    // Non-admin paths: read session from cookie (no network) to refresh tokens in the response.
+    await supabase.auth.getSession()
   }
 
   return supabaseResponse

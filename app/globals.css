@@ -1,22 +1,12 @@
 @import 'tailwindcss';
 @import 'tw-animate-css';
-@import '@fontsource/inter/400.css';
-@import '@fontsource/inter/500.css';
-@import '@fontsource/inter/600.css';
-@import '@fontsource/inter/700.css';
-@import '@fontsource/source-serif-4/400.css';
-@import '@fontsource/source-serif-4/500.css';
-@import '@fontsource/source-serif-4/600.css';
-@import '@fontsource/source-serif-4/700.css';
-@import '@fontsource/jetbrains-mono/400.css';
-@import '@fontsource/jetbrains-mono/500.css';
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --font-sans: 'Inter', system-ui, -apple-system, sans-serif;
-  --font-serif: 'Source Serif 4', Georgia, serif;
-  --font-mono: 'JetBrains Mono', Menlo, monospace;
+  --font-sans: var(--font-inter, 'Inter'), system-ui, -apple-system, sans-serif;
+  --font-serif: var(--font-source-serif, 'Source Serif 4'), Georgia, serif;
+  --font-mono: var(--font-jetbrains, 'JetBrains Mono'), Menlo, monospace;
 
   /* Surfaces — warm cream by default */
   --color-surface-0: #FAF7F2;
