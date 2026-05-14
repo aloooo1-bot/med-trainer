@@ -94,7 +94,6 @@ export function OrderView({
 
   // ── CLINICAL: non-case-specific reference lists + master-list search ──
   if (caseDifficulty === 'Clinical') {
-    const orderedList = Array.from(orderedTests)
     const searchResults = testSearchQuery.length >= 2 ? searchTests(testSearchQuery) : []
 
     return (
@@ -127,21 +126,21 @@ export function OrderView({
             <div className="absolute z-10 mt-1 w-full rounded-lg border border-surface-4 bg-surface-2 shadow-xl overflow-hidden max-h-60 overflow-y-auto">
               {searchResults.slice(0, 10).map(result => {
                 const isOrdered = orderedTests.has(result.name)
+                const isSelected = selectedTests.has(result.name)
                 return (
                   <button
                     key={result.name}
                     onMouseDown={() => {
                       if (!isOrdered && !locked) {
-                        addOrderedTest(result.name)
-                        setTestSearchQuery('')
+                        toggleTest(result.name)
                       }
                     }}
                     disabled={isOrdered || locked}
-                    className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-sm transition-colors ${isOrdered ? 'opacity-50 cursor-default bg-surface-2' : 'hover:bg-surface-3 cursor-pointer'}`}
+                    className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-sm transition-colors ${isOrdered ? 'opacity-50 cursor-default bg-surface-2' : isSelected ? 'bg-primary-50' : 'hover:bg-surface-3 cursor-pointer'}`}
                   >
                     <span className="text-ink-primary">{result.name}</span>
                     <span className="text-xs text-ink-tertiary ml-2 flex-shrink-0">
-                      {isOrdered ? <Badge text="Ordered" color="green" /> : result.category}
+                      {isOrdered ? <Badge text="Ordered" color="green" /> : isSelected ? <Badge text="Selected" color="blue" /> : result.category}
                     </span>
                   </button>
                 )
@@ -153,11 +152,11 @@ export function OrderView({
               <button
                 onMouseDown={() => {
                   const name = testSearchQuery.trim()
-                  if (name && !locked) { addOrderedTest(name); setTestSearchQuery(''); setShowSearchDropdown(false) }
+                  if (name && !locked) { toggleTest(name); setTestSearchQuery(''); setShowSearchDropdown(false) }
                 }}
                 className="w-full flex items-center justify-between px-4 py-3 text-left text-sm hover:bg-surface-3 transition-colors"
               >
-                <span className="text-ink-primary">Order &ldquo;{testSearchQuery.trim()}&rdquo;</span>
+                <span className="text-ink-primary">Select &ldquo;{testSearchQuery.trim()}&rdquo;</span>
                 <span className="text-xs text-ink-tertiary ml-2 flex-shrink-0">custom</span>
               </button>
             </div>
@@ -172,14 +171,17 @@ export function OrderView({
                 <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
                   {cat.tests.map(test => {
                     const isOrdered = orderedTests.has(test)
+                    const isSelected = selectedTests.has(test)
                     return (
                       <button
                         key={test}
-                        onClick={() => !isOrdered && !locked && addOrderedTest(test)}
+                        onClick={() => !isOrdered && !locked && toggleTest(test)}
                         disabled={isOrdered || locked}
                         className={`text-left rounded-md border px-3 py-2 text-sm transition-colors ${
                           isOrdered
                             ? 'border-confirmed-border bg-confirmed-bg text-confirmed cursor-default'
+                            : isSelected
+                            ? 'border-primary-400 bg-primary-50 text-primary-700 cursor-pointer'
                             : locked
                             ? 'border-surface-4 bg-surface-2 text-ink-tertiary opacity-50 cursor-not-allowed'
                             : 'border-surface-4 bg-surface-1 text-ink-primary hover:border-surface-4 hover:bg-surface-2 cursor-pointer'
@@ -187,6 +189,7 @@ export function OrderView({
                       >
                         {test}
                         {isOrdered && <span className="ml-1.5 text-xs">✓</span>}
+                        {isSelected && !isOrdered && <span className="ml-1.5 text-xs">●</span>}
                       </button>
                     )
                   })}
@@ -200,14 +203,17 @@ export function OrderView({
           <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
             {IMAGING_WITH_IMAGES.map(study => {
               const isOrdered = orderedTests.has(study)
+              const isSelected = selectedTests.has(study)
               return (
                 <button
                   key={study}
-                  onClick={() => !isOrdered && !locked && addOrderedTest(study)}
+                  onClick={() => !isOrdered && !locked && toggleTest(study)}
                   disabled={isOrdered || locked}
                   className={`text-left rounded-md border px-3 py-2 text-sm transition-colors ${
                     isOrdered
                       ? 'border-confirmed-border bg-confirmed-bg text-confirmed cursor-default'
+                      : isSelected
+                      ? 'border-primary-400 bg-primary-50 text-primary-700 cursor-pointer'
                       : locked
                       ? 'border-surface-4 bg-surface-2 text-ink-tertiary opacity-50 cursor-not-allowed'
                       : 'border-surface-4 bg-surface-1 text-ink-primary hover:border-surface-4 hover:bg-surface-2 cursor-pointer'
@@ -215,22 +221,20 @@ export function OrderView({
                 >
                   {study}
                   {isOrdered && <span className="ml-1.5 text-xs">✓</span>}
+                  {isSelected && !isOrdered && <span className="ml-1.5 text-xs">●</span>}
                 </button>
               )
             })}
           </div>
         </SectionCard>
 
-        {orderedList.length > 0 && (
-          <SectionCard title={`Ordered Tests (${orderedList.length})`}>
-            <div className="flex flex-wrap gap-2">
-              {orderedList.map(t => (
-                <span key={t} className="inline-flex items-center gap-1.5 rounded-md border border-confirmed-border bg-confirmed-bg px-2.5 py-1 text-xs text-confirmed">
-                  {t}
-                </span>
-              ))}
-            </div>
-          </SectionCard>
+        {selectedTests.size > 0 && (
+          <div className="flex items-center justify-between rounded-lg border border-primary-300 bg-primary-50 px-4 py-3">
+            <span className="text-sm text-primary-700">{selectedTests.size} test{selectedTests.size > 1 ? 's' : ''} selected</span>
+            <button onClick={orderTests} className="rounded-md bg-primary-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-primary-400 transition-colors">
+              Order Selected Tests
+            </button>
+          </div>
         )}
       </div>
     )
@@ -243,6 +247,7 @@ export function OrderView({
   const combinedTestList = [...MASTER_TEST_LIST, ...caseSpecificTests]
   const searchResults = searchTests(testSearchQuery, combinedTestList)
   const orderedList = Array.from(orderedTests)
+  const selectedList = Array.from(selectedTests)
 
   return (
     <div className="space-y-4">
@@ -266,21 +271,22 @@ export function OrderView({
           <div className="absolute z-10 mt-1 w-full rounded-lg border border-surface-4 bg-surface-2 shadow-xl overflow-hidden">
             {searchResults.map(result => {
               const isOrdered = orderedTests.has(result.name)
+              const isSelected = selectedTests.has(result.name)
               return (
                 <button
                   key={result.name}
                   onMouseDown={() => {
                     if (!isOrdered && !locked) {
-                      addOrderedTest(result.name)
+                      toggleTest(result.name)
                       setTestSearchQuery('')
                     }
                   }}
                   disabled={isOrdered || locked}
-                  className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-sm transition-colors ${isOrdered ? 'opacity-50 cursor-default bg-surface-2' : 'hover:bg-surface-3 cursor-pointer'}`}
+                  className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-sm transition-colors ${isOrdered ? 'opacity-50 cursor-default bg-surface-2' : isSelected ? 'bg-primary-50' : 'hover:bg-surface-3 cursor-pointer'}`}
                 >
                   <span className="text-ink-primary">{result.name}</span>
                   <span className="text-xs text-ink-tertiary ml-2 flex-shrink-0">
-                    {isOrdered ? <Badge text="Ordered" color="green" /> : result.category}
+                    {isOrdered ? <Badge text="Ordered" color="green" /> : isSelected ? <Badge text="Selected" color="blue" /> : result.category}
                   </span>
                 </button>
               )
@@ -293,14 +299,14 @@ export function OrderView({
               onMouseDown={() => {
                 const name = testSearchQuery.trim()
                 if (name && !locked) {
-                  addOrderedTest(name)
+                  toggleTest(name)
                   setTestSearchQuery('')
                   setShowSearchDropdown(false)
                 }
               }}
               className="w-full flex items-center justify-between px-4 py-3 text-left text-sm hover:bg-surface-3 transition-colors"
             >
-              <span className="text-ink-primary">Order &ldquo;{testSearchQuery.trim()}&rdquo;</span>
+              <span className="text-ink-primary">Select &ldquo;{testSearchQuery.trim()}&rdquo;</span>
               <span className="text-xs text-ink-tertiary ml-2 flex-shrink-0">custom</span>
             </button>
           </div>
@@ -311,14 +317,17 @@ export function OrderView({
         <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
           {IMAGING_WITH_IMAGES.map(study => {
             const isOrdered = orderedTests.has(study)
+            const isSelected = selectedTests.has(study)
             return (
               <button
                 key={study}
-                onClick={() => !isOrdered && !locked && addOrderedTest(study)}
+                onClick={() => !isOrdered && !locked && toggleTest(study)}
                 disabled={isOrdered || locked}
                 className={`text-left rounded-md border px-3 py-2 text-sm transition-colors ${
                   isOrdered
                     ? 'border-confirmed-border bg-confirmed-bg text-confirmed cursor-default'
+                    : isSelected
+                    ? 'border-primary-400 bg-primary-50 text-primary-700 cursor-pointer'
                     : locked
                     ? 'border-surface-4 bg-surface-2 text-ink-tertiary opacity-50 cursor-not-allowed'
                     : 'border-surface-4 bg-surface-1 text-ink-primary hover:border-surface-4 hover:bg-surface-2 cursor-pointer'
@@ -326,13 +335,27 @@ export function OrderView({
               >
                 {study}
                 {isOrdered && <span className="ml-1.5 text-xs">✓</span>}
+                {isSelected && !isOrdered && <span className="ml-1.5 text-xs">●</span>}
               </button>
             )
           })}
         </div>
       </SectionCard>
 
-      {orderedList.length > 0 ? (
+      {selectedList.length > 0 && (
+        <SectionCard title={`Selected Tests (${selectedList.length})`}>
+          <div className="space-y-2">
+            {selectedList.map(t => (
+              <div key={t} className="flex items-center justify-between rounded-md border border-primary-300 bg-primary-50 px-3 py-2">
+                <span className="text-sm text-primary-700">{t}</span>
+                <button onClick={() => toggleTest(t)} className="text-primary-400 hover:text-primary-700 text-xs transition-colors ml-3 flex-shrink-0">✕</button>
+              </div>
+            ))}
+          </div>
+        </SectionCard>
+      )}
+
+      {orderedList.length > 0 && (
         <SectionCard title={`Ordered Tests (${orderedList.length})`}>
           <div className="space-y-2">
             {orderedList.map(t => (
@@ -343,10 +366,21 @@ export function OrderView({
             ))}
           </div>
         </SectionCard>
-      ) : (
+      )}
+
+      {selectedList.length === 0 && orderedList.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-ink-tertiary">
-          <p className="text-sm">No tests ordered yet.</p>
+          <p className="text-sm">No tests selected yet.</p>
           <p className="text-xs mt-1">Search for a test above to add it.</p>
+        </div>
+      )}
+
+      {selectedTests.size > 0 && (
+        <div className="flex items-center justify-between rounded-lg border border-primary-300 bg-primary-50 px-4 py-3">
+          <span className="text-sm text-primary-700">{selectedTests.size} test{selectedTests.size > 1 ? 's' : ''} selected</span>
+          <button onClick={orderTests} className="rounded-md bg-primary-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-primary-400 transition-colors">
+            Order Selected Tests
+          </button>
         </div>
       )}
     </div>
