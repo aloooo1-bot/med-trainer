@@ -3,7 +3,17 @@
  * Used by admin API routes (PATCH/regenerate) and importable from server-side Next.js code.
  */
 
-export const ADMIN_EMAIL = 'jorellana9100@gmail.com'
+// Reads ADMIN_EMAILS env var (comma-separated) with the literal address as fallback.
+// Use isAdmin() for access checks; ADMIN_EMAIL kept for single-email legacy callers.
+export const ADMIN_EMAIL = (process.env.ADMIN_EMAILS ?? 'jorellana9100@gmail.com')
+  .split(',')[0].trim()
+
+export function isAdmin(email: string | null | undefined): boolean {
+  if (!email) return false
+  const list = (process.env.ADMIN_EMAILS ?? 'jorellana9100@gmail.com')
+    .split(',').map(s => s.trim()).filter(Boolean)
+  return list.includes(email)
+}
 
 export const CASE_SYSTEM_PROMPT = `You are a medical education case generator. Generate realistic, detailed clinical cases.
 Return ONLY valid JSON. No markdown, no code fences, no explanation. Just the raw JSON object.

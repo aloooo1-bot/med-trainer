@@ -27,7 +27,7 @@ export async function middleware(request: NextRequest) {
   // Do NOT add business logic here between createServerClient and getUser().
   const { data: { user } } = await supabase.auth.getUser()
 
-  // Protect all /admin/* — only jorellana9100@gmail.com may access.
+  // Protect all /admin/* — only emails in ADMIN_EMAILS env var may access.
   if (request.nextUrl.pathname.startsWith('/admin')) {
     if (!user) {
       const url = request.nextUrl.clone()
@@ -35,7 +35,9 @@ export async function middleware(request: NextRequest) {
       url.searchParams.set('redirectTo', request.nextUrl.pathname)
       return NextResponse.redirect(url)
     }
-    if (user.email !== 'jorellana9100@gmail.com') {
+    const adminList = (process.env.ADMIN_EMAILS ?? 'jorellana9100@gmail.com')
+      .split(',').map(s => s.trim()).filter(Boolean)
+    if (!user.email || !adminList.includes(user.email)) {
       return NextResponse.redirect(new URL('/', request.url))
     }
   }

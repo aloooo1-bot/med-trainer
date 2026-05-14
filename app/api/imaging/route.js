@@ -1,6 +1,11 @@
+import { imagingRatelimit } from '@/app/lib/ratelimit'
+
 export const dynamic = 'force-dynamic';
 
 export async function GET(req) {
+  const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'anonymous'
+  const { success } = await imagingRatelimit.limit(ip)
+  if (!success) return Response.json([], { status: 429 })
   const { searchParams } = new URL(req.url);
   const query = searchParams.get('query') ?? '';
   const it = searchParams.get('it') ?? 'x';

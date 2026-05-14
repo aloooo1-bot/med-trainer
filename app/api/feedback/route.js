@@ -1,22 +1,23 @@
-import { createClient } from '@supabase/supabase-js'
-
-function getAdminClient() {
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
-    return null
-  }
-  return createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY,
-    { auth: { autoRefreshToken: false, persistSession: false } }
-  )
-}
+import { createAdminClient } from '@/app/lib/supabase/admin'
+import { createClient } from '@/app/lib/supabase/server'
+import { feedbackRatelimit } from '@/app/lib/ratelimit'
 
 export async function POST(request) {
+  // Auth check
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return Response.json({ ok: false }, { status: 401 })
+
+  // Rate limit by user id
+  const { success } = await feedbackRatelimit.limit(user.id)
+  if (!success) {
+    return Response.json({ ok: false, error: 'Too many requests' }, { status: 429 })
+  }
+
   try {
     const body = await request.json()
-    const { diagnosis, difficulty, system, patientName, ratings, feedback, userId, caseId } = body
+    const { diagnosis, difficulty, system, patientName, ratings, feedback, caseId } = body
 
-    // Log to server console (always)
     const ratingStr = Object.entries(ratings ?? {})
       .map(([k, v]) => `${k}: ${v}/5`)
       .join(' | ')
@@ -28,15 +29,14 @@ Difficulty: ${difficulty ?? 'unknown'}
 Patient:    ${patientName ?? 'unknown'}
 Ratings:    ${ratingStr || '(none)'}
 Feedback:   ${feedback?.trim() ? `"${feedback.trim()}"` : '(none)'}
-User:       ${userId ?? 'anonymous'}
+User:       ${user.id}
 Timestamp:  ${new Date().toISOString()}
 ====================`)
 
-    // Persist to Supabase
-    const supabase = getAdminClient()
-    if (supabase) {
-      const { error } = await supabase.from('ratings').insert({
-        user_id:               userId ?? null,
+    const admin = createAdminClient()
+    if (admin) {
+      const { error } = await admin.from('ratings').insert({
+        user_id:               user.id,
         case_id:               caseId ?? null,
         diagnosis:             diagnosis ?? '',
         system:                system ?? '',

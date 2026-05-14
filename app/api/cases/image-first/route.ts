@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/app/lib/supabase/admin'
+import { createClient } from '@/app/lib/supabase/server'
 import type { OpenIResult } from '@/app/lib/imagingSearch'
 
 // Returns a random image-anchored case for the given system + difficulty.
@@ -10,6 +11,10 @@ export async function GET(req: NextRequest) {
   const difficulty = req.nextUrl.searchParams.get('difficulty')
   if (!system || !difficulty) return NextResponse.json({ status: 'miss' })
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ status: 'miss' })
+
+  const authClient = await createClient()
+  const { data: { user } } = await authClient.auth.getUser()
+  if (!user) return NextResponse.json({ status: 'miss' }, { status: 401 })
 
   try {
     const supabase = createAdminClient()
