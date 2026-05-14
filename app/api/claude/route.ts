@@ -8,24 +8,24 @@ const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 7
 
 export async function POST(req: Request) {
   console.log('[/api/claude] request received');
-  const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'anonymous';
-  const { success, limit, reset, remaining } = await claudeRatelimit.limit(ip);
-
-  if (!success) {
-    return Response.json(
-      { error: 'Too many requests — please wait a moment before trying again.' },
-      {
-        status: 429,
-        headers: {
-          'X-RateLimit-Limit': String(limit),
-          'X-RateLimit-Remaining': String(remaining),
-          'X-RateLimit-Reset': String(reset),
-        },
-      }
-    );
-  }
-
   try {
+    const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'anonymous';
+    const { success, limit, reset, remaining } = await claudeRatelimit.limit(ip);
+
+    if (!success) {
+      return Response.json(
+        { error: 'Too many requests — please wait a moment before trying again.' },
+        {
+          status: 429,
+          headers: {
+            'X-RateLimit-Limit': String(limit),
+            'X-RateLimit-Remaining': String(remaining),
+            'X-RateLimit-Reset': String(reset),
+          },
+        }
+      );
+    }
+
     const { messages, system, max_tokens } = await req.json();
     const response = await client.messages.create(
       {

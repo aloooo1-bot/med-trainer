@@ -9,8 +9,12 @@ export async function POST(request: Request) {
   if (!user) return Response.json({ ok: false }, { status: 401 })
 
   // Rate limit by user id
-  const { success } = await feedbackRatelimit.limit(user.id)
-  if (!success) {
+  let rlSuccess = true
+  try {
+    const { success } = await feedbackRatelimit.limit(user.id)
+    rlSuccess = success
+  } catch { /* fail open */ }
+  if (!rlSuccess) {
     return Response.json({ ok: false, error: 'Too many requests' }, { status: 429 })
   }
 

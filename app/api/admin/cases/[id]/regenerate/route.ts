@@ -27,8 +27,12 @@ export async function POST(
   if (!auth.ok) return auth.response
 
   const key = request.headers.get('x-forwarded-for') ?? 'anon'
-  const { success } = await regenerateRatelimit.limit(key)
-  if (!success) {
+  let rlSuccess = true
+  try {
+    const { success } = await regenerateRatelimit.limit(key)
+    rlSuccess = success
+  } catch { /* fail open */ }
+  if (!rlSuccess) {
     return NextResponse.json({ error: 'Too many regeneration requests — please wait a moment.' }, { status: 429 })
   }
 

@@ -21,6 +21,12 @@ export async function callClaude(
     }
     throw e
   }
+  const contentType = res.headers.get('content-type') ?? ''
+  if (!contentType.includes('application/json')) {
+    const text = await res.text()
+    const preview = text.slice(0, 200).replace(/\s+/g, ' ').trim()
+    throw new Error(`Server error (${res.status}) — unexpected non-JSON response: ${preview || '(empty)'}`)
+  }
   const data = await res.json()
   if (!res.ok) throw new Error(data?.error ?? `API error ${res.status}`)
   if (onUsage && data.usage) onUsage(data.usage as RawUsage)

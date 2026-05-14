@@ -527,7 +527,7 @@ Return ONLY valid JSON — no markdown, no explanation:
 
   const generateCase = async (overrideSystem?: string, overrideDifficulty?: string, overrideDiagnosis?: string): Promise<CaseData | null> => {
     try {
-      const gateRes = await fetch('/api/gate/check', { method: 'POST' })
+      const gateRes = await fetch('/api/gate/check', { method: 'POST', signal: AbortSignal.timeout(5_000) })
       const gate = await gateRes.json()
       if (!gate.allowed) {
         setGateBlocked(true)
@@ -601,7 +601,8 @@ Return ONLY valid JSON — no markdown, no explanation:
       try {
         const t0 = performance.now()
         const imgRes = await fetch(
-          `/api/cases/image-first?system=${encodeURIComponent(resolvedSystem)}&difficulty=${encodeURIComponent(resolvedDifficulty)}`
+          `/api/cases/image-first?system=${encodeURIComponent(resolvedSystem)}&difficulty=${encodeURIComponent(resolvedDifficulty)}`,
+          { signal: AbortSignal.timeout(10_000) }
         )
         if (imgRes.ok) {
           const imgData = await imgRes.json()
@@ -622,7 +623,9 @@ Return ONLY valid JSON — no markdown, no explanation:
             return imgData.caseData
           }
         }
-      } catch {
+      } catch (e) {
+        const name = (e as { name?: string } | null)?.name
+        if (name === 'TimeoutError' || name === 'AbortError') console.warn('[gen] image-first fetch timed out — falling through to manifest')
         // fall through to manifest
       }
     }
@@ -823,7 +826,7 @@ PMH LEAK RULE: The pastMedicalHistory fields (conditions, surgeries, hospitaliza
       if (caseId) {
         try {
           const t0 = performance.now()
-          const lookupRes = await fetch(`/api/cases/lookup?id=${encodeURIComponent(caseId)}`)
+          const lookupRes = await fetch(`/api/cases/lookup?id=${encodeURIComponent(caseId)}`, { signal: AbortSignal.timeout(10_000) })
           if (lookupRes.ok) {
             const { status, caseData: cached, imagingCache: prefetched } = await lookupRes.json()
             console.log(`[gen] lookup id=${caseId} status=${status} in ${Math.round(performance.now() - t0)}ms`)
@@ -843,7 +846,9 @@ PMH LEAK RULE: The pastMedicalHistory fields (conditions, surgeries, hospitaliza
               return cached
             }
           }
-        } catch {
+        } catch (e) {
+          const name = (e as { name?: string } | null)?.name
+          if (name === 'TimeoutError' || name === 'AbortError') console.warn('[gen] lookup fetch timed out — falling through to Claude')
           // Supabase unavailable — fall through to Claude
         }
       }

@@ -11,9 +11,13 @@ type OpenIItem = {
 }
 
 export async function GET(req: Request) {
-  const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'anonymous'
-  const { success } = await imagingRatelimit.limit(ip)
-  if (!success) return Response.json([], { status: 429 })
+  let rlSuccess = true
+  try {
+    const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'anonymous'
+    const { success } = await imagingRatelimit.limit(ip)
+    rlSuccess = success
+  } catch { /* fail open */ }
+  if (!rlSuccess) return Response.json([], { status: 429 })
   const { searchParams } = new URL(req.url);
   const query = searchParams.get('query') ?? '';
   const it = searchParams.get('it') ?? 'x';
