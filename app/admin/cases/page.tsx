@@ -28,7 +28,7 @@ async function fetchAll() {
   const [casesRes, ratingsRes] = await Promise.all([
     supabase
       .from('cases')
-      .select('id, system, difficulty, diagnosis, chief_complaint:case_data->patientInfo->>chiefComplaint, is_generated, generated_at')
+      .select<string, CaseRow>('id, system, difficulty, diagnosis, chief_complaint:case_data->patientInfo->>chiefComplaint, is_generated, generated_at')
       .order('system').order('difficulty').order('diagnosis'),
     supabase
       .from('ratings')

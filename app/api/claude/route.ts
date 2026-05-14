@@ -6,7 +6,7 @@ export const dynamic = 'force-dynamic';
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
 
-export async function POST(req) {
+export async function POST(req: Request) {
   const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'anonymous';
   const { success, limit, reset, remaining } = await claudeRatelimit.limit(ip);
 
@@ -35,10 +35,10 @@ export async function POST(req) {
     return Response.json(response);
   } catch (err) {
     Sentry.captureException(err, { extra: { route: '/api/claude' } });
-    console.error('[/api/claude] error:', err?.message ?? err);
-    return Response.json(
-      { error: err?.message ?? 'Unknown error', status: err?.status },
-      { status: err?.status ?? 500 }
-    );
+    const e = err as { message?: string; status?: number } | null
+    const message = e?.message ?? 'Unknown error'
+    const status = e?.status ?? 500
+    console.error('[/api/claude] error:', message);
+    return Response.json({ error: message, status }, { status });
   }
 }

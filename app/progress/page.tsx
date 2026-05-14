@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import dynamic from 'next/dynamic'
 import '@/app/dashboard.css'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import { createClient } from '@/app/lib/supabase/client'
 import type { GradingResult } from '@/app/grading/types'
-import ScoreOverTime from '@/app/components/progress/ScoreOverTime'
-import ComponentScoreTrends from '@/app/components/progress/ComponentScoreTrends'
+
+const ScoreOverTime = dynamic(() => import('@/app/components/progress/ScoreOverTime'), { ssr: false })
+const ComponentScoreTrends = dynamic(() => import('@/app/components/progress/ComponentScoreTrends'), { ssr: false })
 import PerformanceBreakdown from '@/app/components/progress/PerformanceBreakdown'
 import ActivityCalendar from '@/app/components/progress/ActivityCalendar'
 
@@ -39,11 +41,9 @@ export default function ProgressPage() {
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) { setLoaded(true); return }
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const sb = supabase as any
       const [{ data: p }, { data: rows }] = await Promise.all([
-        sb.from('profiles').select('display_name,tier').eq('id', user.id).single(),
-        sb.from('case_sessions')
+        supabase.from('profiles').select('display_name,tier').eq('id', user.id).single(),
+        supabase.from('case_sessions')
           .select('id, score, correct, system, difficulty, completed_at, elapsed_seconds, grading_result')
           .eq('user_id', user.id)
           .order('completed_at', { ascending: false }),
@@ -52,7 +52,7 @@ export default function ProgressPage() {
         setDisplayName(p.display_name ?? user.email?.split('@')[0] ?? 'User')
         setTier(p.tier ?? 'free')
       }
-      setSessions(rows ?? [])
+      setSessions((rows ?? []) as Session[])
       setLoaded(true)
     })
   }, [])

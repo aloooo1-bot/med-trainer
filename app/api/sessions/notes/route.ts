@@ -10,16 +10,15 @@ export async function POST(req: Request) {
 
   const { id, notes }: { id: string; notes: string } = await req.json()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error, count } = await (supabase as any)
+  const { data, error } = await supabase
     .from('case_sessions')
     .update({ notes })
     .eq('id', id)
     .eq('user_id', user.id)
-    .select('id', { count: 'exact', head: true })
+    .select('id')
 
   if (error) return Response.json({ error: error.message }, { status: 500 })
-  if (count === 0) return Response.json({ error: 'Not found' }, { status: 404 })
+  if (!data || data.length === 0) return Response.json({ error: 'Not found' }, { status: 404 })
 
   return Response.json({ ok: true })
 }

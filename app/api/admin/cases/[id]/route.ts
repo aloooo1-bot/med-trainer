@@ -1,6 +1,6 @@
 import { createAdminClient } from '../../../../lib/supabase/admin'
 import { createClient } from '../../../../lib/supabase/server'
-import { ADMIN_EMAIL } from '../../../../lib/generators/shared'
+import { isAdmin } from '../../../../lib/generators/shared'
 import { NextRequest, NextResponse } from 'next/server'
 
 async function checkAdmin(): Promise<{ ok: true } | { ok: false; response: NextResponse }> {
@@ -9,7 +9,7 @@ async function checkAdmin(): Promise<{ ok: true } | { ok: false; response: NextR
   if (!user) {
     return { ok: false, response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
   }
-  if (user.email !== ADMIN_EMAIL) {
+  if (!isAdmin(user.email)) {
     return { ok: false, response: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
   }
   return { ok: true }

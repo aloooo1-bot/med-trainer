@@ -1,6 +1,19 @@
+import { imagingRatelimit } from '@/app/lib/ratelimit'
+
 export const dynamic = 'force-dynamic';
 
-export async function GET(req) {
+type OpenIItem = {
+  imgLarge?: string | null
+  imgThumb?: string | null
+  uid?: string | number | null
+  image?: { caption?: string | null; modalityMajor?: string | null } | null
+  abstract?: string | null
+}
+
+export async function GET(req: Request) {
+  const ip = req.headers.get('x-forwarded-for') ?? req.headers.get('x-real-ip') ?? 'anonymous'
+  const { success } = await imagingRatelimit.limit(ip)
+  if (!success) return Response.json([], { status: 429 })
   const { searchParams } = new URL(req.url);
   const query = searchParams.get('query') ?? '';
   const it = searchParams.get('it') ?? 'x';
@@ -23,14 +36,14 @@ export async function GET(req) {
     if (!upstream.ok) return Response.json([]);
 
     const data = await upstream.json();
-    const list = Array.isArray(data?.list) ? data.list : [];
+    const list: OpenIItem[] = Array.isArray(data?.list) ? data.list : [];
 
     const results = list
       .filter(item => item.imgLarge)
       .map(item => {
         // imgLarge path: /imgs/512/218/4687507/PMC4687507_name.png
         // detailedresult?img= takes the filename without extension
-        const imgFile = item.imgLarge.split('/').pop()?.replace(/\.[^.]+$/, '') ?? String(item.uid ?? '')
+        const imgFile = item.imgLarge!.split('/').pop()?.replace(/\.[^.]+$/, '') ?? String(item.uid ?? '')
         return {
           uid: imgFile,
           imageUrl: `https://openi.nlm.nih.gov${item.imgLarge}`,
@@ -43,7 +56,7 @@ export async function GET(req) {
 
     return Response.json(results);
   } catch (err) {
-    console.error('[imaging] Open-i proxy error:', err?.message ?? err);
+    console.error('[imaging] Open-i proxy error:', err instanceof Error ? err.message : err);
     return Response.json([]);
   }
 }

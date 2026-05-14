@@ -1,5 +1,7 @@
+import { revalidateTag } from 'next/cache'
 import { createClient } from '@/app/lib/supabase/server'
 import type { CaseSessionRecord } from '@/app/lib/analytics'
+import type { Json } from '@/app/lib/supabase/types'
 
 export async function POST(req: Request) {
   const supabase = await createClient()
@@ -11,8 +13,7 @@ export async function POST(req: Request) {
 
   const session: CaseSessionRecord = await req.json()
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error } = await (supabase as any).from('case_sessions').insert({
+  const { error } = await supabase.from('case_sessions').insert({
     id: session.id,
     user_id: user.id,
     started_at: new Date(session.startedAt).toISOString(),
@@ -28,8 +29,8 @@ export async function POST(req: Request) {
     total_cost_usd: session.totalCostUSD,
     total_input_tokens: session.totalInputTokens,
     total_output_tokens: session.totalOutputTokens,
-    api_calls: session.apiCalls,
-    grading_result: session.gradingResult ?? null,
+    api_calls: session.apiCalls as unknown as Json,
+    grading_result: (session.gradingResult ?? null) as unknown as Json,
     bookmarked: session.bookmarked ?? false,
     parent_session_id: session.parentSessionId ?? null,
   })
@@ -40,5 +41,6 @@ export async function POST(req: Request) {
     return Response.json({ error: error.message }, { status: 500 })
   }
 
+  revalidateTag(`session:${user.id}`, 'max')
   return Response.json({ ok: true })
 }

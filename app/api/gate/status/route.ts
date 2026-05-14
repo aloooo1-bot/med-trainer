@@ -18,8 +18,7 @@ export async function GET() {
     return Response.json({ tier: 'anonymous', casesLeft: used ? 0 : 1, firstCaseDone: false })
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: profile } = await (supabase as any)
+  const { data: profile } = await supabase
     .from('profiles')
     .select('tier, cases_used_today, cases_today_reset_at, first_case_completed')
     .eq('id', user.id)

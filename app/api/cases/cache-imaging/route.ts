@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/app/lib/supabase/admin'
+import { createClient } from '@/app/lib/supabase/server'
 
 // Merges a single test's image results into the case's imaging_cache column.
 // Called fire-and-forget from the trainer after Open-i returns results at runtime.
@@ -8,6 +9,10 @@ export async function POST(req: NextRequest) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return NextResponse.json({ ok: false })
   }
+
+  const authClient = await createClient()
+  const { data: { user } } = await authClient.auth.getUser()
+  if (!user) return NextResponse.json({ ok: false }, { status: 401 })
 
   try {
     const { id, testName, results } = await req.json() as {
@@ -28,19 +33,16 @@ export async function POST(req: NextRequest) {
       .from('cases')
       .select('imaging_cache')
       .eq('id', id)
-      .single() as unknown as {
-        data: { imaging_cache: Record<string, unknown> } | null
-        error: { message: string } | null
-      }
+      .single()
 
     if (readErr || !data) return NextResponse.json({ ok: false })
 
     const merged = { ...(data.imaging_cache ?? {}), [testName]: results }
 
-    const { error: writeErr } = await (supabase
+    const { error: writeErr } = await supabase
       .from('cases')
-      .update({ imaging_cache: merged } as never)
-      .eq('id', id) as unknown as Promise<{ error: { message: string } | null }>)
+      .update({ imaging_cache: merged })
+      .eq('id', id)
 
     if (writeErr) {
       console.error('cache-imaging write:', writeErr.message)

@@ -181,7 +181,7 @@ export const JSON_SCHEMA = `{
  * @param {string|null} namesClause
  * @returns {string}
  */
-export function buildCaseSystemPrompt(namesClause) {
+export function buildCaseSystemPrompt(namesClause: string | null) {
   const clause = namesClause ?? 'Draw from diverse ethnicities and countries each time (rotate through Eastern European, West African, East Asian, Latin American, Scandinavian, South Asian, Middle Eastern, etc.).'
   return `You are a medical education case generator. Generate realistic, detailed clinical cases.
 Return ONLY valid JSON. No markdown, no code fences, no explanation. Just the raw JSON object.
@@ -195,8 +195,8 @@ Invent a completely unique patient name. ${clause} Never reuse first names or la
  * @param {string|null} [variantSeed] - unused (kept for backwards compat)
  * @returns {string}
  */
-export function buildCasePrompt(system, difficulty, diagnosis, variantSeed) {
-  const diffRules = DIFFICULTY_RULES[difficulty] ?? DIFFICULTY_RULES.Foundations
+export function buildCasePrompt(system: string, difficulty: string, diagnosis?: string, variantSeed?: string | null) {
+  const diffRules = DIFFICULTY_RULES[difficulty as keyof typeof DIFFICULTY_RULES] ?? DIFFICULTY_RULES.Foundations
   const diffCount = difficulty === 'Foundations' ? '2-3' : difficulty === 'Clinical' ? '3-4' : '4-5'
   const schema = JSON_SCHEMA.replace('DIFF_COUNT', diffCount)
   const diagnosisLine = diagnosis

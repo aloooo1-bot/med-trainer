@@ -18,7 +18,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import Anthropic from '@anthropic-ai/sdk'
 import { MANIFEST, VARIANT_SEEDS } from './case-manifest.mjs'
-import { buildCaseSystemPrompt, buildCasePrompt } from '../app/lib/casePrompt.js'
+import { buildCaseSystemPrompt, buildCasePrompt } from '../app/lib/casePrompt.ts'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')

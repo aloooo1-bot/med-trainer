@@ -57,13 +57,12 @@ export default function SettingsPage() {
       if (!user) return
       setUserId(user.id)
       setEmail(user.email ?? '')
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      ;(supabase as any)
+      supabase
         .from('profiles')
         .select('display_name,tier,email_case_reminders,email_weekly_summary,rest_days,weekly_volume,difficulty_mix,default_system')
         .eq('id', user.id)
         .single()
-        .then(({ data: p }: { data: Record<string, unknown> | null }) => {
+        .then(({ data: p }) => {
           if (!p) return
           setDisplayName((p.display_name as string | null) ?? '')
           setTier((p.tier as string) ?? 'free')

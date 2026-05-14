@@ -41,8 +41,7 @@ export async function POST() {
   }
 
   // ── Authenticated ─────────────────────────────────────────────────────────
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { data: profile, error } = await (supabase as any)
+  const { data: profile, error } = await supabase
     .from('profiles')
     .select('tier, cases_used_today, cases_today_reset_at, first_case_completed')
     .eq('id', user.id)
@@ -88,8 +87,7 @@ export async function POST() {
     ? { cases_used_today: usedToday + 1 }
     : { cases_used_today: 1, cases_today_reset_at: now.toISOString() }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  await (supabase as any)
+  await supabase
     .from('profiles')
     .update(updatePayload)
     .eq('id', user.id)

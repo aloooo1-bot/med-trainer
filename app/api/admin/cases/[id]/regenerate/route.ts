@@ -1,6 +1,7 @@
 import { createAdminClient } from '../../../../../lib/supabase/admin'
 import { createClient } from '../../../../../lib/supabase/server'
-import { ADMIN_EMAIL } from '../../../../../lib/generators/shared'
+import { isAdmin } from '../../../../../lib/generators/shared'
+import { regenerateRatelimit } from '../../../../../lib/ratelimit'
 import { generateManifest } from '../../../../../lib/generators/manifest'
 import { generateLocal, findCombo } from '../../../../../lib/generators/local'
 import { NextRequest, NextResponse } from 'next/server'
@@ -11,18 +12,24 @@ async function checkAdmin(): Promise<{ ok: true } | { ok: false; response: NextR
   if (!user) {
     return { ok: false, response: NextResponse.json({ error: 'Unauthorized' }, { status: 401 }) }
   }
-  if (user.email !== ADMIN_EMAIL) {
+  if (!isAdmin(user.email)) {
     return { ok: false, response: NextResponse.json({ error: 'Forbidden' }, { status: 403 }) }
   }
   return { ok: true }
 }
 
 export async function POST(
-  _request: NextRequest,
+  request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   const auth = await checkAdmin()
   if (!auth.ok) return auth.response
+
+  const key = request.headers.get('x-forwarded-for') ?? 'anon'
+  const { success } = await regenerateRatelimit.limit(key)
+  if (!success) {
+    return NextResponse.json({ error: 'Too many regeneration requests — please wait a moment.' }, { status: 429 })
+  }
 
   const { id } = await params
   const adminClient = createAdminClient()

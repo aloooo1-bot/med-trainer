@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/app/lib/supabase/admin'
+import { createClient } from '@/app/lib/supabase/server'
 
 // status: 'hit'  = cached case found and returned
 // status: 'miss' = slot exists but not yet generated (proceed to Claude)
@@ -10,6 +11,10 @@ export async function GET(req: NextRequest) {
 
   // If Supabase isn't configured, treat as miss so the app still works without it
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ status: 'miss' })
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ status: 'miss' }, { status: 401 })
 
   try {
     const supabase = createAdminClient()

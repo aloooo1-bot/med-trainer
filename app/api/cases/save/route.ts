@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/app/lib/supabase/admin'
+import { createClient } from '@/app/lib/supabase/server'
 
 export async function POST(req: NextRequest) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ ok: false })
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return NextResponse.json({ ok: false }, { status: 401 })
 
   try {
     const { id, system, difficulty, diagnosis, variantIndex, caseData } = await req.json() as {
@@ -20,8 +25,7 @@ export async function POST(req: NextRequest) {
       : caseData
 
     const supabase = createAdminClient()
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const { error } = await (supabase as any)
+    const { error } = await supabase
       .from('cases')
       .upsert({
         id,
