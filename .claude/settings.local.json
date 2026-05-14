@@ -94,7 +94,27 @@
       "Bash(Select-String -Pattern \"\\(after:|═══|Fixed:|Already clean:|Errors:|✗\\)\")",
       "Bash(Select-Object -Last 30)",
       "PowerShell(Test-Path *)",
-      "Bash(awk -F: '{print $1}')"
+      "Bash(awk -F: '{print $1}')",
+      "Bash(Move-Item \"app/api/claude/route.js\" \"app/api/claude/route.ts\" -Force)",
+      "Bash(Move-Item \"app/api/imaging/route.js\" \"app/api/imaging/route.ts\" -Force)",
+      "Bash(Move-Item \"app/api/feedback/route.js\" \"app/api/feedback/route.ts\" -Force)",
+      "Bash(Move-Item \"app/lib/casePrompt.js\" \"app/lib/casePrompt.ts\" -Force)",
+      "Bash(awk -F: '$2 > 1537')",
+      "Bash(awk '/^  const renderMain = \\\\\\(\\\\\\)/, 0 { print NR\": \"$0 }' app/trainer/page.tsx)",
+      "Bash(awk -F: '$2 >= 2500 && $2 <= 2860')",
+      "Bash(awk NR >= 2830 && NR <= 2870 { print NR\": \"$0 } *)",
+      "Bash(awk NR >= 1630 && NR <= 1650 { print NR\": \"$0 } *)",
+      "Bash(awk NR >= 1705 && NR <= 1735 { print NR\": \"$0 } *)",
+      "Bash(awk NR >= 2045 && NR <= 2065 { print NR\": \"$0 } *)",
+      "Bash(awk NR >= 2388 && NR <= 2400 { print NR\": \"$0 } *)",
+      "Bash(awk NR >= 1524 && NR <= 1540 { print NR\": \"$0 } *)",
+      "Bash(awk NR >= 2830 && NR <= 2845 { print NR\": \"$0 } *)",
+      "Bash(awk 'NR==528' app/trainer/page.tsx)",
+      "Bash(awk 'NR==909' app/trainer/page.tsx)",
+      "Bash(echo \"generateCase: $\\(awk 'NR==528' app/trainer/page.tsx\\) to $\\(awk 'NR==909' app/trainer/page.tsx\\) = $\\(\\(909-528+1\\)\\) lines\")",
+      "Bash(awk 'NR >= 100')",
+      "Bash(Get-ChildItem app/lib/generators/)",
+      "Bash(Select-Object Name)"
     ]
   }
 }
