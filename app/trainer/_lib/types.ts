@@ -9,6 +9,7 @@ export interface CaseData {
   socialHistory?: { smoking?: string; alcohol?: string; drugs?: string; occupation?: string; living?: string; other?: string }
   reviewOfSystems: Record<string, string>
   physicalExam: Record<string, string>
+  relevantExamRegions?: string[]
   availableLabs: string[]
   availableImaging: string[]
   labGroups?: Array<{ name: string; tests: string[] }>

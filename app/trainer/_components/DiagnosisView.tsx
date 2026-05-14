@@ -7,7 +7,6 @@ import { MicButton } from './MicButton'
 import { getRubric, type DimensionKey } from '@/app/grading/rubric'
 import { type GradingResult } from '@/app/grading/types'
 import { type TimerState, type NotesState, SOAP_TEMPLATE } from '../_lib/types'
-import { fmtTime } from '../_lib/useTimer'
 import type { CaseData } from '../_lib/types'
 
 export function DiagnosisView({
@@ -267,11 +266,6 @@ export function DiagnosisView({
               <div style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 15, fontWeight: 600, color: 'var(--color-ink)' }}>
                 {caseData?.diagnosis ?? '—'}
               </div>
-              {gradingResult.efficiency && (
-                <div style={{ fontSize: 11, color: 'var(--color-ink-3)', fontFamily: 'JetBrains Mono, monospace', marginTop: 2 }}>
-                  {fmtTime(gradingResult.efficiency.elapsedSeconds)}
-                </div>
-              )}
             </div>
           </div>
         </div>
@@ -285,7 +279,6 @@ export function DiagnosisView({
             </div>
             <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--color-ink-3)', textAlign: 'center', lineHeight: 1.6, marginTop: 2 }}>
               {gradingResult.score}/100 rubric
-              {gradingResult.efficiency && (<><br/>{caseDifficulty} · {fmtTime(gradingResult.efficiency.elapsedSeconds)}</>)}
             </div>
           </div>
 
@@ -307,24 +300,6 @@ export function DiagnosisView({
                   />
                 )
               })}
-              {gradingResult.efficiency && (() => {
-                const eff = gradingResult.efficiency!
-                const pct = (eff.score / 10) * 100
-                const barColor = pct >= 80 ? 'bg-confirmed' : pct >= 50 ? 'bg-caution' : 'bg-critical'
-                const scoreColor = pct >= 80 ? 'text-confirmed' : pct >= 50 ? 'text-caution' : 'text-critical'
-                return (
-                  <div className="flex items-center gap-3 px-4 py-3 bg-paper-2">
-                    <span className="w-40 shrink-0 text-xs font-medium text-ink-3">Efficiency</span>
-                    <div className="flex-1 h-1.5 rounded-full bg-paper-3 overflow-hidden">
-                      <div className={'h-full rounded-full ' + barColor} style={{ width: pct + '%' }} />
-                    </div>
-                    <span className={'w-14 text-right font-mono text-xs tabular-nums ' + scoreColor}>
-                      {eff.score}<span className="text-ink-3">/10</span>
-                    </span>
-                    <span className="text-[10px] text-ink-3 italic whitespace-nowrap">not in /100</span>
-                  </div>
-                )
-              })()}
             </div>
             {gradingResult.feedback && (
               <div style={{ borderTop: '1px solid var(--color-rule)', padding: '14px 20px', background: 'var(--color-paper-2)' }}>
@@ -337,19 +312,17 @@ export function DiagnosisView({
         </div>
 
         {/* C — Feedback section carousel */}
-        {((gradingResult.strengths?.length ?? 0) > 0 || gradingResult.efficiency?.score === 10
+        {((gradingResult.strengths?.length ?? 0) > 0
           || (gradingResult.missedQuestions?.length ?? 0) > 0
           || (gradingResult.teachingPoints?.length ?? 0) > 0) && (
           <div style={{ borderTop: '1px solid var(--color-rule)', paddingTop: 12, paddingBottom: 4, background: 'var(--color-paper)' }}>
             {(() => {
               const strengthsAll = [
                 ...(gradingResult.strengths ?? []),
-                ...(gradingResult.efficiency?.score === 10 ? ['Completed the case efficiently within the allotted time'] : []),
               ]
               const feedSections: FeedbackSection[] = []
               if (strengthsAll.length > 0) feedSections.push({
                 title: 'Strengths', items: strengthsAll, tone: 'confirmed', icon: '✓',
-                footer: gradingResult.efficiency?.timedOut ? 'The case timed out before submission. Time management is a clinical skill that improves with practice. Focus on high-yield questions early and order targeted tests rather than a broad workup.' : undefined,
               })
               if ((gradingResult.missedQuestions?.length ?? 0) > 0) feedSections.push({
                 title: 'What you missed', items: gradingResult.missedQuestions!, tone: 'caution', icon: '!',

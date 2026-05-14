@@ -3,7 +3,7 @@ import { fractionToPercent, scoreColor } from '@/app/lib/scoreColor'
 
 const SCORECARD_LABELS: Record<keyof CaseEntry['scorecard'], string> = {
   history: 'History', testing: 'Test Ordering', diagnosis: 'Diagnosis',
-  completeness: 'Completeness', reasoning: 'Reasoning', efficiency: 'Efficiency',
+  completeness: 'Completeness', reasoning: 'Reasoning',
 }
 
 export default function CaseDetailPanel({ c }: { c: CaseEntry }) {

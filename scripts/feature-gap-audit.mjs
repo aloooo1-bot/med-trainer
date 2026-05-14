@@ -181,7 +181,7 @@ EXISTING TRAINER FEATURES (do NOT suggest these — they already exist):
 - Image zoom: lightbox for ECG, imaging, and special modality images
 - Help modal: context-sensitive per-section help with "?" button
 - Vitals strip: always-visible at top with abnormal-value highlighting and BMI auto-calc
-- Score breakdown: 5 grading dimensions (history interview, test ordering, diagnosis accuracy, completeness, clinical reasoning) + efficiency axis
+- Score breakdown: 5 grading dimensions (history interview, test ordering, diagnosis accuracy, completeness, clinical reasoning)
 - Oral presentation grading (Advanced): 4 axes (accuracy, completeness, conciseness, safety) + critical misses list
 - Teaching points: 4 clinical pearls shown post-grading
 - Differential discussion: all differentials with explanations, shown post-grading

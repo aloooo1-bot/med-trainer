@@ -426,8 +426,7 @@ const SCORECARD_DIMENSIONS: readonly { name: string; score: number; max: number;
 function Scorecard() {
   const subtotal = SCORECARD_DIMENSIONS.reduce((s, d) => s + d.score, 0)
   const subtotalMax = SCORECARD_DIMENSIONS.reduce((s, d) => s + d.max, 0)
-  const efficiency = 8
-  const total = subtotal + efficiency
+  const total = subtotal
 
   return (
     <section id="scorecard" className={`${styles.section} ${styles.scorecardSection}`}>
@@ -461,7 +460,7 @@ function Scorecard() {
               </div>
               <div className={styles.scoreTotalLabel}>Strong performance</div>
               <div className={styles.scoreTotalSub}>
-                {subtotal}/{subtotalMax} rubric · +{efficiency} efficiency · 9:42 of 22:00
+                {subtotal}/{subtotalMax} rubric · 9:42 of 22:00
               </div>
             </div>
 

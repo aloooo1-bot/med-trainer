@@ -20,7 +20,6 @@ const CLINICAL_ADVANCED_DIMS = [
   { name: 'Clinical Reasoning',     pts: 15, desc: 'Do your interview choices and written reasoning link specific findings to the diagnosis? Penalised for fabricated findings or wrong conclusions, not for brevity.' },
 ]
 
-const EFFICIENCY_NOTE = 'Efficiency (/10, shown separately): At Clinical and Advanced difficulty, a timer tracks how quickly you complete the case. Efficiency is displayed as a separate /10 indicator on the scorecard and is not included in the /100 score.'
 
 const FAQS = [
   {
@@ -109,9 +108,6 @@ export default function HelpPage() {
                     <span className="dx-help-dim-desc">{d.desc}</span>
                   </div>
                 ))}
-                <div style={{ paddingTop: 10, fontSize: 12, color: 'var(--muted)', fontStyle: 'italic', lineHeight: 1.5 }}>
-                  {EFFICIENCY_NOTE}
-                </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 4 }}>
                   {[
                     { label: 'Correct', threshold: '≥ 75', color: 'var(--green)' },

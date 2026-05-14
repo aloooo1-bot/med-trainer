@@ -6,7 +6,7 @@ const ScoreDimensionSchema = z.object({
 })
 
 // Validates the raw JSON Claude returns for a grading result.
-// .passthrough() preserves fields we don't explicitly define (e.g. presentation, efficiency).
+// .passthrough() preserves fields we don't explicitly define (e.g. presentation).
 export const GradingResultSchema = z.object({
   score: z.number(),
   correct: z.boolean(),
@@ -21,6 +21,7 @@ export const GradingResultSchema = z.object({
     diagnosisAccuracy:     ScoreDimensionSchema,
     diagnosisCompleteness: ScoreDimensionSchema,
     clinicalReasoning:     ScoreDimensionSchema.optional(),
+    examinationFocus:      ScoreDimensionSchema.optional(),
   }).optional(),
 }).passthrough()
 

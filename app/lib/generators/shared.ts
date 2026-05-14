@@ -55,6 +55,7 @@ CRITICAL: The lab/imaging results must include at least one finding that, when i
 STEMI RULE: When the diagnosis is any form of STEMI, ecgFindings MUST explicitly state the affected leads with millimeter elevation.
 PAST HISTORY CONSISTENCY RULE: The pastMedicalHistory fields shown to the patient (conditions, surgeries, hospitalizations) MUST NOT contradict hiddenHistory.fullHistory. The hidden history may ADD detail, but must never contradict what was already stated.
 PHYSICAL EXAM OBJECTIVITY RULE: Every physicalExam field MUST describe only objective, observable findings. NEVER include diagnostic interpretations, disease names, or phrases like "consistent with X" or "suggesting X".
+EXAM FOCUS RULE: relevantExamRegions must list every physicalExam key whose findings a competent physician would intentionally examine for this diagnosis. Use the exact same string keys as in physicalExam. Omit regions that are entirely normal/unremarkable and unrelated to the working diagnosis.
 INTERPRETATION OBJECTIVITY RULE: In imagingResults, procedureResults, hematologyFindings, urineFindings, fundusFindings, skinFindings, biopsyFindings, and relevantTests[].imagingResult — NEVER include phrases like "consistent with [disease]", "suggestive of [disease]", "indicating [disease]", "compatible with [disease]", "characteristic of [disease]", "diagnostic of [disease]", "concerning for [disease]", or "findings of [disease]". Do NOT name the diagnosis in these fields. Describe only what is physically observed: morphological features, measurements, signal characteristics, distribution. STEMI EXCEPTION: ecgFindings for STEMI cases must retain "consistent with [anatomic-area] STEMI" per the STEMI RULE.
 CLINICAL HPI WORD LIMIT RULE: The clinicalHpi field is a HARD MAXIMUM of 40 words. State only: age, sex, primary symptom, and duration.
 FOUNDATIONS HPI WORD LIMIT RULE: The hpi field is a HARD MAXIMUM of 60 words. State ONLY: the chief complaint, primary symptom(s), and duration. Move everything else into hiddenHistory.fullHistory.
@@ -88,6 +89,7 @@ export const JSON_SCHEMA_TEMPLATE = `{
     "Cardiovascular": "<findings>", "Pulmonary": "<findings>", "Abdomen": "<findings>",
     "Extremities": "<findings>", "Neurological": "<findings>", "Skin": "<findings>"
   },
+  "relevantExamRegions": ["<physicalExam key>", ...list only regions a competent physician would target for this diagnosis],
   "availableLabs": ["<lab name>", ...10-14 relevant and distractor labs],
   "availableImaging": ["<study name>", ...3-5 relevant and distractor studies],
   "labGroups": [{ "name": "<panel name>", "tests": ["<exact lab name>", ...] }, ...group every lab],

@@ -21,13 +21,7 @@ export interface GradingResult {
     diagnosisAccuracy: ScoreDimension
     diagnosisCompleteness: ScoreDimension
     clinicalReasoning?: ScoreDimension  // omitted at Foundations (no reasoning input)
-  }
-  efficiency?: {
-    score: number
-    feedback: string
-    elapsedSeconds: number
-    pausedSeconds: number
-    timedOut: boolean
+    examinationFocus?: ScoreDimension   // omitted at Foundations; omitted for legacy cases lacking relevantExamRegions
   }
   missedQuestions: string[]
   teachingPoints: string[]
@@ -61,10 +55,10 @@ export function stripToBasic(result: GradingResult): GradingResult {
           ...(result.dimensions.clinicalReasoning !== undefined
             ? { clinicalReasoning: { score: result.dimensions.clinicalReasoning.score, feedback: '' } }
             : {}),
+          ...(result.dimensions.examinationFocus !== undefined
+            ? { examinationFocus: { score: result.dimensions.examinationFocus.score, feedback: '' } }
+            : {}),
         }
-      : undefined,
-    efficiency: result.efficiency
-      ? { score: result.efficiency.score, feedback: '', elapsedSeconds: result.efficiency.elapsedSeconds, pausedSeconds: result.efficiency.pausedSeconds, timedOut: result.efficiency.timedOut }
       : undefined,
   }
 }
@@ -88,4 +82,6 @@ export interface GradingInput {
   supplementaryTests?: string[]
   prePresentedInfo?: string
   timedOut: boolean
+  revealedExamRegions?: string[]
+  relevantExamRegions?: string[]
 }

@@ -8,6 +8,7 @@ export type DimensionKey =
   | 'diagnosisAccuracy'
   | 'diagnosisCompleteness'
   | 'clinicalReasoning'
+  | 'examinationFocus'
 
 export interface RubricDimension {
   key: DimensionKey
@@ -25,11 +26,12 @@ const FOUNDATIONS_RUBRIC: RubricDimension[] = [
 ]
 
 const CLINICAL_ADVANCED_RUBRIC: RubricDimension[] = [
-  { key: 'historyInterview',      label: 'History & Interview',    max: 20 },
-  { key: 'testOrdering',          label: 'Test Ordering',          max: 20 },
+  { key: 'historyInterview',      label: 'History & Interview',    max: 18 },
+  { key: 'testOrdering',          label: 'Test Ordering',          max: 18 },
   { key: 'diagnosisAccuracy',     label: 'Diagnosis Accuracy',     max: 30 },
-  { key: 'diagnosisCompleteness', label: 'Diagnosis Completeness', max: 15 },
+  { key: 'diagnosisCompleteness', label: 'Diagnosis Completeness', max: 14 },
   { key: 'clinicalReasoning',     label: 'Clinical Reasoning',     max: 15 },
+  { key: 'examinationFocus',      label: 'Examination Focus',      max:  5 },
 ]
 
 export function getRubric(difficulty: string): RubricDimension[] {
@@ -53,6 +55,7 @@ export function buildRubricPrompt(input: GradingInput): string {
   const da  = rubric.find(d => d.key === 'diagnosisAccuracy')!
   const dc  = rubric.find(d => d.key === 'diagnosisCompleteness')!
   const cr  = rubric.find(d => d.key === 'clinicalReasoning')
+  const ef  = rubric.find(d => d.key === 'examinationFocus')
 
   // Proportional calibration ranges derived from each axis's max
   const hiHigh   = Math.round(hi.max * 0.89)   // e.g. 80% of max
@@ -83,6 +86,8 @@ export function buildRubricPrompt(input: GradingInput): string {
 
   const crFloor = cr ? Math.round(cr.max * 0.73) : 0  // 11/15 scaled
 
+  const hasExamData = ef && (input.relevantExamRegions?.length ?? 0) > 0
+
   const weightBlock = rubric
     .map(d => `- ${d.label} (${d.key}): ${d.max} points`)
     .join('\n')
@@ -102,6 +107,25 @@ ${isFoundations ? '' : ''}- Grade based on the written clinical reasoning text (
 
   const crJsonField = cr
     ? `    "clinicalReasoning":     { "score": <0-${cr.max}>, "feedback": "<1 sentence on the quality of reasoning or evidence linkage>" }`
+    : ''
+
+  const efSection = hasExamData ? `
+EXAMINATION FOCUS (/${ef!.max}):
+Relevant exam regions for this case: ${input.relevantExamRegions!.join(', ')}
+Student examined: ${(input.revealedExamRegions ?? []).join(', ') || '(none)'}
+- Award full ${ef!.max}/${ef!.max} if the student examined all relevant regions AND examined zero irrelevant regions
+- Deduct ~1 point (~80%) for each single irrelevant region examined; two or more irrelevant regions examined → cap at ${Math.round(ef!.max * 0.50)}/${ef!.max}
+- Deduct ~2 points (~60%) if one relevant region was skipped; multiple skipped relevant regions → award 0-${Math.round(ef!.max * 0.20)}/${ef!.max}
+- If both irrelevant exams and missed relevant regions are present, apply the stricter of the two deductions
+- Irrelevant means a region unrelated to the working differential (e.g. Neurological for a clear pulmonary case; Skin for a pure cardiac case)
+- Do not penalise for examining "General" regardless of diagnosis — it is routine
+` : (ef ? `
+EXAMINATION FOCUS (/${ef.max}):
+No ground-truth exam focus data for this case. Award ${ef.max}/${ef.max} and note "not applicable for this case" in feedback.
+` : '')
+
+  const efJsonField = ef
+    ? `    "examinationFocus":      { "score": <0-${ef.max}>, "feedback": "<1 sentence on examination relevance or 'not applicable for this case' if no data>" }`
     : ''
 
   return `Case: ${input.patientInfo}
@@ -126,7 +150,7 @@ Key clinical information that should have been elicited: ${input.keyQuestions.jo
 Teaching points: ${input.teachingPoints.join(' | ')}
 Differentials: ${input.differentials.join(', ')}
 
-SCORING WEIGHTS (must sum to 100 — efficiency is tracked separately and is NOT part of this rubric):
+SCORING WEIGHTS (must sum to 100):
 ${weightBlock}
 ${input.timedOut ? '\nNOTE: This case was submitted when time expired. Grade whatever was submitted fairly — partial work should receive partial credit. Do not penalize harshly for incomplete reasoning if it appears the student was mid-sentence. Note in the feedback: "This case was submitted when time expired." Do not reduce scores further beyond what the time expiry already reflects.\n' : ''}
 HISTORY & INTERVIEW (/${hi.max}):
@@ -168,7 +192,7 @@ DIAGNOSIS COMPLETENESS (/${dc.max}):
 - For Clinical: award ${dcClinMin}-${dcClinMax} if the core diagnosis is correct; require at least one supporting detail (etiology, severity, or complication) to score ${Math.round(dc.max * 0.87)}-${dcClinMax}
 - Reserve scores below ${dcLowMax + 1} for cases where the student is meaningfully incomplete or names only a vague syndrome without the correct pathological process
 - For Advanced only: require etiology, staging, or complication details to score above ${Math.round(dc.max * 0.67)}
-${crSection}
+${crSection}${efSection}
 GENERAL CALIBRATION:
 - Reward efficient targeted questioning over exhaustive checklists
 - Do NOT penalise for skipping history questions if the same information was already apparent from physical exam or the HPI
@@ -196,7 +220,7 @@ Return:
     "historyInterview":      { "score": <0-${hi.max}>, "feedback": "<1 sentence: what they did well or missed>" },
     "testOrdering":          { "score": <0-${to.max}>, "feedback": "<1 sentence>" },
     "diagnosisAccuracy":     { "score": <0-${da.max}>, "feedback": "<1 sentence>" },
-    "diagnosisCompleteness": { "score": <0-${dc.max}>, "feedback": "<1 sentence>" }${crJsonField ? `,\n    ${crJsonField}` : ''}
+    "diagnosisCompleteness": { "score": <0-${dc.max}>, "feedback": "<1 sentence>" }${crJsonField ? `,\n    ${crJsonField}` : ''}${efJsonField ? `,\n    ${efJsonField}` : ''}
   },
   "missedQuestions": ["<question that would have meaningfully changed dx or management>", ...omit anything already available],
   "teachingPoints": ${JSON.stringify(input.teachingPoints)},

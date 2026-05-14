@@ -25,7 +25,6 @@ import { MANIFEST, makeCaseId } from '../lib/caseManifest'
 import { jitterCase } from '../lib/caseJitter'
 import { reconcileHistoryConsistency, sanitizePmhLeak, DIFFICULTY_RULES } from '../lib/generators/shared'
 import { type GradingResult, type GradingInput, stripToBasic } from '../grading/types'
-import { calcEfficiency } from '../grading/efficiency'
 import { gradeCase, type GradingUsageCallback } from '../grading/grader'
 import { type DimensionKey } from '../grading/rubric'
 import {
@@ -127,6 +126,7 @@ export default function MedTrainer() {
   const [revealed, setRevealed] = useState(false)
 
   const [caseDifficulty, setCaseDifficulty] = useState<string>('')
+  const [revealedExamRegions, setRevealedExamRegions] = useState<Set<string>>(new Set())
   const [collapsedPanels, setCollapsedPanels] = useState<Set<string>>(new Set())
   const [rosState, setRosState] = useState<ROSState>(makeInitialROSState())
   const [userPresentation, setUserPresentation] = useState('')
@@ -546,6 +546,7 @@ Return ONLY valid JSON — no markdown, no explanation:
     setCaseData(null)
     setOrderedTests(new Set())
     setSelectedTests(new Set())
+    setRevealedExamRegions(new Set())
     setChatMessages([])
     setGradingResult(null)
     setRevealed(false)
@@ -964,9 +965,13 @@ PMH LEAK RULE: The pastMedicalHistory fields (conditions, surgeries, hospitaliza
       ? pmhLines.join('\n')
       : 'No significant past medical history.'
 
-    const examSection = Object.entries(caseData.physicalExam)
-      .map(([region, finding]) => `${region}: ${finding}`)
-      .join('\n')
+    const isExamGated =
+      (caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') &&
+      (caseData.relevantExamRegions?.length ?? 0) > 0
+    const examEntries = isExamGated
+      ? Object.entries(caseData.physicalExam).filter(([region]) => revealedExamRegions.has(region))
+      : Object.entries(caseData.physicalExam)
+    const examSection = examEntries.map(([region, finding]) => `${region}: ${finding}`).join('\n')
 
     const behaviorRules = caseDifficulty === 'Advanced'
       ? `- You have NOT shared most of your symptoms — only mention what's in your presenting story above
@@ -1237,6 +1242,8 @@ Student message: "${msg}"`
       differentials: caseData.differentials,
       prePresentedInfo,
       timedOut,
+      revealedExamRegions: Array.from(revealedExamRegions),
+      relevantExamRegions: caseData.relevantExamRegions ?? [],
       ...(expectedLabs?.length        ? { expectedLabs }        : {}),
       ...(expectedImaging?.length     ? { expectedImaging }     : {}),
       ...(supplementaryTests?.length  ? { supplementaryTests }  : {}),
@@ -1246,20 +1253,6 @@ Student message: "${msg}"`
 
     try {
       const result = await gradeCase(gradingInput, gradingUsageCb)
-
-      // Merge client-side efficiency score (not sent to AI)
-      if (caseDifficulty !== 'Foundations' && timerState.status !== 'idle') {
-        const eff = calcEfficiency(caseDifficulty, timerState.remainingSeconds, timedOut)
-        if (eff.feedback) {
-          result.efficiency = {
-            score: eff.score,
-            feedback: eff.feedback,
-            elapsedSeconds: timerState.elapsedSeconds,
-            pausedSeconds: timerState.pausedSeconds,
-            timedOut,
-          }
-        }
-      }
 
       // Save to history
       try {
@@ -1412,7 +1405,24 @@ Student message: "${msg}"`
 
       case 'exam':
         if (!caseData) addTerminalLines({ type: 'error', content: 'No case loaded.' })
-        else {
+        else if (
+          (caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') &&
+          (caseData.relevantExamRegions?.length ?? 0) > 0
+        ) {
+          addTerminalLines({ type: 'info', content: 'PHYSICAL EXAMINATION (revealed regions only)' })
+          const revealed = Array.from(revealedExamRegions)
+          if (revealed.length === 0) {
+            addTerminalLines({ type: 'info', content: '  No regions examined yet. Use the Exam tab to examine regions.' })
+          } else {
+            revealed.forEach(area => {
+              const val = caseData.physicalExam[area] ?? ''
+              addTerminalLines({ type: 'output', content: `  ${area.padEnd(18)} ${val}` })
+            })
+          }
+          const unrevealed = Object.keys(caseData.physicalExam).filter(r => !revealedExamRegions.has(r))
+          if (unrevealed.length > 0)
+            addTerminalLines({ type: 'info', content: `  Not yet examined: ${unrevealed.join(', ')}` })
+        } else {
           addTerminalLines({ type: 'info', content: 'PHYSICAL EXAMINATION' })
           Object.entries(caseData.physicalExam).forEach(([area, val]) =>
             addTerminalLines({ type: 'output', content: `  ${area.padEnd(18)} ${val}` })
@@ -1534,7 +1544,12 @@ Student message: "${msg}"`
           gradingResult={gradingResult}
         />
       case 'exam':
-        return <ExamView caseData={caseData} />
+        return <ExamView
+          caseData={caseData}
+          caseDifficulty={caseDifficulty}
+          revealedExamRegions={revealedExamRegions}
+          revealExamRegion={(r) => setRevealedExamRegions(prev => { const next = new Set(prev); next.add(r); return next })}
+        />
       case 'order':
         return <OrderView
           caseData={caseData}

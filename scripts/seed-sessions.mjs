@@ -151,7 +151,7 @@ function makeSessions(userId) {
         feedback: 'Good recognition of prerenal pattern. The FENa calculation and urine osmolality interpretation were correctly applied. Volume assessment history could be more thorough.',
         dimensions: {
           historyInterview: { score: 13, feedback: 'Asked about fluid intake and output, but missed NSAID use history.', max: 18 },
-          testOrdering:     { score: 15, feedback: 'BMP, urinalysis, and FENa — all appropriate. Good test efficiency.', max: 18 },
+          testOrdering:     { score: 15, feedback: 'BMP, urinalysis, and FENa — all appropriate. Well-targeted workup.', max: 18 },
           diagnosisAccuracy:{ score: 21, feedback: 'Correct diagnosis. Differentiated prerenal from intrinsic AKI well.', max: 27 },
           diagnosisCompleteness: { score: 10, feedback: 'Identified prerenal cause but management plan was vague.', max: 13 },
           clinicalReasoning: { score: 11, feedback: 'Reasonable reasoning, minor gaps in reversible cause identification.', max: 14 },

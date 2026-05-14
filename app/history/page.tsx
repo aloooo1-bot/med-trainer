@@ -133,22 +133,6 @@ function ScoreDetail({
                 )
               })}
 
-              {gr.efficiency && gr.efficiency.score > 0 && (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
-                    <span style={{ color: 'var(--text-secondary)' }}>Efficiency</span>
-                    <span style={{ fontWeight: 600, fontFamily: 'JetBrains Mono, monospace', color: scoreColorVar(gr.efficiency.score * 10) }}>
-                      {gr.efficiency.score}<span style={{ color: 'var(--muted)' }}>/10</span>
-                    </span>
-                  </div>
-                  <div style={{ height: 6, borderRadius: 3, background: 'var(--border)', overflow: 'hidden' }}>
-                    <div style={{ height: '100%', width: `${gr.efficiency.score * 10}%`, borderRadius: 3, background: scoreColorVar(gr.efficiency.score * 10) }} />
-                  </div>
-                  {gr.efficiency.feedback && (
-                    <p style={{ margin: 0, fontSize: 11, color: 'var(--muted)', lineHeight: 1.4 }}>{gr.efficiency.feedback}</p>
-                  )}
-                </div>
-              )}
             </div>
           )}
         </div>

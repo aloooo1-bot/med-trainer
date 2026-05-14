@@ -25,14 +25,13 @@ function cssScore(score: number): string {
   return 'var(--green)'
 }
 
-const CAT_KEYS = ['history', 'testing', 'diagnosis', 'completeness', 'reasoning', 'efficiency'] as const
+const CAT_KEYS = ['history', 'testing', 'diagnosis', 'completeness', 'reasoning'] as const
 const CAT_LABELS: Record<typeof CAT_KEYS[number], string> = {
   history: 'History & Interview',
   testing: 'Test Ordering',
   diagnosis: 'Diagnosis Accuracy',
   completeness: 'Completeness',
   reasoning: 'Clinical Reasoning',
-  efficiency: 'Efficiency',
 }
 const CAT_INSIGHT: Record<typeof CAT_KEYS[number], string> = {
   history:      'You miss asking about bone pain, prior fractures, and infection history',
@@ -40,7 +39,6 @@ const CAT_INSIGHT: Record<typeof CAT_KEYS[number], string> = {
   diagnosis:    'Correct organ system but wrong primary etiology in 3 of 6 cases',
   completeness: 'Diagnoses lack downstream complications and staging',
   reasoning:    'Malignancy dismissed too quickly when WBC is normal',
-  efficiency:   'Excellent — consistently finishing within time limits',
 }
 
 const MISSED_PATTERNS = [

@@ -115,7 +115,7 @@ const HELP_CONTENT: Record<string, HelpEntry> = {
       },
       {
         heading: 'How you\'re graded',
-        body: 'The rubric rewards targeted history, selective testing, accurate diagnosis, complete reasoning, and efficiency. Each dimension carries a fixed point weight.',
+        body: 'The rubric rewards targeted history, selective testing, accurate diagnosis, and complete reasoning. Each dimension carries a fixed point weight.',
       },
     ],
     tip: 'Mention the pathognomonic finding explicitly in your reasoning — the grader looks for it.',

@@ -34,6 +34,7 @@ export default function ComponentScoreTrends({ sessions }: { sessions: Session[]
       diagnosisAccuracy:     theme.critical,
       diagnosisCompleteness: theme.confirmed,
       clinicalReasoning:     theme.purple,
+      examinationFocus:      theme.insight,
     }
 
     const allDims = getRubric('Clinical')
