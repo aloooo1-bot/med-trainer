@@ -1,3 +1,4 @@
+import { after } from 'next/server'
 import { createAdminClient } from '../../../../../lib/supabase/admin'
 import { createClient } from '../../../../../lib/supabase/server'
 import { isAdmin } from '../../../../../lib/generators/shared'
@@ -32,11 +33,22 @@ export async function POST(
   }
 
   const { id } = await params
+
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json({ error: 'ANTHROPIC_API_KEY is not set on the server' }, { status: 500 })
+  }
+
+  if (id.startsWith('img-')) {
+    return NextResponse.json(
+      { error: 'Image-anchored cases (img-*) must be regenerated via scripts/image-first-cases.mjs from the terminal.' },
+      { status: 422 }
+    )
+  }
+
   const adminClient = createAdminClient()
 
   interface CaseBasic { id: string; system: string; difficulty: string; diagnosis: string; variant_index: number }
 
-  // Fetch the existing row
   const { data: row, error: fetchError } = await adminClient
     .from('cases')
     .select('id, system, difficulty, diagnosis, variant_index')
@@ -47,51 +59,69 @@ export async function POST(
     return NextResponse.json({ error: 'Case not found' }, { status: 404 })
   }
 
-  if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: 'ANTHROPIC_API_KEY is not set on the server' }, { status: 500 })
+  // Insert a pending job row and return immediately — generation runs in the background.
+  const { data: job, error: jobErr } = await adminClient
+    .from('case_regeneration_jobs')
+    .insert({ case_id: id })
+    .select('id')
+    .single()
+
+  if (jobErr || !job) {
+    return NextResponse.json({ error: 'Failed to create regeneration job' }, { status: 500 })
   }
 
-  let caseData: Record<string, unknown>
+  const jobId = job.id as string
 
-  try {
-    if (id.startsWith('img-')) {
-      // Image-anchored cases require re-running scripts/image-first-cases.mjs
-      return NextResponse.json(
-        { error: 'Image-anchored cases (img-*) must be regenerated via scripts/image-first-cases.mjs from the terminal.' },
-        { status: 422 }
-      )
-    } else if (id.startsWith('local-')) {
-      // local-{modality}-{category}-{N}
-      const parts = id.split('-')
-      const modality  = parts[1]
-      const category  = parts.slice(2, -1).join('-')
-      const combo = findCombo(modality, category)
-      if (!combo) {
-        return NextResponse.json({ error: `Unknown local combo: ${modality}/${category}` }, { status: 400 })
+  // after() fires after the response is sent. Fluid Compute keeps the function
+  // instance alive so this completes even if the client tab closes.
+  after(async () => {
+    const db = createAdminClient()
+
+    await db.from('case_regeneration_jobs')
+      .update({ status: 'running', started_at: new Date().toISOString() })
+      .eq('id', jobId)
+
+    try {
+      let caseData: Record<string, unknown>
+
+      if (id.startsWith('local-')) {
+        const parts = id.split('-')
+        const modality = parts[1]
+        const category = parts.slice(2, -1).join('-')
+        const combo = findCombo(modality, category)
+        if (!combo) throw new Error(`Unknown local combo: ${modality}/${category}`)
+        caseData = await generateLocal(combo)
+      } else {
+        caseData = await generateManifest({
+          system:       row.system,
+          difficulty:   row.difficulty,
+          diagnosis:    row.diagnosis,
+          variantIndex: row.variant_index ?? 0,
+        })
       }
-      caseData = await generateLocal(combo)
-    } else {
-      // manifest case
-      caseData = await generateManifest({
-        system:       row.system,
-        difficulty:   row.difficulty,
-        diagnosis:    row.diagnosis,
-        variantIndex: row.variant_index ?? 0,
-      })
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (db.from('cases') as any)
+        .update({ case_data: caseData, is_generated: true, generated_at: new Date().toISOString() })
+        .eq('id', id)
+
+      await db.from('case_regeneration_jobs')
+        .update({
+          status: 'done',
+          completed_at: new Date().toISOString(),
+          result_diagnosis: String(caseData.diagnosis ?? ''),
+        })
+        .eq('id', jobId)
+    } catch (e) {
+      await db.from('case_regeneration_jobs')
+        .update({
+          status: 'error',
+          completed_at: new Date().toISOString(),
+          error: e instanceof Error ? e.message : String(e),
+        })
+        .eq('id', jobId)
     }
-  } catch (e) {
-    const msg = (e instanceof Error) ? e.message : String(e)
-    return NextResponse.json({ error: `Generation failed: ${msg}` }, { status: 500 })
-  }
+  })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const { error: upsertError } = await (adminClient.from('cases') as any)
-    .update({ case_data: caseData, is_generated: true, generated_at: new Date().toISOString() })
-    .eq('id', id)
-
-  if (upsertError) {
-    return NextResponse.json({ error: upsertError.message }, { status: 500 })
-  }
-
-  return NextResponse.json({ ok: true, diagnosis: caseData.diagnosis })
+  return NextResponse.json({ jobId }, { status: 202 })
 }
