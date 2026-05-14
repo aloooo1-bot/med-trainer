@@ -185,16 +185,47 @@ export interface Database {
         }
         Update: Partial<Database['public']['Tables']['ratings']['Insert']>
       }
+      case_regeneration_jobs: {
+        Relationships: []
+        Row: {
+          id: string
+          case_id: string
+          status: 'pending' | 'running' | 'done' | 'error'
+          started_at: string | null
+          completed_at: string | null
+          error: string | null
+          result_diagnosis: string | null
+          created_at: string
+        }
+        Insert: {
+          id?: string
+          case_id: string
+          status?: 'pending' | 'running' | 'done' | 'error'
+          started_at?: string | null
+          completed_at?: string | null
+          error?: string | null
+          result_diagnosis?: string | null
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['case_regeneration_jobs']['Insert']>
+      }
     }
     Views: Record<string, never>
-    Functions: Record<string, never>
+    Functions: {
+      cache_imaging_test: {
+        Args: { p_case_id: string; p_test_name: string; p_results: Json }
+        Returns: undefined
+      }
+    }
   }
 }
 
 export type Tables<T extends keyof Database['public']['Tables']> =
   Database['public']['Tables'][T]['Row']
 
-export type CaseRow        = Tables<'cases'>
-export type ProfileRow     = Tables<'profiles'>
-export type RatingRow      = Tables<'ratings'>
-export type CaseReportRow  = Tables<'case_reports'>
+export type CaseRow             = Tables<'cases'>
+export type ProfileRow          = Tables<'profiles'>
+export type RatingRow           = Tables<'ratings'>
+export type CaseReportRow       = Tables<'case_reports'>
+export type RegenJobRow         = Tables<'case_regeneration_jobs'>
+export type RegenJobStatus      = RegenJobRow['status']

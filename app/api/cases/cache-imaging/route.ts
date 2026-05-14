@@ -4,7 +4,8 @@ import { createClient } from '@/app/lib/supabase/server'
 
 // Merges a single test's image results into the case's imaging_cache column.
 // Called fire-and-forget from the trainer after Open-i returns results at runtime.
-// Silently no-ops if Supabase isn't configured or the case doesn't exist.
+// Uses a Postgres function (cache_imaging_test) for an atomic single-UPDATE so
+// concurrent calls for the same case don't clobber each other's keys.
 export async function POST(req: NextRequest) {
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
     return NextResponse.json({ ok: false })
@@ -18,7 +19,7 @@ export async function POST(req: NextRequest) {
     const { id, testName, results } = await req.json() as {
       id: string
       testName: string
-      results: unknown[]
+      results: import('@/app/lib/supabase/types').Json[]
     }
 
     if (!id || !testName || !Array.isArray(results) || results.length === 0) {
@@ -27,25 +28,14 @@ export async function POST(req: NextRequest) {
 
     const supabase = createAdminClient()
 
-    // Read-merge-write: add the new test results to the existing cache without
-    // overwriting other tests that may have been cached in a concurrent request.
-    const { data, error: readErr } = await supabase
-      .from('cases')
-      .select('imaging_cache')
-      .eq('id', id)
-      .single()
+    const { error } = await supabase.rpc('cache_imaging_test', {
+      p_case_id: id,
+      p_test_name: testName,
+      p_results: results,
+    })
 
-    if (readErr || !data) return NextResponse.json({ ok: false })
-
-    const merged = { ...(data.imaging_cache ?? {}), [testName]: results }
-
-    const { error: writeErr } = await supabase
-      .from('cases')
-      .update({ imaging_cache: merged })
-      .eq('id', id)
-
-    if (writeErr) {
-      console.error('cache-imaging write:', writeErr.message)
+    if (error) {
+      console.error('cache-imaging rpc:', error.message)
       return NextResponse.json({ ok: false })
     }
 
