@@ -29,6 +29,12 @@ export default withSentryConfig(nextConfig, {
   tunnelRoute: "/monitoring",
 
   webpack: {
+    // Sentry's App Router auto-wrapping transforms route module exports in a way
+    // that breaks Next.js 16 — causes "components.ComponentMod.handler is not a function"
+    // on every request to /api/* routes. Disabling it; errors are still captured via
+    // onRequestError (instrumentation.ts) and manual Sentry.captureException calls.
+    autoInstrumentAppDirectory: false,
+
     // Enables automatic instrumentation of Vercel Cron Monitors. (Does not yet work with App Router route handlers.)
     // See the following for more information:
     // https://docs.sentry.io/product/crons/
