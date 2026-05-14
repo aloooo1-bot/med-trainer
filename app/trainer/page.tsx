@@ -15,13 +15,11 @@ import {
   looksClinical,
   classifyFinding,
 } from '../lib/rosDetector'
-import { CLINICAL_CATEGORIES, IMAGING_WITH_IMAGES, MASTER_TEST_LIST, searchTests } from '../lib/testMasterList'
 import { type OpenIResult, fetchImagingResults } from '../lib/imagingSearch'
 import { type ECGImage, getECGCategory, getRandomECGImage } from '../lib/ecgImageLookup'
 import {
   type SpecialImage, type SpecialModality,
   getSpecialModality, getSpecialCategory, getRandomSpecialImage,
-  isSmearTest, isBiopsyTest, isFundusTest, isDermTest, isUrineTest,
 } from '../lib/specialImageLookup'
 import { MANIFEST, makeCaseId } from '../lib/caseManifest'
 import { jitterCase } from '../lib/caseJitter'
@@ -29,29 +27,28 @@ import { reconcileHistoryConsistency, sanitizePmhLeak, DIFFICULTY_RULES } from '
 import { type GradingResult, type GradingInput, stripToBasic } from '../grading/types'
 import { calcEfficiency } from '../grading/efficiency'
 import { gradeCase, type GradingUsageCallback } from '../grading/grader'
-import { getRubric, RUBRIC_TOTAL, type DimensionKey } from '../grading/rubric'
+import { type DimensionKey } from '../grading/rubric'
 import {
   type RawUsage, type APICallType, type ActiveSession,
   makeCallRecord, recordToSession, createActiveSession, finalizeSession, syncSessionToSupabase,
-  recordAbandonedSession, saveFeedbackRecord,
+  recordAbandonedSession,
 } from '../lib/analytics'
-import { type CaseData, type TimerState, type NotesState, selectHpi } from './_lib/types'
-import { isPendingTest, pendingHours } from './_lib/pendingTests'
-import { normalizeTestName, findResultKey, getPanelSummary, parseDirection, getVitalStatus, isECGTest } from './_lib/testUtils'
+import { type CaseData, type TimerState, type NotesState, selectHpi, SOAP_TEMPLATE } from './_lib/types'
+import { isPendingTest } from './_lib/pendingTests'
+import { normalizeTestName, findResultKey, getVitalStatus, isECGTest } from './_lib/testUtils'
 import { type CaseHistoryEntry, getHistory, addHistoryEntry, hasUsedROSBefore, markROSUsed, getUsedNames, recordUsedName } from './_lib/localHistory'
 import { markCaseSeen, loadFromLibrary } from './_lib/caseLibrary'
 import { useTimer, fmtTime } from './_lib/useTimer'
 import { callClaude } from './_lib/callClaude'
-import { SectionCard } from './_components/SectionCard'
 import { Badge } from './_components/Badge'
-import { ScoreRing, CategoryRow, NotesResultPanel, ScorecardNotesPanel } from './_components/ScoreRing'
-import { FeedbackCarousel, type FeedbackSection } from './_components/FeedbackCarousel'
-import { DiagnosisInput } from './_components/DiagnosisInput'
 import { MicButton } from './_components/MicButton'
-import { ECGPanel } from './_components/ECGPanel'
-import { ImagingPanel } from './_components/ImagingPanel'
-import { SpecialPanel, SPECIAL_LABELS } from './_components/SpecialPanel'
 import { HelpModal, hasHelpContent } from './_components/HelpModal'
+import { HPIView } from './_components/HPIView'
+import { ROSView } from './_components/ROSView'
+import { ExamView } from './_components/ExamView'
+import { OrderView } from './_components/OrderView'
+import { ResultsView } from './_components/ResultsView'
+import { DiagnosisView } from './_components/DiagnosisView'
 
 const SYSTEMS = [
   'Any',
@@ -89,25 +86,6 @@ const GENERATION_PHASES = [
   'Finalizing case details…',
 ] as const
 
-const SOAP_TEMPLATE = `SUBJECTIVE
-Chief Complaint:
-HPI:
-PMH / Meds / Allergies / Social:
-
-OBJECTIVE
-Vitals:
-Exam:
-Labs / Imaging:
-
-ASSESSMENT
-Primary Dx:
-Differentials:
-Reasoning:
-
-PLAN
-Immediate:
-Further workup:
-Disposition: `
 
 
 const DIFFICULTY_INFO: Record<string, string> = {
@@ -1538,1315 +1516,106 @@ Student message: "${msg}"`
     if (!caseData) return null
 
     switch (activeSection) {
-      case 'hpi': {
-        const isGatedHPI = caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced'
-
-        const bgGroups = [
-          {
-            key: 'pmh', label: 'Past Medical History',
-            fields: [
-              { field: 'pmh_conditions' as HPIField, label: 'Conditions', value: caseData.pastMedicalHistory?.conditions },
-              { field: 'pmh_surgeries' as HPIField, label: 'Surgeries', value: caseData.pastMedicalHistory?.surgeries },
-              { field: 'pmh_hospitalizations' as HPIField, label: 'Hospitalizations', value: caseData.pastMedicalHistory?.hospitalizations },
-            ],
-          },
-          {
-            key: 'med', label: 'Current Medications',
-            fields: [
-              { field: 'med_medications' as HPIField, label: 'Rx', value: caseData.currentMedications?.medications },
-              { field: 'med_otc' as HPIField, label: 'OTC / Supplements', value: caseData.currentMedications?.otc },
-            ],
-          },
-          {
-            key: 'soc', label: 'Social History',
-            fields: [
-              { field: 'soc_smoking' as HPIField, label: 'Smoking', value: caseData.socialHistory?.smoking },
-              { field: 'soc_alcohol' as HPIField, label: 'Alcohol', value: caseData.socialHistory?.alcohol },
-              { field: 'soc_drugs' as HPIField, label: 'Drugs', value: caseData.socialHistory?.drugs },
-              { field: 'soc_occupation' as HPIField, label: 'Occupation', value: caseData.socialHistory?.occupation },
-              { field: 'soc_living' as HPIField, label: 'Living', value: caseData.socialHistory?.living },
-              { field: 'soc_other' as HPIField, label: 'Other', value: caseData.socialHistory?.other },
-            ],
-          },
-        ]
-        const totalBgFields = bgGroups.reduce((s, g) => s + g.fields.length, 0)
-        const unlockedHPICount = isGatedHPI
-          ? Object.values(hpiUnlocked).filter(Boolean).length
-          : totalBgFields
-
-        return (
-          <div className="space-y-4">
-            {!caseStarted && (caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') && (
-              <div className="rounded-lg border border-insight-border bg-insight-bg px-5 py-4 flex items-center justify-between gap-4">
-                <div>
-                  <p className="text-sm font-semibold text-insight">
-                    Timer not started — {caseDifficulty === 'Clinical' ? '22 minutes' : '15 minutes'} allotted
-                  </p>
-                  <p className="text-[11px] text-insight/70 mt-0.5">Read the case first. Start the timer when you are ready to begin the clinical encounter.</p>
-                </div>
-                <button
-                  onClick={() => { startTimer(caseDifficulty); setCaseStarted(true); setTimeout(() => chatInputRef.current?.focus(), 50) }}
-                  className="flex-shrink-0 rounded-md bg-primary-500 px-4 py-2 text-sm font-semibold text-ink-inverse hover:bg-primary-400 transition-colors"
-                >
-                  Start Timer
-                </button>
-              </div>
-            )}
-            <SectionCard title="History of Present Illness">
-              <p className="font-serif text-[15px] leading-relaxed text-ink-primary max-w-[70ch]">{selectHpi(caseData, caseDifficulty)}</p>
-            </SectionCard>
-            {(caseData.pastMedicalHistory || caseData.currentMedications || caseData.socialHistory) && (
-              <SectionCard title="Background History">
-                {isGatedHPI && (
-                  <div className="mb-3 flex items-center justify-between">
-                    <span className="text-xs text-ink-tertiary">{unlockedHPICount} / {totalBgFields} background fields reviewed</span>
-                    {unlockedHPICount === 0 && (
-                      <span className="text-xs text-ink-tertiary italic">Ask the patient about their history to reveal fields</span>
-                    )}
-                  </div>
-                )}
-                <div className="space-y-3">
-                  {bgGroups.map(({ key, label, fields }) => (
-                    <div key={key} className="rounded-md bg-surface-2 px-4 py-3">
-                      <div className="text-[11px] font-semibold uppercase tracking-wide text-primary-400 mb-2">{label}</div>
-                      <div className="space-y-1.5">
-                        {fields.map(({ field, label: fLabel, value }) => {
-                          const unlocked = !isGatedHPI || hpiUnlocked[field]
-                          return (
-                            <div key={field} className="flex gap-2">
-                              <span className="text-[11px] text-ink-tertiary uppercase tracking-wide w-32 flex-shrink-0 pt-0.5">{fLabel}</span>
-                              {unlocked ? (
-                                <span className="text-[13px] text-ink-primary">{value ?? 'None documented.'}</span>
-                              ) : (
-                                <span className="text-ink-tertiary/40 text-sm select-none">—</span>
-                              )}
-                            </div>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </SectionCard>
-            )}
-          </div>
-        )
-      }
-
-      case 'ros': {
-        const isGatedDifficulty = caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced'
-        if (isGatedDifficulty) {
-          const unlockedCount = ROS_CATEGORIES.filter(c => rosState[c].status !== 'locked').length
-          return (
-            <SectionCard title="Review of Systems">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs text-ink-tertiary">
-                  {unlockedCount} / {ROS_CATEGORIES.length} systems reviewed
-                </span>
-                {unlockedCount === 0 && (
-                  <span className="text-xs text-ink-tertiary italic">Ask the patient about each system to reveal findings</span>
-                )}
-              </div>
-              <div className="space-y-1.5">
-                {ROS_CATEGORIES.map(cat => {
-                  const entry = rosState[cat]
-                  const isLocked = entry.status === 'locked'
-                  const isPositive = entry.status === 'positive'
-                  return (
-                    <div
-                      key={cat}
-                      className={`flex gap-3 rounded-md px-3 py-2.5 ${
-                        isLocked
-                          ? 'bg-surface-1/40'
-                          : isPositive
-                          ? 'bg-caution-bg border border-caution-border'
-                          : 'bg-surface-1'
-                      }`}
-                    >
-                      <span className={`w-44 flex-shrink-0 text-xs font-semibold uppercase tracking-wide pt-0.5 ${
-                        isLocked ? 'text-ink-tertiary' : isPositive ? 'text-caution' : 'text-primary-400'
-                      }`}>
-                        {cat}
-                      </span>
-                      {isLocked ? (
-                        <span className="text-ink-tertiary text-sm select-none">—</span>
-                      ) : entry.derivedFinding === undefined ? (
-                        <span className="text-xs text-ink-tertiary italic">Recording…</span>
-                      ) : !gradingResult ? (
-                        <span className={`text-sm leading-relaxed ${isPositive ? 'text-caution' : 'text-ink-secondary'}`}>
-                          {entry.derivedFinding}
-                        </span>
-                      ) : (
-                        <div className="flex flex-col gap-1 min-w-0">
-                          <span className={`text-sm leading-relaxed ${isPositive ? 'text-caution' : 'text-ink-secondary'}`}>
-                            {entry.derivedFinding}
-                          </span>
-                          <span className="text-xs text-ink-tertiary italic leading-relaxed">
-                            <span className="not-italic text-ink-tertiary uppercase tracking-wide mr-1">Full:</span>
-                            {entry.finding}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </SectionCard>
-          )
-        }
-        return (
-          <SectionCard title="Review of Systems">
-            <div className="space-y-1.5">
-              {Object.entries(caseData.reviewOfSystems).map(([cat, findings]) => (
-                <div key={cat} className="flex gap-3 rounded-md bg-surface-1 px-3 py-2.5">
-                  <span className="w-44 flex-shrink-0 text-xs font-semibold text-primary-400 uppercase tracking-wide pt-0.5">{cat}</span>
-                  <span className="text-sm text-ink-secondary">{findings}</span>
-                </div>
-              ))}
-            </div>
-          </SectionCard>
-        )
-      }
-
+      case 'hpi':
+        return <HPIView
+          caseData={caseData}
+          caseDifficulty={caseDifficulty}
+          hpiUnlocked={hpiUnlocked}
+          caseStarted={caseStarted}
+          startTimer={startTimer}
+          setCaseStarted={setCaseStarted}
+          chatInputRef={chatInputRef}
+        />
+      case 'ros':
+        return <ROSView
+          caseData={caseData}
+          caseDifficulty={caseDifficulty}
+          rosState={rosState}
+          gradingResult={gradingResult}
+        />
       case 'exam':
-        return (
-          <SectionCard title="Physical Examination">
-            <div className="space-y-3">
-              {Object.entries(caseData.physicalExam).map(([system, findings]) => (
-                <div key={system} className="flex gap-3 rounded-md bg-surface-1 p-3">
-                  <span className="w-36 flex-shrink-0 text-xs font-semibold text-primary-400 uppercase tracking-wide pt-0.5">{system}</span>
-                  <span className="text-sm text-ink-secondary">{findings}</span>
-                </div>
-              ))}
-            </div>
-          </SectionCard>
-        )
-
-      case 'order': {
-        // ── FOUNDATIONS: curated checklist (unchanged) ──
-        if (caseDifficulty === 'Foundations') {
-          const allOrdered = (name: string) => orderedTests.has(name)
-          return (
-            <div className="space-y-4">
-              <SectionCard title="Laboratory Studies">
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {caseData.availableLabs.map(lab => {
-                    const isOrdered = allOrdered(lab)
-                    const isSelected = selectedTests.has(lab)
-                    return (
-                      <label key={lab} className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${isOrdered ? 'border-confirmed-border bg-confirmed-bg cursor-default' : isSelected ? 'border-primary-400 bg-primary-50' : 'border-surface-4 bg-surface-1 hover:border-surface-4'}`}>
-                        <input type="checkbox" checked={isSelected || isOrdered} disabled={isOrdered} onChange={() => !isOrdered && toggleTest(lab)} className="accent-primary-500" />
-                        <span className="text-sm text-ink-primary">{lab}</span>
-                        {isOrdered && <Badge text="Ordered" color="green" />}
-                      </label>
-                    )
-                  })}
-                </div>
-              </SectionCard>
-              <SectionCard title="Imaging Studies">
-                <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  {caseData.availableImaging.map(img => {
-                    const isOrdered = allOrdered(img)
-                    const isSelected = selectedTests.has(img)
-                    return (
-                      <label key={img} className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${isOrdered ? 'border-confirmed-border bg-confirmed-bg cursor-default' : isSelected ? 'border-primary-400 bg-primary-50' : 'border-surface-4 bg-surface-1 hover:border-surface-4'}`}>
-                        <input type="checkbox" checked={isSelected || isOrdered} disabled={isOrdered} onChange={() => !isOrdered && toggleTest(img)} className="accent-primary-500" />
-                        <span className="text-sm text-ink-primary">{img}</span>
-                        {isOrdered && <Badge text="Ordered" color="green" />}
-                      </label>
-                    )
-                  })}
-                </div>
-              </SectionCard>
-              <div className="rounded-lg border border-surface-4 bg-surface-2 p-3">
-                <p className="text-xs text-ink-secondary mb-2">Order a custom test not listed above:</p>
-                <div className="flex gap-2">
-                  <input
-                    type="text"
-                    value={customTestInput}
-                    onChange={e => setCustomTestInput(e.target.value)}
-                    onKeyDown={e => { if (e.key === 'Enter') orderCustomTest() }}
-                    placeholder="e.g. Factor VIII Activity, Knee MRI..."
-                    className="flex-1 rounded-md border border-surface-5 bg-surface-1 px-3 py-2 text-sm text-ink-primary placeholder-ink-tertiary focus:border-primary-400 focus:outline-none"
-                  />
-                  <button onClick={orderCustomTest} disabled={!customTestInput.trim()} className="rounded-md bg-primary-500 px-3 py-2 text-sm font-medium text-white hover:bg-primary-400 disabled:opacity-40 transition-colors">
-                    Order
-                  </button>
-                </div>
-              </div>
-              {selectedTests.size > 0 && (
-                <div className="flex items-center justify-between rounded-lg border border-primary-300 bg-primary-50 px-4 py-3">
-                  <span className="text-sm text-primary-700">{selectedTests.size} test{selectedTests.size > 1 ? 's' : ''} selected</span>
-                  <button onClick={orderTests} className="rounded-md bg-primary-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-primary-400 transition-colors">
-                    Order Selected Tests
-                  </button>
-                </div>
-              )}
-            </div>
-          )
-        }
-
-        // ── CLINICAL: non-case-specific reference lists + master-list search ──
-        if (caseDifficulty === 'Clinical') {
-          const orderedList = Array.from(orderedTests)
-          const searchResults = testSearchQuery.length >= 2 ? searchTests(testSearchQuery) : []
-
-          return (
-            <div className="space-y-4">
-
-              {/* Search bar — full master list */}
-              <div className="relative">
-                <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
-                  <svg className="h-4 w-4 text-ink-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                  </svg>
-                </div>
-                <input
-                  type="text"
-                  value={testSearchQuery}
-                  onChange={e => { setTestSearchQuery(e.target.value); setShowSearchDropdown(true) }}
-                  onFocus={() => setShowSearchDropdown(true)}
-                  onBlur={() => setTimeout(() => setShowSearchDropdown(false), 150)}
-                  disabled={locked}
-                  placeholder={locked ? 'Start the timer to order tests' : 'Search any test or study…'}
-                  className="w-full rounded-lg border border-surface-5 bg-surface-1 py-2.5 pl-9 pr-4 text-sm text-ink-primary placeholder-ink-tertiary focus:border-primary-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-                />
-                {testSearchQuery && (
-                  <button
-                    onMouseDown={() => { setTestSearchQuery(''); setShowSearchDropdown(false) }}
-                    className="absolute inset-y-0 right-3 flex items-center text-ink-tertiary hover:text-ink-secondary"
-                  >
-                    ✕
-                  </button>
-                )}
-                {showSearchDropdown && searchResults.length > 0 && (
-                  <div className="absolute z-10 mt-1 w-full rounded-lg border border-surface-4 bg-surface-2 shadow-xl overflow-hidden max-h-60 overflow-y-auto">
-                    {searchResults.slice(0, 10).map(result => {
-                      const isOrdered = orderedTests.has(result.name)
-                      return (
-                        <button
-                          key={result.name}
-                          onMouseDown={() => {
-                            if (!isOrdered && !locked) {
-                              addOrderedTest(result.name)
-                              setTestSearchQuery('')
-                            }
-                          }}
-                          disabled={isOrdered || locked}
-                          className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-sm transition-colors ${isOrdered ? 'opacity-50 cursor-default bg-surface-2' : 'hover:bg-surface-3 cursor-pointer'}`}
-                        >
-                          <span className="text-ink-primary">{result.name}</span>
-                          <span className="text-xs text-ink-tertiary ml-2 flex-shrink-0">
-                            {isOrdered ? <Badge text="Ordered" color="green" /> : result.category}
-                          </span>
-                        </button>
-                      )
-                    })}
-                  </div>
-                )}
-                {showSearchDropdown && testSearchQuery.length >= 2 && searchResults.length === 0 && (
-                  <div className="absolute z-10 mt-1 w-full rounded-lg border border-surface-4 bg-surface-2 shadow-xl overflow-hidden">
-                    <button
-                      onMouseDown={() => {
-                        const name = testSearchQuery.trim()
-                        if (name && !locked) { addOrderedTest(name); setTestSearchQuery(''); setShowSearchDropdown(false) }
-                      }}
-                      className="w-full flex items-center justify-between px-4 py-3 text-left text-sm hover:bg-surface-3 transition-colors"
-                    >
-                      <span className="text-ink-primary">Order &ldquo;{testSearchQuery.trim()}&rdquo;</span>
-                      <span className="text-xs text-ink-tertiary ml-2 flex-shrink-0">custom</span>
-                    </button>
-                  </div>
-                )}
-              </div>
-
-              {/* Common laboratory tests by category */}
-              <SectionCard title="Common Laboratory Tests">
-                <div className="space-y-4">
-                  {CLINICAL_CATEGORIES.filter(cat => cat.name !== 'Imaging').map(cat => (
-                    <div key={cat.name}>
-                      <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-primary-400">{cat.name}</p>
-                      <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-                        {cat.tests.map(test => {
-                          const isOrdered = orderedTests.has(test)
-                          return (
-                            <button
-                              key={test}
-                              onClick={() => !isOrdered && !locked && addOrderedTest(test)}
-                              disabled={isOrdered || locked}
-                              className={`text-left rounded-md border px-3 py-2 text-sm transition-colors ${
-                                isOrdered
-                                  ? 'border-confirmed-border bg-confirmed-bg text-confirmed cursor-default'
-                                  : locked
-                                  ? 'border-surface-4 bg-surface-2 text-ink-tertiary opacity-50 cursor-not-allowed'
-                                  : 'border-surface-4 bg-surface-1 text-ink-primary hover:border-surface-4 hover:bg-surface-2 cursor-pointer'
-                              }`}
-                            >
-                              {test}
-                              {isOrdered && <span className="ml-1.5 text-xs">✓</span>}
-                            </button>
-                          )
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </SectionCard>
-
-              {/* Imaging studies with real image libraries */}
-              <SectionCard title="Imaging Studies">
-                <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-                  {IMAGING_WITH_IMAGES.map(study => {
-                    const isOrdered = orderedTests.has(study)
-                    return (
-                      <button
-                        key={study}
-                        onClick={() => !isOrdered && !locked && addOrderedTest(study)}
-                        disabled={isOrdered || locked}
-                        className={`text-left rounded-md border px-3 py-2 text-sm transition-colors ${
-                          isOrdered
-                            ? 'border-confirmed-border bg-confirmed-bg text-confirmed cursor-default'
-                            : locked
-                            ? 'border-surface-4 bg-surface-2 text-ink-tertiary opacity-50 cursor-not-allowed'
-                            : 'border-surface-4 bg-surface-1 text-ink-primary hover:border-surface-4 hover:bg-surface-2 cursor-pointer'
-                        }`}
-                      >
-                        {study}
-                        {isOrdered && <span className="ml-1.5 text-xs">✓</span>}
-                      </button>
-                    )
-                  })}
-                </div>
-              </SectionCard>
-
-              {/* Ordered tests */}
-              {orderedList.length > 0 && (
-                <SectionCard title={`Ordered Tests (${orderedList.length})`}>
-                  <div className="flex flex-wrap gap-2">
-                    {orderedList.map(t => (
-                      <span key={t} className="inline-flex items-center gap-1.5 rounded-md border border-confirmed-border bg-confirmed-bg px-2.5 py-1 text-xs text-confirmed">
-                        {t}
-                      </span>
-                    ))}
-                  </div>
-                </SectionCard>
-              )}
-            </div>
-          )
-        }
-
-        // ── ADVANCED: free-text search ──
-        // Include relevantTests (specialty tests pre-generated for this case) as searchable items
-        const caseSpecificTests = (caseData.relevantTests ?? [])
-          .filter(rt => !MASTER_TEST_LIST.some(m => m.name === rt.name))
-          .map(rt => ({ name: rt.name, abbreviations: [] as string[], synonyms: [] as string[], category: rt.category }))
-        const combinedTestList = [...MASTER_TEST_LIST, ...caseSpecificTests]
-        const searchResults = searchTests(testSearchQuery, combinedTestList)
-        const orderedList = Array.from(orderedTests)
-        return (
-          <div className="space-y-4">
-            <div className="rounded-md border border-primary-200 bg-primary-50 px-4 py-3">
-              <p className="text-xs text-primary-700">
-                <span className="font-semibold">Advanced difficulty:</span> no pre-listed lab panels — search and type test names from memory. Imaging modalities are listed below for reference.
-              </p>
-            </div>
-            <div className="relative">
-              <input
-                type="text"
-                value={testSearchQuery}
-                onChange={e => { setTestSearchQuery(e.target.value); setShowSearchDropdown(true) }}
-                onFocus={() => setShowSearchDropdown(true)}
-                onBlur={() => setTimeout(() => setShowSearchDropdown(false), 150)}
-                disabled={locked}
-                placeholder={locked ? 'Start the timer to order tests' : 'Search for a test or study...'}
-                className="w-full rounded-lg border border-surface-5 bg-surface-1 px-4 py-3 text-sm text-ink-primary placeholder-ink-tertiary focus:border-primary-400 focus:outline-none disabled:opacity-50 disabled:cursor-not-allowed"
-              />
-              {showSearchDropdown && searchResults.length > 0 && (
-                <div className="absolute z-10 mt-1 w-full rounded-lg border border-surface-4 bg-surface-2 shadow-xl overflow-hidden">
-                  {searchResults.map(result => {
-                    const isOrdered = orderedTests.has(result.name)
-                    return (
-                      <button
-                        key={result.name}
-                        onMouseDown={() => {
-                          if (!isOrdered && !locked) {
-                            addOrderedTest(result.name)
-                            setTestSearchQuery('')
-                          }
-                        }}
-                        disabled={isOrdered || locked}
-                        className={`w-full flex items-center justify-between px-4 py-2.5 text-left text-sm transition-colors ${isOrdered ? 'opacity-50 cursor-default bg-surface-2' : 'hover:bg-surface-3 cursor-pointer'}`}
-                      >
-                        <span className="text-ink-primary">{result.name}</span>
-                        <span className="text-xs text-ink-tertiary ml-2 flex-shrink-0">
-                          {isOrdered ? <Badge text="Ordered" color="green" /> : result.category}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
-              )}
-              {showSearchDropdown && testSearchQuery.length >= 2 && searchResults.length === 0 && (
-                <div className="absolute z-10 mt-1 w-full rounded-lg border border-surface-4 bg-surface-2 shadow-xl overflow-hidden">
-                  <button
-                    onMouseDown={() => {
-                      const name = testSearchQuery.trim()
-                      if (name && !locked) {
-                        addOrderedTest(name)
-                        setTestSearchQuery('')
-                        setShowSearchDropdown(false)
-                      }
-                    }}
-                    className="w-full flex items-center justify-between px-4 py-3 text-left text-sm hover:bg-surface-3 transition-colors"
-                  >
-                    <span className="text-ink-primary">Order &ldquo;{testSearchQuery.trim()}&rdquo;</span>
-                    <span className="text-xs text-ink-tertiary ml-2 flex-shrink-0">custom</span>
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <SectionCard title="Imaging Studies">
-              <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-                {IMAGING_WITH_IMAGES.map(study => {
-                  const isOrdered = orderedTests.has(study)
-                  return (
-                    <button
-                      key={study}
-                      onClick={() => !isOrdered && !locked && addOrderedTest(study)}
-                      disabled={isOrdered || locked}
-                      className={`text-left rounded-md border px-3 py-2 text-sm transition-colors ${
-                        isOrdered
-                          ? 'border-confirmed-border bg-confirmed-bg text-confirmed cursor-default'
-                          : locked
-                          ? 'border-surface-4 bg-surface-2 text-ink-tertiary opacity-50 cursor-not-allowed'
-                          : 'border-surface-4 bg-surface-1 text-ink-primary hover:border-surface-4 hover:bg-surface-2 cursor-pointer'
-                      }`}
-                    >
-                      {study}
-                      {isOrdered && <span className="ml-1.5 text-xs">✓</span>}
-                    </button>
-                  )
-                })}
-              </div>
-            </SectionCard>
-
-            {orderedList.length > 0 ? (
-              <SectionCard title={`Ordered Tests (${orderedList.length})`}>
-                <div className="space-y-2">
-                  {orderedList.map(t => (
-                    <div key={t} className="flex items-center justify-between rounded-md border border-surface-4 bg-surface-1 px-3 py-2">
-                      <span className="text-sm text-ink-primary">{t}</span>
-                      <button onClick={() => removeOrderedTest(t)} className="text-ink-tertiary hover:text-critical text-xs transition-colors ml-3 flex-shrink-0">✕</button>
-                    </div>
-                  ))}
-                </div>
-              </SectionCard>
-            ) : (
-              <div className="flex flex-col items-center justify-center py-16 text-ink-tertiary">
-                <p className="text-sm">No tests ordered yet.</p>
-                <p className="text-xs mt-1">Search for a test above to add it.</p>
-              </div>
-            )}
-          </div>
-        )
-      }
-
-      case 'results': {
-        const orderedArr = Array.from(orderedTests)
-        const orderedLabs = orderedArr.filter(t => findResultKey(t, caseData.labResults) !== null)
-        const orderedImaging = orderedArr.filter(t => findResultKey(t, caseData.imagingResults) !== null)
-        const orderedProcedures = orderedArr.filter(t =>
-          caseData.procedureResults != null && findResultKey(t, caseData.procedureResults) !== null
-        )
-        const pendingLabs = orderedArr.filter(t =>
-          findResultKey(t, caseData.labResults) === null &&
-          findResultKey(t, caseData.imagingResults) === null &&
-          (caseData.procedureResults == null || findResultKey(t, caseData.procedureResults) === null) &&
-          isPendingTest(t)
-        )
-        const loadingOnDemand = orderedArr.filter(t => generatingOnDemand.has(t))
-        const diagnosisSubmitted = !!gradingResult
-
-        orderedArr.forEach(t => {
-          if (findResultKey(t, caseData.labResults) === null &&
-              findResultKey(t, caseData.imagingResults) === null &&
-              (caseData.procedureResults == null || findResultKey(t, caseData.procedureResults) === null) &&
-              !isPendingTest(t) &&
-              !generatingOnDemand.has(t)) {
-            console.error(`[MedTrainer] No result found for ordered test: "${t}" (not in labResults, imagingResults, procedureResults, pendingTests, or generatingOnDemand)`)
-          }
-        })
-
-        const allResultPanels = [...orderedLabs, ...orderedImaging, ...orderedProcedures]
-        const allCollapsed = allResultPanels.length > 0 && allResultPanels.every(p => collapsedPanels.has(p))
-        const toggleAllPanels = () => {
-          setCollapsedPanels(allCollapsed ? new Set() : new Set(allResultPanels))
-        }
-        const togglePanel = (name: string) => {
-          setCollapsedPanels(prev => {
-            const next = new Set(prev)
-            next.has(name) ? next.delete(name) : next.add(name)
-            return next
-          })
-        }
-
-        if (orderedTests.size === 0) {
-          return (
-            <div className="flex flex-col items-center justify-center py-20 text-ink-tertiary">
-              <svg className="mb-3 h-12 w-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-              </svg>
-              <p className="text-sm">No tests ordered yet.</p>
-              <button onClick={() => setActiveSection('order')} className="mt-2 text-sm text-primary-400 hover:text-primary-300">
-                Go to Order Tests →
-              </button>
-            </div>
-          )
-        }
-        return (
-          <div className="space-y-4">
-            {allResultPanels.length > 0 && (
-              <div className="flex justify-end">
-                <button
-                  onClick={toggleAllPanels}
-                  className="text-xs text-ink-secondary hover:text-ink-primary transition-colors"
-                >
-                  {allCollapsed ? 'Expand all' : 'Collapse all'}
-                </button>
-              </div>
-            )}
-            {(orderedLabs.length > 0 || pendingLabs.length > 0 || loadingOnDemand.length > 0) && (
-              <SectionCard title="Laboratory Results">
-                <div className="space-y-2">
-                  {orderedLabs.map(lab => {
-                    const key = findResultKey(lab, caseData.labResults)!
-                    const raw = caseData.labResults[key]
-                    const components: Array<{ name: string; value: string; unit: string; referenceRange: string; status: string }> =
-                      Array.isArray(raw?.components) && raw.components.length > 0
-                        ? raw.components
-                        : raw?.value
-                          ? [{ name: lab, value: raw.value, unit: raw.unit ?? '', referenceRange: raw.referenceRange ?? '—', status: raw.status ?? 'normal' }]
-                          : raw?.result
-                            ? [{ name: lab, value: raw.result, unit: '', referenceRange: raw.referenceRange ?? '—', status: raw.status ?? 'normal' }]
-                            : []
-                    const panelAbnormal = components.some(c => c.status === 'abnormal' || c.status === 'critical')
-                    const isCollapsed = collapsedPanels.has(lab)
-                    const summary = getPanelSummary(components)
-                    return (
-                      <div key={lab} className="rounded-md border border-surface-4 overflow-hidden">
-                        <button
-                          className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
-                          onClick={() => togglePanel(lab)}
-                        >
-                          <span className={`text-xs font-semibold uppercase tracking-wide ${panelAbnormal ? 'text-caution' : 'text-ink-secondary'}`}>{lab}</span>
-                          <div className="flex items-center gap-3 min-w-0">
-                            {isCollapsed && <span className="text-xs text-ink-tertiary truncate max-w-xs">{summary}</span>}
-                            <svg className={`w-4 h-4 text-ink-secondary transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                        </button>
-                        {!isCollapsed && (
-                          <table className="w-full text-sm border-collapse table-fixed">
-                            <colgroup>
-                              <col className="w-[36%]" />
-                              <col className="w-[16%]" />
-                              <col className="w-14" />
-                              <col className="w-[16%]" />
-                              <col className="w-[26%]" />
-                            </colgroup>
-                            <thead>
-                              <tr className="bg-surface-1 border-b border-surface-4">
-                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-secondary">Test</th>
-                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-secondary">Result</th>
-                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-secondary">Flag</th>
-                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-secondary">Unit</th>
-                                <th className="px-4 py-2.5 text-left text-xs font-semibold uppercase tracking-wide text-ink-secondary">Ref Range</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {components.map((c, j) => {
-                                const isCritical = c.status === 'critical'
-                                const isAbnormal = c.status === 'abnormal' || isCritical
-                                const direction = isAbnormal ? parseDirection(c.value, c.referenceRange) : null
-                                return (
-                                  <tr key={j} className={`border-b border-surface-4/40 last:border-0 ${j % 2 === 0 ? 'bg-surface-2' : 'bg-surface-2/60'}`}>
-                                    <td className="pl-5 pr-4 py-2.5 text-ink-secondary">{c.name}</td>
-                                    <td className={`px-4 py-2.5 font-semibold tabular-nums ${isCritical ? 'text-critical' : isAbnormal ? 'text-caution' : 'text-ink-primary'}`}>{c.value}</td>
-                                    <td className="px-4 py-2.5 w-14 text-sm font-bold">
-                                      {isAbnormal && (
-                                        <span className={isCritical ? 'text-critical' : 'text-caution'}>
-                                          {direction === 'high' ? '↑' : direction === 'low' ? '↓' : isCritical ? '!' : 'A'}
-                                          {isCritical && <span className="ml-1 text-[10px] font-semibold tracking-wide">CRIT</span>}
-                                        </span>
-                                      )}
-                                    </td>
-                                    <td className="px-4 py-2.5 text-ink-secondary">{c.unit}</td>
-                                    <td className="px-4 py-2.5 text-ink-secondary">{c.referenceRange}</td>
-                                  </tr>
-                                )
-                              })}
-                            </tbody>
-                          </table>
-                        )}
-                      </div>
-                    )
-                  })}
-                  {pendingLabs.map(lab => (
-                    <div key={lab} className={`rounded-md border border-surface-4 px-4 py-3 ${diagnosisSubmitted ? 'bg-surface-2/60' : 'bg-caution-bg border-caution-border'}`}>
-                      {diagnosisSubmitted ? (
-                        <>
-                          <div className="flex items-start gap-2">
-                            <span className="text-xs font-semibold uppercase tracking-wide text-ink-tertiary">{lab}</span>
-                            <span className="text-xs text-ink-tertiary italic">(returned after your diagnosis — typically {pendingHours(lab)})</span>
-                          </div>
-                          <div className="mt-1 text-xs text-ink-secondary">Result not modeled for this case.</div>
-                        </>
-                      ) : (
-                        <div className="flex items-center gap-2">
-                          <span className="inline-block h-2 w-2 rounded-full bg-caution animate-pulse flex-shrink-0" />
-                          <span className="text-xs font-semibold uppercase tracking-wide text-caution">{lab}</span>
-                          <span className="text-xs text-ink-tertiary">Result pending — typically available in {pendingHours(lab)}</span>
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                  {loadingOnDemand.map(t => (
-                    <div key={t} className="rounded-md border border-primary-200 bg-primary-50 px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <svg className="w-3.5 h-3.5 animate-spin text-primary-600 flex-shrink-0" fill="none" viewBox="0 0 24 24">
-                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
-                        </svg>
-                        <span className="text-xs font-semibold uppercase tracking-wide text-primary-700">{t}</span>
-                        <span className="text-xs text-ink-tertiary">Generating result...</span>
-                      </div>
-                    </div>
-                  ))}
-                  {orderedArr.filter(t => failedOnDemand.has(t)).map(t => (
-                    <div key={t} className="rounded-md border border-surface-4 bg-surface-2/60 px-4 py-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">{t}</span>
-                        <button
-                          className="text-xs text-primary-400 hover:text-primary-400 transition-colors flex-shrink-0"
-                          onClick={() => {
-                            setFailedOnDemand(prev => { const n = new Set(prev); n.delete(t); return n })
-                            onDemandQueuedRef.current.delete(t)
-                            setOrderedTests(prev => new Set(prev))
-                          }}
-                        >
-                          Retry
-                        </button>
-                      </div>
-                      <p className="mt-1 text-xs text-ink-tertiary">Result generation failed — this test may not be available for this case.</p>
-                    </div>
-                  ))}
-                </div>
-              </SectionCard>
-            )}
-            {(orderedImaging.length > 0 || orderedProcedures.length > 0) && (
-              <SectionCard title="Imaging & Studies">
-                <div className="space-y-2">
-                  {orderedImaging.map(img => {
-                    const key = findResultKey(img, caseData.imagingResults)!
-                    const report = caseData.imagingResults[key]
-                    const isCollapsed = collapsedPanels.has(img)
-
-                    if (isECGTest(img)) {
-                      const ecgImage = img in ecgCache ? ecgCache[img] : null
-                      const ecgSummary = (caseData.ecgFindings ?? report).split(/[.!?]/)[0].trim()
-                      return (
-                        <div key={img} className="rounded-md border border-surface-4 overflow-hidden">
-                          <button
-                            className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
-                            onClick={() => togglePanel(img)}
-                          >
-                            <span className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">ECG / Electrocardiogram</span>
-                            <div className="flex items-center gap-3 min-w-0">
-                              {isCollapsed && diagnosisSubmitted && <span className="text-xs text-ink-tertiary truncate max-w-xs">ECG | {ecgSummary}</span>}
-                              <svg className={`w-4 h-4 text-ink-secondary transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
-                            </div>
-                          </button>
-                          {!isCollapsed && (
-                            <ECGPanel
-                              ecgFindings={caseData.ecgFindings}
-                              aiReport={report}
-                              image={ecgImage}
-                              diagnosisSubmitted={diagnosisSubmitted}
-                              onZoom={(src, alt) => setZoomedImage({ src, alt })}
-                            />
-                          )}
-                        </div>
-                      )
-                    }
-
-                    const specialModality = getSpecialModality(img)
-                    if (specialModality) {
-                      const specialCacheMap: Record<SpecialModality, Record<string, SpecialImage | null | 'none'>> = {
-                        smear: smearCache, biopsy: biopsyImgCache,
-                        fundus: fundusCache, derm: dermCache, urine: urineImgCache,
-                      }
-                      const findingsMap: Record<SpecialModality, string | undefined> = {
-                        smear:  caseData.hematologyFindings,
-                        biopsy: caseData.biopsyFindings,
-                        fundus: caseData.fundusFindings,
-                        derm:   caseData.skinFindings,
-                        urine:  caseData.urineFindings,
-                      }
-                      const specialImage = img in specialCacheMap[specialModality] ? specialCacheMap[specialModality][img] : null
-                      const firstLine = report.split(/[.\n]/)[0].trim()
-                      const isBiopsyGated = specialModality === 'biopsy' && !diagnosisSubmitted
-                      return (
-                        <div key={img} className="rounded-md border border-surface-4 overflow-hidden">
-                          <button
-                            className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
-                            onClick={() => togglePanel(img)}
-                          >
-                            <span className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">
-                              {SPECIAL_LABELS[specialModality]}
-                              {isBiopsyGated && <span className="ml-2 text-xs font-normal text-caution normal-case">(results after diagnosis)</span>}
-                            </span>
-                            <div className="flex items-center gap-3 min-w-0">
-                              {isCollapsed && <span className="text-xs text-ink-tertiary truncate max-w-xs">{firstLine}</span>}
-                              <svg className={`w-4 h-4 text-ink-secondary transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                              </svg>
-                            </div>
-                          </button>
-                          {!isCollapsed && (
-                            isBiopsyGated ? (
-                              <div className="bg-surface-1 px-4 py-4">
-                                <p className="text-sm text-ink-tertiary italic">H&E biopsy results are typically available after clinical assessment. Submit your diagnosis to view pathology findings.</p>
-                              </div>
-                            ) : (
-                              <SpecialPanel
-                                modality={specialModality}
-                                report={report}
-                                image={specialImage}
-                                findings={findingsMap[specialModality]}
-                                onZoom={(src, alt) => setZoomedImage({ src, alt })}
-                              />
-                            )
-                          )}
-                        </div>
-                      )
-                    }
-
-                    const firstLine = report.split(/[.\n]/)[0].trim()
-                    const cachedResults = imagingCache[img] ?? null
-                    return (
-                      <div key={img} className="rounded-md border border-surface-4 overflow-hidden">
-                        <button
-                          className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
-                          onClick={() => togglePanel(img)}
-                        >
-                          <span className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">{img}</span>
-                          <div className="flex items-center gap-3 min-w-0">
-                            {isCollapsed && diagnosisSubmitted && <span className="text-xs text-ink-tertiary truncate max-w-xs">{firstLine}</span>}
-                            <svg className={`w-4 h-4 text-ink-secondary transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                        </button>
-                        {!isCollapsed && (
-                          <ImagingPanel report={report} results={cachedResults} diagnosisSubmitted={diagnosisSubmitted} />
-                        )}
-                      </div>
-                    )
-                  })}
-                  {orderedProcedures.map(proc => {
-                    const key = findResultKey(proc, caseData.procedureResults!)!
-                    const report = caseData.procedureResults![key]
-                    const isCollapsed = collapsedPanels.has(proc)
-                    const firstLine = report.split(/[.\n]/)[0].trim()
-                    return (
-                      <div key={proc} className="rounded-md border border-surface-4 overflow-hidden">
-                        <button
-                          className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
-                          onClick={() => togglePanel(proc)}
-                        >
-                          <span className="text-xs font-semibold uppercase tracking-wide text-ink-secondary">{proc}</span>
-                          <div className="flex items-center gap-3 min-w-0">
-                            {isCollapsed && <span className="text-xs text-ink-tertiary truncate max-w-xs">{firstLine}</span>}
-                            <svg className={`w-4 h-4 text-ink-secondary transition-transform duration-200 flex-shrink-0 ${isCollapsed ? '' : 'rotate-180'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                          </div>
-                        </button>
-                        {!isCollapsed && (
-                          <div className="rounded-b-md bg-surface-1 px-4 py-3">
-                            <p className="text-sm leading-relaxed text-ink-secondary">{report}</p>
-                          </div>
-                        )}
-                      </div>
-                    )
-                  })}
-                </div>
-              </SectionCard>
-            )}
-          </div>
-        )
-      }
-
+        return <ExamView caseData={caseData} />
+      case 'order':
+        return <OrderView
+          caseData={caseData}
+          caseDifficulty={caseDifficulty}
+          orderedTests={orderedTests}
+          selectedTests={selectedTests}
+          toggleTest={toggleTest}
+          orderTests={orderTests}
+          addOrderedTest={addOrderedTest}
+          orderCustomTest={orderCustomTest}
+          removeOrderedTest={removeOrderedTest}
+          openCategories={openCategories}
+          setOpenCategories={setOpenCategories}
+          testSearchQuery={testSearchQuery}
+          setTestSearchQuery={setTestSearchQuery}
+          showSearchDropdown={showSearchDropdown}
+          setShowSearchDropdown={setShowSearchDropdown}
+          customTestInput={customTestInput}
+          setCustomTestInput={setCustomTestInput}
+          locked={locked}
+        />
+      case 'results':
+        return <ResultsView
+          caseData={caseData}
+          orderedTests={orderedTests}
+          imagingCache={imagingCache}
+          ecgCache={ecgCache}
+          smearCache={smearCache}
+          biopsyImgCache={biopsyImgCache}
+          fundusCache={fundusCache}
+          dermCache={dermCache}
+          urineImgCache={urineImgCache}
+          collapsedPanels={collapsedPanels}
+          setCollapsedPanels={setCollapsedPanels}
+          generatingOnDemand={generatingOnDemand}
+          failedOnDemand={failedOnDemand}
+          setFailedOnDemand={setFailedOnDemand}
+          gradingResult={gradingResult}
+          setZoomedImage={setZoomedImage}
+          setActiveSection={setActiveSection}
+          setOrderedTests={setOrderedTests}
+          onRetryFailed={(t) => {
+            setFailedOnDemand(prev => { const n = new Set(prev); n.delete(t); return n })
+            onDemandQueuedRef.current.delete(t)
+            setOrderedTests(prev => new Set(prev))
+          }}
+        />
       case 'diagnosis':
-        return (
-          <div className="space-y-4">
-            {gradingLoading ? (
-              <SectionCard title="Evaluating Diagnosis">
-                <div className="flex flex-col items-center justify-center py-14 gap-4">
-                  <div className="h-8 w-8 animate-spin rounded-full border-2 border-surface-4 border-t-primary-400" />
-                  <div className="text-center space-y-1">
-                    <p className="text-sm font-medium text-ink-primary">Evaluating your diagnosis…</p>
-                    <p className="text-xs text-ink-tertiary">Reviewing history, workup, and clinical reasoning</p>
-                  </div>
-                </div>
-              </SectionCard>
-            ) : gradingError ? (
-              <SectionCard title="Submit Your Diagnosis">
-                <div className="flex flex-col items-center justify-center py-10 gap-4 text-center">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full border border-red-800 bg-red-950/50">
-                    <svg className="h-4 w-4 text-critical" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p className="text-sm text-critical mb-0.5">{gradingError}</p>
-                    <p className="text-xs text-ink-tertiary">Your diagnosis and reasoning are still saved above.</p>
-                  </div>
-                  <button
-                    onClick={() => submitDiagnosis()}
-                    className="rounded-md bg-primary-500 px-5 py-2 text-sm font-semibold text-white hover:bg-primary-400 transition-colors"
-                  >
-                    Retry
-                  </button>
-                </div>
-              </SectionCard>
-            ) : !gradingResult ? (
-              <SectionCard title="Submit Your Diagnosis">
-                <div className="space-y-4">
-                  <div>
-                    <label className="mb-2 flex items-center justify-between text-sm text-ink-secondary">
-                      <span>Primary diagnosis:</span>
-                      <MicButton
-                        onTranscript={text => setUserDiagnosis(prev => prev ? prev + ' ' + text : text)}
-                        paused={timerState.status === 'paused' || gradingLoading || locked}
-                        className="py-1"
-                      />
-                    </label>
-                    <DiagnosisInput
-                      value={userDiagnosis}
-                      onChange={setUserDiagnosis}
-                      onKeyDown={e => e.key === 'Enter' && caseDifficulty === 'Foundations' && submitDiagnosis()}
-                      disabled={gradingLoading || locked}
-                    />
-                  </div>
-
-                  {caseDifficulty === 'Clinical' && (
-                    <div>
-                      <label className="mb-2 flex items-center justify-between text-sm text-ink-secondary">
-                        <span>Clinical Reasoning <span className="text-ink-tertiary">(required)</span></span>
-                        <MicButton
-                          onTranscript={text => setUserPresentation(prev => prev ? prev + ' ' + text : text)}
-                          paused={timerState.status === 'paused' || gradingLoading || locked}
-                          className="py-1"
-                        />
-                      </label>
-                      <textarea
-                        value={userPresentation}
-                        onChange={e => setUserPresentation(e.target.value)}
-                        disabled={locked}
-                        placeholder="Explain what findings support your diagnosis. Reference specific values from the history, exam, or test results that led you to this conclusion."
-                        rows={5}
-                        className="w-full rounded-md border border-surface-5 bg-surface-1 px-4 py-3 text-sm text-ink-primary placeholder-ink-tertiary focus:border-primary-400 focus:outline-none resize-y disabled:opacity-50 disabled:cursor-not-allowed"
-                      />
-                    </div>
-                  )}
-
-                  {caseDifficulty === 'Advanced' && (
-                    <div>
-                      <label className="mb-2 flex items-center justify-between text-sm text-ink-secondary">
-                        <span>Oral Presentation <span className="text-ink-tertiary">(required)</span></span>
-                        <div className="flex items-center gap-2">
-                          <MicButton
-                            onTranscript={text => setUserPresentation(prev => prev ? prev + ' ' + text : text)}
-                            paused={timerState.status === 'paused' || gradingLoading || locked}
-                            className="py-1"
-                          />
-                          <span className={`text-xs tabular-nums ${userPresentation.trim().split(/\s+/).filter(Boolean).length < 50 ? 'text-ink-tertiary' : 'text-ink-secondary'}`}>
-                            {userPresentation.trim() === '' ? 0 : userPresentation.trim().split(/\s+/).filter(Boolean).length} words
-                          </span>
-                        </div>
-                      </label>
-                      <textarea
-                        value={userPresentation}
-                        onChange={e => setUserPresentation(e.target.value)}
-                        disabled={locked}
-                        placeholder={"Patient summary: [Name] is a [age]yo [gender] presenting with [chief complaint].\n\nKey findings: [Most significant positives and pertinent negatives from history, exam, and results — cite actual values.]\n\nAssessment: [Your diagnosis and why the findings support it. Address top differentials and why you ruled them out.]\n\nPlan: [Immediate management steps — treatment, further workup, disposition, safety considerations.]"}
-                        rows={10}
-                        className="w-full rounded-md border border-surface-5 bg-surface-1 px-4 py-3 text-sm text-ink-primary placeholder-ink-tertiary focus:border-primary-400 focus:outline-none resize-y font-mono leading-relaxed disabled:opacity-50 disabled:cursor-not-allowed"
-                      />
-                    </div>
-                  )}
-
-                  <p className="text-xs text-ink-tertiary italic">
-                    {caseDifficulty === 'Advanced'
-                      ? 'Tip: Be specific — cite actual values (e.g. "UPCR 5.8", "eGFR 48") rather than general terms.'
-                      : 'Tip: Consider including the underlying cause in your diagnosis (e.g. "X secondary to Y").'}
-                  </p>
-
-                  {/* Pre-submission history checklist — most commonly missed question categories */}
-                  <div className="rounded-md border border-surface-4/60 bg-surface-2/40 px-3 py-2.5">
-                    <p className="text-xs font-medium text-ink-tertiary mb-1.5">Before submitting — have you asked about:</p>
-                    <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-                      {[
-                        'Family history of similar conditions',
-                        'Recent medication changes or new drugs',
-                        'OTC medications, NSAIDs, or supplements',
-                        'Recent travel or sick contacts',
-                      ].map((q) => (
-                        <div key={q} className="flex items-start gap-1.5 text-xs text-ink-tertiary">
-                          <span className="mt-px flex-shrink-0 text-ink-tertiary">□</span>
-                          <span>{q}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => submitDiagnosis()}
-                    disabled={
-                      !userDiagnosis.trim() ||
-                      gradingLoading ||
-                      locked ||
-                      ((caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') && !userPresentation.trim())
-                    }
-                    className="w-full rounded-md bg-primary-500 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-400 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
-                  >
-                    {gradingLoading ? 'Grading...' : 'Submit Diagnosis'}
-                  </button>
-                  {orderedTests.size === 0 && (
-                    <p className="text-xs text-caution">
-                      Tip: Order some tests first to improve your workup.
-                    </p>
-                  )}
-                </div>
-              </SectionCard>
-            ) : (
-              <div className="rounded-2xl border border-rule bg-paper text-ink shadow-sm overflow-hidden">
-
-                {/* A — Header bar */}
-                <div style={{ background: 'var(--color-paper-2)', borderBottom: '1px solid var(--color-rule)', padding: '12px 20px' }}>
-                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
-                    <div>
-                      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ink-3)', marginBottom: 4 }}>
-                        {'CASE · ' + (resolvedSystemRef.current || 'General') + ' · ' + caseDifficulty}
-                      </div>
-                      <div style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 20, fontWeight: 600, color: 'var(--color-ink)', lineHeight: 1.2 }}>
-                        {(caseData?.patientInfo?.name ?? '') + (caseData?.patientInfo?.name ? ', ' : '') + (caseData?.patientInfo?.age ?? '') + (caseData?.patientInfo?.gender === 'male' ? 'M' : caseData?.patientInfo?.gender === 'female' ? 'F' : (caseData?.patientInfo?.gender?.charAt(0).toUpperCase() ?? ''))}
-                      </div>
-                    </div>
-                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
-                      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ink-3)', marginBottom: 4 }}>
-                        SUBMITTED DIAGNOSIS
-                      </div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
-                        <span style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 15, fontWeight: 600, color: 'var(--color-ink)' }}>{userDiagnosis}</span>
-                        <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: '50%', background: gradingResult.correct ? 'var(--color-confirmed)' : 'var(--color-critical)', color: 'white', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
-                          {gradingResult.correct ? '✓' : '✗'}
-                        </span>
-                      </div>
-                      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ink-3)', marginTop: 10, marginBottom: 4 }}>
-                        CORRECT DIAGNOSIS
-                      </div>
-                      <div style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 15, fontWeight: 600, color: 'var(--color-ink)' }}>
-                        {caseData?.diagnosis ?? '—'}
-                      </div>
-                      {gradingResult.efficiency && (
-                        <div style={{ fontSize: 11, color: 'var(--color-ink-3)', fontFamily: 'JetBrains Mono, monospace', marginTop: 2 }}>
-                          {fmtTime(gradingResult.efficiency.elapsedSeconds)}
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </div>
-
-                {/* B — Body: ring (left) + categories (right) */}
-                <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
-                  {/* Left: score ring + verdict + meta */}
-                  <div className="flex flex-col items-center gap-2 py-8 px-6 border-b md:border-b-0 md:border-r border-rule">
-                    <ScoreRing score={gradingResult.score} />
-                    <div style={{ marginTop: 6, fontSize: 15, fontWeight: 500, color: 'var(--color-ink)' }}>
-                      {gradingResult.score >= 80 ? 'Strong pass' : gradingResult.score >= 70 ? 'Pass' : gradingResult.score >= 50 ? 'Needs review' : 'Did not pass'}
-                    </div>
-                    <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--color-ink-3)', textAlign: 'center', lineHeight: 1.6, marginTop: 2 }}>
-                      {gradingResult.score}/100 rubric
-                      {gradingResult.efficiency && (<><br/>{caseDifficulty} · {fmtTime(gradingResult.efficiency.elapsedSeconds)}</>)}
-                    </div>
-                  </div>
-
-                  {/* Right: rubric rows + efficiency + overall feedback */}
-                  <div className="flex flex-col">
-                    <div className="flex flex-col divide-y divide-rule">
-                      {gradingResult.dimensions && getRubric(caseDifficulty).map(({ key, label, max }) => {
-                        const dim = gradingResult.dimensions![key]
-                        if (!dim) return null
-                        const pct = Math.min(100, (dim.score / max) * 100)
-                        return (
-                          <CategoryRow
-                            key={key}
-                            label={label}
-                            dim={dim}
-                            max={max}
-                            pct={pct}
-                            expanded={expandedCategory === key}
-                            onToggle={() => setExpandedCategory(expandedCategory === key ? null : key)}
-                          />
-                        )
-                      })}
-                      {gradingResult.efficiency && (() => {
-                        const eff = gradingResult.efficiency!
-                        const pct = (eff.score / 10) * 100
-                        const barColor = pct >= 80 ? 'bg-confirmed' : pct >= 50 ? 'bg-caution' : 'bg-critical'
-                        const scoreColor = pct >= 80 ? 'text-confirmed' : pct >= 50 ? 'text-caution' : 'text-critical'
-                        return (
-                          <div className="flex items-center gap-3 px-4 py-3 bg-paper-2">
-                            <span className="w-40 shrink-0 text-xs font-medium text-ink-3">Efficiency</span>
-                            <div className="flex-1 h-1.5 rounded-full bg-paper-3 overflow-hidden">
-                              <div className={'h-full rounded-full ' + barColor} style={{ width: pct + '%' }} />
-                            </div>
-                            <span className={'w-14 text-right font-mono text-xs tabular-nums ' + scoreColor}>
-                              {eff.score}<span className="text-ink-3">/10</span>
-                            </span>
-                            <span className="text-[10px] text-ink-3 italic whitespace-nowrap">not in /100</span>
-                          </div>
-                        )
-                      })()}
-                    </div>
-                    {/* Overall feedback prose — full width under the rubric rows */}
-                    {gradingResult.feedback && (
-                      <div style={{ borderTop: '1px solid var(--color-rule)', padding: '14px 20px', background: 'var(--color-paper-2)' }}>
-                        <p style={{ fontSize: 13, color: 'var(--color-ink-2)', lineHeight: 1.7, fontStyle: 'italic', margin: 0 }}>
-                          {gradingResult.feedback}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* C — Feedback section carousel */}
-                {((gradingResult.strengths?.length ?? 0) > 0 || gradingResult.efficiency?.score === 10
-                  || (gradingResult.missedQuestions?.length ?? 0) > 0
-                  || (gradingResult.teachingPoints?.length ?? 0) > 0) && (
-                  <div style={{ borderTop: '1px solid var(--color-rule)', paddingTop: 12, paddingBottom: 4, background: 'var(--color-paper)' }}>
-                    {(() => {
-                      const strengthsAll = [
-                        ...(gradingResult.strengths ?? []),
-                        ...(gradingResult.efficiency?.score === 10 ? ['Completed the case efficiently within the allotted time'] : []),
-                      ]
-                      const feedSections: FeedbackSection[] = []
-                      if (strengthsAll.length > 0) feedSections.push({
-                        title: 'Strengths', items: strengthsAll, tone: 'confirmed', icon: '✓',
-                        footer: gradingResult.efficiency?.timedOut ? 'The case timed out before submission. Time management is a clinical skill that improves with practice. Focus on high-yield questions early and order targeted tests rather than a broad workup.' : undefined,
-                      })
-                      if ((gradingResult.missedQuestions?.length ?? 0) > 0) feedSections.push({
-                        title: 'What you missed', items: gradingResult.missedQuestions!, tone: 'caution', icon: '!',
-                      })
-                      if ((gradingResult.teachingPoints?.length ?? 0) > 0) feedSections.push({
-                        title: 'Teaching points', items: gradingResult.teachingPoints!, tone: 'insight', icon: '★',
-                      })
-                      return <FeedbackCarousel sections={feedSections} />
-                    })()}
-                  </div>
-                )}
-
-                {/* Differentials */}
-                {gradingResult.differentials?.length > 0 && (
-                  <div className="border-t border-rule px-5 py-4">
-                    <h3 className="font-serif text-sm font-semibold text-ink mb-3">Differential Diagnosis Discussion</h3>
-                    <div className="space-y-2">
-                      {gradingResult.differentials.map((dx, i) => {
-                        const colonIdx = dx.indexOf(':')
-                        const name = colonIdx !== -1 ? dx.slice(0, colonIdx).trim() : dx
-                        const explanation = colonIdx !== -1 ? dx.slice(colonIdx + 1).trim() : ''
-                        return (
-                          <div key={i} style={{ background: 'var(--color-paper-2)', border: '1px solid var(--color-rule)', borderRadius: 8, padding: '10px 14px' }}>
-                            <div style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 15, fontWeight: 600, color: '#7A6A95', marginBottom: explanation ? 4 : 0 }}>{name}</div>
-                            {explanation && <p style={{ fontSize: 12, color: 'var(--color-ink-secondary)', lineHeight: 1.6 }}>{explanation}</p>}
-                          </div>
-                        )
-                      })}
-                    </div>
-                  </div>
-                )}
-
-                {/* Oral Presentation (Advanced) */}
-                {gradingResult.presentation?.scores && (
-                  <div className="border-t border-rule px-5 py-4">
-                    <h3 className="font-serif text-sm font-semibold text-ink mb-3">
-                      Oral Presentation
-                      <span className="ml-2 font-mono font-normal text-xs text-ink-3">
-                        {gradingResult.presentation.presentationTotal ?? 0}/100
-                      </span>
-                    </h3>
-                    <div className="grid grid-cols-2 gap-2 mb-3">
-                      {(
-                        [
-                          ['Accuracy', gradingResult.presentation.scores.accuracy],
-                          ['Completeness', gradingResult.presentation.scores.completeness],
-                          ['Conciseness', gradingResult.presentation.scores.conciseness],
-                          ['Safety', gradingResult.presentation.scores.safety],
-                        ] as [string, number][]
-                      ).map(([axis, score]) => {
-                        const pct = (score / 25) * 100
-                        const c = pct >= 72 ? 'text-confirmed' : pct >= 48 ? 'text-caution' : 'text-critical'
-                        return (
-                          <div key={axis} className="rounded-lg bg-paper-2 border border-rule px-3 py-2">
-                            <div className="text-xs text-ink-3 mb-1">{axis}</div>
-                            <span className={'text-base font-semibold font-mono ' + c}>{score}/25</span>
-                          </div>
-                        )
-                      })}
-                    </div>
-                    {gradingResult.presentation.presentationFeedback && (
-                      <p className="text-sm text-ink-2 leading-relaxed">{gradingResult.presentation.presentationFeedback}</p>
-                    )}
-                    {gradingResult.presentation.criticalMisses && gradingResult.presentation.criticalMisses.length > 0 && (
-                      <div className="mt-3 rounded-lg border border-critical/30 bg-critical/5 px-3 py-2.5">
-                        <div className="text-xs font-semibold uppercase tracking-wide text-critical mb-2">Critical Misses</div>
-                        <ul className="space-y-1">
-                          {gradingResult.presentation.criticalMisses.map((miss, i) => (
-                            <li key={i} className="flex gap-2 text-sm text-critical">
-                              <span className="flex-shrink-0">!</span>{miss}
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Case Notes */}
-                {notes.content.trim() && notes.content !== SOAP_TEMPLATE && (
-                  <div className="border-t border-rule px-5 py-4">
-                    <ScorecardNotesPanel content={notes.content} />
-                  </div>
-                )}
-
-                {/* Rate This Case */}
-                {(() => {
-                  const FEEDBACK_DIMS = [
-                    { key: 'overall',               label: 'Overall Case' },
-                    { key: 'clinicalRealism',        label: 'Clinical Realism' },
-                    { key: 'gradingFairness',        label: 'Grading Fairness' },
-                    { key: 'patientCommunication',   label: 'Patient Communication' },
-                    { key: 'difficultyAccuracy',     label: 'Difficulty Accuracy' },
-                  ]
-                  const submitFeedback = async () => {
-                    setFeedbackSubmitting(true)
-                    try {
-                      await fetch('/api/feedback', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          diagnosis: caseData?.diagnosis,
-                          difficulty: caseDifficulty,
-                          system: caseData?.patientInfo ? resolvedSystemRef.current : undefined,
-                          patientName: caseData?.patientInfo?.name,
-                          ratings: feedbackRatings,
-                          feedback: feedbackText,
-                        }),
-                      })
-                    } catch {}
-                    setFeedbackSubmitted(true)
-                    setFeedbackSubmitting(false)
-                  }
-                  const hasAnyRating = Object.values(feedbackRatings).some(v => v > 0)
-                  return (
-                    <div className="border-t border-rule px-5 py-4">
-                      <div className="eyebrow" style={{ marginBottom: 14 }}>Rate This Case</div>
-                      {feedbackSubmitted ? (
-                        <p className="text-sm text-confirmed text-center py-2">Thank you for your feedback!</p>
-                      ) : (
-                        <>
-                          <div className="space-y-3 mb-4">
-                            {FEEDBACK_DIMS.map(({ key, label }) => {
-                              const active = feedbackRatings[key] ?? 0
-                              const hov = feedbackHover[key] ?? 0
-                              return (
-                                <div key={key} className="flex items-center justify-between gap-3">
-                                  <span className="text-xs text-ink-2 w-40 shrink-0">{label}</span>
-                                  <div className="flex gap-1">
-                                    {[1, 2, 3, 4, 5].map(star => (
-                                      <button
-                                        key={star}
-                                        onMouseEnter={() => setFeedbackHover(h => ({ ...h, [key]: star }))}
-                                        onMouseLeave={() => setFeedbackHover(h => ({ ...h, [key]: 0 }))}
-                                        onClick={() => setFeedbackRatings(r => ({ ...r, [key]: star }))}
-                                        className="text-xl leading-none transition-colors"
-                                        aria-label={star + ' star'}
-                                      >
-                                        <span className={(hov || active) >= star ? 'text-caution' : 'text-ink-3'}>
-                                          ★
-                                        </span>
-                                      </button>
-                                    ))}
-                                  </div>
-                                </div>
-                              )
-                            })}
-                          </div>
-                          <textarea
-                            value={feedbackText}
-                            onChange={e => setFeedbackText(e.target.value)}
-                            placeholder="Any comments or suggestions? (optional)"
-                            rows={3}
-                            className="w-full rounded-md border border-rule bg-paper-2 px-3 py-2 text-sm text-ink placeholder-ink-3 focus:border-sc-accent focus:outline-none resize-none mb-3"
-                          />
-                          <button
-                            onClick={submitFeedback}
-                            disabled={!hasAnyRating || feedbackSubmitting}
-                            className="w-full rounded-md bg-sc-accent px-4 py-2 text-sm font-medium text-white hover:bg-sc-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
-                          >
-                            {feedbackSubmitting ? 'Submitting…' : 'Submit Feedback'}
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  )
-                })()}
-
-                {/* D — Action bar */}
-                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '12px 20px', background: 'var(--color-paper-2)', borderTop: '1px solid var(--color-rule)', borderRadius: '0 0 1rem 1rem', flexWrap: 'wrap' }}>
-                  <Link
-                    href="/"
-                    style={{ border: '1px solid var(--color-rule)', borderRadius: 8, padding: '8px 16px', fontSize: 13, color: 'var(--color-ink-2)', textDecoration: 'none', background: 'transparent', display: 'inline-block', lineHeight: '1.4' }}
-                    className="hover:bg-paper-3 transition-colors"
-                  >
-                    Dashboard
-                  </Link>
-                  <Link
-                    href="/history"
-                    style={{ border: '1px solid var(--color-rule)', borderRadius: 8, padding: '8px 16px', fontSize: 13, color: 'var(--color-ink-2)', textDecoration: 'none', background: 'transparent', display: 'inline-block', lineHeight: '1.4' }}
-                    className="hover:bg-paper-3 transition-colors"
-                  >
-                    Case History
-                  </Link>
-                  <button
-                    onClick={() => generateCase()}
-                    style={{ background: 'var(--color-primary)', color: 'var(--color-primary-foreground)', border: 'none', borderRadius: 10, padding: '8px 18px', fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em', cursor: 'pointer', lineHeight: '1.4' }}
-                    className="hover:opacity-90 transition-opacity"
-                  >
-                    Next case →
-                  </button>
-                </div>
-
-              </div>
-            )}
-          </div>
-        )
+        return <DiagnosisView
+          caseData={caseData}
+          caseDifficulty={caseDifficulty}
+          resolvedSystem={resolvedSystemRef.current}
+          gradingLoading={gradingLoading}
+          gradingError={gradingError}
+          gradingResult={gradingResult}
+          userDiagnosis={userDiagnosis}
+          setUserDiagnosis={setUserDiagnosis}
+          userPresentation={userPresentation}
+          setUserPresentation={setUserPresentation}
+          timerState={timerState}
+          locked={locked}
+          expandedCategory={expandedCategory}
+          setExpandedCategory={setExpandedCategory}
+          feedbackRatings={feedbackRatings}
+          setFeedbackRatings={setFeedbackRatings}
+          feedbackHover={feedbackHover}
+          setFeedbackHover={setFeedbackHover}
+          feedbackText={feedbackText}
+          setFeedbackText={setFeedbackText}
+          feedbackSubmitted={feedbackSubmitted}
+          setFeedbackSubmitted={setFeedbackSubmitted}
+          feedbackSubmitting={feedbackSubmitting}
+          setFeedbackSubmitting={setFeedbackSubmitting}
+          notes={notes}
+          setNotes={setNotes}
+          submitDiagnosis={submitDiagnosis}
+          generateCase={generateCase}
+          orderedTests={orderedTests}
+        />
+      default:
+        return null
     }
   }
 

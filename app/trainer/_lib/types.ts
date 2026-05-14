@@ -70,3 +70,23 @@ export function selectHpi(c: CaseData, difficulty: string): string {
   if (difficulty === 'Advanced' && c.advancedHpi) return c.advancedHpi
   return c.hpi
 }
+
+export const SOAP_TEMPLATE = `SUBJECTIVE
+Chief Complaint:
+HPI:
+PMH / Meds / Allergies / Social:
+
+OBJECTIVE
+Vitals:
+Exam:
+Labs / Imaging:
+
+ASSESSMENT
+Primary Dx:
+Differentials:
+Reasoning:
+
+PLAN
+Immediate:
+Further workup:
+Disposition: `
