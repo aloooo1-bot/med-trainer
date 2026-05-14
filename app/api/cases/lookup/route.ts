@@ -13,15 +13,11 @@ export async function GET(req: NextRequest) {
   // If Supabase isn't configured, treat as miss so the app still works without it
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ status: 'miss' })
 
+  // Cookie-only session check (no network verify) — middleware already refreshed
+  // the session, and case_data is not user-specific so a forged cookie can't escalate.
   const supabase = await createClient()
-  const userResult = await Promise.race([
-    supabase.auth.getUser(),
-    new Promise<{ data: { user: null } }>(resolve =>
-      setTimeout(() => resolve({ data: { user: null } }), 8_000)
-    ),
-  ])
-  const user = userResult.data.user
-  if (!user) return NextResponse.json({ status: 'miss' }, { status: 401 })
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return NextResponse.json({ status: 'miss' }, { status: 401 })
 
   try {
     const supabase = createAdminClient()

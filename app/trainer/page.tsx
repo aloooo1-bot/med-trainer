@@ -599,11 +599,13 @@ Return ONLY valid JSON — no markdown, no explanation:
     // 40% of the time: try an image-anchored case (skip when redo-ing a specific diagnosis)
     if (!overrideDx && Math.random() < 0.4) {
       try {
+        const t0 = performance.now()
         const imgRes = await fetch(
           `/api/cases/image-first?system=${encodeURIComponent(resolvedSystem)}&difficulty=${encodeURIComponent(resolvedDifficulty)}`
         )
         if (imgRes.ok) {
           const imgData = await imgRes.json()
+          console.log(`[gen] image-first ${imgData.status} in ${Math.round(performance.now() - t0)}ms`)
           if (imgData.status === 'hit' && imgData.caseData) {
             if (imgData.caseData.patientInfo?.name) recordUsedName(imgData.caseData.patientInfo.name)
             setActiveCaseId(imgData.caseId)
@@ -820,9 +822,11 @@ PMH LEAK RULE: The pastMedicalHistory fields (conditions, surgeries, hospitaliza
       // Check Supabase cache first — instant if this case slot was already generated
       if (caseId) {
         try {
+          const t0 = performance.now()
           const lookupRes = await fetch(`/api/cases/lookup?id=${encodeURIComponent(caseId)}`)
           if (lookupRes.ok) {
             const { status, caseData: cached, imagingCache: prefetched } = await lookupRes.json()
+            console.log(`[gen] lookup id=${caseId} status=${status} in ${Math.round(performance.now() - t0)}ms`)
             if (status === 'hit' && cached) {
               if (cached.patientInfo?.name) recordUsedName(cached.patientInfo.name)
               setCaseData(jitterCase(cached))
@@ -845,8 +849,11 @@ PMH LEAK RULE: The pastMedicalHistory fields (conditions, surgeries, hospitaliza
       }
 
       // Cache miss — generate live with Claude
+      console.log(`[gen] cache miss for id=${caseId} diagnosis="${diagnosis}" — falling through to live Claude`)
+      const tClaude = performance.now()
       const text = await callClaude(claudeSystem, [{ role: 'user', content: prompt }], 12000,
         (u) => recordApiCall('generation', u))
+      console.log(`[gen] Claude generated in ${Math.round(performance.now() - tClaude)}ms`)
       const match = text.match(/\{[\s\S]*\}/)
       if (!match) throw new Error('No JSON in response')
       const rawParsed = JSON.parse(match[0]) as CaseData
