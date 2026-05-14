@@ -1,0 +1,337 @@
+{
+  "totals": {
+    "rows": 468,
+    "generated": 178,
+    "img": 34,
+    "manifest": 144
+  },
+  "matrix": {
+    "Cardiovascular": {
+      "Foundations": {
+        "img": 2,
+        "manifest": 4,
+        "total": 6
+      },
+      "Clinical": {
+        "img": 6,
+        "manifest": 4,
+        "total": 10
+      },
+      "Advanced": {
+        "img": 2,
+        "manifest": 4,
+        "total": 6
+      }
+    },
+    "Respiratory": {
+      "Foundations": {
+        "img": 3,
+        "manifest": 4,
+        "total": 7
+      },
+      "Clinical": {
+        "img": 4,
+        "manifest": 4,
+        "total": 8
+      },
+      "Advanced": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      }
+    },
+    "Neurologic": {
+      "Foundations": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Clinical": {
+        "img": 3,
+        "manifest": 4,
+        "total": 7
+      },
+      "Advanced": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      }
+    },
+    "Gastrointestinal": {
+      "Foundations": {
+        "img": 1,
+        "manifest": 4,
+        "total": 5
+      },
+      "Clinical": {
+        "img": 6,
+        "manifest": 4,
+        "total": 10
+      },
+      "Advanced": {
+        "img": 2,
+        "manifest": 4,
+        "total": 6
+      }
+    },
+    "Renal": {
+      "Foundations": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Clinical": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Advanced": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      }
+    },
+    "Endocrine / Metabolic": {
+      "Foundations": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Clinical": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Advanced": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      }
+    },
+    "Infectious": {
+      "Foundations": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Clinical": {
+        "img": 1,
+        "manifest": 4,
+        "total": 5
+      },
+      "Advanced": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      }
+    },
+    "Hematologic / Oncologic": {
+      "Foundations": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Clinical": {
+        "img": 3,
+        "manifest": 4,
+        "total": 7
+      },
+      "Advanced": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      }
+    },
+    "Musculoskeletal": {
+      "Foundations": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Clinical": {
+        "img": 1,
+        "manifest": 4,
+        "total": 5
+      },
+      "Advanced": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      }
+    },
+    "Psychiatric": {
+      "Foundations": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Clinical": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Advanced": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      }
+    },
+    "Toxicologic": {
+      "Foundations": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Clinical": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Advanced": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      }
+    },
+    "Trauma": {
+      "Foundations": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Clinical": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      },
+      "Advanced": {
+        "img": 0,
+        "manifest": 4,
+        "total": 4
+      }
+    }
+  },
+  "imgGaps": [
+    "stemi",
+    "nstemi",
+    "congestive heart failure",
+    "aortic stenosis",
+    "hypertrophic cardiomyopathy",
+    "dilated cardiomyopathy",
+    "pericardial effusion",
+    "myocarditis",
+    "endocarditis",
+    "pulmonary hypertension",
+    "pulmonary embolism",
+    "deep vein thrombosis",
+    "pleural effusion",
+    "copd",
+    "asthma",
+    "lung cancer",
+    "hemothorax",
+    "tuberculosis",
+    "sarcoidosis",
+    "interstitial lung disease",
+    "ards",
+    "acute appendicitis",
+    "pancreatitis",
+    "diverticulitis",
+    "cholecystitis",
+    "choledocholithiasis",
+    "crohn's disease",
+    "ulcerative colitis",
+    "peptic ulcer disease",
+    "colon cancer",
+    "brain tumor",
+    "meningitis",
+    "multiple sclerosis",
+    "brain abscess",
+    "hydrocephalus",
+    "spinal stenosis",
+    "herniated disc",
+    "kidney stone",
+    "pyelonephritis",
+    "renal cell carcinoma",
+    "polycystic kidney disease",
+    "ovarian cyst",
+    "acl tear",
+    "meniscus tear",
+    "rotator cuff tear",
+    "shoulder dislocation",
+    "hip fracture",
+    "ankle fracture",
+    "wrist fracture",
+    "spine fracture",
+    "osteomyelitis",
+    "septic arthritis",
+    "gout",
+    "osteoarthritis",
+    "rheumatoid arthritis",
+    "hodgkin lymphoma",
+    "multiple myeloma",
+    "abdominal aortic aneurysm",
+    "splenic laceration",
+    "traumatic brain injury",
+    "pneumoperitoneum",
+    "pelvic fracture",
+    "adrenal mass",
+    "thyroid nodule",
+    "pituitary adenoma",
+    "epiglottitis",
+    "lung abscess",
+    "liver abscess",
+    "intussusception",
+    "atrial fibrillation",
+    "traumatic aortic injury",
+    "exudative pleural effusion",
+    "pulmonary arterial hypertension",
+    "first unprovoked seizure",
+    "first episode psychosis",
+    "cerebral venous sinus thrombosis",
+    "reactive arthritis",
+    "adult-onset still's disease",
+    "dermatomyositis",
+    "polymyalgia rheumatica",
+    "antiphospholipid syndrome",
+    "systemic lupus erythematosus",
+    "compartment syndrome",
+    "rhabdomyolysis",
+    "abdominal compartment syndrome",
+    "fat embolism syndrome",
+    "membranous nephropathy",
+    "siadh",
+    "rhabdomyolysis with acute kidney injury",
+    "paroxysmal nocturnal hemoglobinuria",
+    "myelodysplastic syndrome",
+    "immune thrombocytopenia",
+    "vitamin b12 deficiency",
+    "warm autoimmune hemolytic anemia",
+    "sepsis",
+    "disseminated histoplasmosis",
+    "primary sclerosing cholangitis",
+    "carbon monoxide poisoning",
+    "methanol ingestion",
+    "organophosphate poisoning",
+    "wernicke's encephalopathy",
+    "lithium toxicity",
+    "serotonin syndrome",
+    "neuroleptic malignant syndrome",
+    "tricyclic antidepressant overdose",
+    "salicylate toxicity",
+    "digoxin toxicity",
+    "beta-blocker overdose",
+    "anticholinergic toxidrome",
+    "cyanide poisoning",
+    "benzodiazepine overdose",
+    "acetaminophen overdose",
+    "panic disorder",
+    "major depressive episode",
+    "bipolar i disorder",
+    "generalized anxiety disorder",
+    "ptsd",
+    "alcohol withdrawal syndrome",
+    "opioid use disorder",
+    "bipolar i disorder manic episode"
+  ],
+  "manifestGaps": []
+}

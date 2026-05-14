@@ -20,11 +20,18 @@ export default function NextCaseCard({
     reason = `Your ${w.name} avg is ${w.score}.`
   }
 
+  const tierClass = tier.toLowerCase()
+
   return (
     <div className="dx-next-card">
-      <div className="dx-next-eyebrow">Recommended next case</div>
+      <div className="dx-next-eyebrow">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" width="11" height="11" style={{ marginRight: 5, verticalAlign: 'middle', opacity: 0.8 }}>
+          <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+        </svg>
+        Recommended next case
+      </div>
       <h2 className="dx-next-headline">
-        {system} · <span className="dx-next-tier">{tier}</span>
+        {system} <span className={`dx-next-tier ${tierClass}`}>{tier}</span>
       </h2>
       <p className="dx-next-reason">{reason}</p>
       <Link

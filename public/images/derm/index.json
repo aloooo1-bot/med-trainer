@@ -1,0 +1,42 @@
+{
+  "melanoma": [
+    "melanoma_000.jpg",
+    "melanoma_001.jpg",
+    "melanoma_002.jpg",
+    "melanoma_003.jpg",
+    "melanoma_004.jpg",
+    "melanoma_005.jpg"
+  ],
+  "basal_cell": [
+    "basal_cell_000.jpg",
+    "basal_cell_001.jpg",
+    "basal_cell_002.jpg",
+    "basal_cell_003.jpg",
+    "basal_cell_004.jpg",
+    "basal_cell_005.jpg"
+  ],
+  "squamous_cell": [
+    "squamous_cell_000.jpg",
+    "squamous_cell_001.jpg",
+    "squamous_cell_002.jpg",
+    "squamous_cell_003.jpg",
+    "squamous_cell_004.jpg",
+    "squamous_cell_005.jpg"
+  ],
+  "nevus": [
+    "nevus_000.jpg",
+    "nevus_001.jpg",
+    "nevus_002.jpg",
+    "nevus_003.jpg",
+    "nevus_004.jpg",
+    "nevus_005.jpg"
+  ],
+  "normal": [
+    "normal_000.jpg",
+    "normal_001.jpg",
+    "normal_002.jpg",
+    "normal_003.jpg",
+    "normal_004.jpg",
+    "normal_005.jpg"
+  ]
+}

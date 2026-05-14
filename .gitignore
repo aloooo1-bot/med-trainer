@@ -62,3 +62,13 @@ scripts/datasets/smear/
 
 # Audit data — development only
 scripts/audit_results*.json
+
+# Case backup snapshots from scripts — not for version control
+scripts/backups/
+
+# Scratch files
+"Landing Page.html"
+Landing Page.html
+
+# Sentry Config File
+.env.sentry-build-plugin

@@ -1,0 +1,66 @@
+{
+  "malaria_falciparum/malaria_falciparum_000.png": {
+    "label": "Malaria — Plasmodium falciparum (parasitized red blood cells)",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "malaria_falciparum/malaria_falciparum_001.png": {
+    "label": "Malaria — Plasmodium falciparum (parasitized red blood cells)",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "malaria_falciparum/malaria_falciparum_002.png": {
+    "label": "Malaria — Plasmodium falciparum (parasitized red blood cells)",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "malaria_falciparum/malaria_falciparum_003.png": {
+    "label": "Malaria — Plasmodium falciparum (parasitized red blood cells)",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "malaria_falciparum/malaria_falciparum_004.png": {
+    "label": "Malaria — Plasmodium falciparum (parasitized red blood cells)",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "malaria_falciparum/malaria_falciparum_005.png": {
+    "label": "Malaria — Plasmodium falciparum (parasitized red blood cells)",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "malaria_falciparum/malaria_falciparum_006.png": {
+    "label": "Malaria — Plasmodium falciparum (parasitized red blood cells)",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "malaria_falciparum/malaria_falciparum_007.png": {
+    "label": "Malaria — Plasmodium falciparum (parasitized red blood cells)",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "normal/normal_000.png": {
+    "label": "Normal peripheral blood smear — uninfected red blood cells",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "normal/normal_001.png": {
+    "label": "Normal peripheral blood smear — uninfected red blood cells",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "normal/normal_002.png": {
+    "label": "Normal peripheral blood smear — uninfected red blood cells",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "normal/normal_003.png": {
+    "label": "Normal peripheral blood smear — uninfected red blood cells",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "normal/normal_004.png": {
+    "label": "Normal peripheral blood smear — uninfected red blood cells",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "normal/normal_005.png": {
+    "label": "Normal peripheral blood smear — uninfected red blood cells",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "normal/normal_006.png": {
+    "label": "Normal peripheral blood smear — uninfected red blood cells",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  },
+  "normal/normal_007.png": {
+    "label": "Normal peripheral blood smear — uninfected red blood cells",
+    "source": "NIH LHNCBC Malaria Cell Image Dataset (Rajaraman et al., 2018) — public domain"
+  }
+}

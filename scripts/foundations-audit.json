@@ -1,0 +1,526 @@
+[
+  {
+    "id": "respiratory-foundations-acute-asthma-exacerbation-2",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Asthma Exacerbation",
+    "structuralFlags": [
+      "Missing nativeDifficulty field",
+      "Missing differentialExplanations",
+      "Missing expectedLabs",
+      "Missing expectedImaging",
+      "Missing clinicalHpi",
+      "Missing advancedHpi",
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-foundations-opioid-toxidrome-0",
+    "system": "Toxicologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Opioid Toxidrome",
+    "structuralFlags": [
+      "advancedHpi too long: 28 words (max 20)",
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-foundations-hemorrhagic-shock-0",
+    "system": "Trauma",
+    "difficulty": "Foundations",
+    "diagnosis": "Hemorrhagic Shock",
+    "structuralFlags": [
+      "advancedHpi too long: 23 words (max 20)",
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-foundations-splenic-laceration-0",
+    "system": "Trauma",
+    "difficulty": "Foundations",
+    "diagnosis": "Splenic Laceration",
+    "structuralFlags": [
+      "advancedHpi too long: 21 words (max 20)",
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-foundations-sickle-cell-vaso-occlusive-crisis-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Sickle Cell Vaso-Occlusive Crisis",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "cardiovascular-foundations-atrial-fibrillation-with-rapid-ventricular-response-0",
+    "system": "Cardiovascular",
+    "difficulty": "Foundations",
+    "diagnosis": "Atrial Fibrillation with Rapid Ventricular Response",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-foundations-community-acquired-pneumonia-0",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Community-Acquired Pneumonia",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-foundations-acute-asthma-exacerbation-0",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Asthma Exacerbation",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-foundations-spontaneous-pneumothorax-0",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Spontaneous Pneumothorax",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "cardiovascular-foundations-st-elevation-myocardial-infarction-inferior-stemi-0",
+    "system": "Cardiovascular",
+    "difficulty": "Foundations",
+    "diagnosis": "ST-Elevation Myocardial Infarction (Inferior STEMI)",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "cardiovascular-foundations-hypertensive-emergency-0",
+    "system": "Cardiovascular",
+    "difficulty": "Foundations",
+    "diagnosis": "Hypertensive Emergency",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "neurologic-foundations-acute-ischemic-stroke-0",
+    "system": "Neurologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Ischemic Stroke",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "neurologic-foundations-bacterial-meningitis-0",
+    "system": "Neurologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Bacterial Meningitis",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "neurologic-foundations-migraine-with-aura-0",
+    "system": "Neurologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Migraine with Aura",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "gastrointestinal-foundations-acute-cholecystitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Cholecystitis",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-foundations-prerenal-acute-kidney-injury-0",
+    "system": "Renal",
+    "difficulty": "Foundations",
+    "diagnosis": "Prerenal Acute Kidney Injury",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-foundations-severe-hyperkalemia-0",
+    "system": "Renal",
+    "difficulty": "Foundations",
+    "diagnosis": "Severe Hyperkalemia",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "endocrine-metabolic-foundations-diabetic-ketoacidosis-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Foundations",
+    "diagnosis": "Diabetic Ketoacidosis",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "endocrine-metabolic-foundations-hypothyroidism-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Foundations",
+    "diagnosis": "Hypothyroidism",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "endocrine-metabolic-foundations-graves-disease-hyperthyroidism-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Foundations",
+    "diagnosis": "Graves' Disease (Hyperthyroidism)",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "endocrine-metabolic-foundations-severe-hypoglycemia-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Foundations",
+    "diagnosis": "Severe Hypoglycemia",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-foundations-sepsis-bacterial-urinary-source-0",
+    "system": "Infectious",
+    "difficulty": "Foundations",
+    "diagnosis": "Sepsis (Bacterial — Urinary Source)",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-foundations-cellulitis-0",
+    "system": "Infectious",
+    "difficulty": "Foundations",
+    "diagnosis": "Cellulitis",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "musculoskeletal-foundations-acute-gouty-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Gouty Arthritis",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "musculoskeletal-foundations-rheumatoid-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Foundations",
+    "diagnosis": "Rheumatoid Arthritis",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-foundations-panic-disorder-0",
+    "system": "Psychiatric",
+    "difficulty": "Foundations",
+    "diagnosis": "Panic Disorder",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-foundations-opioid-use-disorder-with-withdrawal-0",
+    "system": "Psychiatric",
+    "difficulty": "Foundations",
+    "diagnosis": "Opioid Use Disorder with Withdrawal",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-foundations-carbon-monoxide-poisoning-0",
+    "system": "Toxicologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Carbon Monoxide Poisoning",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-foundations-tension-pneumothorax-0",
+    "system": "Trauma",
+    "difficulty": "Foundations",
+    "diagnosis": "Tension Pneumothorax",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-foundations-epidural-hematoma-0",
+    "system": "Trauma",
+    "difficulty": "Foundations",
+    "diagnosis": "Epidural Hematoma",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "neurologic-foundations-first-unprovoked-seizure-0",
+    "system": "Neurologic",
+    "difficulty": "Foundations",
+    "diagnosis": "First Unprovoked Seizure",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "gastrointestinal-foundations-acute-appendicitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Appendicitis",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-foundations-meningococcal-meningitis-0",
+    "system": "Infectious",
+    "difficulty": "Foundations",
+    "diagnosis": "Meningococcal Meningitis",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-foundations-first-episode-psychosis-0",
+    "system": "Psychiatric",
+    "difficulty": "Foundations",
+    "diagnosis": "First-Episode Psychosis",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-foundations-acetaminophen-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Acetaminophen Overdose",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-foundations-benzodiazepine-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Benzodiazepine Overdose",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "cardiovascular-foundations-acute-heart-failure-exacerbation-0",
+    "system": "Cardiovascular",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Heart Failure Exacerbation",
+    "structuralFlags": [
+      "Foundations should have 2-3 differentials, got 5"
+    ],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-foundations-ureterolithiasis-ureteral-stone-0",
+    "system": "Renal",
+    "difficulty": "Foundations",
+    "diagnosis": "Ureterolithiasis (Ureteral Stone)",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "gastrointestinal-foundations-acute-pancreatitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Pancreatitis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-foundations-iron-deficiency-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Iron Deficiency Anemia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-foundations-deep-vein-thrombosis-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Deep Vein Thrombosis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-foundations-influenza-0",
+    "system": "Infectious",
+    "difficulty": "Foundations",
+    "diagnosis": "Influenza",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "musculoskeletal-foundations-lumbar-disc-herniation-with-radiculopathy-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Foundations",
+    "diagnosis": "Lumbar Disc Herniation with Radiculopathy",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-foundations-major-depressive-episode-0",
+    "system": "Psychiatric",
+    "difficulty": "Foundations",
+    "diagnosis": "Major Depressive Episode",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-foundations-pulmonary-embolism-0",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Pulmonary Embolism",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "gastrointestinal-foundations-peptic-ulcer-disease-with-upper-gi-bleed-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Foundations",
+    "diagnosis": "Peptic Ulcer Disease with Upper GI Bleed",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-foundations-acute-pyelonephritis-0",
+    "system": "Renal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Pyelonephritis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-foundations-immune-thrombocytopenia-itp-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Immune Thrombocytopenia (ITP)",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "musculoskeletal-foundations-osteoporotic-vertebral-compression-fracture-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Foundations",
+    "diagnosis": "Osteoporotic Vertebral Compression Fracture",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  }
+]

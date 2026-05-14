@@ -1,0 +1,1977 @@
+{
+  "generatedAt": "2026-05-06T03:23:27.719Z",
+  "sampleSize": 24,
+  "perCase": [
+    {
+      "id": "respiratory-foundations-spontaneous-pneumothorax-0",
+      "system": "Respiratory",
+      "difficulty": "Foundations",
+      "diagnosis": "Spontaneous Pneumothorax",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing management decision-making (observation vs. needle aspiration vs. chest tube) based on pneumothorax size and hemodynamic stability, as this is the core clinical action step learners must master for this diagnosis."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add aortic dissection as a differential with an explanation of why it is ruled out here, since acute severe pleuritic/tearing chest pain in a young male is a classic teaching scenario for distinguishing these two conditions."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on tension pneumothorax recognition and when to act before imaging — the tracheal deviation already present in this exam makes this a critical missed opportunity to teach the life-threatening progression and the rule that clinical diagnosis should precede chest X-ray when tension is suspected."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a targeted question about symptoms or features of Marfan syndrome (tall stature, arm span, lens dislocation, aortic root dilation) since the family history of spontaneous pneumothorax and ectomorphic habitus make screening for connective tissue disorders a high-yield teaching moment."
+          },
+          {
+            "severity": "low",
+            "area": "lab selection",
+            "suggestion": "Remove PEFR from available labs as it is not clinically indicated or teachable in the context of spontaneous pneumothorax and its presence without explanation may confuse foundational-level learners about appropriate workup selection."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Imaging Annotation Overlay",
+            "rationale": "Spontaneous pneumothorax is primarily a visual diagnosis — learners must identify the visceral pleural line, absent lung markings, and tracheal deviation on CXR. A guided annotation layer where learners can mark findings before seeing the answer would build image-reading pattern recognition that a simple lightbox cannot provide.",
+            "caseEvidence": "imagingCount of 9 in a pneumothorax case means multiple radiographs (CXR PA, lateral, possibly expiratory view) are central to the diagnosis, yet the platform currently only offers zoom — no active engagement with the image itself."
+          },
+          {
+            "name": "Auscultation Simulator",
+            "rationale": "Absent breath sounds on the affected side is the cardinal physical exam finding in pneumothorax. At Foundations level, learners have limited clinical exposure, making an interactive lung auscultation widget (click a chest zone → hear the sound) a high-yield substitute for bedside learning that directly reinforces the pathophysiology.",
+            "caseEvidence": "Foundations difficulty targets pre-clinical students; spontaneous pneumothorax has a pathognomonic auscultation finding that cannot be conveyed through text vitals or labs alone, and the case lacks derm/fundus/hematology imagery to anchor physical exam learning elsewhere."
+          },
+          {
+            "name": "Pathophysiology Diagram (Interactive)",
+            "rationale": "Foundations learners need to understand the mechanism — loss of negative intrapleural pressure, lung collapse, and potential tension progression — before they can reason about management. A collapsible, step-through animated diagram of pleural pressure dynamics would bridge the gap between memorization and conceptual understanding at this difficulty tier.",
+            "caseEvidence": "The case has only 3 differentials and 4 teaching points, suggesting a focused scope; a mechanism diagram would deepen understanding of the single diagnosis rather than broadening differential breadth, which is appropriate for Foundations level."
+          },
+          {
+            "name": "Management Decision Branch (Post-Diagnosis)",
+            "rationale": "Pneumothorax has a clinically critical management fork — observation vs. needle aspiration vs. chest tube — based on size, stability, and first vs. recurrent episode. Adding a post-diagnosis branching scenario where the learner selects an intervention and receives immediate consequence feedback (O2 sat trend, repeat imaging result) teaches the treatment algorithm that pure diagnostic grading misses.",
+            "caseEvidence": "The case has hasRelevantTests true and an ECG, implying hemodynamic monitoring context; spontaneous pneumothorax is one of the few emergency diagnoses where the post-diagnosis management decision is as educationally important as the diagnosis itself, yet the platform's grading axes stop at diagnosis accuracy and reasoning."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "imaging selection",
+            "reason": "With 9 imaging studies available for a Foundations-level case, students may over-order or struggle to prioritize chest X-ray as the key diagnostic step, especially given the large lab count (15) which may distract toward lab-first thinking despite imaging being definitively diagnostic for pneumothorax",
+            "confidence": "high"
+          },
+          {
+            "moment": "ordering labs vs. recognizing imaging sufficiency",
+            "reason": "10 lab groups across 15 labs creates a broad ordering surface that may lead students to exhaustively order labs before committing to imaging, when the correct Foundations-level approach should rapidly center on chest X-ray; the structural imbalance between lab depth and diagnostic simplicity creates a mismatch",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG interpretation role in workflow",
+            "reason": "The presence of an ECG in a Spontaneous Pneumothorax case may confuse Foundations students about its relevance — they may either over-weight it as a diagnostic clue or spend significant time on it trying to find meaning, when it likely serves only to rule out cardiac differentials; with only 3 differentials the narrow scope may not clearly signal why the ECG was ordered",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "local-fundus-hypertensive-0",
+      "system": "Cardiovascular",
+      "difficulty": "Clinical",
+      "diagnosis": "Grade III Hypertensive Retinopathy",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "physical exam",
+            "suggestion": "Add fundoscopic findings to the physical exam (e.g., describe AV nicking, flame-shaped hemorrhages, cotton-wool spots, hard exudates, and absence of disc edema) since dilated fundoscopy is the defining diagnostic examination for this case and its absence makes the physical exam incomplete for teaching retinopathy grading."
+          },
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a specific teaching point explaining the Keith-Wagener-Barker grading system in full (Grades I–IV with distinguishing features for each), not just Grade III vs. IV, so learners can apply the classification framework across presentations."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add hypertensive urgency versus hypertensive emergency as a differential consideration with explicit criteria distinguishing the two (e.g., presence vs. absence of acute end-organ damage), since this case's BP of 192/118 with visual symptoms makes this distinction the most clinically urgent teaching moment and it is currently buried in teaching points rather than featured as a differential."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a specific question probing for symptoms of hypertensive encephalopathy (e.g., 'Have you had any confusion, memory lapses, or episodes of feeling 'not yourself'?') to teach learners to actively screen for CNS end-organ damage before attributing findings solely to retinopathy."
+          },
+          {
+            "severity": "low",
+            "area": "lab selection",
+            "suggestion": "Add BNP to the expected labs list (it is currently available but not expected) given the hidden history of exertional dyspnea and the S4 gallop on exam, which together suggest hypertensive cardiac remodeling that warrants explicit workup and a corresponding teaching point."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Fundoscopy Interactive Grading Overlay",
+            "rationale": "Hypertensive retinopathy is diagnosed and staged primarily through fundoscopic findings (AV nicking, flame hemorrhages, papilledema, copper/silver wiring). A static image with zoom is insufficient; learners need to actively identify and annotate specific lesions to build pattern recognition and understand the Grade I–IV staging schema.",
+            "caseEvidence": "hasFundus: true, diagnosis is Grade III Hypertensive Retinopathy — the fundus image is the single most critical diagnostic artifact in this case and warrants interactive annotation beyond simple lightbox zoom"
+          },
+          {
+            "name": "Multi-Image Side-by-Side Comparison Viewer",
+            "rationale": "This case has 5 imaging studies, an ECG, fundus, and derm images spanning multiple modalities. Learners benefit from simultaneously comparing, e.g., the fundus alongside the ECG (LVH evidence) or chest X-ray (cardiomegaly/pulmonary edema) to understand how end-organ damage manifests across systems — a core competency in hypertensive emergency workup.",
+            "caseEvidence": "imagingCount: 5, hasECG: true, hasFundus: true, hasDerm: true — unusually high multi-modality image burden makes single-image sequential review pedagogically weak"
+          },
+          {
+            "name": "End-Organ Damage Mapping Widget",
+            "rationale": "Grade III Hypertensive Retinopathy exists within a broader hypertensive end-organ damage framework (retina, kidney, heart, brain). A post-submission visual map linking the patient's lab/imaging findings to affected organ systems would help learners synthesize why specific tests were ordered and how each result confirms or rules out target-organ involvement.",
+            "caseEvidence": "hasECG: true, hasUrine: true, hasHematology: true, labCount: 12 — the breadth of tests directly reflects multi-organ assessment; learners need scaffolding to connect these results into a unified end-organ damage picture"
+          },
+          {
+            "name": "Blood Pressure Staging Decision Tooltip",
+            "rationale": "Hypertensive retinopathy grading is tightly coupled to BP classification (JNC/ACC-AHA staging) and urgency triage (urgency vs. emergency). An inline, context-sensitive tooltip triggered when the student views vitals or submits diagnosis that maps the recorded BP to the staging rubric and explains the Grade III vs. Grade IV distinction would reinforce a critical and commonly confused clinical decision point.",
+            "caseEvidence": "diagnosis is Grade III Hypertensive Retinopathy — the grade boundary between III and IV (presence of papilledema) is a high-stakes clinical distinction not supported by any existing feature; vitals strip shows BP but provides no interpretive scaffolding"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "interpreting special images (fundoscopic/retinal imaging)",
+            "reason": "Grade III Hypertensive Retinopathy diagnosis depends critically on fundoscopic findings, but medical students rarely have robust training in reading retinal images within a cardiology workflow context — the unexpected presence of ophthalmic imaging in a cardiovascular case creates category confusion and interpretive uncertainty",
+            "confidence": "high"
+          },
+          {
+            "moment": "diagnosis submission with narrow differential",
+            "reason": "With only 4 differentials available, students may struggle to confidently distinguish Grade III from adjacent hypertensive retinopathy grades (II vs IV) or hypertensive emergency variants — the grading specificity of the diagnosis requires precise clinical reasoning that the limited differential set punishes if the student anchors incorrectly on systemic hypertensive sequelae",
+            "confidence": "high"
+          },
+          {
+            "moment": "prioritizing labs across 4 groups within the 22-minute timer",
+            "reason": "12 labs across 4 groups alongside ECG and biopsy creates a high cognitive load for triage — students may over-invest time ordering cardiac biomarkers or interpreting ECG (expected in a cardiovascular case) when the confirmatory path actually runs through imaging, causing timer-driven anxiety late in the workflow",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "img-MPX1896_synpic27389-advanced",
+      "system": "Respiratory",
+      "difficulty": "Advanced",
+      "diagnosis": "Congenital diaphragmatic hernia",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing ECMO candidacy criteria and the role of permissive hypercapnia/gentle ventilation strategy in CDH, as ventilator-induced lung injury from aggressive ventilation is a key preventable harm that advanced learners must recognize."
+          },
+          {
+            "severity": "high",
+            "area": "imaging",
+            "suggestion": "Add an expected echocardiogram to the expectedImaging list, since the teaching points already emphasize its necessity for assessing pulmonary hypertension and right-to-left shunting — its omission from expected studies creates a contradictory educational message."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add congenital lobar emphysema as a differential, as it presents with unilateral hyperinflation, mediastinal shift, and respiratory distress in neonates and requires differentiation from CDH on imaging — its absence is a notable gap for an advanced-level case."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on associated anomalies — specifically that CDH is associated with chromosomal abnormalities (trisomy 18, 13) and cardiac defects in 10–15% of cases — so learners understand why a full anomaly workup influences prognosis and surgical decision-making."
+          },
+          {
+            "severity": "low",
+            "area": "key questions",
+            "suggestion": "Add a question asking about the index of suspicion for pulmonary hypertension severity (e.g., pre- and post-ductal SpO2 gradient), as this specific clinical assessment is foundational to CDH management and is not currently prompted in the key questions."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Anatomical overlay viewer",
+            "rationale": "CDH involves complex spatial relationships between herniated abdominal organs and thoracic structures; an interactive diagram letting learners map which organs have herniated and identify mediastinal shift would reinforce the anatomical reasoning that distinguishes CDH from other neonatal respiratory diagnoses",
+            "caseEvidence": "imagingCount of 4 suggests chest X-ray and possibly upper GI series are central to diagnosis; CDH is a structural anomaly where spatial understanding is inseparable from diagnosis"
+          },
+          {
+            "name": "Serial imaging comparison tool",
+            "rationale": "CDH management (e.g., pre- vs post-stabilisation CXR, post-surgical repair) involves tracking radiographic changes over time; a side-by-side or slider-compare view for sequential images would help learners appreciate disease progression and treatment response in a way static lightbox zoom cannot",
+            "caseEvidence": "imagingCount of 4 combined with a congenital structural diagnosis where imaging is the primary diagnostic modality makes temporal image comparison uniquely high-value here"
+          },
+          {
+            "name": "Neonatal-specific vital signs interpreter",
+            "rationale": "Normal ranges for neonatal HR, RR, SpO2, and BP differ substantially from adult values; an inline reference overlay on the vitals strip that auto-flags values against age-appropriate neonatal norms (rather than generic adult thresholds) would prevent learners from misreading normal neonatal physiology as pathological or vice versa",
+            "caseEvidence": "CDH presents at or shortly after birth, so all vitals must be interpreted against neonatal reference ranges; the existing vitals strip highlighting is adult-calibrated and would be misleading in this case"
+          },
+          {
+            "name": "Management decision branching",
+            "rationale": "CDH requires sequenced stabilisation decisions (permissive hypercapnia, avoiding bag-mask ventilation, HFOV vs conventional ventilation, timing of surgical repair) before and after diagnosis; a post-diagnosis decision tree where learners select and are graded on initial management steps would extend learning beyond diagnosis accuracy into acute neonatal management, which is the primary Advanced-level skill gap in this condition",
+            "caseEvidence": "Advanced difficulty and a diagnosis with high-stakes, counterintuitive acute management (e.g., avoiding bag-mask) that is not captured by the existing 5-dimension scoring rubric"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "imaging interpretation — distinguishing bowel loops in chest on X-ray/CT",
+            "reason": "CDH's hallmark finding (herniated abdominal viscera appearing as chest masses or air-fluid loops) is visually atypical and can be misread as pneumothorax, pleural effusion, or complex lung pathology; students unfamiliar with neonatal or congenital presentations are likely to anchor on more common respiratory diagnoses when interpreting the 4 imaging studies",
+            "confidence": "high"
+          },
+          {
+            "moment": "diagnosis submission with only 4 differentials available",
+            "reason": "CDH sits in an unusual diagnostic neighborhood — students may spend time considering tension pneumothorax, cystic adenomatoid malformation, or pleural effusion and struggle to confidently narrow to CDH without a clear elimination pathway; a constrained 4-option differential means one wrong anchor can crowd out the correct diagnosis, especially if imaging friction already pushed them toward a competing option",
+            "confidence": "high"
+          },
+          {
+            "moment": "lab ordering strategy across 5 lab groups within a 15-minute timer",
+            "reason": "With 12 labs spread across 5 groups and an ECG available, students may over-order (chasing a cardiac or metabolic cause suggested by the ECG option) or under-order by skipping blood gas panels that are critical for confirming the respiratory failure pattern in CDH; the ECG's presence in a congenital respiratory case creates a plausible but misleading cardiac workup branch that consumes time",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cardiovascular-clinical-acute-pericarditis-0",
+      "system": "Cardiovascular",
+      "difficulty": "Clinical",
+      "diagnosis": "Acute Pericarditis",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly describing the four-stage ECG evolution of acute pericarditis (Stage I: diffuse ST elevation with PR depression; Stage II: ST normalization; Stage III: T-wave inversions; Stage IV: normalization), as ECG interpretation is a core skill tested in this diagnosis and is only vaguely referenced in the current points."
+          },
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on recognizing cardiac tamponade as a feared complication of pericarditis, including the Beck's triad, significance of pulsus paradoxus >10 mmHg, and the echocardiographic findings that would prompt urgent pericardiocentesis, since tamponade recognition is a critical safety milestone for learners at this level."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add aortic dissection as a differential with a specific explanation distinguishing it from pericarditis via pain character (tearing, maximal at onset, no positional variation), pulse differentials, widened mediastinum on CXR, and CT angiography findings, since anterior chest pain radiating to the shoulder in a young male mandates its consideration."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a direct question about NSAID or aspirin use before presentation (dose, duration, GI tolerance), since prior self-treatment affects both diagnostic interpretation of inflammation markers and guides safe first-line therapy selection, particularly given this patient's documented GI intolerance to ibuprofen."
+          },
+          {
+            "severity": "low",
+            "area": "lab selection",
+            "suggestion": "Add Comprehensive Metabolic Panel to the expected labs list and explicitly note that checking bicarbonate and anion gap is required in this T1DM patient to exclude DKA, since it is listed as available and is directly referenced in teaching point #3 but is absent from the expected workup."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "ECG Annotation Tool",
+            "rationale": "Acute pericarditis has pathognomonic ECG findings (diffuse ST elevation, PR depression, saddle-shaped morphology) that are frequently misread by learners. An interactive overlay allowing students to click/annotate waveform segments and label findings—with AI feedback on correctness—would transform passive ECG viewing into an active diagnostic skill.",
+            "caseEvidence": "hasECG: true; diagnosis of Acute Pericarditis where ECG interpretation is a critical discriminating step separating it from STEMI and other ST-elevation mimics"
+          },
+          {
+            "name": "Serial Test Trending Panel",
+            "rationale": "Pericarditis workup involves tracking inflammatory markers (CRP, ESR, troponin) and interpreting trends over time. A timeline view showing ordered labs plotted as trend lines, with annotations on clinical significance of rising/falling values, would teach pattern recognition that a single static result cannot convey.",
+            "caseEvidence": "labCount: 19 with a diagnosis where serial inflammatory markers and troponin trending are central to confirming diagnosis and ruling out myopericarditis"
+          },
+          {
+            "name": "Differential Elimination Walkthrough",
+            "rationale": "With only 4 differentials but a diagnosis easily confused with STEMI, myocarditis, and pleuritis, a post-grading interactive step-through that asks students to identify which single finding rules out each competing diagnosis reinforces the discriminating logic rather than just listing explanations.",
+            "caseEvidence": "differentialCount: 4; Acute Pericarditis shares overlapping features with life-threatening mimics (STEMI), making the elimination reasoning process as educationally important as the final answer"
+          },
+          {
+            "name": "Imaging Modality Comparison Viewer",
+            "rationale": "Pericarditis cases often include echocardiography alongside chest X-ray and possibly CT, each contributing different diagnostic information. A side-by-side split viewer that lets students place two imaging results adjacent and annotate corresponding structures would teach multi-modal integration—a skill unavailable when images are viewed sequentially in isolation.",
+            "caseEvidence": "imagingCount: 5 across a cardiovascular case where echo (pericardial effusion), CXR (cardiomegaly), and CT findings all contribute complementary diagnostic value"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "ECG interpretation",
+            "reason": "Acute Pericarditis has a pathognomonic but easily misread ECG pattern (diffuse ST elevation with PR depression) that students often confuse with STEMI or early repolarization; the case structure confirms ECG presence and a tight 22-minute timer, increasing the chance students anchor on MI differentials and waste time on unnecessary cardiac enzyme ordering rather than pivoting to the pericarditis pattern",
+            "confidence": "high"
+          },
+          {
+            "moment": "Navigating 12 lab groups across 19 labs",
+            "reason": "With 12 lab groups containing only 19 total labs, many groups likely contain 1-2 labs each, meaning students must open numerous panels to find clinically relevant values (e.g., ESR, CRP, troponin); the scattered panel structure under time pressure creates decision fatigue about which groups to prioritize, and students may miss inflammatory markers if they anchor on cardiac panels first",
+            "confidence": "high"
+          },
+          {
+            "moment": "Differential submission with only 4 options",
+            "reason": "A 4-item differential for Acute Pericarditis likely includes close mimics like STEMI, myocarditis, and pleuritis — diagnoses that share overlapping symptom profiles and lab findings; students who misread the ECG or under-weight the inflammatory markers may submit a cardiac ischemia diagnosis confidently, not recognizing the narrow but critical distinctions the case is testing",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "img-MPX1723_synpic34922-advanced",
+      "system": "Neurologic",
+      "difficulty": "Advanced",
+      "diagnosis": "Subarachnoid hemorrhage",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly explaining the LP xanthochromia interpretation: xanthochromia (yellow discoloration due to oxyhemoglobin/bilirubin) distinguishes true SAH from a traumatic tap, and spectrophotometry is more sensitive than visual inspection alone, as this is a critical decision point frequently tested at the advanced level."
+          },
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on the Hunt and Hess or World Federation of Neurosurgical Societies (WFNS) grading scale for SAH severity, as grading directly guides prognosis and management decisions (e.g., timing of aneurysm securing, ICU disposition) and is essential knowledge for an advanced-level case."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a key question asking about use of sympathomimetic substances (cocaine, amphetamines, energy drinks) and sexual activity at headache onset, as these are important precipitants of thunderclap headache and aneurysm rupture that distinguish SAH from RCVS and are not addressed anywhere in the case."
+          },
+          {
+            "severity": "medium",
+            "area": "physical exam",
+            "suggestion": "Add Kernig's sign to the neurological or neck examination findings, as it is a paired classical meningeal sign with Brudzinski's and its presence or absence should be explicitly documented to model complete SAH physical assessment for learners."
+          },
+          {
+            "severity": "low",
+            "area": "differentials",
+            "suggestion": "Add hypertensive emergency with hypertensive encephalopathy as a differential given the BP of 182/98, prior hypertension non-adherence, and severe headache, with an explanation of why the thunderclap onset, meningismus, and CT findings distinguish it from SAH, reinforcing BP management nuance in this case."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Fundoscopic Finding Annotation Layer",
+            "rationale": "Subarachnoid hemorrhage classically produces subhyaloid (preretinal) hemorrhages on fundoscopy — a finding many learners miss or misinterpret. An interactive annotation layer overlaid on the fundus image would let learners tap/click suspected findings, receive AI-labeled confirmations (e.g., 'subhyaloid hemorrhage at 7 o'clock'), and understand why this finding directly implicates elevated ICP. This transforms the fundus image from a passive exhibit into an active diagnostic reasoning step.",
+            "caseEvidence": "hasFundus: true in a subarachnoid hemorrhage case — the fundoscopic findings here are pathognomonic and high-yield but require guided interpretation that a plain image zoom cannot provide"
+          },
+          {
+            "name": "Time-Critical Escalation Simulator",
+            "rationale": "SAH is a neurosurgical emergency where delays in recognition and intervention directly worsen outcomes. A branching decision-prompt — triggered mid-case when key danger signs appear (thunderclap onset, Hunt-Hess grade indicators, abnormal vitals) — would ask the learner to choose a disposition or escalation action (e.g., 'Activate stroke team now / Order LP first / Await CT result'). Correct vs. incorrect choices would not halt the case but would appear in post-case feedback as a 'time-to-escalation' axis, reinforcing emergency triage behavior.",
+            "caseEvidence": "Diagnosis is subarachnoid hemorrhage — a time-sensitive emergency; hasRelevantTests: true and imagingCount: 5 suggest a rich decision tree around CT non-contrast → LP → CTA sequencing that learners should be held accountable for"
+          },
+          {
+            "name": "ECG–Neuro Correlation Callout",
+            "rationale": "SAH produces characteristic ECG changes (diffuse deep T-wave inversions, QTc prolongation, Wellens-like morphology) driven by catecholamine surge, which learners routinely misattribute to primary cardiac disease. A post-ECG-order callout panel — separate from the standard image zoom — would prompt the learner to classify the ECG abnormality and then answer a single forced-choice question: 'Does this change alter your primary diagnosis?' with an AI-explained rationale regardless of answer. This prevents anchoring to a cardiac diagnosis while teaching neuro-cardiac coupling.",
+            "caseEvidence": "hasECG: true combined with diagnosis of subarachnoid hemorrhage — the ECG in this case is a deliberate red-herring/teaching tool whose educational value is lost without a structured interpretation checkpoint"
+          },
+          {
+            "name": "Graded Imaging Sequence Enforcer",
+            "rationale": "The diagnostic imaging pathway in SAH (non-contrast CT → LP if CT negative → CT angiography for aneurysm localization) is a critical clinical algorithm. With 5 imaging studies available, learners may order CTA before non-contrast CT or skip LP logic entirely. A sequencing audit in the post-case score breakdown would flag out-of-order imaging choices, explain the evidence-based rationale for each step's position in the workup, and deduct efficiency points for unsafe ordering patterns — distinct from the existing test-ordering score which only assesses whether tests were ordered, not in what order.",
+            "caseEvidence": "imagingCount: 5 in a subarachnoid hemorrhage case directly maps to the multi-step CT/LP/CTA algorithm; the existing test-ordering dimension scores selection but not sequence, leaving a critical reasoning gap for this specific case type"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "imaging interpretation — distinguishing CT head findings",
+            "reason": "SAH diagnosis hinges on non-contrast CT head showing hyperdense cisterns, but with 5 imaging studies including special images, students must correctly prioritize and interpret the critical CT finding among multiple images; advanced students may over-anchor on MRI or angiography findings and misread the sequence of diagnostic importance",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG ordering and interpretation in the context of neurologic workup",
+            "reason": "SAH classically produces ECG changes (peaked T-waves, QTc prolongation, deep T inversions) that mimic cardiac pathology; students encountering an ECG in a neurologic case may incorrectly pivot toward a cardiac differential or fail to contextualize the ECG as a neurologic sequela, stalling their diagnostic momentum with 15 minutes on the clock",
+            "confidence": "high"
+          },
+          {
+            "moment": "differential narrowing across 4 diagnoses under time pressure",
+            "reason": "With 13 ROS categories to unlock and only 15 minutes, students must decide when to stop gathering history and commit to labs/imaging; SAH mimics — including hypertensive emergency, meningitis, and migraine — require specific lab and imaging combinations to exclude, and students may struggle to efficiently allocate remaining time between ROS completion and the high-yield CT/LP decision",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "musculoskeletal-clinical-lumbar-disc-herniation-with-radiculopathy-0",
+      "system": "Musculoskeletal",
+      "difficulty": "Clinical",
+      "diagnosis": "Lumbar Disc Herniation with Radiculopathy",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing the initial management algorithm for lumbar disc herniation with radiculopathy — specifically that most cases (>90%) resolve within 6–12 weeks with conservative care (NSAIDs, activity modification, physical therapy), and that MRI is not routinely indicated in the first 4–6 weeks unless red flags are present."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add epidural abscess or discitis as a differential with an explanation distinguishing it from disc herniation (fever, elevated ESR/CRP, insidious onset, IV drug use or recent infection history), since this case includes inflammatory markers in the expected labs and the distinction is a critical safety teaching point."
+          },
+          {
+            "severity": "medium",
+            "area": "hpi clarity",
+            "suggestion": "The advancedHpi field ('42yo male with low back pain. Works in a warehouse and recently started ibuprofen.') is severely underdeveloped for a clinical-difficulty case — expand it to include the radicular distribution, dermatomal pattern, and aggravating/relieving factors to maintain educational consistency across HPI display levels."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explaining the anatomical basis for why L5-S1 herniation compresses S1 (not L5) — specifically that the traversing nerve root, not the exiting root, is compressed by a posterolateral disc herniation, which is a commonly tested and frequently misunderstood concept."
+          },
+          {
+            "severity": "low",
+            "area": "lab selection",
+            "suggestion": "Add Hemoglobin A1c or fasting glucose to the available labs panel and include it as a consideration in the teaching content, since peripheral neuropathy from undiagnosed diabetes is a clinically important mimicker of S1 radiculopathy that learners should be prompted to exclude."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Anatomical Localization Mapper",
+            "rationale": "Lumbar disc herniation requires students to correlate dermatomal/myotomal patterns with specific spinal levels; an interactive spine diagram where students map their suspected lesion level (L4-L5, L5-S1, etc.) before diagnosis submission reinforces the spatial reasoning central to radiculopathy workup",
+            "caseEvidence": "Diagnosis is Lumbar Disc Herniation with Radiculopathy — a condition defined by anatomical level localization that cannot be adequately assessed through text-based diagnosis input alone"
+          },
+          {
+            "name": "Physical Exam Builder",
+            "rationale": "Musculoskeletal and neurological cases hinge on physical examination findings (straight leg raise, reflex grading, dermatomal sensory testing, motor strength) that are entirely absent from the current chat-and-labs workflow; a structured PE ordering panel analogous to test ordering would let students select and receive findings for specific maneuvers, scoring their exam efficiency",
+            "caseEvidence": "Radiculopathy diagnosis is primarily clinical — SLR, crossed SLR, reflexes, and myotomal weakness are the cardinal findings — yet no PE-ordering feature exists to simulate this critical step"
+          },
+          {
+            "name": "Imaging Annotation Tool",
+            "rationale": "MRI and X-ray interpretation for disc herniation requires students to identify the herniation level, laterality, and degree of canal/foraminal compromise; allowing students to mark and label findings on the imaging before seeing the graded result tests image interpretation as a discrete skill",
+            "caseEvidence": "imagingCount of 4 in a disc herniation case almost certainly includes lumbar MRI/X-ray where level identification and herniation characterization are the primary learning objectives"
+          },
+          {
+            "name": "Management Plan Submitter",
+            "rationale": "Lumbar disc herniation has a well-defined stepwise management pathway (conservative care, epidural steroid injection, surgical referral criteria) with clear red-flag escalation triggers; a post-diagnosis management ordering step where students select initial interventions and receive feedback would extend learning beyond diagnosis to the clinical decision-making that dominates real outpatient MSK encounters",
+            "caseEvidence": "differentialCount of only 3 and a straightforward diagnosis suggests the case complexity lies in management nuance (when to image, when to refer, when to inject) rather than diagnostic uncertainty, making management assessment the highest-value untapped dimension"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "ordering labs from a large, ungrouped pool",
+            "reason": "With 14 labs across 10 groups and a musculoskeletal radiculopathy case, students will struggle to justify lab ordering relevance — most labs are low-yield for this diagnosis, creating decision paralysis about which groups to open and risking time waste on a 22-minute timer",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG interpretation and relevance recognition",
+            "reason": "An ECG is structurally unexpected in a lumbar disc herniation case; students will likely spend disproportionate cognitive effort trying to integrate cardiac findings into a musculoskeletal differential, causing confusion about whether a cardiac red herring is intentional or whether they are missing a systemic diagnosis",
+            "confidence": "high"
+          },
+          {
+            "moment": "ROS unlock across 13 categories",
+            "reason": "With 13 ROS categories and a focused musculoskeletal/neurological presentation, students must decide which non-obvious systems (e.g., GI, GU, constitutional) are worth unlocking under time pressure — the breadth relative to the narrow diagnosis creates friction about scope versus efficiency, especially with only 22 minutes",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "respiratory-advanced-spontaneous-pneumothorax-0",
+      "system": "Respiratory",
+      "difficulty": "Advanced",
+      "diagnosis": "Spontaneous Pneumothorax",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly covering the management decision algorithm (observation vs. aspiration vs. chest tube) based on pneumothorax size, symptoms, and stability, as this is the core clinical decision-making skill at the advanced level and is entirely absent."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add aortic dissection as a differential diagnosis, since it presents with acute severe chest pain in a young tall male and is a critical life-threatening diagnosis that must be excluded in this demographic before attributing symptoms to pneumothorax."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point addressing the significance of tracheal deviation and when its presence should prompt urgent intervention for tension pneumothorax without waiting for imaging, including the clinical threshold for needle decompression."
+          },
+          {
+            "severity": "medium",
+            "area": "hpi clarity",
+            "suggestion": "The hidden history mentions marijuana vaping as a relevant exposure, but this is never surfaced in the clinical or advanced HPI — include vaping history as an elicitable detail in the presented HPI since it is an increasingly recognized risk factor for bleb formation and pneumothorax that learners should actively associate with this presentation."
+          },
+          {
+            "severity": "low",
+            "area": "key questions",
+            "suggestion": "Add a question asking about symptoms of Marfan syndrome features (lens dislocation, arm span, joint hypermobility) given the documented family history of spontaneous pneumothorax, which should prompt learners to screen for connective tissue disorders that increase recurrence risk and alter long-term management."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Breath Sound Auscultation Simulator",
+            "rationale": "Spontaneous pneumothorax is classically diagnosed in part by absent or diminished breath sounds on the affected side; an interactive auscultation tool (anterior, lateral, posterior lung zones) would train learners to correlate physical exam findings with imaging and reinforce why early clinical suspicion matters before imaging is ordered",
+            "caseEvidence": "The diagnosis is Spontaneous Pneumothorax — a condition where auscultation findings are a cornerstone of bedside diagnosis, yet no physical exam simulation exists beyond static vitals"
+          },
+          {
+            "name": "Imaging Interpretation Annotation Tool",
+            "rationale": "With 9 imaging studies, learners are passively viewing results; an annotation layer where students must identify and mark the visceral pleural line, mediastinal shift, or lung collapse on the CXR/CT before the AI-generated result is revealed would transform passive review into active radiological reasoning",
+            "caseEvidence": "imagingCount of 9 is high for this case type, and pneumothorax diagnosis is heavily imaging-dependent — correct identification of the pleural line is a discrete, teachable visual skill that current image zoom alone does not assess"
+          },
+          {
+            "name": "Management Decision Branch",
+            "rationale": "Spontaneous pneumothorax has a critical post-diagnosis management fork — observation vs. needle aspiration vs. chest tube — that varies by size, hemodynamic stability, and patient type (primary vs. secondary); a post-diagnosis decision tree with AI feedback on management selection would extend learning beyond diagnosis accuracy into clinical decision-making",
+            "caseEvidence": "The differential count is only 3 and the diagnosis is relatively identifiable, meaning the higher learning value for Advanced students lies in what happens after the diagnosis, not before it"
+          },
+          {
+            "name": "Serial Exam Snapshots (Dynamic Case State)",
+            "rationale": "Pneumothorax can progress to tension pneumothorax if unrecognized; timed clinical deterioration snapshots — e.g., repeat vitals showing worsening tachycardia and hypotension at a defined interval — would teach learners to recognize a time-critical trajectory and prompt urgency, rewarding early correct diagnosis with a stable endpoint and penalizing delay with a deteriorating one",
+            "caseEvidence": "The case has a 15-min Advanced timer, hasECG true (ECG changes can accompany tension physiology), and abnormal-value highlighting in the vitals strip — the infrastructure supports dynamic state changes that could simulate real clinical urgency"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "imaging selection and interpretation",
+            "reason": "With 9 imaging options available, students must identify the chest X-ray as the critical diagnostic tool for pneumothorax while potentially being drawn to pursue CT or other modalities first; the visually subtle pleural line on a pneumothorax image is a known advanced-level perceptual challenge that may cause students to miss or misinterpret the finding under time pressure",
+            "confidence": "high"
+          },
+          {
+            "moment": "lab ordering triage under time constraint",
+            "reason": "15 labs across 10 groups in a 15-minute timer creates a prioritization trap — spontaneous pneumothorax is primarily an imaging diagnosis, so students who default to extensive lab ordering (ABG, CBC, BMP) before imaging will burn significant time on low-yield data, reflecting a mismatch between lab-heavy case architecture and the clinical reality that labs don't confirm this diagnosis",
+            "confidence": "high"
+          },
+          {
+            "moment": "differential narrowing with only 3 slots",
+            "reason": "Spontaneous pneumothorax at Advanced difficulty sits within a competitive differential including PE and acute asthma/COPD exacerbation, all sharing dyspnea and pleuritic chest pain; with only 3 differential slots and an ECG present (which may suggest PE is a plausible decoy), students may struggle to commit to pneumothorax over PE before imaging confirms it, risking premature or misordered differential submission",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hematologic-oncologic-foundations-immune-thrombocytopenia-itp-0",
+      "system": "Hematologic / Oncologic",
+      "difficulty": "Foundations",
+      "diagnosis": "Immune Thrombocytopenia (ITP)",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly explaining the diagnostic criteria and platelet threshold for treatment initiation in ITP (e.g., observation for platelets >30,000 without bleeding vs. treatment for <30,000 or significant mucosal/systemic bleeding), as the current points jump from diagnosis to treatment without this critical decision-making framework."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add Systemic Lupus Erythematosus (SLE) as a differential since this is a young woman with thrombocytopenia, an ANA is available in the lab panel, the family history includes autoimmune disease, and secondary ITP from SLE is a clinically essential distinction to teach at any level."
+          },
+          {
+            "severity": "medium",
+            "area": "lab selection",
+            "suggestion": "Add HIV 1/2 Antigen/Antibody Combination and Hepatitis C Antibody to the expected labs list, as these are guideline-recommended screening tests in newly diagnosed ITP to exclude secondary causes and their omission teaches incomplete workup habits."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point describing the clinical features that should prompt urgent bone marrow biopsy (e.g., age >60, abnormal WBC or RBC indices, failure to respond to first-line therapy) to help learners understand when ITP as a diagnosis of exclusion requires further investigation beyond standard labs."
+          },
+          {
+            "severity": "low",
+            "area": "hpi clarity",
+            "suggestion": "Specify the platelet count or anticipated lab result range in the case narrative or a structured 'expected findings' section so learners can connect the clinical presentation to a quantitative severity tier (severe <20k, moderate 20–50k, mild 50–100k) rather than leaving this entirely implicit."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Interactive Blood Smear Annotator",
+            "rationale": "ITP is a hematologic diagnosis heavily reliant on peripheral blood smear interpretation (thrombocytopenia, normal morphology, large platelets). A zoomable, annotatable smear where learners tap/click to identify cell types and get instant feedback would build foundational morphology recognition skills critical for heme/onc cases.",
+            "caseEvidence": "hasHematology: true combined with Foundations difficulty and ITP diagnosis — learners at this level need guided visual interpretation of smear findings rather than just a static image"
+          },
+          {
+            "name": "Pathophysiology Diagram Overlay",
+            "rationale": "At Foundations level, learners benefit from seeing the mechanism of disease mapped visually (e.g., anti-GPIb/IIb antibody → splenic macrophage destruction → thrombocytopenia). An unlockable post-diagnosis interactive flowchart linking pathophysiology to clinical findings reinforces conceptual understanding beyond factual recall.",
+            "caseEvidence": "Foundations difficulty with only 3 differentials and 4 teaching points suggests a knowledge-building rather than diagnostic-pressure context, making mechanistic visualization high-value for this audience"
+          },
+          {
+            "name": "Bleeding Risk Decision Aid Module",
+            "rationale": "ITP management hinges on platelet count thresholds and bleeding phenotype to decide observation vs. treatment. A structured post-diagnosis decision-tree exercise (e.g., 'Given plt 18k + petechiae, which intervention is indicated?') would teach the clinical decision framework that is otherwise absent from the diagnostic-only workflow.",
+            "caseEvidence": "hasDerm: true (petechiae/purpura visible) + ITP diagnosis where treatment thresholds are a core learning objective that pure diagnosis scoring does not capture"
+          },
+          {
+            "name": "Lab Trend Animator",
+            "rationale": "ITP cases often involve serial CBC monitoring to confirm isolated thrombocytopenia and exclude other cytopenias. An animated timeline showing how platelet counts change over simulated days — and prompting the learner to interpret the trend — teaches longitudinal hematologic reasoning not captured by single-timepoint lab ordering.",
+            "caseEvidence": "labCount: 21 with hasHematology: true suggests a rich lab dataset; at Foundations level, understanding what isolated thrombocytopenia looks like across time is a key competency for distinguishing ITP from TTP, HUS, or marrow failure"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "Lab ordering and interpretation",
+            "reason": "With 21 labs across 12 groups, a Foundations-level student may struggle to identify which panels are essential for ITP (CBC with differential, peripheral smear) versus noise. The absence of biopsy shifts diagnostic weight entirely to labs, increasing decision paralysis about what to order first.",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG interpretation in a hematologic case",
+            "reason": "The presence of an ECG in an ITP case is structurally unexpected — students at Foundations level may fixate on it, attempting to reconcile cardiac findings with a thrombocytopenia workup, wasting time or deriving false diagnostic leads.",
+            "confidence": "high"
+          },
+          {
+            "moment": "Diagnosis submission with only 3 differentials",
+            "reason": "ITP requires ruling out secondary causes (SLE, medication-induced, TTP), and a constrained 3-differential list forces early commitment. Foundations students may be unfamiliar with ITP as a diagnosis of exclusion and may prematurely submit a competing diagnosis before completing the lab workup.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "local-urine-uti-0",
+      "system": "Renal",
+      "difficulty": "Foundations",
+      "diagnosis": "Acute Uncomplicated Cystitis (UTI)",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing when urine culture IS indicated (e.g., recurrent UTIs, treatment failure, atypical symptoms) to help learners understand the nuance beyond 'not routinely required.'"
+          },
+          {
+            "severity": "high",
+            "area": "lab selection",
+            "suggestion": "Remove CBC, BMP, and CRP from expectedLabs — ordering these for a classic uncomplicated cystitis case models poor clinical reasoning and resource stewardship; only urinalysis with reflex culture, GC/chlamydia NAAT, and pregnancy test are defensible here."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a question about prior antibiotic use or recent antibiotic exposure in the past 3 months, which directly informs empiric antibiotic selection due to trimethoprim-sulfamethoxazole resistance patterns."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on the role of urine pregnancy test before prescribing nitrofurantoin or TMP-SMX, as both have gestational contraindications, especially relevant in a sexually active woman of reproductive age."
+          },
+          {
+            "severity": "low",
+            "area": "differentials",
+            "suggestion": "Add interstitial cystitis/bladder pain syndrome as a differential to teach learners to consider non-infectious etiologies when symptoms are recurrent or fail to resolve with antibiotics."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Urinalysis Visual Interpreter",
+            "rationale": "Foundations learners benefit from seeing a visual dipstick or microscopy strip with color-coded result fields (leukocyte esterase, nitrites, WBC casts, etc.) mapped to pathophysiology callouts, bridging the gap between raw lab values and clinical meaning before they can synthesize findings independently.",
+            "caseEvidence": "hasUrine: true on a Foundations-difficulty UTI case — urinalysis is the cornerstone diagnostic test here, yet novice learners often lack the scaffolding to interpret dipstick and microscopy patterns without guidance"
+          },
+          {
+            "name": "Anatomy Hotspot Overlay",
+            "rationale": "For Foundations renal cases, annotating a labeled diagram of the urinary tract (bladder, urethra, ureters, kidneys) with hotspot tags that light up as relevant symptoms or findings are introduced would anchor pathophysiology spatially — critical for learners who haven't yet built a mental model of the system.",
+            "caseEvidence": "system: Renal + difficulty: Foundations + diagnosis: Acute Uncomplicated Cystitis — the disease is anatomically localized and Foundations learners need spatial context to distinguish cystitis from pyelonephritis or urethritis"
+          },
+          {
+            "name": "Guided Differential Elimination Coach",
+            "rationale": "With only 3 differentials and 5 key questions, this compact case is ideal for teaching learners *how* to actively rule out diagnoses using specific findings. A step-by-step coach that asks 'What single finding most helped you eliminate [differential]?' immediately post-diagnosis — before final feedback — would build systematic reasoning habits at the Foundations level.",
+            "caseEvidence": "differentialCount: 3 + keyQuestionCount: 5 + difficulty: Foundations — the narrow differential makes it pedagogically tractable to train explicit elimination reasoning without overwhelming a novice"
+          },
+          {
+            "name": "Redundant Test Flag with Cost Annotation",
+            "rationale": "This case has an ECG, biopsy gate, derm, fundus, hematology, and imaging alongside a straightforward UTI diagnosis — creating a rich opportunity to teach test stewardship. A post-submission flag that highlights ordered tests irrelevant to the working diagnosis, annotated with relative cost or radiation exposure, would teach Foundations learners to match test selection to clinical context.",
+            "caseEvidence": "labCount: 10 + imagingCount: 3 + hasECG: true + hasBiopsy: true + hasFundus: true on a Foundations-level uncomplicated cystitis — the breadth of available tests far exceeds what is clinically indicated, making over-ordering a likely novice pitfall"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "ordering ECG and biopsy for a UTI case",
+            "reason": "An ECG and biopsy are structurally available but clinically irrelevant for acute uncomplicated cystitis; foundations-level students may feel compelled to order them to be thorough, wasting time and creating decision paralysis about whether these are needed or red herrings",
+            "confidence": "high"
+          },
+          {
+            "moment": "ROS unlock across 13 categories",
+            "reason": "13 ROS categories is substantial for a foundations-level case with a straightforward diagnosis; students may over-investigate constitutional, cardiac, and neurological categories looking for complicating factors that don't exist, slowing workflow significantly",
+            "confidence": "high"
+          },
+          {
+            "moment": "navigating 3 imaging studies for an uncomplicated lower UTI",
+            "reason": "Imaging is typically not indicated for acute uncomplicated cystitis; the presence of 3 imaging options (possibly including special images) may confuse foundations students who haven't yet internalized that imaging is unnecessary here, leading them to order all three before feeling confident enough to submit a diagnosis",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hematologic-oncologic-advanced-paroxysmal-nocturnal-hemoglobinuria-0",
+      "system": "Hematologic / Oncologic",
+      "difficulty": "Advanced",
+      "diagnosis": "Paroxysmal Nocturnal Hemoglobinuria",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "key questions",
+            "suggestion": "Add a key question specifically eliciting erectile dysfunction and prior dysphagia as smooth muscle dystonia symptoms of NO scavenging, since these hidden symptoms are diagnostically significant for PNH but require direct questioning and are currently absent from the key questions list."
+          },
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explaining the thrombophilic mechanism in PNH — specifically that free hemoglobin scavenges nitric oxide causing platelet aggregation, smooth muscle contraction, and thrombosis in unusual venous sites (hepatic, mesenteric, cerebral) — to connect the left calf DVT, abdominal cramps, and chest tightness to the underlying pathophysiology."
+          },
+          {
+            "severity": "medium",
+            "area": "lab selection",
+            "suggestion": "Add Reticulocyte Count and Peripheral Blood Smear to the expectedLabs list, as both are essential early workup steps in any hemolytic anemia that distinguish PNH morphology (polychromasia, absent schistocytes) from TTP/MAHA and guide the differential before flow cytometry is ordered."
+          },
+          {
+            "severity": "medium",
+            "area": "imaging",
+            "suggestion": "Add Doppler Ultrasound of Left Lower Extremity to expectedImaging given the clearly documented left calf asymmetry and positive Homan's sign — leaving expectedImaging empty is a significant teaching omission when DVT is strongly suspected and requires urgent confirmation."
+          },
+          {
+            "severity": "low",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point addressing the PNH-aplastic anemia overlap syndrome and when bone marrow biopsy is indicated, clarifying the clinical triggers (pancytopenia, hypocellular marrow on biopsy) that would prompt evaluation for an underlying marrow failure state requiring allogeneic transplant consideration."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Flow Cytometry Interactive Interpreter",
+            "rationale": "PNH diagnosis hinges on flow cytometry demonstrating GPI-anchor protein deficiency (CD55/CD59) on RBCs and granulocytes. A static image result fails to build the interpretive skill; an interactive panel where learners gate populations, identify the PNH clone size, and are graded on their interpretation would create durable diagnostic competency for this rare but critical test.",
+            "caseEvidence": "PNH is definitively diagnosed by flow cytometry, yet hasBiopsy=false and hasHematology=true suggests peripheral smear/flow data are present; learners need guided interpretation of clone-size quantification rather than just a text result."
+          },
+          {
+            "name": "Peripheral Smear Annotation Tool",
+            "rationale": "Hemolytic anemias like PNH require active recognition of smear findings (schistocytes, polychromasia, absence of spherocytes). An annotatable smear where learners circle and label cells, then receive AI feedback comparing their labels to expert annotations, builds pattern recognition that passive image viewing cannot.",
+            "caseEvidence": "hasHematology=true with 20 labs implies a peripheral smear is included; PNH's characteristic smear findings are subtle and easily missed without structured visual training."
+          },
+          {
+            "name": "Complement Pathway Cascade Visualizer",
+            "rationale": "PNH pathophysiology is rooted in complement dysregulation due to PIG-A mutation causing GPI-anchor deficiency, directly motivating eculizumab therapy. A post-grading interactive diagram of the complement cascade that highlights where the GPI-anchor proteins normally inhibit C3/C5 convertase—and where PNH fails—would convert abstract biochemistry into mechanistic understanding essential for Advanced-level learners.",
+            "caseEvidence": "PNH involves terminal complement pathway escape; the Advanced difficulty and 5 teaching points signal that mechanism depth is expected, yet no feature currently provides visual pathway-level reasoning scaffolds."
+          },
+          {
+            "name": "Thrombosis Risk Stratification Decision Tool",
+            "rationale": "The most lethal complication of PNH is thrombosis (Budd-Chiari, cerebral sinus thrombosis), and anticoagulation vs. eculizumab decisions are non-trivial. A post-diagnosis decision-tree exercise where the learner chooses management steps and receives branching consequence feedback—including when to start anticoagulation and when to refer for stem cell transplant—would address the high-stakes management reasoning gap absent from current grading dimensions.",
+            "caseEvidence": "PNH with imagingCount=7 likely includes abdominal/hepatic imaging for thrombotic events; the Advanced tier and 5 differentials imply management complexity that the current 5 grading dimensions (focused on diagnosis accuracy) do not fully capture."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "lab ordering and interpretation",
+            "reason": "With 20 labs across 14 groups and no biopsy, the diagnostic burden falls heavily on lab interpretation. PNH requires recognizing specific findings like flow cytometry (likely embedded in special images or labs), LDH elevation, and hemoglobinuria — students unfamiliar with PNH's lab signature may order redundantly or miss the GPI-anchor deficiency clue, especially under a 15-minute timer with this volume.",
+            "confidence": "high"
+          },
+          {
+            "moment": "special images / flow cytometry review",
+            "reason": "PNH diagnosis is confirmed by flow cytometry showing CD55/CD59-deficient red cell clones, which is likely represented in the special images. Students may not recognize flow cytometry data as the pivotal diagnostic image in an otherwise hematologic workup, especially since there is no biopsy to anchor their expectations — causing them to deprioritize or misread the special image panel.",
+            "confidence": "high"
+          },
+          {
+            "moment": "diagnosis submission from differential",
+            "reason": "PNH is a rare and frequently missed diagnosis that mimics hemolytic anemia, aplastic anemia, and thrombotic disorders. With 5 differentials and an advanced case, students may confidently commit to autoimmune hemolytic anemia or aplastic anemia without synthesizing the nocturnal hemoglobinuria and thrombosis pattern, leading to late-stage hesitation or incorrect final selection despite correct lab ordering.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "infectious-foundations-cellulitis-0",
+      "system": "Infectious",
+      "difficulty": "Foundations",
+      "diagnosis": "Cellulitis",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing the penicillin allergy management decision: explain that a non-anaphylactic urticarial penicillin reaction generally permits cautious use of cephalosporins (low cross-reactivity ~1-2%), and outline the antibiotic selection rationale — cephalexin as first-line vs. clindamycin or TMP-SMX as alternatives — since this is a critical prescribing decision embedded in the case."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add erysipelas as a differential diagnosis with an explanation distinguishing it from cellulitis by its sharply demarcated, raised border, predominantly Group A Strep etiology, and superficial dermis involvement — this is a high-yield distinction at the Foundations level that is currently absent."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on outpatient vs. inpatient admission criteria for cellulitis using the Eron classification or SSTI severity framework, specifying which clinical features in this case (e.g., controlled fever, no systemic toxicity, compliant patient) support outpatient oral therapy rather than IV antibiotics."
+          },
+          {
+            "severity": "medium",
+            "area": "lab selection",
+            "suggestion": "Add explicit educational guidance explaining why wound surface swab cultures are not recommended for non-purulent cellulitis (low yield, colonization confounds results) so learners understand the rationale for omitting it from expected labs rather than selecting it reflexively."
+          },
+          {
+            "severity": "low",
+            "area": "key questions",
+            "suggestion": "Add a question asking about prior MRSA infection, household MRSA contacts, or recent hospitalization/healthcare exposure to teach learners when empiric MRSA coverage (e.g., TMP-SMX, doxycycline) should be considered in cellulitis management."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Derm Lesion Annotator",
+            "rationale": "Cellulitis is a visual diagnosis heavily dependent on recognizing erythema borders, warmth, and swelling distribution; learners benefit from an interactive overlay that lets them mark the leading edge of erythema and compare their annotation to the canonical finding, reinforcing pattern recognition skills that pure text feedback cannot provide.",
+            "caseEvidence": "hasDerm: true paired with a skin-and-soft-tissue infection diagnosis makes visual lesion interpretation a core competency this case should teach, yet no current feature supports spatial annotation or comparison of dermatological findings."
+          },
+          {
+            "name": "Antibiotic Stewardship Decision Module",
+            "rationale": "Cellulitis management is a high-yield antibiotic-selection scenario where learners must distinguish MSSA-adequate coverage from MRSA-targeted therapy based on severity and risk factors; a post-diagnosis interactive step asking the learner to choose an antibiotic class, dose, and route with immediate rationale feedback would close the diagnosis-to-management gap.",
+            "caseEvidence": "Infectious system + Cellulitis diagnosis at a Foundations level is precisely where empiric antibiotic reasoning is first taught; no existing feature bridges from 'correct diagnosis' to 'appropriate treatment choice'."
+          },
+          {
+            "name": "Spread Progression Timeline",
+            "rationale": "One of the critical safety concepts in cellulitis is recognizing rapid proximal spread as a red flag for necrotizing fasciitis or bacteremia; an animated or stepped timeline showing how the clinical picture evolves over 12–24–48 hours would train Foundations learners to appreciate temporal urgency without requiring a full simulation re-run.",
+            "caseEvidence": "Foundations difficulty means learners are new to infectious emergencies; the case's small differential (3) and low key-question count (5) suggest straightforward presentation, making a complication-progression teaching tool the highest-value add for pattern recognition beyond initial diagnosis."
+          },
+          {
+            "name": "Lab Interpretation Guided Walkthrough",
+            "rationale": "With 18 labs available at the Foundations level, novice learners are prone to over-ordering or misinterpreting inflammatory markers (WBC, CRP, ESR) versus metabolic panels in the context of a skin infection; a guided post-submission walkthrough that groups ordered labs by clinical relevance tier (essential / supportive / unnecessary) with one-sentence explanations would build systematic lab reasoning habits early.",
+            "caseEvidence": "labCount: 18 is high relative to a Foundations cellulitis case where only a handful of labs are truly decision-changing; no existing feature distinguishes clinically essential from incidental results or teaches cost-conscious ordering at the foundational level."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "lab selection from 18 labs across 12 groups",
+            "reason": "Cellulitis is a clinical diagnosis that rarely requires labs; a Foundations student may over-order trying to 'find' confirmatory evidence that doesn't meaningfully exist, wasting time parsing 12 lab groups without a clear signal to guide selection",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG interpretation relevance",
+            "reason": "An ECG is unexpected in a soft-tissue infectious case; Foundations students are likely to fixate on it, unsure whether it signals a cardiac complication (e.g., sepsis workup) or is a distractor, creating decision paralysis about how much weight to give it",
+            "confidence": "high"
+          },
+          {
+            "moment": "differential submission with only 3 diagnoses",
+            "reason": "A narrow 3-item differential for a skin/soft-tissue presentation forces students to confidently distinguish cellulitis from close mimics (e.g., DVT, necrotizing fasciitis, contact dermatitis); Foundations learners often lack the clinical heuristics to rank these without laboratory anchoring, especially when labs return relatively normal",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "gastrointestinal-advanced-small-bowel-obstruction-0",
+      "system": "Gastrointestinal",
+      "difficulty": "Advanced",
+      "diagnosis": "Small Bowel Obstruction",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly covering the clinical decision between operative versus non-operative (NGT decompression, IV fluids, NPO) management of SBO, including the specific findings — fever >38.5°C, peritoneal signs, rising lactate, closed-loop pattern on CT — that mandate emergent surgery over a trial of conservative management."
+          },
+          {
+            "severity": "high",
+            "area": "physical exam",
+            "suggestion": "Resolve the internal contradiction in the abdominal exam where both 'no guarding' and 'voluntary guarding present' are documented in the same field, as this inconsistency will confuse learners about the peritoneal exam and the critical distinction between voluntary and involuntary guarding in assessing for strangulation."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add volvulus (sigmoid or small bowel) as a differential diagnosis with an explanation, since it presents with acute-onset colicky pain, obstipation, and distension and represents a surgically urgent subset of obstruction that learners at the advanced level should actively exclude on imaging."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a key question targeting hernia history and current groin or abdominal wall exam findings (e.g., 'Do you notice any new bulge in your groin or abdomen?'), since incarcerated hernias are the second most common cause of SBO and are a clinically correctable etiology that the physical exam section does not address."
+          },
+          {
+            "severity": "low",
+            "area": "lab selection",
+            "suggestion": "Add an expected lab explanation clarifying why a venous blood gas (VBG) is clinically valuable in this case — specifically to detect metabolic alkalosis from bilious vomiting and to rapidly assess acid-base status as a surrogate for severity — so learners understand its role rather than treating it as an optional panel item."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Surgical vs. Conservative Decision Node",
+            "rationale": "Small bowel obstruction management hinges critically on the operative vs. non-operative decision (complete vs. partial obstruction, signs of strangulation, peritonitis). A structured branching decision checkpoint mid-case would force learners to commit to a management pathway before seeing further results, reinforcing this high-stakes clinical reasoning step that pure diagnosis grading misses.",
+            "caseEvidence": "SBO is the archetypal surgical emergency where the management decision is as educationally important as the diagnosis itself; the case has 7 imaging studies suggesting CT and plain films that map directly to this go/no-go surgical decision."
+          },
+          {
+            "name": "Serial Imaging Comparison Viewer",
+            "rationale": "SBO management often involves interval imaging (upright abdominal X-ray, CT with and without contrast) to track progression or resolution. A side-by-side or slider comparison tool for two imaging panels would teach learners to recognize interval change — distension worsening, air-fluid levels shifting — a skill not addressable by single-image lightbox zoom alone.",
+            "caseEvidence": "7 imaging studies in this case likely include multiple abdominal X-rays and CT cuts; presenting these as a temporal or positional comparison series would add substantial interpretive value specific to GI obstruction workup."
+          },
+          {
+            "name": "Fluid Resuscitation & NPO Management Simulator",
+            "rationale": "Initial SBO management is largely supportive — IV fluids, NGT decompression, NPO — and errors here (under-resuscitation, failure to correct electrolyte derangements) directly worsen outcomes. An interactive fluid/electrolyte management mini-task where learners select fluid type, rate, and NGT decision would fill the gap between diagnosis and surgical referral that the current scoring dimensions don't capture.",
+            "caseEvidence": "17 labs including a urine panel strongly implies electrolyte and renal function monitoring is central to this case; BMP derangements from third-spacing are a classic SBO teaching point that a resuscitation simulator would make actionable."
+          },
+          {
+            "name": "Strangulation Risk Stratification Tool",
+            "rationale": "Differentiating simple from strangulated SBO is the most critical and often missed clinical skill — tachycardia, fever, peritoneal signs, and CT findings like bowel wall thickening or mesenteric edema each shift the probability. An interactive risk-scoring overlay (similar to a Wells or Alvarado tool but SBO-specific) presented before the learner locks in their management plan would make this pattern recognition explicit and gradable.",
+            "caseEvidence": "The differential list of 4 likely includes volvulus or incarcerated hernia — conditions where strangulation risk stratification is immediately life-altering — and the ECG presence suggests tachycardia or arrhythmia as a systemic sign the learner must contextualize within the obstruction picture."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "Imaging selection and interpretation",
+            "reason": "With 7 imaging studies and special images available, students must decide between plain abdominal X-ray, CT abdomen/pelvis, and potentially other modalities. SBO diagnosis heavily hinges on imaging interpretation (air-fluid levels, dilated loops), and the presence of special images suggests layered or sequential imaging decisions. Advanced students may over-order or missequence imaging, especially under a 15-minute timer.",
+            "confidence": "high"
+          },
+          {
+            "moment": "Lab triage across 12 lab groups with 17 total labs",
+            "reason": "SBO is primarily a clinical and imaging diagnosis; labs are supportive but not definitive. The high lab group count relative to a 15-minute timer creates pressure-driven over-ordering. Students may chase metabolic derangements (electrolytes, lactate) without prioritizing imaging, or fail to recognize which labs actually shift the differential versus confirm a complication like strangulation.",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG ordering rationale within a GI case",
+            "reason": "The presence of an ECG in a Small Bowel Obstruction case is structurally unexpected. Students may either skip it entirely (missing a relevant comorbidity signal like electrolyte-driven arrhythmia from vomiting/dehydration) or become confused about its diagnostic relevance, wasting time deliberating whether cardiac pathology is part of the differential or a red herring.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "respiratory-clinical-community-acquired-pneumonia-0",
+      "system": "Respiratory",
+      "difficulty": "Clinical",
+      "diagnosis": "Community-Acquired Pneumonia",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly walking through this patient's CURB-65 score component by component (Confusion=1, Urea unknown at presentation=0, RR≥30 borderline, BP<90 systolic or ≤60 diastolic=0, Age<65=0), clarifying he scores 1-2 and explaining why clinical gestalt and additional factors still drive admission, as the current teaching point contains a factual error claiming a score of 'at least 3.'"
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add Lung Abscess or Necrotizing Pneumonia as a differential given the thick purulent sputum, high fever, and diabetic host, with an explanation distinguishing it from uncomplicated CAP on imaging and clinical course."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on empiric antibiotic selection for hospitalized non-ICU CAP per IDSA/ATS guidelines (beta-lactam plus macrolide, or respiratory fluoroquinolone monotherapy), explicitly noting metformin management and the need to hold it if IV contrast or sepsis develops."
+          },
+          {
+            "severity": "medium",
+            "area": "lab selection",
+            "suggestion": "Add Urine Legionella Antigen to the expectedLabs list since this patient has risk factors (crowded gathering 8 days prior, age >50, male, diabetic, former smoker) and Legionella is a critical diagnosis to capture that alters antibiotic management."
+          },
+          {
+            "severity": "low",
+            "area": "hpi clarity",
+            "suggestion": "Specify sputum character, volume, and presence of pleuritic chest pain in the clinicalHpi field, as these are diagnostically discriminating features of CAP that learners should be prompted to elicit early and are currently buried only in the hiddenHistory and ROS."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Severity Scoring Calculator",
+            "rationale": "CAP management is heavily guided by validated severity scores (CURB-65, PSI/PORT) that determine outpatient vs. inpatient vs. ICU disposition. An interactive in-case calculator that lets students input clinical variables and see a risk-stratified score would teach the decision-making framework, not just the diagnosis.",
+            "caseEvidence": "Community-Acquired Pneumonia diagnosis with 20 labs and 6 imaging studies implies rich clinical data is available; CURB-65 relies on BUN, respiratory rate, BP, age, and confusion — all collectable in this case's data set."
+          },
+          {
+            "name": "Antibiotic Selection Challenge",
+            "rationale": "For CAP specifically, choosing the correct empiric antibiotic regimen (based on severity, risk factors for atypicals, MRSA, Pseudomonas) is a core learning outcome distinct from reaching the diagnosis. A post-diagnosis step prompting the student to select a regimen and receiving AI feedback on coverage rationale would close that gap.",
+            "caseEvidence": "CAP is a diagnosis where management decision-making — outpatient macrolide vs. respiratory fluoroquinolone vs. beta-lactam + macrolide combination — is as educationally critical as recognition, yet no management-selection feature currently exists."
+          },
+          {
+            "name": "Imaging Annotation Tool",
+            "rationale": "With 6 imaging studies, learners should actively identify and label radiographic findings (e.g., lobar consolidation, air bronchograms, pleural effusion) rather than passively viewing them. An overlay annotation layer with AI comparison to expert-marked findings would build pattern-recognition skills.",
+            "caseEvidence": "An imaging-heavy respiratory case (6 studies) where CXR and CT interpretation are central to diagnosing and characterising CAP severity makes passive image viewing a missed learning opportunity; the existing image zoom lightbox does not support active annotation."
+          },
+          {
+            "name": "Pathophysiology Explainer Panel",
+            "rationale": "CAP involves overlapping mechanisms (bacterial vs. atypical pathogen, consolidation physiology, ventilation-perfusion mismatch causing hypoxia, inflammatory cascade) that are testable and commonly misunderstood. A post-grading expandable visual diagram linking the patient's specific findings to underlying pathophysiology would deepen conceptual understanding beyond the four existing teaching-point text blurbs.",
+            "caseEvidence": "With only 3 differentials and 4 teaching points for a mechanistically rich condition like CAP, a visual pathophysiology layer would add explanatory depth that static pearls cannot provide, especially given the presence of both pulmonary imaging and a urine antigen test suggesting Legionella workup."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "ordering labs",
+            "reason": "With 20 labs spread across 14 groups, students must navigate a fragmented ordering interface to find relevant panels (e.g., sputum culture, procalcitonin, blood cultures). The high group-to-lab ratio suggests many small clusters, increasing cognitive load and time spent hunting for the right tests under a 22-minute timer.",
+            "confidence": "high"
+          },
+          {
+            "moment": "reading imaging",
+            "reason": "6 imaging studies combined with special images (likely including CXR and possibly CT chest) requires students to distinguish classic CAP consolidation patterns from mimics like pulmonary edema or malignancy. The presence of special images suggests additional views or annotated findings that may be ambiguously presented, causing students to over-order or misinterpret laterality and lobar involvement.",
+            "confidence": "high"
+          },
+          {
+            "moment": "diagnosis submission with only 3 differentials",
+            "reason": "CAP shares significant overlap with atypical pneumonia, aspiration pneumonia, and lung abscess. A differential slot count of just 3 forces students to prematurely collapse uncertainty, and the inclusion of an ECG (suggesting possible pleuritic or cardiopulmonary overlap concern) may mislead students into spending time ruling out PE or pericarditis before committing to CAP as their primary diagnosis.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "infectious-clinical-pneumocystis-jirovecii-pneumonia-pcp-0",
+      "system": "Infectious",
+      "difficulty": "Clinical",
+      "diagnosis": "Pneumocystis Jirovecii Pneumonia (PCP)",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a dedicated teaching point explaining TMP-SMX dosing (15-20 mg/kg/day of TMP component divided q6-8h for 21 days) and the specific alternative regimens for penicillin-allergic patients (IV pentamidine, primaquine plus clindamycin, or atovaquone), since this patient has a documented penicillin allergy that directly complicates first-line therapy."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add Cryptococcal pneumonia as a differential diagnosis, as it shares the same immunocompromised host, subacute onset, bilateral infiltrates, and low CD4 milieu, and serum CrAg is already listed in available labs — its omission creates a misleading impression of an incomplete differential workup."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a targeted question asking about prior pneumothorax history, since the hidden history reveals a spontaneous pneumothorax 2 years prior — a pathognomonic PCP complication that, if elicited, would dramatically narrow the differential and represents a high-yield diagnostic clue learners should be trained to seek."
+          },
+          {
+            "severity": "medium",
+            "area": "imaging",
+            "suggestion": "Include CT Chest High-Resolution as an expected imaging study alongside CXR, as bilateral ground-glass opacities in a perihilar or 'bat-wing' distribution on HRCT are a defining diagnostic feature of PCP and the case already notes CXR findings can be subtle or absent in early disease."
+          },
+          {
+            "severity": "low",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing the immune reconstitution inflammatory syndrome (IRIS) risk when initiating antiretroviral therapy in the setting of acute PCP, including the recommended delay of ART initiation by approximately 2 weeks after starting PCP treatment to reduce IRIS risk while still improving survival."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Immunocompromise Risk Stratification Widget",
+            "rationale": "PCP almost exclusively affects immunocompromised hosts; a dynamic risk-ladder visualization showing how each disclosed history element (HIV status, CD4 count, steroid use, transplant) incrementally raises PCP pre-test probability would train learners to think probabilistically about host defense deficits before ordering tests",
+            "caseEvidence": "Infectious system case with PCP as diagnosis — the pivotal clinical pivot in this case is recognizing immune status, yet no existing feature scaffolds probabilistic host-risk reasoning beyond plain HPI gating"
+          },
+          {
+            "name": "Antibiotic/Antimicrobial Stewardship Tracker",
+            "rationale": "PCP requires targeted prophylaxis and treatment (TMP-SMX) rather than empiric broad-spectrum antibiotics; a live tracker that flags inappropriate broad-spectrum antibiotic orders, suggests de-escalation rationale, and scores stewardship choices would reinforce a core infectious disease competency absent from current test-ordering feedback",
+            "caseEvidence": "Infectious system with 22 labs and 5 imaging studies implies a complex workup where learners may reflexively order broad antibiotics; no existing feature penalizes or educates on antimicrobial choice appropriateness"
+          },
+          {
+            "name": "CD4/LDH Trend Simulator",
+            "rationale": "In PCP, serial LDH and the implied CD4 trajectory are critical severity and monitoring markers; an interactive mini-trend panel that lets learners request a 'simulated 48-hour repeat' of key infectious biomarkers (LDH, O2 sat, WBC) to assess treatment response would teach longitudinal management thinking beyond the snapshot encounter",
+            "caseEvidence": "22 lab results in an infectious case with PCP — high lab density suggests biomarker-heavy workup, yet the platform currently has no mechanism for simulating interval monitoring or treatment-response labs"
+          },
+          {
+            "name": "Prophylaxis & Exposure Context Prompt",
+            "rationale": "PCP diagnosis requires learners to elicit not just current symptoms but prophylaxis history, CD4 thresholds, and exposure risk factors; a structured 'Epidemiologic Context Card' that unlocks only after the learner explicitly asks about immunosuppression, prophylaxis adherence, and sexual/exposure history would reinforce the unique epidemiologic interview skill set required for opportunistic infections",
+            "caseEvidence": "PCP in an Infectious system case — the diagnosis is impossible without recognizing the opportunistic infection context, yet chat-based HPI gating applies generically and does not specifically scaffold or reward the epidemiologic line of questioning critical to this disease class"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "lab ordering and interpretation",
+            "reason": "With 22 labs across 14 groups and no biopsy, students must piece together PCP diagnosis through indirect markers (LDH elevation, ABG hypoxemia, CD4 count) rather than a definitive pathology result. The large lab group count relative to total labs suggests sparse groups, creating decision fatigue about which panels to prioritize under a 22-minute timer.",
+            "confidence": "high"
+          },
+          {
+            "moment": "imaging review with special images",
+            "reason": "PCP classically presents with bilateral ground-glass opacities on CT and a near-normal or subtle CXR early on. With 5 imaging items including special images, students may over-anchor on chest X-ray findings (or be confused by their subtlety) and fail to correctly weight the CT pattern, especially without biopsy confirmation to close the diagnostic loop.",
+            "confidence": "high"
+          },
+          {
+            "moment": "diagnosis submission with only 4 differentials",
+            "reason": "A differential count of 4 is narrow for an Infectious case with overlapping etiologies (atypical pneumonia, TB, CMV pneumonitis, bacterial PCP mimic). Students may hesitate at submission unsure whether to commit to PCP vs. a bacterial or viral pneumonia, particularly if the ECG (whose relevance is non-obvious here) creates a distracting cardiopulmonary rabbit hole.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "gastrointestinal-foundations-acute-cholecystitis-0",
+      "system": "Gastrointestinal",
+      "difficulty": "Foundations",
+      "diagnosis": "Acute Cholecystitis",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add acute hepatitis or right lower lobe pneumonia as a differential to teach learners that RUQ pain has important extra-biliary mimics, particularly relevant given this patient's low-grade fever and diabetes."
+          },
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly explaining the Tokyo Guidelines diagnostic criteria for acute cholecystitis (local signs + systemic signs + imaging confirmation) so learners understand how the diagnosis is formally established rather than by gestalt."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point addressing management disposition — specifically that acute cholecystitis requires IV antibiotics, NPO, surgical consultation, and that early laparoscopic cholecystectomy (within 72 hours) is the standard of care — as this is entirely absent from the current teaching points."
+          },
+          {
+            "severity": "medium",
+            "area": "lab selection",
+            "suggestion": "Add LFTs to the expected labs list and explicitly teach that mildly elevated bilirubin or transaminases can occur in uncomplicated cholecystitis but significantly elevated levels should raise concern for choledocholithiasis or Mirizzi syndrome."
+          },
+          {
+            "severity": "low",
+            "area": "hpi clarity",
+            "suggestion": "Explicitly include the 8-month history of prior episodic biliary colic in the clinical HPI field (not just hidden history) so learners can practice recognizing the prodromal pattern of cholelithiasis progressing to acute cholecystitis."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Anatomical Diagram Overlay",
+            "rationale": "Foundations-level learners benefit from visual anchoring of GI anatomy when interpreting RUQ pain differentials; an interactive abdominal map linking pain locations to likely diagnoses (e.g., RUQ→cholecystitis, epigastric→peptic ulcer) would reinforce spatial clinical reasoning before they develop pattern recognition.",
+            "caseEvidence": "Acute cholecystitis with only 3 differentials and Foundations difficulty signals early learners who may not yet map symptoms to anatomy; 6 imaging studies also provide rich visual material that benefits from anatomical context overlays."
+          },
+          {
+            "name": "Lab Value Trend Visualizer",
+            "rationale": "With 16 labs, Foundations students risk treating each result as an isolated fact rather than understanding physiological patterns; a simple timeline or bar-chart view highlighting which labs are abnormal and how they cluster (e.g., elevated WBC + bilirubin + ALP pointing to biliary obstruction) would teach result interpretation as a narrative.",
+            "caseEvidence": "16 labs in a Foundations-difficulty case is a heavy cognitive load for novices; cholecystitis has a classic lab constellation (leukocytosis, mildly elevated LFTs) that is ideal for teaching grouped pattern recognition."
+          },
+          {
+            "name": "Guided Differential Builder",
+            "rationale": "Foundations cases should scaffold the diagnostic reasoning process; a structured tool that prompts students to actively weigh RUQ differentials (cholecystitis vs. peptic ulcer vs. hepatitis) against the patient's findings—before submitting a final answer—would teach elimination logic rather than guessing.",
+            "caseEvidence": "Only 3 differentials exist in this case, making it an ideal contained sandbox for teaching structured differential narrowing; Foundations difficulty means students have not yet internalized elimination heuristics."
+          },
+          {
+            "name": "Imaging Interpretation Checklist",
+            "rationale": "With 6 imaging studies including an ECG, Foundations learners need a scaffold to read images systematically rather than pattern-matching superficially; a modality-specific checklist (e.g., for RUQ ultrasound: gallbladder wall thickness, pericholecystic fluid, shadowing calculi) would teach methodical interpretation skills early.",
+            "caseEvidence": "6 imaging studies plus an ECG in an acute cholecystitis case is above average for imaging volume; at Foundations level, students likely lack a reading framework for ultrasound findings that are pathognomonic for cholecystitis."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "ordering imaging",
+            "reason": "With 6 imaging options available in a GI case where RUQ ultrasound is the gold standard for acute cholecystitis, students may over-order or hesitate between CT abdomen and ultrasound, unsure which confirms the diagnosis at Foundations level",
+            "confidence": "high"
+          },
+          {
+            "moment": "lab ordering from 12 lab groups",
+            "reason": "16 labs spread across 12 groups is an unusually high group-to-lab ratio, meaning many groups contain only 1-2 tests; students may miss LFTs or lipase by not recognizing which group name maps to which relevant panel, creating navigation friction",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG interpretation relevance",
+            "reason": "An ECG in an acute cholecystitis case has no direct diagnostic value but its presence signals to students that cardiac pathology may be in play; this likely causes confusion about whether to order/interpret it and may distract from the GI workup or prompt unnecessary cardiac differentials",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "img-MPX1896_synpic27390-advanced",
+      "system": "Respiratory",
+      "difficulty": "Advanced",
+      "diagnosis": "Congenital diaphragmatic hernia",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing the ventilatory strategy for CDH — permissive hypercapnia, gentle ventilation with low PIP targets, and avoidance of pneumothorax — as this is a high-stakes management concept frequently tested at the advanced level and currently absent."
+          },
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on pulmonary hypertension management in CDH, specifically the role of inhaled nitric oxide, avoiding hypoxia/acidosis/hypothermia as pulmonary vasoconstrictors, and the pre/post-ductal saturation monitoring rationale, since PPHN is identified as a key differential but its co-management with CDH is never taught."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add tension pneumothorax as a differential, as it presents with respiratory distress, deviated trachea, and absent breath sounds in a neonate and must be actively excluded on CXR before attributing findings to CDH."
+          },
+          {
+            "severity": "medium",
+            "area": "imaging",
+            "suggestion": "Add explicit expected findings on chest X-ray — specifically the NG tube coursing into the left hemithorax, bowel gas loops above the diaphragm, mediastinal shift to the right, and the absence of a normal diaphragmatic contour — as current imaging guidance lists only 'Chest X-Ray' without describing what learners should identify or why it is diagnostic."
+          },
+          {
+            "severity": "low",
+            "area": "key questions",
+            "suggestion": "Add a key question about family history of diaphragmatic hernia or chromosomal syndromes (e.g., Trisomy 18, Fryns syndrome), as roughly 30–40% of CDH cases are associated with genetic anomalies and eliciting this history has direct prognostic and counseling implications."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Neonatal/Pediatric Age-Adjusted Reference Ranges",
+            "rationale": "CDH is a neonatal diagnosis where normal lab and vital sign ranges differ dramatically from adult values; learners need age-stratified reference bands (e.g., neonatal SpO2, blood gas targets, RR norms) displayed inline to avoid misinterpreting results",
+            "caseEvidence": "Congenital diaphragmatic hernia is a congenital/neonatal condition — the case's 12 labs and vitals strip will show values that are physiologically normal for a neonate but flagged misleadingly under adult reference ranges"
+          },
+          {
+            "name": "Anatomical Overlay Annotator",
+            "rationale": "CDH involves herniated abdominal organs into the thoracic cavity, making spatial reasoning on chest imaging critical; an interactive overlay tool that lets learners mark structures on imaging (e.g., bowel loops, mediastinal shift, lung hypoplasia) before revealing the annotated ground truth would build image interpretation skills",
+            "caseEvidence": "The case has 4 imaging studies, which for CDH would include chest X-ray with bowel gas pattern in the thorax — a visually complex finding where annotation practice adds significant learning value beyond passive lightbox zoom"
+          },
+          {
+            "name": "Ventilator / Management Parameter Simulator",
+            "rationale": "CDH management involves nuanced respiratory support decisions (permissive hypercapnia, avoiding high peak pressures, HFOV vs conventional ventilation, iNO); a post-diagnosis management round where learners set ventilator parameters or select escalation strategies and receive AI feedback would bridge diagnosis to disposition",
+            "caseEvidence": "Advanced-difficulty respiratory case with a diagnosis requiring highly specialized neonatal respiratory management — diagnosis accuracy alone undersells the clinical complexity learners should engage with"
+          },
+          {
+            "name": "Differential Rank-Order Confidence Slider",
+            "rationale": "CDH mimics tension pneumothorax, congenital lung malformation, and cardiac causes at presentation; requiring learners to rank and assign confidence percentages to their differentials before submitting forces explicit probabilistic reasoning and reveals anchoring bias in post-case review",
+            "caseEvidence": "The case has 4 differentials, all of which can present with acute respiratory distress in a neonate — a rank-order confidence exercise would expose how learners weigh overlapping presentations and improve diagnostic reasoning beyond single-diagnosis autocomplete"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "imaging interpretation — chest X-ray/radiograph review",
+            "reason": "CDH diagnosis is heavily dependent on imaging recognition (bowel loops in thorax, mediastinal shift), but with 4 imaging studies and no special images flagged, students may over-anchor on lab values before reaching the confirmatory imaging, or misread the radiograph as pneumothorax or pleural effusion — a classic and dangerous pitfall specific to this diagnosis",
+            "confidence": "high"
+          },
+          {
+            "moment": "diagnosis submission with only 4 differentials",
+            "reason": "CDH can mimic several respiratory and cardiac conditions (tension pneumothorax, pulmonary hypoplasia, CCAM), and with only 4 differential slots, students may fill the list with more common respiratory diagnoses before considering a congenital structural cause, especially under a 15-minute timer at advanced difficulty",
+            "confidence": "high"
+          },
+          {
+            "moment": "ROS unlock across 13 categories for a likely neonatal/perinatal presentation",
+            "reason": "CDH typically presents at or shortly after birth, making many standard ROS categories (e.g., psychiatric, musculoskeletal, genitourinary) clinically irrelevant — students may waste significant time navigating all 13 categories searching for meaningful positive findings that largely don't exist in this population, creating decision fatigue before reaching labs and imaging",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "respiratory-clinical-lung-abscess-0",
+      "system": "Respiratory",
+      "difficulty": "Clinical",
+      "diagnosis": "Lung Abscess",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing the microbiologic distinction between primary lung abscess (oral anaerobes: Fusobacterium, Peptostreptococcus, Prevotella) and secondary abscess, including why anaerobic sputum culture requires dedicated transport and why standard cultures frequently miss the causative organisms — a critical gap given the anaerobic culture is listed but not explained."
+          },
+          {
+            "severity": "high",
+            "area": "physical exam",
+            "suggestion": "Add a note on the absence of finger clubbing with explanation that clubbing can be seen in chronic lung abscess (>weeks to months) but its absence here reflects the subacute timeline — this is a high-yield bedside finding that learners frequently expect in this diagnosis and its pedagogic value is lost without explicit commentary."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add necrotizing pneumonia as a distinct differential, explicitly distinguishing it from lung abscess by the absence of a discrete cavity wall and the presence of multiple small holes rather than a single air-fluid level, as the distinction has direct management implications and is a common source of learner confusion."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a specific question probing the positional relationship of symptoms — asking whether coughing is worse when lying on the right side or when bending forward — to teach learners that positional cough variation can reflect gravity-dependent drainage of an abscess cavity, a classic and high-yield clinical pearl not currently addressed."
+          },
+          {
+            "severity": "low",
+            "area": "imaging",
+            "suggestion": "Add structured teaching text to the CT chest with contrast result specifying how to radiographically distinguish a lung abscess from an empyema using the 'split pleura sign,' acute versus obtuse pleural angles, and lung compression, since the differential explanation references these findings but no imaging teaching note anchors them to actual CT interpretation skills."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Imaging Progression Viewer",
+            "rationale": "Lung abscess is a dynamic radiological diagnosis where serial chest X-rays and CT findings evolve with treatment or deterioration. A time-sequenced imaging viewer showing 'Day 0 → Day 3 → Day 7' frames would teach learners to recognize cavitation development, air-fluid levels, and treatment response — skills not addressable with a single static image set.",
+            "caseEvidence": "imagingCount of 5 suggests multiple views or modalities are already present; linking these temporally rather than as a flat gallery would unlock the longitudinal radiological narrative central to lung abscess diagnosis and management."
+          },
+          {
+            "name": "Antibiotic Stewardship Decision Branch",
+            "rationale": "Lung abscess management hinges on antibiotic selection, duration, and escalation/de-escalation decisions, including distinguishing community-acquired aspiration flora from hospital-acquired or immunocompromised organisms. An interactive branching panel post-diagnosis that asks learners to select empirical coverage, justify it against sensitivities, and adjust based on clinical response would add a high-value management layer currently absent from the platform.",
+            "caseEvidence": "hasBiopsy is false and differentialCount is only 4, suggesting the case's complexity lives in post-diagnosis management rather than diagnostic ambiguity; antibiotic reasoning is the natural next teaching frontier here."
+          },
+          {
+            "name": "Microbiology Culture Cascade",
+            "rationale": "Lung abscess requires learners to interpret sputum and blood culture results, understand polymicrobial anaerobic patterns, and reconcile culture lag with clinical urgency. A timed 'culture pending → preliminary → final' reveal mechanic — where initial Gram stain unlocks early, sensitivities unlock later — would simulate real clinical microbiology pacing and teach appropriate empiric-to-definitive therapy transitions.",
+            "caseEvidence": "labCount of 18 is high and hasHematology/hasUrine are true, indicating a rich lab workup; a culture cascade would differentiate the respiratory-specific labs from routine panels and add interpretive depth specific to pulmonary infection."
+          },
+          {
+            "name": "Aspiration Risk Factor Mapping Tool",
+            "rationale": "Lung abscess is almost always precipitated by identifiable aspiration risk factors (dysphagia, altered consciousness, poor dentition, GERD, structural airway disease). An interactive risk-factor mapper that asks learners to tag history elements as aspiration contributors — and then renders a scored 'aspiration risk profile' — reinforces the mechanistic HPI reasoning that separates lung abscess from other cavitary lesions on the differential.",
+            "caseEvidence": "keyQuestionCount of 5 and differentialCount of 4 suggest the case differentials likely include malignancy, TB, and empyema; anchoring the HPI to a structured aspiration mechanism would sharpen diagnostic reasoning and explain why the other differentials are deprioritized."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionGuesses": [
+          {
+            "moment": "imaging interpretation (chest X-ray vs CT selection and sequencing)",
+            "reason": "With 5 imaging studies and special images available, students must decide which modality to prioritize. Lung abscess can initially mimic pneumonia or mass on plain film, and the cavity with air-fluid level is the diagnostic key — students may order plain films, anchor on pneumonia, and delay CT, burning critical time in a 22-minute window",
+            "confidence": "high"
+          },
+          {
+            "moment": "lab ordering strategy across 12 lab groups with 18 total labs",
+            "reason": "Lung abscess requires specific microbiological workup (sputum culture, anaerobic cultures, blood cultures) distributed across multiple lab groups. Students trained on generic respiratory protocols may not navigate to anaerobic/culture-specific groups, missing the pathogen data needed to distinguish lung abscess from empyema or cavitating malignancy",
+            "confidence": "high"
+          },
+          {
+            "moment": "diagnosis submission with only 4 differentials",
+            "reason": "Lung abscess sits in a tight differential space with cavitating TB, necrotizing pneumonia, and cavitating lung carcinoma — all sharing imaging and lab overlap. A constrained 4-option differential may present options that are structurally similar enough that students who have not yet resolved the air-fluid level imaging finding will lack sufficient discriminating evidence at submission time, creating last-moment uncertainty",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "img-MPX1508_synpic48380",
+      "system": "Gastrointestinal",
+      "difficulty": "Clinical",
+      "diagnosis": "Hepatic cirrhosis with splenomegaly",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing the MELD score or Child-Pugh classification and how this patient's labs (INR, bilirubin, creatinine, albumin) should be used to prognosticate and guide management decisions such as transplant eligibility."
+          },
+          {
+            "severity": "high",
+            "area": "key questions",
+            "suggestion": "Add a key question asking about prior HBV vaccination status and whether the patient has ever received antiviral therapy (e.g., tenofovir, entecavir), as untreated chronic HBV is the primary driver of cirrhosis here and directly impacts management."
+          },
+          {
+            "severity": "medium",
+            "area": "lab selection",
+            "suggestion": "Add ammonia to the expected labs list, since the wife is reporting forgetfulness and daytime somnolence that strongly suggests subclinical hepatic encephalopathy — this is a critical and actionable finding that the learner should be prompted to investigate."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point about the risk of NSAID use (ibuprofen on his medication list) in cirrhotic patients, specifically the increased risk of renal impairment, precipitation of hepatorenal syndrome, and GI bleeding — a high-yield medication safety teaching moment that is currently unaddressed."
+          },
+          {
+            "severity": "low",
+            "area": "differentials",
+            "suggestion": "Add Wilson's disease to the differential with a brief explanation noting that while less likely at age 54, the family history of paternal 'liver problems' at 60 and the Nigerian origin (where underdiagnosis is common) warrant at least a ceruloplasmin check, which is already available in the lab panel but unexplained without this differential."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Fibrosis Staging Visualizer",
+            "rationale": "Cirrhosis cases hinge on understanding disease progression from hepatitis/steatosis through fibrosis stages to end-stage liver disease; a visual Metavir/Ishak staging ladder overlaid on the post-grading review would contextualize lab trends (AST/ALT ratio, platelet count, INR) against histological stage, deepening understanding of why biopsy is the gold standard even when absent",
+            "caseEvidence": "Diagnosis is hepatic cirrhosis — a stage-dependent condition — with 13 labs including hematology and urine panels that map directly onto compensated vs. decompensated staging criteria"
+          },
+          {
+            "name": "Portal Hypertension Complication Mapper",
+            "rationale": "Splenomegaly is one sequela of portal hypertension; learners benefit from an interactive post-case diagram showing the portal venous anatomy and branching complication tree (varices, ascites, hepatic encephalopathy, HRS) so they understand the mechanistic link between the pathophysiology and the clinical findings they just encountered",
+            "caseEvidence": "Diagnosis explicitly includes splenomegaly as a complication, and the 4-imaging workup likely includes abdominal ultrasound or CT that demonstrates portal hypertension findings"
+          },
+          {
+            "name": "Lab Trend Interpreter",
+            "rationale": "Cirrhosis produces a characteristic constellation of lab abnormalities that evolve over time; an annotated lab panel view — activated post-submission — that groups results into functional categories (synthetic function, portal hypertension, hypersplenism, renal function) with arrows indicating expected direction of change as disease progresses would teach pattern recognition beyond individual value memorization",
+            "caseEvidence": "13 labs spanning hematology and urine panels create a rich multi-system dataset that is uniquely interpretable as an integrated cirrhosis lab signature rather than isolated values"
+          },
+          {
+            "name": "Imaging Annotation Overlay",
+            "rationale": "Abdominal imaging in cirrhosis contains specific morphological findings (nodular liver surface, caudate lobe hypertrophy, splenomegaly measurement, ascites) that trainees frequently miss or cannot name; a post-submission mode where key findings are labeled on the actual case images with linked explanations would build radiology-pathophysiology correlation skills critical for this diagnosis",
+            "caseEvidence": "4 imaging studies ordered for a hepatic cirrhosis with splenomegaly case almost certainly include ultrasound and/or CT abdomen containing visually identifiable cirrhotic morphology that warrants structured annotation"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "lab ordering and interpretation",
+            "reason": "With 13 labs split across 7 lab groups, students must navigate fragmented panels to build a cirrhosis picture (LFTs, coagulation, CBC for thrombocytopenia, ammonia, etc.). The grouping structure may obscure which panels are diagnostically critical, and students unfamiliar with hepatic workup may over-order or miss key combinations like PT/INR alongside albumin.",
+            "confidence": "high"
+          },
+          {
+            "moment": "imaging selection and interpretation",
+            "reason": "4 imaging studies with special images present a multimodal challenge — students must likely reconcile ultrasound findings (splenomegaly, portal hypertension signs) with possible CT or elastography. The presence of special images suggests non-standard visuals that may be ambiguous without clear labels, and students may struggle to connect imaging findings to the cirrhosis-splenomegaly distinction rather than a hepatic mass or portal vein thrombosis differential.",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG integration into differential reasoning",
+            "reason": "An ECG is structurally unexpected in a GI/cirrhosis case. Students may lose time trying to determine its relevance, possibly suspecting a cardiac cause of hepatomegaly (e.g., congestive hepatopathy) as a competing diagnosis. With only 22 minutes and 4 differentials, spending cognitive load on ECG interpretation could disrupt pacing and introduce anchoring away from cirrhosis.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "neurologic-foundations-bacterial-meningitis-0",
+      "system": "Neurologic",
+      "difficulty": "Foundations",
+      "diagnosis": "Bacterial Meningitis",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing the management principle that empiric antibiotics (e.g., ceftriaxone + vancomycin + dexamethasone) must be started immediately without waiting for CSF results when bacterial meningitis is suspected, as treatment delay worsens mortality."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add at least one additional differential diagnosis such as Herpes Simplex Encephalitis, which is critical to distinguish at this level because it also presents with fever, headache, and altered mental status but requires a different treatment (acyclovir) and has distinct CSF and MRI findings."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explaining how to interpret expected CSF findings in bacterial meningitis (neutrophilic pleocytosis >1000 cells/µL, glucose <45 mg/dL or CSF:serum glucose ratio <0.4, elevated protein >100 mg/dL) so learners can connect the LP decision to the diagnostic result."
+          },
+          {
+            "severity": "medium",
+            "area": "hpi clarity",
+            "suggestion": "Reconcile the inconsistency between the basic HPI (which omits neck stiffness) and the clinicalHpi (which includes it) by adding neck stiffness to the foundational HPI, as it is a cardinal symptom that foundational learners must recognize from the opening presentation."
+          },
+          {
+            "severity": "low",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on the significance of the non-blanching petechial/purpuric rash as a red flag sign for meningococcemia and DIC risk, linking it to the rationale for ordering coagulation studies and d-dimer in this clinical context."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Meningeal Sign Simulator",
+            "rationale": "Bacterial meningitis diagnosis hinges on recognizing classic physical exam findings (Kernig's, Brudzinski's, nuchal rigidity) that cannot be conveyed through labs or imaging alone. An interactive physical exam panel with illustrated, stepwise maneuver demonstrations would help Foundations learners connect the bedside examination to the underlying pathophysiology before ordering tests.",
+            "caseEvidence": "Foundations-level neurologic case with only 2 differentials and 5 key questions suggests the learning objective is pattern recognition of classic meningitis signs, which are exclusively physical exam findings not represented by any existing feature."
+          },
+          {
+            "name": "LP Procedure Walkthrough",
+            "rationale": "Lumbar puncture is the definitive diagnostic step in bacterial meningitis and is a high-yield procedural milestone for Foundations learners. An interactive, ordered step-through of the LP procedure (positioning, landmark identification, CSF tube labeling, opening pressure interpretation) would bridge the gap between ordering a test and understanding how its result is obtained.",
+            "caseEvidence": "19 labs including expected CSF studies (glucose, protein, cell count, culture) are present, yet no procedural context exists to help a Foundations learner understand why and how those specific values are generated."
+          },
+          {
+            "name": "Derm Lesion Identifier Overlay",
+            "rationale": "Petechial/purpuric rash is a critical early warning sign of meningococcal meningitis and a key diagnostic trigger. An annotated overlay tool on the derm image that lets learners tap lesion regions to reveal descriptive clinical labels (e.g., 'non-blanching petechiae — sign of septic emboli') would reinforce visual pattern recognition essential at the Foundations level.",
+            "caseEvidence": "hasDerm is true in a bacterial meningitis case, making the skin findings clinically central; Foundations learners need guided visual interpretation support that image zoom alone does not provide."
+          },
+          {
+            "name": "Pathophysiology Cascade Reveal",
+            "rationale": "Foundations learners benefit from understanding the mechanism chain (bacteremia → BBB disruption → CSF pleocytosis → raised ICP → neurologic deterioration) rather than memorizing isolated facts. A post-case animated or step-diagram cascade that maps this patient's specific lab and symptom values onto the disease mechanism would convert recall into conceptual understanding and complement the existing teaching points.",
+            "caseEvidence": "Low differential count (2) and Foundations difficulty signal the case prioritizes depth over breadth; 19 labs and 4 imaging studies provide rich data points that can be mapped onto a pathophysiology chain rather than presented as isolated results."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "ordering labs — identifying LP/CSF panel among 19 labs across 12 groups",
+            "reason": "Bacterial meningitis diagnosis pivots on CSF results, but a Foundations-level student may not know to look for a lumbar puncture panel or may not recognize which lab group contains it; 12 groups is a high number to scan for a novice, and missing CSF analysis stalls the entire diagnostic pathway",
+            "confidence": "high"
+          },
+          {
+            "moment": "ROS unlock — navigating all 13 ROS categories",
+            "reason": "13 ROS categories is on the larger end for a Foundations case; students at this level have not yet developed pattern-recognition shortcuts for neurologic presentations and may exhaustively work through every category rather than targeting neck stiffness, fever, and photophobia clusters, creating cognitive overload and time waste",
+            "confidence": "medium"
+          },
+          {
+            "moment": "diagnosis submission — committing to Bacterial Meningitis with only 2 differential options",
+            "reason": "A 2-item differential is atypical and structurally signals the case expects a clear binary choice (e.g., bacterial vs. viral/aseptic meningitis); Foundations students may feel uncertain whether the narrow differential means they are missing something or over-anchoring, causing hesitation at submission even when evidence is sufficient",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "img-MPX1749_synpic15006",
+      "system": "Cardiovascular",
+      "difficulty": "Clinical",
+      "diagnosis": "Giant left atrium with mitral valve disease",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly explaining the pathophysiology of mitral stenosis hemodynamics — specifically how a reduced mitral valve area elevates left atrial pressure, causes pulmonary hypertension, and leads to right heart failure — as this mechanistic chain is foundational for understanding the clinical presentation and is entirely absent."
+          },
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point addressing why DOACs are contraindicated in rheumatic mitral stenosis (excluded from major DOAC trials, higher stroke rates shown in INVICTUS trial) versus non-rheumatic AF, as this is a high-yield, commonly tested clinical distinction that is currently only stated without explanation."
+          },
+          {
+            "severity": "medium",
+            "area": "physical exam",
+            "suggestion": "Add documentation of a right ventricular heave or parasternal lift to the cardiovascular exam, as this finding indicates pulmonary hypertension and right ventricular pressure overload — a critical physical exam correlate of advanced mitral stenosis that is missing and educationally important."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add tricuspid regurgitation secondary to pulmonary hypertension as a differential consideration or co-diagnosis, since the case features elevated JVP, hepatomegaly, and pedal edema that could prompt learners to independently reason through right-sided involvement rather than accepting it implicitly."
+          },
+          {
+            "severity": "low",
+            "area": "key questions",
+            "suggestion": "Add a question asking about prior cardiac procedures or interventions (e.g., balloon mitral valvuloplasty or commissurotomy) given the patient's long-known murmur and Nigerian origin, as this is directly relevant to management planning and models thorough history-taking in rheumatic heart disease."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Interactive cardiac anatomy overlay",
+            "rationale": "Giant left atrial enlargement and mitral valve disease are inherently spatial diagnoses — learners benefit from annotating or tracing chamber boundaries directly on the echocardiogram/CXR imaging to connect the radiographic findings (e.g., double contour, splaying of carina) to underlying pathophysiology, reinforcing structural reasoning beyond just reading a report",
+            "caseEvidence": "5 imaging studies including ECG with a complex structural cardiac diagnosis where chamber geometry and valve anatomy are central to diagnosis"
+          },
+          {
+            "name": "ECG pattern-matching drill",
+            "rationale": "Mitral valve disease and giant left atrium produce characteristic ECG changes (P-mitrale, AF, left atrial enlargement criteria) that require deliberate practice to recognize; an interactive step where students must identify and label key ECG features before viewing the AI interpretation would build pattern recognition skills not supported by passive image zoom alone",
+            "caseEvidence": "hasECG:true with a diagnosis where ECG findings (P-mitrale, atrial fibrillation) are diagnostically and mechanistically critical"
+          },
+          {
+            "name": "Hemodynamic simulator",
+            "rationale": "Mitral stenosis/regurgitation with giant left atrium involves pressure gradient, cardiac output, and pulmonary hypertension concepts that are difficult to grasp from static data; an interactive pressure-volume or flow diagram that responds to student-selected severity levels would let learners explore how valve area and regurgitant fraction drive the clinical picture",
+            "caseEvidence": "Giant left atrium with mitral valve disease is a hemodynamically complex diagnosis where understanding pressure consequences is essential for management decisions"
+          },
+          {
+            "name": "Imaging interpretation confidence scoring",
+            "rationale": "With 5 imaging studies covering a structurally nuanced diagnosis, learners should be prompted to rate their confidence and record their interpretation of each image before seeing results; this metacognitive step surfaces imaging blind spots and is tracked in the scorecard to show calibration between confidence and accuracy across cases",
+            "caseEvidence": "imagingCount:5 with structural cardiac pathology where CXR, echo, and other modalities each contribute distinct diagnostic clues requiring independent interpretation skill"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "Imaging interpretation — chest X-ray and echocardiography",
+            "reason": "Giant left atrium is a visually dramatic but often underappreciated finding; students may recognize cardiomegaly but fail to specifically attribute the massive left atrial enlargement as the dominant pathology, causing them to anchor on generic heart failure differentials rather than the structural mitral valve disease driving the case",
+            "confidence": "high"
+          },
+          {
+            "moment": "Diagnosis submission — distinguishing giant left atrium with mitral disease from other valvular or cardiomyopathic diagnoses",
+            "reason": "With only 4 differentials available, students may struggle to differentiate the primary structural diagnosis (giant left atrium WITH mitral valve disease as a combined entity) from standalone mitral stenosis or dilated cardiomyopathy, particularly if they haven't encountered this specific diagnostic label before — the framing of the combined entity is unusual",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG interpretation in context of lab ordering strategy",
+            "reason": "With 13 labs across 4 groups and a 22-minute timer, students must decide how much time to allocate to ECG analysis (likely showing atrial fibrillation and left atrial enlargement findings) versus lab ordering; the ECG findings could either clarify or complicate the differential depending on student experience, and poor prioritization here compresses decision time for the remaining workflow",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "img-CXR216_IM-0777-2001",
+      "system": "Cardiovascular",
+      "difficulty": "Foundations",
+      "diagnosis": "Cardiomegaly",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explaining the pathophysiologic progression from hypertensive LVH to eccentric remodeling and eventual cardiomegaly, as this mechanistic link is the core educational concept for this case and is currently absent."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add valvular heart disease (e.g., mitral regurgitation) as a differential since the case features an apical systolic murmur that directly implicates it and its exclusion requires active reasoning rather than dismissal."
+          },
+          {
+            "severity": "medium",
+            "area": "physical exam",
+            "suggestion": "Remove the contradictory HEENT finding ('No JVD appreciated supine') which directly conflicts with the Neck exam documenting elevated JVP to 10 cm H2O, as this inconsistency will confuse foundational learners."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explaining the significance of a displaced PMI and S3 gallop as bedside signs of ventricular dilation and volume overload, since these classic findings are present in the exam but never linked to cardiomegaly in the teaching content."
+          },
+          {
+            "severity": "low",
+            "area": "lab selection",
+            "suggestion": "Add Hemoglobin A1c to the expected labs list given the patient's family history of diabetes, mild nocturia, and the educational value of screening for a reversible contributor to cardiomyopathy at the foundational level."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "ECG Annotation Layer",
+            "rationale": "Foundations learners seeing their first ECGs need guided interpretation scaffolding; an interactive annotation layer letting students label intervals, waves, and rhythm findings—with AI feedback on correctness—would bridge the gap between raw image viewing and clinical ECG literacy.",
+            "caseEvidence": "hasECG: true on a Foundations-difficulty case means learners are likely encountering ECG interpretation early in training and would benefit from structured, interactive ECG teaching beyond a static zoomable image."
+          },
+          {
+            "name": "Chest X-Ray Hotspot Overlay",
+            "rationale": "Cardiomegaly is a radiographic diagnosis; learners need to practice identifying the cardiothoracic ratio and cardiac silhouette enlargement directly on the image. A hotspot overlay tool where students click/mark the relevant finding and receive feedback on accuracy reinforces the visual-spatial skill central to this diagnosis.",
+            "caseEvidence": "diagnosis: Cardiomegaly with imagingCount: 4 means the CXR is the pivotal diagnostic image, yet the existing image zoom feature provides no structured interactivity to help Foundations learners locate or measure the defining radiographic finding."
+          },
+          {
+            "name": "Pathophysiology Explainer Cards",
+            "rationale": "Foundations-level learners need mechanistic context to connect clinical findings to disease. Brief, toggleable illustrated cards explaining why cardiomegaly causes specific symptoms, signs, and lab/imaging findings would reinforce the conceptual framework that differentiates memorization from understanding.",
+            "caseEvidence": "difficulty: Foundations with a narrow differentialCount: 3 and teachingPointCount: 4 suggests the case is concept-dense but the existing post-grade teaching points are text-only and appear only after submission, leaving a gap in real-time mechanistic learning during case work."
+          },
+          {
+            "name": "Lab Trend Simulator",
+            "rationale": "With 12 labs available, Foundations learners benefit from understanding how cardiac biomarkers and other values evolve over time in cardiomegaly and heart failure. A timeline slider that simulates how selected lab values would trend across hours or days contextualizes the single time-point snapshot and teaches serial monitoring logic.",
+            "caseEvidence": "labCount: 12 on a Foundations cardiovascular case implies multiple cardiac biomarkers are present; without trend context, learners may not grasp the temporal significance of values like BNP or troponin that are central to cardiomegaly evaluation."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "ECG interpretation",
+            "reason": "Foundations-level students likely have limited ECG training; cardiomegaly cases may show non-specific or subtle findings (e.g., voltage criteria, LVH pattern) that don't map cleanly to a single diagnosis, creating confusion about what the ECG is 'telling' them to do next",
+            "confidence": "high"
+          },
+          {
+            "moment": "diagnosis submission with only 3 differentials",
+            "reason": "Cardiomegaly is a radiographic descriptor rather than an etiologic diagnosis; Foundations students may not know whether to submit 'Cardiomegaly' as the answer or pivot to an underlying cause (e.g., dilated cardiomyopathy, heart failure), and a narrow 3-option differential increases the chance they second-guess the correct label",
+            "confidence": "high"
+          },
+          {
+            "moment": "imaging selection and sequencing across 4 imaging studies",
+            "reason": "With 4 imaging options available, Foundations students may be uncertain which to order first — chest X-ray is the canonical cardiomegaly finding, but if echo or additional views are present, students may over-order or misinterpret the sequence as implying multiple abnormalities, creating cognitive overload before labs are even reviewed",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "neurologic-clinical-acute-ischemic-stroke-0",
+      "system": "Neurologic",
+      "difficulty": "Clinical",
+      "diagnosis": "Acute Ischemic Stroke",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing the preceding-day TIA (hidden symptom of transient right hand clumsiness) as a critical stroke warning sign and the ABCD2 score framework for TIA risk stratification, since this case contains a clinically actionable missed TIA that is never pedagogically leveraged."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add 'Complex/Hemiplegic Migraine' as a differential to teach learners to distinguish migrainous aura with motor deficit from ischemic stroke, particularly given the absence of headache here as a distinguishing feature worth explicit discussion."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a question asking about the presence and duration of any atrial fibrillation symptoms (palpitations, prior cardioversions) or prior cardiac workup, since cardioembolic stroke is a major mechanism and atrial fibrillation screening is a required management step that is underemphasized in the key questions."
+          },
+          {
+            "severity": "medium",
+            "area": "imaging",
+            "suggestion": "Add CTA Head and Neck to the expected imaging list and include a teaching point explaining that large vessel occlusion (LVO) identification is mandatory to determine eligibility for mechanical thrombectomy, which is indicated for NIHSS ≥6 with proximal occlusion up to 24 hours and is entirely absent from this case's workup guidance."
+          },
+          {
+            "severity": "low",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point covering blood pressure management thresholds in acute ischemic stroke — specifically that BP should not be lowered below 185/110 mmHg if tPA is being considered, and not below 220/120 mmHg if the patient is not a thrombolysis candidate — since the patient's BP of 188/102 directly raises this clinical decision point."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "NIHSS Interactive Scoring Tool",
+            "rationale": "Acute ischemic stroke management hinges on accurate NIH Stroke Scale scoring, which determines eligibility for tPA and thrombectomy. An interactive NIHSS widget where students score each of the 11 domains based on simulated patient findings (motor, language, gaze, etc.) would reinforce this critical time-sensitive assessment skill and contribute to the overall score.",
+            "caseEvidence": "Diagnosis is Acute Ischemic Stroke in the Neurologic system — NIHSS is the single most important standardized assessment tool for this condition and is not reflected in any existing feature."
+          },
+          {
+            "name": "Time-to-Treatment Decision Timeline",
+            "rationale": "Stroke is uniquely time-critical; the 4.5-hour tPA window and 24-hour thrombectomy window are core learning objectives. A visual timeline overlay showing the patient's symptom onset relative to the student's elapsed case time, with decision gates (tPA eligible? thrombectomy candidate?) would teach 'time is brain' reasoning in a way a static timer cannot.",
+            "caseEvidence": "Acute Ischemic Stroke has strict pharmacologic and interventional time windows that are central to clinical decision-making; the existing 22-minute timer reflects exam pacing but does not model real-world treatment urgency or eligibility windows."
+          },
+          {
+            "name": "Neurological Localization Map",
+            "rationale": "Stroke diagnosis requires mapping deficits to vascular territories (MCA, PCA, basilar, etc.). An interactive brain/vascular territory diagram where students tag the suspected lesion location based on history and imaging findings — then receive feedback comparing their localization to the confirmed infarct on imaging — would build foundational neuroanatomy skills essential for this case type.",
+            "caseEvidence": "The case has 8 imaging studies (likely including CT head and MRI DWI) and a Neurologic system designation, making vascular territory localization a high-yield, case-specific learning objective not addressed by the image zoom lightbox alone."
+          },
+          {
+            "name": "Contraindication Checklist for Thrombolytics",
+            "rationale": "Before administering tPA, clinicians must systematically screen for absolute and relative contraindications. A structured, case-integrated contraindication checklist (recent surgery, anticoagulation use, BP thresholds, prior stroke timing, etc.) that students must complete before a treatment recommendation is accepted would simulate real clinical decision support and expose gaps in safety reasoning.",
+            "caseEvidence": "Acute Ischemic Stroke is the canonical scenario for tPA administration; with 20 labs and HPI data available, student errors in missing contraindications (e.g., elevated INR, recent surgery) represent a high-stakes safety dimension not captured by existing diagnosis accuracy or oral presentation grading."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "navigating 14 lab groups across 20 labs under time pressure",
+            "reason": "With only 22 minutes and 14 lab groups to parse, students must rapidly triage which panels are diagnostically essential (coagulation, metabolic, CBC) versus noise. The high lab group count relative to timer creates decision paralysis about ordering efficiency, especially for students who feel compelled to be comprehensive before imaging.",
+            "confidence": "high"
+          },
+          {
+            "moment": "integrating ECG findings with imaging in the diagnostic workflow",
+            "reason": "Acute Ischemic Stroke requires students to recognize cardioembolic etiology via ECG (e.g., atrial fibrillation) while simultaneously processing 8 imaging studies — likely including CT head and possibly MRI/MRA. The branching interpretive load between two distinct modalities with mechanistic implications for a 3-differential case may cause students to sequence incorrectly or underweight the ECG.",
+            "confidence": "high"
+          },
+          {
+            "moment": "committing to diagnosis submission with only 3 differentials",
+            "reason": "A constrained differential of 3 in a stroke case where mimics (Todd's paralysis, complex migraine, hypertensive encephalopathy) are clinically plausible may pressure students who haven't yet reconciled all imaging and lab data. Students may stall at submission waiting for a single 'confirming' data point that the case structure doesn't clearly foreground.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "endocrine-metabolic-advanced-diabetic-ketoacidosis-0",
+      "system": "Endocrine / Metabolic",
+      "difficulty": "Advanced",
+      "diagnosis": "Diabetic Ketoacidosis",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly covering the initial fluid resuscitation protocol for DKA (isotonic saline 1L/hr for the first 1-2 hours, then guided by corrected sodium and hemodynamic status), as management is a core competency at the advanced level and is entirely absent."
+          },
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on cerebral edema as the most feared complication of DKA treatment, including risk factors (younger age, rapid osmolality correction, excessive free water) and early warning signs, which is especially relevant given this patient's age."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add starvation ketoacidosis or euglycemic DKA (particularly relevant given SGLT-2 inhibitor use context and her recent diet change) as a differential to challenge advanced learners to distinguish it from classic DKA using glucose level and clinical history."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a direct question about SGLT-2 inhibitor use or any new medications started with the diet, since euglycemic DKA is a high-yield mimic that advanced learners must recognize and the 'recently started a new diet' detail in advancedHpi is introduced but never pursued diagnostically."
+          },
+          {
+            "severity": "low",
+            "area": "lab selection",
+            "suggestion": "Add an expected lab result value set (e.g., glucose 498, pH 7.18, bicarb 8, anion gap 24, beta-hydroxybutyrate 4.8) so learners can practice interpreting a complete DKA lab panel rather than only ordering tests without seeing the diagnostic data."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Anion Gap & Calculated Metabolic Calculator",
+            "rationale": "DKA management hinges on serial anion gap closure, corrected sodium, and effective osmolality calculations. An interactive calculator that lets students input raw lab values and derive these calculated metrics — with feedback on whether they interpreted the result correctly — would reinforce the quantitative reasoning essential for DKA diagnosis and monitoring.",
+            "caseEvidence": "21 labs including urine studies in a DKA case means students must synthesize ABG, BMP, and urine ketones into calculated values; no existing feature guides this arithmetic reasoning step"
+          },
+          {
+            "name": "Sequential Lab Resimulation (Treatment Response Simulation)",
+            "rationale": "DKA is a dynamic, time-sensitive condition where management decisions (insulin drip rate, fluid replacement, potassium repletion) directly alter subsequent lab values. Allowing students to choose a treatment action and then receive a 'repeat labs at 2 hours' panel that reflects physiologically plausible changes would teach iterative critical care reasoning.",
+            "caseEvidence": "DKA requires monitoring of anion gap closure, glucose trending, and potassium shifts over time — a static one-shot lab panel cannot capture the management feedback loop that defines real DKA care"
+          },
+          {
+            "name": "ECG Interpretation Prompt with Hyperkalemia Correlation",
+            "rationale": "DKA frequently presents with hyperkalemia-induced ECG changes (peaked T-waves, widened QRS). Prompting students to formally interpret the ECG and then explicitly link their interpretation to a specific lab abnormality — with AI feedback on the correlation — reinforces the life-threatening electrolyte-cardiac axis that is a critical miss in this condition.",
+            "caseEvidence": "Case has both hasECG: true and 21 labs in a DKA context; peaked T-waves from hyperkalemia are a high-yield, frequently missed critical safety finding that warrants a dedicated interpretation-and-correlation step"
+          },
+          {
+            "name": "Fluid & Insulin Dosing Calculator with Safety Guardrails",
+            "rationale": "DKA treatment requires weight-based insulin dosing and aggressive fluid resuscitation with specific rate targets. A dosing input widget where students enter a fluid rate and insulin dose — validated against safe ranges with flagging of dangerous entries (e.g., insulin without adequate potassium repletion) — would operationalize management reasoning beyond mere diagnosis.",
+            "caseEvidence": "Advanced-difficulty DKA case implies readiness for management decisions; no existing feature bridges the gap between ordering discrete tests and applying quantitative treatment protocols with safety awareness"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionGuesses": [
+          {
+            "moment": "lab ordering and interpretation across 21 labs in 12 groups",
+            "reason": "DKA confirmation requires recognizing a specific constellation (glucose, pH, bicarb, anion gap, ketones, BMP components) spread across many lab groups. Students may over-order irrelevant panels or miss the anion gap calculation buried across separate electrolyte values, causing delays in a 15-minute timer",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG interpretation in context of metabolic derangement",
+            "reason": "DKA-associated hyperkalemia produces characteristic ECG changes (peaked T-waves, widened QRS). Students may not intuitively connect ordering the ECG to a metabolic diagnosis rather than a cardiac one, and if they do order it, may fail to link the findings back to potassium derangement rather than treating it as a cardiac differential",
+            "confidence": "high"
+          },
+          {
+            "moment": "diagnosis submission with only 3 differential slots",
+            "reason": "DKA shares presentation overlap with HHS, alcoholic ketoacidosis, and starvation ketosis. With only 3 differential slots and an advanced-difficulty framing, students may struggle to prioritize and correctly rank DKA versus competing ketotic states, especially if lab interpretation of glucose levels (moderately vs severely elevated) is ambiguous before full results load",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cardiovascular-clinical-hypertensive-emergency-0",
+      "system": "Cardiovascular",
+      "difficulty": "Clinical",
+      "diagnosis": "Hypertensive Emergency",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing the BP reduction target and rate — specifically that MAP should be reduced by no more than 20-25% in the first hour to avoid watershed ischemia, a frequently tested and clinically critical principle."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add ischemic or hemorrhagic stroke as a differential, since severe headache with BP 226/138 and occipital presentation demands its active exclusion, and CT Head without Contrast is listed in available imaging yet not in expected imaging despite this diagnostic need."
+          },
+          {
+            "severity": "medium",
+            "area": "imaging",
+            "suggestion": "Add CT Head without Contrast to the expected imaging list with an explanation of when it is indicated — the case presents a scenario (severe headache described as 'worst of his life') where ruling out subarachnoid hemorrhage before attributing symptoms to hypertensive emergency is standard of care."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a question assessing for prior hypertensive emergency hospitalizations, cocaine or sympathomimetic use, and NSAID/decongestant use — secondary causes of acute BP surge are a high-yield teaching target that the hidden history only partially addresses."
+          },
+          {
+            "severity": "low",
+            "area": "hpi clarity",
+            "suggestion": "Clarify the contradiction between 'worst headache of his life' framing in the hidden history and the throbbing, gradual-onset description in the HPI, as this distinction is diagnostically critical and should be explicitly surfaced in the teaching narrative to reinforce how to differentiate thunderclap from hypertensive headache."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Blood Pressure Target Simulator",
+            "rationale": "Hypertensive emergency management hinges on controlled, staged BP reduction — too fast risks end-organ ischemia, too slow risks ongoing damage. An interactive simulator where learners choose a target MAP reduction percentage and time window, then see modeled end-organ outcomes, would reinforce this critical dosing principle that static teaching points cannot convey.",
+            "caseEvidence": "Diagnosis is Hypertensive Emergency, where the 25% MAP reduction in first hour rule is a high-yield, frequently tested, and clinically dangerous concept requiring active decision-making practice beyond passive reading."
+          },
+          {
+            "name": "Fundoscopic Finding Annotator",
+            "rationale": "Hypertensive retinopathy grading (Keith-Wagener-Barker) is a core clinical skill for staging hypertensive emergency severity. An interactive overlay on the fundus image allowing learners to identify and label specific findings (AV nicking, flame hemorrhages, papilledema) before seeing the graded result would build pattern-recognition skills actively rather than passively.",
+            "caseEvidence": "hasFundus is true and the diagnosis is Hypertensive Emergency, making fundoscopic interpretation directly relevant to end-organ damage staging — a skill that benefits from interactive annotation rather than static image viewing."
+          },
+          {
+            "name": "End-Organ Damage Checklist",
+            "rationale": "Hypertensive emergency is defined by end-organ damage across multiple systems simultaneously. A structured, learner-completed checklist requiring students to actively identify which organs are affected (brain, heart, kidneys, eyes) before grading — with post-submission mapping to their ordered tests and history findings — reinforces the diagnostic framework and connects data gathering to clinical synthesis.",
+            "caseEvidence": "The case has 19 labs, 6 imaging studies, ECG, fundus, urinalysis, and hematology, all of which map to distinct end-organ damage domains in hypertensive emergency, making systematic multi-organ assessment a central learning objective."
+          },
+          {
+            "name": "Antihypertensive Agent Selector with Mechanism Feedback",
+            "rationale": "Choosing the correct IV antihypertensive (labetalol, nicardipine, nitroprusside, hydralazine, etc.) and contraindicated agents in hypertensive emergency is a high-stakes pharmacology decision. A post-diagnosis step asking learners to select and justify a first-line agent, with AI feedback on mechanism, contraindications relative to this patient's comorbidities, and why alternatives were inferior, would add a therapeutic reasoning layer absent from current workflow.",
+            "caseEvidence": "Hypertensive Emergency is a diagnosis where management choice is as educationally important as diagnosis itself, and the rich lab/imaging profile (ECG, renal labs, urine) provides comorbidity context that makes the contraindication reasoning exercise meaningful and patient-specific."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "Lab ordering and interpretation across 19 labs in 12 groups",
+            "reason": "High lab group count relative to a cardiovascular case focused on hypertensive emergency means students must navigate granular subgroups (e.g., renal panel, cardiac enzymes, urinalysis for end-organ damage) where the clinical relevance of each group may not be immediately obvious. Students may over-order or miss the targeted labs proving end-organ damage, which is the diagnostic key.",
+            "confidence": "high"
+          },
+          {
+            "moment": "Distinguishing hypertensive emergency from urgency at diagnosis submission with only 3 differentials",
+            "reason": "A narrow 3-option differential in a case where the pivot diagnosis hinges on a functional distinction (end-organ damage present vs. absent) rather than a different disease entity creates a trap — students may select hypertensive urgency or a mimic like hypertensive encephalopathy if imaging/lab results are not synthesized correctly before submitting.",
+            "confidence": "high"
+          },
+          {
+            "moment": "Interpreting special images alongside ECG within the 22-minute timer",
+            "reason": "With 6 imaging studies, an ECG, and special images all available, students must triage which modalities confirm end-organ involvement (e.g., fundoscopic changes, chest X-ray for pulmonary edema) under time pressure. The presence of special images in a cardiovascular case is atypical and students may deprioritize or misinterpret them, slowing the diagnostic pathway.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    }
+  ],
+  "aggregation": {
+    "themes": [
+      {
+        "lens": "content",
+        "theme": "Management algorithm absent from teaching points",
+        "affectedCases": [
+          "respiratory-foundations-spontaneous-pneumothorax-0",
+          "respiratory-advanced-spontaneous-pneumothorax-0",
+          "musculoskeletal-clinical-lumbar-disc-herniation-with-radiculopathy-0",
+          "img-MPX1896_synpic27389-advanced",
+          "img-MPX1896_synpic27390-advanced",
+          "gastrointestinal-advanced-small-bowel-obstruction-0",
+          "respiratory-clinical-community-acquired-pneumonia-0",
+          "infectious-foundations-cellulitis-0",
+          "gastrointestinal-foundations-acute-cholecystitis-0",
+          "endocrine-metabolic-advanced-diabetic-ketoacidosis-0",
+          "cardiovascular-clinical-hypertensive-emergency-0",
+          "hematologic-oncologic-foundations-immune-thrombocytopenia-itp-0"
+        ],
+        "frequency": "12 of 24 cases",
+        "suggestedAction": "Define a mandatory 'Management' teaching point template that covers decision thresholds, first-line intervention, and escalation criteria, and audit all existing cases against it before publication."
+      },
+      {
+        "lens": "feature",
+        "theme": "Post-diagnosis management decision branch missing",
+        "affectedCases": [
+          "respiratory-foundations-spontaneous-pneumothorax-0",
+          "respiratory-advanced-spontaneous-pneumothorax-0",
+          "img-MPX1896_synpic27389-advanced",
+          "img-MPX1896_synpic27390-advanced",
+          "gastrointestinal-advanced-small-bowel-obstruction-0",
+          "musculoskeletal-clinical-lumbar-disc-herniation-with-radiculopathy-0",
+          "infectious-foundations-cellulitis-0",
+          "respiratory-clinical-lung-abscess-0",
+          "hematologic-oncologic-advanced-paroxysmal-nocturnal-hemoglobinuria-0",
+          "neurologic-clinical-acute-ischemic-stroke-0",
+          "endocrine-metabolic-advanced-diabetic-ketoacidosis-0",
+          "cardiovascular-clinical-hypertensive-emergency-0"
+        ],
+        "frequency": "12 of 24 cases",
+        "suggestedAction": "Build a reusable post-diagnosis branching module that presents 2–4 management options, records the learner's choice, and delivers consequence feedback; prioritise rollout for cases where diagnosis-to-treatment logic is the primary learning objective."
+      },
+      {
+        "lens": "feature",
+        "theme": "Imaging is passive — no active annotation or interpretation layer",
+        "affectedCases": [
+          "respiratory-foundations-spontaneous-pneumothorax-0",
+          "respiratory-advanced-spontaneous-pneumothorax-0",
+          "local-fundus-hypertensive-0",
+          "img-MPX1896_synpic27389-advanced",
+          "img-MPX1896_synpic27390-advanced",
+          "cardiovascular-clinical-acute-pericarditis-0",
+          "musculoskeletal-clinical-lumbar-disc-herniation-with-radiculopathy-0",
+          "respiratory-clinical-community-acquired-pneumonia-0",
+          "gastrointestinal-foundations-acute-cholecystitis-0",
+          "img-CXR216_IM-0777-2001",
+          "img-MPX1749_synpic15006",
+          "img-MPX1508_synpic48380"
+        ],
+        "frequency": "12 of 24 cases",
+        "suggestedAction": "Implement a canvas-based image annotation layer (mark, label, submit) with AI comparison to expert-annotated ground truth as a platform-wide feature configurable per image asset."
+      },
+      {
+        "lens": "content",
+        "theme": "Critical life-threatening differential omitted",
+        "affectedCases": [
+          "respiratory-foundations-spontaneous-pneumothorax-0",
+          "respiratory-advanced-spontaneous-pneumothorax-0",
+          "cardiovascular-clinical-acute-pericarditis-0",
+          "img-MPX1723_synpic34922-advanced",
+          "musculoskeletal-clinical-lumbar-disc-herniation-with-radiculopathy-0",
+          "neurologic-foundations-bacterial-meningitis-0",
+          "hematologic-oncologic-foundations-immune-thrombocytopenia-itp-0",
+          "cardiovascular-clinical-hypertensive-emergency-0",
+          "infectious-clinical-pneumocystis-jirovecii-pneumonia-pcp-0",
+          "img-CXR216_IM-0777-2001",
+          "gastrointestinal-foundations-acute-cholecystitis-0"
+        ],
+        "frequency": "11 of 24 cases",
+        "suggestedAction": "Add a differential completeness review step to the case QA checklist that requires at least one life-threatening mimic to be documented with explicit distinguishing criteria for every case."
+      },
+      {
+        "lens": "feature",
+        "theme": "ECG is viewed but never actively interpreted",
+        "affectedCases": [
+          "cardiovascular-clinical-acute-pericarditis-0",
+          "img-MPX1723_synpic34922-advanced",
+          "img-MPX1749_synpic15006",
+          "img-CXR216_IM-0777-2001",
+          "endocrine-metabolic-advanced-diabetic-ketoacidosis-0",
+          "cardiovascular-clinical-hypertensive-emergency-0",
+          "gastrointestinal-advanced-small-bowel-obstruction-0",
+          "respiratory-clinical-community-acquired-pneumonia-0"
+        ],
+        "frequency": "8 of 24 cases",
+        "suggestedAction": "Create a structured ECG interpretation checkpoint (rhythm, rate, axis, intervals, morphology) that must be completed before ECG results are revealed, and integrate the score into the test-ordering dimension."
+      }
+    ]
+  }
+}

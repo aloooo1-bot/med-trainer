@@ -1,0 +1,35 @@
+{
+  "uti": [
+    "uti_000.png",
+    "uti_001.png",
+    "uti_002.png",
+    "uti_003.png",
+    "uti_004.png",
+    "uti_005.png"
+  ],
+  "nephrotic": [
+    "nephrotic_000.png",
+    "nephrotic_001.png",
+    "nephrotic_002.png",
+    "nephrotic_003.png",
+    "nephrotic_004.png",
+    "nephrotic_005.png"
+  ],
+  "nephritic": [
+    "nephritic_000.png",
+    "nephritic_001.png",
+    "nephritic_002.png",
+    "nephritic_003.png",
+    "nephritic_004.png",
+    "nephritic_005.png"
+  ],
+  "kidney_stone": [
+    "kidney_stone_000.png",
+    "kidney_stone_001.png",
+    "kidney_stone_002.png",
+    "kidney_stone_003.png",
+    "kidney_stone_004.png",
+    "kidney_stone_005.png"
+  ],
+  "normal": []
+}

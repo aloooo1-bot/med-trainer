@@ -10,6 +10,7 @@ import {
   loadFocusSettings,
   saveFocusSettings,
 } from '@/app/lib/focusSettings'
+import { getScheme, setScheme, type Scheme } from '@/app/lib/colorScheme'
 
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
 const DIFF_MIX_OPTIONS: { value: FocusSettings['difficultyMix']; label: string }[] = [
@@ -34,6 +35,9 @@ export default function SettingsPage() {
   // Notification prefs
   const [emailCaseReminders, setEmailCaseReminders] = useState(true)
   const [emailWeeklySummary, setEmailWeeklySummary] = useState(true)
+
+  // Appearance
+  const [colorScheme, setColorScheme] = useState<Scheme>('auto')
 
   // Save state per section
   const [profileStatus,  setProfileStatus]  = useState<SaveStatus>('idle')
@@ -77,6 +81,7 @@ export default function SettingsPage() {
         })
     })
     setFocusSettings(loadFocusSettings())
+    setColorScheme(getScheme())
   }, [])
 
   async function saveProfile() {
@@ -174,9 +179,7 @@ export default function SettingsPage() {
         <div className="dx-content">
 
           <div style={{ marginBottom: 24 }}>
-            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--text)', fontFamily: 'DM Serif Display, serif' }}>
-              Settings
-            </h1>
+            <h1 className="heading-display text-[22px]"><span className="heading-accent">Settings</span></h1>
             <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--muted)' }}>
               Manage your profile and preferences
             </p>
@@ -362,6 +365,32 @@ export default function SettingsPage() {
                     </span>
                   )}
                 </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Appearance ── */}
+          <div className="dx-card">
+            <div className="dx-card-header" style={{ fontWeight: 700 }}>Appearance</div>
+            <div className="dx-card-body">
+              <div className="dx-form-section" style={{ paddingTop: 0 }}>
+                <p className="dx-form-section-title" style={{ fontSize: 13, fontWeight: 600 }}>Theme</p>
+                <div style={{ display: 'flex', gap: 8 }}>
+                  {(['light', 'dark', 'auto'] as Scheme[]).map(s => (
+                    <button
+                      key={s}
+                      className={`dx-chip${colorScheme === s ? ' active' : ''}`}
+                      onClick={() => {
+                        setColorScheme(s)
+                        setScheme(s)
+                      }}
+                      style={{ textTransform: 'capitalize' }}
+                    >
+                      {s === 'light' ? '☀ Light' : s === 'dark' ? '☾ Dark' : '⬤ Auto'}
+                    </button>
+                  ))}
+                </div>
+                <p className="dx-help-text">Auto follows your operating system&apos;s dark/light preference.</p>
               </div>
             </div>
           </div>

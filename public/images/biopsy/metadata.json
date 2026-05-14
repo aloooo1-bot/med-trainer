@@ -1,0 +1,122 @@
+{
+  "colon_cancer/colon_cancer_000.png": {
+    "label": "Colon adenocarcinoma — H&E histopathology",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "colon_cancer/colon_cancer_001.png": {
+    "label": "Colon adenocarcinoma — H&E histopathology",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "colon_cancer/colon_cancer_002.png": {
+    "label": "Colon adenocarcinoma — H&E histopathology",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "colon_cancer/colon_cancer_003.png": {
+    "label": "Colon adenocarcinoma — H&E histopathology",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "colon_cancer/colon_cancer_004.png": {
+    "label": "Colon adenocarcinoma — H&E histopathology",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "colon_cancer/colon_cancer_005.png": {
+    "label": "Colon adenocarcinoma — H&E histopathology",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "liver/liver_000.png": {
+    "label": "Liver biopsy — cirrhosis / hepatic fibrosis (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "liver/liver_001.png": {
+    "label": "Liver biopsy — cirrhosis / hepatic fibrosis (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "liver/liver_002.png": {
+    "label": "Liver biopsy — cirrhosis / hepatic fibrosis (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "liver/liver_003.png": {
+    "label": "Liver biopsy — cirrhosis / hepatic fibrosis (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "liver/liver_004.png": {
+    "label": "Liver biopsy — cirrhosis / hepatic fibrosis (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "liver/liver_005.png": {
+    "label": "Liver biopsy — cirrhosis / hepatic fibrosis (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "gastric/gastric_000.png": {
+    "label": "Gastric biopsy — Helicobacter pylori gastritis (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "gastric/gastric_001.png": {
+    "label": "Gastric biopsy — Helicobacter pylori gastritis (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "gastric/gastric_002.png": {
+    "label": "Gastric biopsy — Helicobacter pylori gastritis (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "gastric/gastric_003.png": {
+    "label": "Gastric biopsy — Helicobacter pylori gastritis (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "gastric/gastric_004.png": {
+    "label": "Gastric biopsy — Helicobacter pylori gastritis (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "gastric/gastric_005.png": {
+    "label": "Gastric biopsy — Helicobacter pylori gastritis (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "breast_cancer/breast_cancer_000.png": {
+    "label": "Breast biopsy — invasive ductal carcinoma (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "breast_cancer/breast_cancer_001.png": {
+    "label": "Breast biopsy — invasive ductal carcinoma (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "breast_cancer/breast_cancer_002.png": {
+    "label": "Breast biopsy — invasive ductal carcinoma (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "breast_cancer/breast_cancer_003.png": {
+    "label": "Breast biopsy — invasive ductal carcinoma (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "breast_cancer/breast_cancer_004.png": {
+    "label": "Breast biopsy — invasive ductal carcinoma (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "breast_cancer/breast_cancer_005.png": {
+    "label": "Breast biopsy — invasive ductal carcinoma (H&E)",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "normal/normal_000.png": {
+    "label": "Normal colonic mucosa — H&E histopathology",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "normal/normal_001.png": {
+    "label": "Normal colonic mucosa — H&E histopathology",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "normal/normal_002.png": {
+    "label": "Normal colonic mucosa — H&E histopathology",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "normal/normal_003.png": {
+    "label": "Normal colonic mucosa — H&E histopathology",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "normal/normal_004.png": {
+    "label": "Normal colonic mucosa — H&E histopathology",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "normal/normal_005.png": {
+    "label": "Normal colonic mucosa — H&E histopathology",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  }
+}

@@ -1,0 +1,2921 @@
+[
+  {
+    "id": "musculoskeletal-clinical-lumbar-disc-herniation-with-radiculopathy-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Lumbar Disc Herniation with Radiculopathy",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "local-fundus-hypertensive-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Grade III Hypertensive Retinopathy",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-advanced-spontaneous-pneumothorax-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Spontaneous Pneumothorax",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1896_synpic27389-advanced",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Congenital diaphragmatic hernia",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1723_synpic34922-advanced",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Subarachnoid hemorrhage",
+    "flags": []
+  },
+  {
+    "id": "local-urine-uti-0",
+    "system": "Renal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Uncomplicated Cystitis (UTI)",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-foundations-immune-thrombocytopenia-itp-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Immune Thrombocytopenia (ITP)",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-advanced-paroxysmal-nocturnal-hemoglobinuria-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Paroxysmal Nocturnal Hemoglobinuria",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "infectious-clinical-pneumocystis-jirovecii-pneumonia-pcp-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Pneumocystis Jirovecii Pneumonia (PCP)",
+    "flags": []
+  },
+  {
+    "id": "respiratory-clinical-lung-abscess-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Lung Abscess",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1896_synpic27390-advanced",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Congenital diaphragmatic hernia",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-foundations-spontaneous-pneumothorax-0",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Spontaneous Pneumothorax",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "gastrointestinal-foundations-acute-cholecystitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Cholecystitis",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1508_synpic48380",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Hepatic cirrhosis with splenomegaly",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-CXR216_IM-0777-2001",
+    "system": "Cardiovascular",
+    "difficulty": "Foundations",
+    "diagnosis": "Cardiomegaly",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "neurologic-clinical-acute-ischemic-stroke-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Ischemic Stroke",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1749_synpic15006",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Giant left atrium with mitral valve disease",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-advanced-diabetic-ketoacidosis-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Diabetic Ketoacidosis",
+    "flags": []
+  },
+  {
+    "id": "renal-foundations-ureterolithiasis-ureteral-stone-0",
+    "system": "Renal",
+    "difficulty": "Foundations",
+    "diagnosis": "Ureterolithiasis (Ureteral Stone)",
+    "flags": []
+  },
+  {
+    "id": "neurologic-foundations-bacterial-meningitis-0",
+    "system": "Neurologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Bacterial Meningitis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "renal-clinical-severe-hyperkalemia-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "Severe Hyperkalemia",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-clinical-hypertensive-emergency-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Hypertensive Emergency",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-clinical-acute-pericarditis-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Pericarditis",
+    "flags": []
+  },
+  {
+    "id": "infectious-foundations-cellulitis-0",
+    "system": "Infectious",
+    "difficulty": "Foundations",
+    "diagnosis": "Cellulitis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-clinical-community-acquired-pneumonia-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Community-Acquired Pneumonia",
+    "flags": []
+  },
+  {
+    "id": "img-CXR3245_IM-1537-4001",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Cardiomegaly with pulmonary venous congestion",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-CXR3945_IM-2014-2001-clinical",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Surgical clip in right lung, otherwise unremarkable chest",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "neurologic-advanced-bacterial-meningitis-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Bacterial Meningitis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "musculoskeletal-advanced-osteoporotic-vertebral-compression-fracture-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Osteoporotic Vertebral Compression Fracture",
+    "flags": []
+  },
+  {
+    "id": "trauma-advanced-compartment-syndrome-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Compartment Syndrome",
+    "flags": []
+  },
+  {
+    "id": "local-urine-nephrotic-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "Minimal Change Disease (Nephrotic Syndrome)",
+    "flags": []
+  },
+  {
+    "id": "infectious-clinical-infective-endocarditis-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Infective Endocarditis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "neurologic-clinical-bacterial-meningitis-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Bacterial Meningitis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "renal-clinical-rhabdomyolysis-with-acute-kidney-injury-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "Rhabdomyolysis with Acute Kidney Injury",
+    "flags": []
+  },
+  {
+    "id": "local-urine-kidney_stone-0",
+    "system": "Renal",
+    "difficulty": "Foundations",
+    "diagnosis": "Calcium Oxalate Nephrolithiasis",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-advanced-autoimmune-hepatitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Autoimmune Hepatitis",
+    "flags": []
+  },
+  {
+    "id": "toxicologic-clinical-acetaminophen-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Acetaminophen Overdose",
+    "flags": []
+  },
+  {
+    "id": "img-CXR3945_IM-2014-1001-clinical",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Normal chest radiograph",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "gastrointestinal-advanced-small-bowel-obstruction-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Small Bowel Obstruction",
+    "flags": []
+  },
+  {
+    "id": "respiratory-advanced-lung-abscess-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Lung Abscess",
+    "flags": []
+  },
+  {
+    "id": "local-urine-nephritic-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "IgA Nephropathy (Berger Disease)",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-foundations-pulmonary-embolism-0",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Pulmonary Embolism",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "infectious-advanced-leptospirosis-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Leptospirosis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "renal-clinical-acute-interstitial-nephritis-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Interstitial Nephritis",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-foundations-hypothyroidism-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Foundations",
+    "diagnosis": "Hypothyroidism",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-CXR3945_IM-2014-1001-advanced",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Normal chest radiograph",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1902_synpic35486-advanced",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Colloid cyst of the third ventricle",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "endocrine-metabolic-advanced-primary-hyperparathyroidism-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Primary Hyperparathyroidism",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "neurologic-clinical-migraine-with-aura-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Migraine with Aura",
+    "flags": []
+  },
+  {
+    "id": "trauma-advanced-abdominal-compartment-syndrome-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Abdominal Compartment Syndrome",
+    "flags": [
+      "CARDIAC TEST RULE: ECG missing from availableImaging for chest pain/dyspnea/syncope case"
+    ]
+  },
+  {
+    "id": "infectious-foundations-influenza-0",
+    "system": "Infectious",
+    "difficulty": "Foundations",
+    "diagnosis": "Influenza",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-foundations-hypertensive-emergency-0",
+    "system": "Cardiovascular",
+    "difficulty": "Foundations",
+    "diagnosis": "Hypertensive Emergency",
+    "flags": []
+  },
+  {
+    "id": "img-CXR3848_IM-1946-1001-0002",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Severe thoracic kyphoscoliosis",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1161_synpic40025-advanced",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Bowel obstruction",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "gastrointestinal-clinical-acute-hepatitis-b-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Hepatitis B",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2266_synpic21020-advanced",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Cerebral metastases with hemorrhage",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-advanced-acute-intermittent-porphyria-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Intermittent Porphyria",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "gastrointestinal-advanced-ischemic-colitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Ischemic Colitis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "neurologic-advanced-anti-nmdar-autoimmune-encephalitis-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Anti-NMDAR Autoimmune Encephalitis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "cardiovascular-advanced-acute-pericarditis-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Pericarditis",
+    "flags": []
+  },
+  {
+    "id": "renal-advanced-thrombotic-microangiopathy-tma-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Thrombotic Microangiopathy (TMA)",
+    "flags": []
+  },
+  {
+    "id": "respiratory-advanced-community-acquired-pneumonia-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Community-Acquired Pneumonia",
+    "flags": []
+  },
+  {
+    "id": "infectious-advanced-rocky-mountain-spotted-fever-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Rocky Mountain Spotted Fever",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1603_synpic10084-clinical",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Small bowel obstruction",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-clinical-diabetic-ketoacidosis-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Diabetic Ketoacidosis",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-foundations-graves-disease-hyperthyroidism-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Foundations",
+    "diagnosis": "Graves' Disease (Hyperthyroidism)",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-clinical-cushing-s-syndrome-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Cushing's Syndrome",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2031_synpic38142",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Pneumatosis intestinalis with mesenteric venous gas",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "cardiovascular-clinical-non-st-elevation-myocardial-infarction-nstemi-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Non-ST-Elevation Myocardial Infarction (NSTEMI)",
+    "flags": []
+  },
+  {
+    "id": "neurologic-foundations-first-unprovoked-seizure-0",
+    "system": "Neurologic",
+    "difficulty": "Foundations",
+    "diagnosis": "First Unprovoked Seizure",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-clinical-exudative-pleural-effusion-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Exudative Pleural Effusion",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-foundations-acute-appendicitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Appendicitis",
+    "flags": []
+  },
+  {
+    "id": "renal-foundations-prerenal-acute-kidney-injury-0",
+    "system": "Renal",
+    "difficulty": "Foundations",
+    "diagnosis": "Prerenal Acute Kidney Injury",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-advanced-goodpasture-syndrome-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Goodpasture Syndrome",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1723_synpic34922",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Subarachnoid hemorrhage",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-foundations-opioid-use-disorder-with-withdrawal-0",
+    "system": "Psychiatric",
+    "difficulty": "Foundations",
+    "diagnosis": "Opioid Use Disorder with Withdrawal",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-clinical-aortic-stenosis-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Aortic Stenosis",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-clinical-warm-autoimmune-hemolytic-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Warm Autoimmune Hemolytic Anemia",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "toxicologic-foundations-acetaminophen-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Acetaminophen Overdose",
+    "flags": []
+  },
+  {
+    "id": "infectious-foundations-sepsis-bacterial-urinary-source-0",
+    "system": "Infectious",
+    "difficulty": "Foundations",
+    "diagnosis": "Sepsis (Bacterial — Urinary Source)",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-advanced-type-a-aortic-dissection-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Type A Aortic Dissection",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-foundations-sickle-cell-vaso-occlusive-crisis-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Sickle Cell Vaso-Occlusive Crisis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "cardiovascular-advanced-cardiac-tamponade-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Cardiac Tamponade",
+    "flags": []
+  },
+  {
+    "id": "toxicologic-advanced-anticholinergic-toxidrome-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Anticholinergic Toxidrome",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "cardiovascular-foundations-st-elevation-myocardial-infarction-inferior-stemi-0",
+    "system": "Cardiovascular",
+    "difficulty": "Foundations",
+    "diagnosis": "ST-Elevation Myocardial Infarction (Inferior STEMI)",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "trauma-clinical-pelvic-fracture-0",
+    "system": "Trauma",
+    "difficulty": "Clinical",
+    "diagnosis": "Pelvic Fracture",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX2313_synpic27141",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Right upper lobe pneumonia",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-advanced-brugada-syndrome-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Brugada Syndrome",
+    "flags": []
+  },
+  {
+    "id": "respiratory-advanced-sarcoidosis-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Sarcoidosis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "renal-advanced-acute-interstitial-nephritis-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Interstitial Nephritis",
+    "flags": []
+  },
+  {
+    "id": "neurologic-clinical-bell-s-palsy-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Bell's Palsy",
+    "flags": []
+  },
+  {
+    "id": "respiratory-clinical-acute-asthma-exacerbation-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Asthma Exacerbation",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1723_synpic34923",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute right posterior parietal lobe ischemic stroke",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-CXR3945_IM-2014-1001",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Normal chest radiograph",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-advanced-hypersensitivity-pneumonitis-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Hypersensitivity Pneumonitis",
+    "flags": []
+  },
+  {
+    "id": "neurologic-advanced-normal-pressure-hydrocephalus-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Normal Pressure Hydrocephalus",
+    "flags": []
+  },
+  {
+    "id": "neurologic-foundations-acute-ischemic-stroke-0",
+    "system": "Neurologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Ischemic Stroke",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-clinical-small-bowel-obstruction-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Small Bowel Obstruction",
+    "flags": []
+  },
+  {
+    "id": "neurologic-clinical-guillain-barr-syndrome-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Guillain-Barré Syndrome",
+    "flags": []
+  },
+  {
+    "id": "respiratory-foundations-community-acquired-pneumonia-0",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Community-Acquired Pneumonia",
+    "flags": []
+  },
+  {
+    "id": "renal-advanced-granulomatosis-with-polyangiitis-anca-associated-vasculitis-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Granulomatosis with Polyangiitis (ANCA-Associated Vasculitis)",
+    "flags": []
+  },
+  {
+    "id": "img-CXR3945_IM-2014-2001",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Surgical clip in right lung, otherwise unremarkable chest",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "endocrine-metabolic-clinical-addison-s-disease-primary-adrenal-insufficiency-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Addison's Disease (Primary Adrenal Insufficiency)",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2266_synpic21022",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Cerebral abscesses",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1063_synpic22166",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Stanford type A aortic dissection with hemopericardium",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-clinical-primary-hyperparathyroidism-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Primary Hyperparathyroidism",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "endocrine-metabolic-foundations-severe-hypoglycemia-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Foundations",
+    "diagnosis": "Severe Hypoglycemia",
+    "flags": []
+  },
+  {
+    "id": "local-biopsy-colon_cancer-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Colorectal Adenocarcinoma",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "hematologic-oncologic-foundations-deep-vein-thrombosis-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Deep Vein Thrombosis",
+    "flags": []
+  },
+  {
+    "id": "img-CXR216_IM-0777-2001-clinical",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Cardiomegaly",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-CXR216_IM-0777-2001-advanced",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Cardiomegaly",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "musculoskeletal-advanced-pseudogout-cppd-crystal-arthropathy-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Pseudogout (CPPD Crystal Arthropathy)",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1765_synpic52690",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Cerebral metastases",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-clinical-diffuse-large-b-cell-lymphoma-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Diffuse Large B-Cell Lymphoma",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1603_synpic10084",
+    "system": "Gastrointestinal",
+    "difficulty": "Foundations",
+    "diagnosis": "Small bowel obstruction",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-foundations-rheumatoid-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Foundations",
+    "diagnosis": "Rheumatoid Arthritis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "local-biopsy-breast_cancer-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Invasive Ductal Carcinoma of the Breast",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-foundations-peptic-ulcer-disease-with-upper-gi-bleed-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Foundations",
+    "diagnosis": "Peptic Ulcer Disease with Upper GI Bleed",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-clinical-hyperosmolar-hyperglycemic-state-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Hyperosmolar Hyperglycemic State",
+    "flags": []
+  },
+  {
+    "id": "neurologic-advanced-cerebral-venous-sinus-thrombosis-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Cerebral Venous Sinus Thrombosis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "endocrine-metabolic-advanced-primary-hyperaldosteronism-conn-s-syndrome-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Primary Hyperaldosteronism (Conn's Syndrome)",
+    "flags": []
+  },
+  {
+    "id": "trauma-clinical-compartment-syndrome-0",
+    "system": "Trauma",
+    "difficulty": "Clinical",
+    "diagnosis": "Compartment Syndrome",
+    "flags": []
+  },
+  {
+    "id": "trauma-foundations-epidural-hematoma-0",
+    "system": "Trauma",
+    "difficulty": "Foundations",
+    "diagnosis": "Epidural Hematoma",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "gastrointestinal-advanced-primary-sclerosing-cholangitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Primary Sclerosing Cholangitis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-clinical-spontaneous-pneumothorax-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Spontaneous Pneumothorax",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1580_synpic57544",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Right middle lobe pneumonia",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-clinical-pulmonary-arterial-hypertension-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Pulmonary Arterial Hypertension",
+    "flags": []
+  },
+  {
+    "id": "renal-clinical-siadh-with-symptomatic-hyponatremia-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "SIADH with Symptomatic Hyponatremia",
+    "flags": []
+  },
+  {
+    "id": "trauma-foundations-hemorrhagic-shock-0",
+    "system": "Trauma",
+    "difficulty": "Foundations",
+    "diagnosis": "Hemorrhagic Shock",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2266_synpic21020",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Cerebral metastases with hemorrhage",
+    "flags": []
+  },
+  {
+    "id": "local-biopsy-gastric-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Helicobacter pylori-Associated Gastric Cancer",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-clinical-copd-exacerbation-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "COPD Exacerbation",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "local-smear-malaria_falciparum-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Plasmodium falciparum Malaria",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-clinical-generalized-anxiety-disorder-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "Generalized Anxiety Disorder",
+    "flags": []
+  },
+  {
+    "id": "local-biopsy-liver-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Alcoholic Liver Cirrhosis",
+    "flags": []
+  },
+  {
+    "id": "trauma-advanced-crush-syndrome-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Crush Syndrome",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1902_synpic35486",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Colloid cyst of the third ventricle",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "toxicologic-foundations-benzodiazepine-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Benzodiazepine Overdose",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1580_synpic57545",
+    "system": "Cardiovascular",
+    "difficulty": "Foundations",
+    "diagnosis": "Post-sternotomy with coronary artery bypass graft",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2036_synpic52417",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Gallbladder sludge with polyp",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-advanced-antiphospholipid-syndrome-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Antiphospholipid Syndrome",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "toxicologic-advanced-cyanide-poisoning-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Cyanide Poisoning",
+    "flags": []
+  },
+  {
+    "id": "trauma-advanced-traumatic-rhabdomyolysis-with-multi-organ-dysfunction-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Traumatic Rhabdomyolysis with Multi-organ Dysfunction",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1896_synpic27389",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Congenital diaphragmatic hernia",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "toxicologic-advanced-beta-blocker-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Beta-Blocker Overdose",
+    "flags": []
+  },
+  {
+    "id": "local-derm-melanoma-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Cutaneous Melanoma",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-clinical-polymyalgia-rheumatica-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Polymyalgia Rheumatica",
+    "flags": []
+  },
+  {
+    "id": "trauma-foundations-splenic-laceration-0",
+    "system": "Trauma",
+    "difficulty": "Foundations",
+    "diagnosis": "Splenic Laceration",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "infectious-clinical-pulmonary-tuberculosis-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Pulmonary Tuberculosis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1161_synpic40025",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Bowel obstruction",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX2036_synpic52419",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Gallbladder adenomatous polyp",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1896_synpic27390",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Congenital diaphragmatic hernia",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "local-derm-squamous_cell-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Cutaneous Squamous Cell Carcinoma",
+    "flags": []
+  },
+  {
+    "id": "local-derm-basal_cell-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Basal Cell Carcinoma",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1669_synpic19442",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Right-sided pneumothorax with deep sulcus sign",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "psychiatric-clinical-ptsd-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "PTSD",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2075_synpic33088",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Hepatic metastasis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "renal-advanced-iga-nephropathy-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "IgA Nephropathy",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2321_synpic23109",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Intrahepatic biliary ductal dilatation due to biliary obstruction",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1771_synpic16984",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Small bowel enteritis with mural edema",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1749_synpic15007",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Left atrial and left ventricular enlargement (cardiomegaly)",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "renal-foundations-acute-pyelonephritis-0",
+    "system": "Renal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Pyelonephritis",
+    "flags": []
+  },
+  {
+    "id": "trauma-clinical-rib-fractures-with-hemothorax-0",
+    "system": "Trauma",
+    "difficulty": "Clinical",
+    "diagnosis": "Rib Fractures with Hemothorax",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-advanced-serotonin-syndrome-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Serotonin Syndrome",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "hematologic-oncologic-advanced-waldenstr-m-macroglobulinemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Waldenström Macroglobulinemia",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-advanced-systemic-lupus-erythematosus-with-nephritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Systemic Lupus Erythematosus with Nephritis",
+    "flags": []
+  },
+  {
+    "id": "local-derm-nevus-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Dysplastic Melanocytic Nevus",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-clinical-septic-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Septic Arthritis",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-foundations-acute-gouty-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Gouty Arthritis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX2544_synpic55622",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Left ventricular non-compaction cardiomyopathy",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-advanced-adult-onset-still-s-disease-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Adult-Onset Still's Disease",
+    "flags": []
+  },
+  {
+    "id": "img-CXR3848_IM-1946-1001-0001",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Cardiomegaly with pulmonary congestion",
+    "flags": []
+  },
+  {
+    "id": "toxicologic-foundations-carbon-monoxide-poisoning-0",
+    "system": "Toxicologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Carbon Monoxide Poisoning",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-foundations-iron-deficiency-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Iron Deficiency Anemia",
+    "flags": [
+      "CARDIAC TEST RULE: ECG missing from availableImaging for chest pain/dyspnea/syncope case",
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "psychiatric-advanced-lithium-toxicity-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Lithium Toxicity",
+    "flags": []
+  },
+  {
+    "id": "toxicologic-advanced-organophosphate-poisoning-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Organophosphate Poisoning",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-advanced-myelodysplastic-syndrome-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Myelodysplastic Syndrome",
+    "flags": [
+      "CARDIAC TEST RULE: ECG missing from availableImaging for chest pain/dyspnea/syncope case",
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "toxicologic-clinical-methanol-ingestion-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Methanol Ingestion",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-clinical-bipolar-i-disorder-manic-episode-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "Bipolar I Disorder — Manic Episode",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "toxicologic-clinical-salicylate-toxicity-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Salicylate Toxicity",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "toxicologic-clinical-digoxin-toxicity-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Digoxin Toxicity",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-advanced-carcinoid-syndrome-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Carcinoid Syndrome",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "trauma-clinical-traumatic-aortic-injury-0",
+    "system": "Trauma",
+    "difficulty": "Clinical",
+    "diagnosis": "Traumatic Aortic Injury",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-advanced-neuroleptic-malignant-syndrome-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Neuroleptic Malignant Syndrome",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-advanced-wernicke-s-encephalopathy-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Wernicke's Encephalopathy",
+    "flags": []
+  },
+  {
+    "id": "toxicologic-clinical-tricyclic-antidepressant-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Tricyclic Antidepressant Overdose",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-clinical-acute-diverticulitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Diverticulitis",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-clinical-crohn-s-disease-flare-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Crohn's Disease Flare",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "psychiatric-foundations-panic-disorder-0",
+    "system": "Psychiatric",
+    "difficulty": "Foundations",
+    "diagnosis": "Panic Disorder",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "neurologic-clinical-chronic-subdural-hematoma-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Chronic Subdural Hematoma",
+    "flags": []
+  },
+  {
+    "id": "toxicologic-foundations-opioid-toxidrome-0",
+    "system": "Toxicologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Opioid Toxidrome",
+    "flags": []
+  },
+  {
+    "id": "renal-clinical-nephrotic-syndrome-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "Nephrotic Syndrome",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-foundations-first-episode-psychosis-0",
+    "system": "Psychiatric",
+    "difficulty": "Foundations",
+    "diagnosis": "First-Episode Psychosis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "musculoskeletal-clinical-reactive-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Reactive Arthritis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "gastrointestinal-advanced-whipple-s-disease-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Whipple's Disease",
+    "flags": [
+      "WHIPPLE'S: PAS-positive macrophages not described in procedureResults",
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "endocrine-metabolic-advanced-pheochromocytoma-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Pheochromocytoma",
+    "flags": []
+  },
+  {
+    "id": "renal-foundations-severe-hyperkalemia-0",
+    "system": "Renal",
+    "difficulty": "Foundations",
+    "diagnosis": "Severe Hyperkalemia",
+    "flags": []
+  },
+  {
+    "id": "infectious-advanced-disseminated-histoplasmosis-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Disseminated Histoplasmosis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "musculoskeletal-clinical-pseudogout-cppd-crystal-arthropathy-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Pseudogout (CPPD Crystal Arthropathy)",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "musculoskeletal-advanced-dermatomyositis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Dermatomyositis",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-foundations-lumbar-disc-herniation-with-radiculopathy-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Foundations",
+    "diagnosis": "Lumbar Disc Herniation with Radiculopathy",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "neurologic-advanced-neuromyelitis-optica-spectrum-disorder-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Neuromyelitis Optica Spectrum Disorder",
+    "flags": []
+  },
+  {
+    "id": "renal-advanced-membranous-nephropathy-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Membranous Nephropathy",
+    "flags": []
+  },
+  {
+    "id": "infectious-foundations-meningococcal-meningitis-0",
+    "system": "Infectious",
+    "difficulty": "Foundations",
+    "diagnosis": "Meningococcal Meningitis",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-advanced-cll-with-autoimmune-hemolytic-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "CLL with Autoimmune Hemolytic Anemia",
+    "flags": [
+      "CARDIAC TEST RULE: ECG missing from availableImaging for chest pain/dyspnea/syncope case",
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "musculoskeletal-foundations-osteoporotic-vertebral-compression-fracture-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Foundations",
+    "diagnosis": "Osteoporotic Vertebral Compression Fracture",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-clinical-alcohol-withdrawal-syndrome-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "Alcohol Withdrawal Syndrome",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-foundations-acute-pancreatitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Pancreatitis",
+    "flags": []
+  },
+  {
+    "id": "infectious-clinical-acute-osteomyelitis-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Osteomyelitis",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-foundations-major-depressive-episode-0",
+    "system": "Psychiatric",
+    "difficulty": "Foundations",
+    "diagnosis": "Major Depressive Episode",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-advanced-takotsubo-cardiomyopathy-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Takotsubo Cardiomyopathy",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "trauma-advanced-fat-embolism-syndrome-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Fat Embolism Syndrome",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "local-fundus-amd-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Neovascular Age-Related Macular Degeneration",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX2544_synpic55621",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Left ventricular non-compaction cardiomyopathy",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-clinical-vitamin-b12-deficiency-megaloblastic-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Vitamin B12 Deficiency Megaloblastic Anemia",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "neurologic-foundations-migraine-with-aura-0",
+    "system": "Neurologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Migraine with Aura",
+    "flags": []
+  },
+  {
+    "id": "trauma-foundations-tension-pneumothorax-0",
+    "system": "Trauma",
+    "difficulty": "Foundations",
+    "diagnosis": "Tension Pneumothorax",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-advanced-pulmonary-alveolar-proteinosis-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Pulmonary Alveolar Proteinosis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "cardiovascular-clinical-dilated-cardiomyopathy-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Dilated Cardiomyopathy",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-foundations-atrial-fibrillation-with-rapid-ventricular-response-0",
+    "system": "Cardiovascular",
+    "difficulty": "Foundations",
+    "diagnosis": "Atrial Fibrillation with Rapid Ventricular Response",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-foundations-diabetic-ketoacidosis-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Foundations",
+    "diagnosis": "Diabetic Ketoacidosis",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2031_synpic38141",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Mesenteric ischemia with portal venous gas and pneumatosis intestinalis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "neurologic-clinical-transient-ischemic-attack-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Transient Ischemic Attack",
+    "flags": []
+  },
+  {
+    "id": "respiratory-foundations-acute-asthma-exacerbation-0",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Asthma Exacerbation",
+    "flags": []
+  },
+  {
+    "id": "local-fundus-glaucoma-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Primary Open-Angle Glaucoma",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "local-fundus-diabetic_retinopathy-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Proliferative Diabetic Retinopathy",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "hematologic-oncologic-clinical-multiple-myeloma-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Multiple Myeloma",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1063_synpic22165",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Stanford type A aortic dissection",
+    "flags": []
+  },
+  {
+    "id": "respiratory-advanced-acute-asthma-exacerbation-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Asthma Exacerbation",
+    "flags": []
+  },
+  {
+    "id": "infectious-advanced-strongyloidiasis-with-hyperinfection-syndrome-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Strongyloidiasis with Hyperinfection Syndrome",
+    "flags": [
+      "CARDIAC TEST RULE: ECG missing from availableImaging for chest pain/dyspnea/syncope case"
+    ]
+  },
+  {
+    "id": "renal-advanced-prerenal-acute-kidney-injury-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Prerenal Acute Kidney Injury",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "renal-clinical-prerenal-acute-kidney-injury-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "Prerenal Acute Kidney Injury",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "endocrine-metabolic-clinical-hypothyroidism-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Hypothyroidism",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "neurologic-clinical-first-unprovoked-seizure-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "First Unprovoked Seizure",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "neurologic-advanced-first-unprovoked-seizure-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "First Unprovoked Seizure",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-advanced-exudative-pleural-effusion-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Exudative Pleural Effusion",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-advanced-non-st-elevation-myocardial-infarction-nstemi-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Non-ST-Elevation Myocardial Infarction (NSTEMI)",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-clinical-acute-appendicitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Appendicitis",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-advanced-acute-appendicitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Appendicitis",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-advanced-hypothyroidism-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Hypothyroidism",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "toxicologic-advanced-opioid-toxidrome-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Opioid Toxidrome",
+    "flags": []
+  },
+  {
+    "id": "infectious-clinical-influenza-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Influenza",
+    "flags": []
+  },
+  {
+    "id": "infectious-advanced-influenza-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Influenza",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-advanced-acute-hepatitis-b-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Hepatitis B",
+    "flags": []
+  },
+  {
+    "id": "img-CXR3848_IM-1946-1001-0002-advanced",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Severe thoracic kyphoscoliosis",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-advanced-cushing-s-syndrome-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Cushing's Syndrome",
+    "flags": []
+  },
+  {
+    "id": "infectious-clinical-cellulitis-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Cellulitis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "endocrine-metabolic-advanced-graves-disease-hyperthyroidism-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Graves' Disease (Hyperthyroidism)",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-clinical-graves-disease-hyperthyroidism-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Graves' Disease (Hyperthyroidism)",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-advanced-alcohol-withdrawal-syndrome-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Alcohol Withdrawal Syndrome",
+    "flags": []
+  },
+  {
+    "id": "infectious-advanced-meningococcal-meningitis-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Meningococcal Meningitis",
+    "flags": []
+  },
+  {
+    "id": "renal-clinical-acute-pyelonephritis-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Pyelonephritis",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1749_synpic15006-advanced",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Giant left atrium with mitral valve disease",
+    "flags": []
+  },
+  {
+    "id": "renal-advanced-nephrotic-syndrome-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Nephrotic Syndrome",
+    "flags": []
+  },
+  {
+    "id": "renal-advanced-rhabdomyolysis-with-acute-kidney-injury-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Rhabdomyolysis with Acute Kidney Injury",
+    "flags": []
+  },
+  {
+    "id": "infectious-advanced-acute-osteomyelitis-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Osteomyelitis",
+    "flags": []
+  },
+  {
+    "id": "trauma-advanced-tension-pneumothorax-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Tension Pneumothorax",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "toxicologic-advanced-salicylate-toxicity-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Salicylate Toxicity",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "gastrointestinal-advanced-acute-diverticulitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Diverticulitis",
+    "flags": []
+  },
+  {
+    "id": "renal-advanced-acute-pyelonephritis-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Pyelonephritis",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-advanced-acute-gouty-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Gouty Arthritis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "trauma-advanced-traumatic-aortic-injury-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Traumatic Aortic Injury",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-clinical-acute-gouty-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Gouty Arthritis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "neurologic-advanced-chronic-subdural-hematoma-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Chronic Subdural Hematoma",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-advanced-septic-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Septic Arthritis",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-clinical-iron-deficiency-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Iron Deficiency Anemia",
+    "flags": [
+      "CARDIAC TEST RULE: ECG missing from availableImaging for chest pain/dyspnea/syncope case",
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "hematologic-oncologic-advanced-iron-deficiency-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Iron Deficiency Anemia",
+    "flags": [
+      "CARDIAC TEST RULE: ECG missing from availableImaging for chest pain/dyspnea/syncope case",
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "psychiatric-advanced-bipolar-i-disorder-manic-episode-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Bipolar I Disorder — Manic Episode",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "toxicologic-advanced-methanol-ingestion-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Methanol Ingestion",
+    "flags": []
+  },
+  {
+    "id": "infectious-advanced-pneumocystis-jirovecii-pneumonia-pcp-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Pneumocystis Jirovecii Pneumonia (PCP)",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-clinical-immune-thrombocytopenia-itp-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Immune Thrombocytopenia (ITP)",
+    "flags": []
+  },
+  {
+    "id": "toxicologic-clinical-carbon-monoxide-poisoning-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Carbon Monoxide Poisoning",
+    "flags": []
+  },
+  {
+    "id": "toxicologic-advanced-carbon-monoxide-poisoning-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Carbon Monoxide Poisoning",
+    "flags": []
+  },
+  {
+    "id": "infectious-clinical-meningococcal-meningitis-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Meningococcal Meningitis",
+    "flags": []
+  },
+  {
+    "id": "toxicologic-advanced-tricyclic-antidepressant-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Tricyclic Antidepressant Overdose",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-clinical-sickle-cell-vaso-occlusive-crisis-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Sickle Cell Vaso-Occlusive Crisis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "psychiatric-advanced-opioid-use-disorder-with-withdrawal-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Opioid Use Disorder with Withdrawal",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-clinical-opioid-use-disorder-with-withdrawal-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "Opioid Use Disorder with Withdrawal",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-advanced-st-elevation-myocardial-infarction-inferior-stemi-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "ST-Elevation Myocardial Infarction (Inferior STEMI)",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "hematologic-oncologic-advanced-immune-thrombocytopenia-itp-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Immune Thrombocytopenia (ITP)",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-advanced-warm-autoimmune-hemolytic-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Warm Autoimmune Hemolytic Anemia",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "cardiovascular-advanced-aortic-stenosis-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Aortic Stenosis",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-advanced-sickle-cell-vaso-occlusive-crisis-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Sickle Cell Vaso-Occlusive Crisis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "psychiatric-clinical-first-episode-psychosis-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "First-Episode Psychosis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "trauma-advanced-pelvic-fracture-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Pelvic Fracture",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "psychiatric-advanced-first-episode-psychosis-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "First-Episode Psychosis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "toxicologic-advanced-acetaminophen-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Acetaminophen Overdose",
+    "flags": []
+  },
+  {
+    "id": "infectious-clinical-sepsis-bacterial-urinary-source-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Sepsis (Bacterial — Urinary Source)",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-clinical-st-elevation-myocardial-infarction-inferior-stemi-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "ST-Elevation Myocardial Infarction (Inferior STEMI)",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX2313_synpic27141-advanced",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Right upper lobe pneumonia",
+    "flags": []
+  },
+  {
+    "id": "infectious-advanced-sepsis-bacterial-urinary-source-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Sepsis (Bacterial — Urinary Source)",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2313_synpic27141-clinical",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Right upper lobe pneumonia",
+    "flags": []
+  },
+  {
+    "id": "neurologic-advanced-guillain-barr-syndrome-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Guillain-Barré Syndrome",
+    "flags": []
+  },
+  {
+    "id": "neurologic-advanced-bell-s-palsy-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Bell's Palsy",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-clinical-acute-pancreatitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Pancreatitis",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-advanced-acute-pancreatitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Pancreatitis",
+    "flags": []
+  },
+  {
+    "id": "neurologic-advanced-acute-ischemic-stroke-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Ischemic Stroke",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1063_synpic22166-advanced",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Stanford type A aortic dissection with hemopericardium",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1723_synpic34923-advanced",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute right posterior parietal lobe ischemic stroke",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "endocrine-metabolic-advanced-severe-hypoglycemia-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Severe Hypoglycemia",
+    "flags": []
+  },
+  {
+    "id": "endocrine-metabolic-clinical-severe-hypoglycemia-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Severe Hypoglycemia",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-advanced-acute-cholecystitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Cholecystitis",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-clinical-deep-vein-thrombosis-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Deep Vein Thrombosis",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-advanced-deep-vein-thrombosis-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Deep Vein Thrombosis",
+    "flags": []
+  },
+  {
+    "id": "img-CXR3945_IM-2014-2001-advanced",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Surgical clip in right lung, otherwise unremarkable chest",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "endocrine-metabolic-advanced-addison-s-disease-primary-adrenal-insufficiency-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Addison's Disease (Primary Adrenal Insufficiency)",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2266_synpic21022-advanced",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Cerebral abscesses",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1765_synpic52690-advanced",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Cerebral metastases",
+    "flags": []
+  },
+  {
+    "id": "trauma-clinical-epidural-hematoma-0",
+    "system": "Trauma",
+    "difficulty": "Clinical",
+    "diagnosis": "Epidural Hematoma",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "hematologic-oncologic-advanced-diffuse-large-b-cell-lymphoma-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Diffuse Large B-Cell Lymphoma",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-advanced-peptic-ulcer-disease-with-upper-gi-bleed-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Peptic Ulcer Disease with Upper GI Bleed",
+    "flags": []
+  },
+  {
+    "id": "trauma-clinical-hemorrhagic-shock-0",
+    "system": "Trauma",
+    "difficulty": "Clinical",
+    "diagnosis": "Hemorrhagic Shock",
+    "flags": []
+  },
+  {
+    "id": "trauma-advanced-epidural-hematoma-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Epidural Hematoma",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "musculoskeletal-advanced-rheumatoid-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Rheumatoid Arthritis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "endocrine-metabolic-advanced-hyperosmolar-hyperglycemic-state-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Hyperosmolar Hyperglycemic State",
+    "flags": []
+  },
+  {
+    "id": "renal-advanced-severe-hyperkalemia-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Severe Hyperkalemia",
+    "flags": []
+  },
+  {
+    "id": "trauma-advanced-hemorrhagic-shock-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Hemorrhagic Shock",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1580_synpic57544-advanced",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Right middle lobe pneumonia",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "respiratory-advanced-pulmonary-arterial-hypertension-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Pulmonary Arterial Hypertension",
+    "flags": []
+  },
+  {
+    "id": "renal-advanced-siadh-with-symptomatic-hyponatremia-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "SIADH with Symptomatic Hyponatremia",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-clinical-rheumatoid-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Rheumatoid Arthritis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1580_synpic57545-clinical",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Post-sternotomy with coronary artery bypass graft",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1603_synpic10084-advanced",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Small bowel obstruction",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1508_synpic48380-advanced",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Hepatic cirrhosis with splenomegaly",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "psychiatric-advanced-generalized-anxiety-disorder-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Generalized Anxiety Disorder",
+    "flags": []
+  },
+  {
+    "id": "toxicologic-clinical-benzodiazepine-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Benzodiazepine Overdose",
+    "flags": []
+  },
+  {
+    "id": "toxicologic-advanced-benzodiazepine-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Benzodiazepine Overdose",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1580_synpic57545-advanced",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Post-sternotomy with coronary artery bypass graft",
+    "flags": []
+  },
+  {
+    "id": "toxicologic-clinical-opioid-toxidrome-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Opioid Toxidrome",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2036_synpic52417-advanced",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Gallbladder sludge with polyp",
+    "flags": []
+  },
+  {
+    "id": "respiratory-advanced-copd-exacerbation-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "COPD Exacerbation",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX2036_synpic52419-advanced",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Gallbladder adenomatous polyp",
+    "flags": []
+  },
+  {
+    "id": "infectious-advanced-cellulitis-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Cellulitis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "trauma-advanced-splenic-laceration-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Splenic Laceration",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "trauma-clinical-splenic-laceration-0",
+    "system": "Trauma",
+    "difficulty": "Clinical",
+    "diagnosis": "Splenic Laceration",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "musculoskeletal-advanced-polymyalgia-rheumatica-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Polymyalgia Rheumatica",
+    "flags": []
+  },
+  {
+    "id": "respiratory-advanced-pulmonary-embolism-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Pulmonary Embolism",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-CXR3245_IM-1537-4001-advanced",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Cardiomegaly with pulmonary venous congestion",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "infectious-advanced-pulmonary-tuberculosis-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Pulmonary Tuberculosis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "psychiatric-advanced-ptsd-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "PTSD",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2075_synpic33088-advanced",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Hepatic metastasis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1749_synpic15007-advanced",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Left atrial and left ventricular enlargement (cardiomegaly)",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "gastrointestinal-clinical-acute-cholecystitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Cholecystitis",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1669_synpic19442-advanced",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Right-sided pneumothorax with deep sulcus sign",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-CXR3848_IM-1946-1001-0001-advanced",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Cardiomegaly with pulmonary congestion",
+    "flags": []
+  },
+  {
+    "id": "trauma-advanced-rib-fractures-with-hemothorax-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Rib Fractures with Hemothorax",
+    "flags": []
+  },
+  {
+    "id": "img-MPX1771_synpic16984-advanced",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Small bowel enteritis with mural edema",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-clinical-major-depressive-episode-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "Major Depressive Episode",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-advanced-major-depressive-episode-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Major Depressive Episode",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-advanced-lumbar-disc-herniation-with-radiculopathy-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Lumbar Disc Herniation with Radiculopathy",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "renal-advanced-ureterolithiasis-ureteral-stone-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Ureterolithiasis (Ureteral Stone)",
+    "flags": []
+  },
+  {
+    "id": "neurologic-advanced-migraine-with-aura-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Migraine with Aura",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-clinical-acute-heart-failure-exacerbation-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Heart Failure Exacerbation",
+    "flags": []
+  },
+  {
+    "id": "psychiatric-clinical-panic-disorder-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "Panic Disorder",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "toxicologic-advanced-digoxin-toxicity-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Digoxin Toxicity",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-advanced-atrial-fibrillation-with-rapid-ventricular-response-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Atrial Fibrillation with Rapid Ventricular Response",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-advanced-dilated-cardiomyopathy-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Dilated Cardiomyopathy",
+    "flags": []
+  },
+  {
+    "id": "musculoskeletal-advanced-reactive-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Reactive Arthritis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "infectious-advanced-infective-endocarditis-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Infective Endocarditis",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "trauma-clinical-tension-pneumothorax-0",
+    "system": "Trauma",
+    "difficulty": "Clinical",
+    "diagnosis": "Tension Pneumothorax",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "musculoskeletal-clinical-osteoporotic-vertebral-compression-fracture-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Osteoporotic Vertebral Compression Fracture",
+    "flags": []
+  },
+  {
+    "id": "renal-clinical-ureterolithiasis-ureteral-stone-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "Ureterolithiasis (Ureteral Stone)",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-advanced-crohn-s-disease-flare-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Crohn's Disease Flare",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "hematologic-oncologic-advanced-vitamin-b12-deficiency-megaloblastic-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Vitamin B12 Deficiency Megaloblastic Anemia",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "psychiatric-advanced-panic-disorder-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Panic Disorder",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "cardiovascular-advanced-acute-heart-failure-exacerbation-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Heart Failure Exacerbation",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-clinical-atrial-fibrillation-with-rapid-ventricular-response-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Atrial Fibrillation with Rapid Ventricular Response",
+    "flags": []
+  },
+  {
+    "id": "neurologic-advanced-transient-ischemic-attack-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Transient Ischemic Attack",
+    "flags": []
+  },
+  {
+    "id": "cardiovascular-advanced-hypertensive-emergency-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Hypertensive Emergency",
+    "flags": []
+  },
+  {
+    "id": "respiratory-clinical-pulmonary-embolism-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Pulmonary Embolism",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "cardiovascular-foundations-acute-heart-failure-exacerbation-0",
+    "system": "Cardiovascular",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Heart Failure Exacerbation",
+    "flags": []
+  },
+  {
+    "id": "img-MPX2321_synpic23109-advanced",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Intrahepatic biliary ductal dilatation due to biliary obstruction",
+    "flags": [
+      "MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive"
+    ]
+  },
+  {
+    "id": "img-MPX1063_synpic22165-advanced",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Stanford type A aortic dissection",
+    "flags": []
+  },
+  {
+    "id": "gastrointestinal-clinical-peptic-ulcer-disease-with-upper-gi-bleed-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Peptic Ulcer Disease with Upper GI Bleed",
+    "flags": []
+  },
+  {
+    "id": "hematologic-oncologic-advanced-multiple-myeloma-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Multiple Myeloma",
+    "flags": []
+  }
+]

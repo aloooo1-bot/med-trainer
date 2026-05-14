@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
+import Link from 'next/link'
 import { Stethoscope, ListChecks, Hand, FlaskConical, Activity, ClipboardCheck } from 'lucide-react'
 import {
   ROS_CATEGORIES,
@@ -25,9 +26,11 @@ import {
 import { useSpeechInput } from '../lib/useSpeechInput'
 import { MANIFEST, makeCaseId } from '../lib/caseManifest'
 import { jitterCase } from '../lib/caseJitter'
+import { reconcileHistoryConsistency, sanitizePmhLeak, DIFFICULTY_RULES } from '../lib/generators/shared'
 import { type GradingResult, type GradingInput, stripToBasic } from '../grading/types'
 import { calcEfficiency } from '../grading/efficiency'
 import { gradeCase, type GradingUsageCallback } from '../grading/grader'
+import { getRubric, RUBRIC_TOTAL, type DimensionKey } from '../grading/rubric'
 import {
   type RawUsage, type APICallType, type ActiveSession,
   makeCallRecord, recordToSession, createActiveSession, finalizeSession, syncSessionToSupabase,
@@ -407,8 +410,8 @@ async function callClaude(
 
 function SectionCard({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="rounded-lg border border-surface-4 bg-surface-1 p-5">
-      <h2 className="mb-4 text-[11px] font-semibold text-ink-secondary uppercase tracking-wider">{title}</h2>
+    <div className="rounded-[14px] border border-surface-4 bg-surface-1 p-5">
+      <h2 className="eyebrow mb-4">{title}</h2>
       {children}
     </div>
   )
@@ -416,7 +419,7 @@ function SectionCard({ title, children }: { title: string; children: React.React
 
 function Badge({ text, color = 'blue' }: { text: string; color?: 'blue' | 'green' | 'yellow' | 'red' | 'purple' }) {
   const colors = {
-    blue:   'bg-insight-bg text-insight border-insight-border',
+    blue:   'bg-primary-50 text-primary-700 border-primary-200',
     green:  'bg-confirmed-bg text-confirmed border-confirmed-border',
     yellow: 'bg-caution-bg text-caution border-caution-border',
     red:    'bg-critical-bg text-critical border-critical-border',
@@ -449,6 +452,191 @@ function NotesResultPanel({ content }: { content: string }) {
             Compare your notes with the teaching points and differential discussion above to identify gaps in your reasoning.
           </p>
         </div>
+      )}
+    </div>
+  )
+}
+
+// ── Scorecard helpers ──────────────────────────────────────────────────────
+
+function ScoreRing({ score }: { score: number }) {
+  const r = 68
+  const circ = 2 * Math.PI * r
+  const offset = circ * (1 - Math.min(100, score) / 100)
+  const strokeColor = score >= 75 ? 'var(--color-confirmed)' : score >= 60 ? 'var(--color-caution)' : 'var(--color-critical)'
+  return (
+    <svg width="160" height="160" role="img" aria-label={`Score: ${score} of 100`} className="block">
+      <circle cx="80" cy="80" r={r} fill="none" stroke="var(--color-surface-3)" strokeWidth="8" />
+      <circle
+        cx="80" cy="80" r={r} fill="none" style={{ stroke: strokeColor }} strokeWidth="8"
+        strokeDasharray={`${circ}`} strokeDashoffset={offset}
+        strokeLinecap="round" transform="rotate(-90 80 80)"
+      />
+      <text x="80" y="86" textAnchor="middle"
+        style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 48, fontWeight: 500, fill: 'var(--color-ink-primary)' }}>
+        {score}
+      </text>
+      <text x="80" y="106" textAnchor="middle"
+        style={{ fontSize: 12, fill: 'var(--color-ink-tertiary)', letterSpacing: '0.05em' }}>/ 100</text>
+    </svg>
+  )
+}
+
+function CategoryRow({
+  label, dim, max, pct, expanded, onToggle,
+}: {
+  label: string
+  dim: { score: number; feedback: string }
+  max: number
+  pct: number
+  expanded: boolean
+  onToggle: () => void
+}) {
+  const barColor = pct >= 75 ? 'bg-confirmed' : pct >= 60 ? 'bg-caution' : 'bg-critical'
+  const scoreColor = pct >= 75 ? 'text-confirmed' : pct >= 60 ? 'text-caution' : 'text-critical'
+  const panelId = `sc-panel-${label.replace(/\s+/g, '-').toLowerCase()}`
+  return (
+    <div>
+      <button
+        onClick={onToggle}
+        aria-expanded={expanded}
+        aria-controls={panelId}
+        aria-label={`${expanded ? 'Collapse' : 'Expand'} ${label} details`}
+        className="flex w-full items-center gap-3 px-4 py-3 text-left hover:bg-paper-2 transition-colors focus-visible:outline-2 focus-visible:outline-sc-accent"
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle() } }}
+      >
+        <span className="w-40 shrink-0 text-sm font-medium text-ink">{label}</span>
+        <div className="flex-1 h-1.5 rounded-full bg-paper-3 overflow-hidden">
+          <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
+        </div>
+        <span className={`w-16 text-right font-mono text-sm tabular-nums ${scoreColor}`}>
+          {dim.score}<span className="text-ink-3 text-xs">/{max}</span>
+        </span>
+        <svg
+          style={{ transition: 'transform 200ms', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
+          className="w-4 h-4 text-ink-3 flex-shrink-0"
+          fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      <div
+        id={panelId}
+        role="region"
+        aria-label={`${label} details`}
+        style={{ overflow: 'hidden', maxHeight: expanded ? '500px' : '0', transition: 'max-height 280ms ease' }}
+      >
+        <div style={{ background: 'var(--overlay-tint)', borderRadius: 8, padding: 12, margin: '0 16px 12px' }}>
+          <p className="text-sm text-ink-2 leading-relaxed">{dim.feedback || 'No detailed feedback available.'}</p>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+function ScorecardNotesPanel({ content }: { content: string }) {
+  const [open, setOpen] = useState(false)
+  return (
+    <div className="rounded-lg border border-caution/30 bg-caution/5">
+      <button
+        onClick={() => setOpen(v => !v)}
+        className="flex w-full items-center justify-between px-5 py-3 text-left"
+      >
+        <span className="text-sm font-semibold text-caution">Your Case Notes</span>
+        <svg className={`w-4 h-4 text-ink-3 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+        </svg>
+      </button>
+      {open && (
+        <div className="border-t border-caution/30 px-5 py-4">
+          <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-ink-2">{content}</pre>
+        </div>
+      )}
+    </div>
+  )
+}
+
+type FeedbackSection = {
+  title: string
+  items: string[]
+  tone: 'confirmed' | 'caution' | 'insight'
+  icon: string
+  footer?: string
+}
+
+const TONE_MAP: Record<'confirmed' | 'caution' | 'insight', {
+  cardBg: string; iconBg: string; labelColor: string; dotColor: string
+}> = {
+  confirmed: { cardBg: 'var(--confirmed-bg)', iconBg: 'var(--color-confirmed)', labelColor: 'var(--color-confirmed)', dotColor: 'var(--color-confirmed)' },
+  caution:   { cardBg: 'var(--caution-bg)',   iconBg: 'var(--color-caution)',   labelColor: 'var(--color-caution)',   dotColor: 'var(--color-caution)'   },
+  insight:   { cardBg: 'var(--insight-bg)',   iconBg: 'var(--color-insight)',   labelColor: 'var(--color-ink-secondary)', dotColor: 'var(--color-ink-secondary)' },
+}
+
+function FeedbackCarousel({ sections }: { sections: FeedbackSection[] }) {
+  const [idx, setIdx] = useState(0)
+  if (sections.length === 0) return null
+  const n = sections.length
+  const safeIdx = idx % n
+  const { title, items, tone, icon, footer } = sections[safeIdx]
+  const { cardBg, iconBg, labelColor, dotColor } = TONE_MAP[tone]
+  const showNav = n > 1
+  return (
+    <div style={{ padding: '0 20px 12px' }}>
+      <div style={{ background: cardBg, borderRadius: 14, padding: '16px 18px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {/* Top: icon + label (left) and nav (right) */}
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 12 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <span style={{ width: 28, height: 28, borderRadius: '50%', background: iconBg, color: '#fff', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, flexShrink: 0 }}>
+              {icon}
+            </span>
+            <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: labelColor, lineHeight: 1.3 }}>
+              {title}
+            </span>
+          </div>
+          {showNav && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6 }}>
+              <div style={{ display: 'flex', gap: 6 }}>
+                <button
+                  onClick={() => setIdx(i => (i - 1 + n) % n)}
+                  aria-label="Previous section"
+                  style={{ width: 30, height: 30, borderRadius: '50%', border: 'none', background: 'var(--overlay-tint)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: 'var(--color-ink-primary)', transition: 'background 120ms' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.setProperty('background', 'var(--overlay-tint-hover)') }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.setProperty('background', 'var(--overlay-tint)') }}
+                >←</button>
+                <button
+                  onClick={() => setIdx(i => (i + 1) % n)}
+                  aria-label="Next section"
+                  style={{ width: 30, height: 30, borderRadius: '50%', border: 'none', background: 'var(--overlay-tint)', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, color: 'var(--color-ink-primary)', transition: 'background 120ms' }}
+                  onMouseEnter={e => { (e.currentTarget as HTMLButtonElement).style.setProperty('background', 'var(--overlay-tint-hover)') }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.setProperty('background', 'var(--overlay-tint)') }}
+                >→</button>
+              </div>
+              <div style={{ display: 'flex', gap: 5 }}>
+                {sections.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setIdx(i)}
+                    aria-current={i === safeIdx ? true : undefined}
+                    aria-label={`Go to ${sections[i].title}`}
+                    style={{ width: 5, height: 5, borderRadius: '50%', border: 'none', background: i === safeIdx ? dotColor : 'var(--color-surface-4)', cursor: 'pointer', padding: 0, display: 'block', transition: 'background 120ms' }}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+        {/* Bullets: full width below header */}
+        <ul style={{ margin: 0, padding: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 8 }}>
+          {items.map((item, i) => (
+            <li key={i} style={{ display: 'flex', gap: 8, alignItems: 'flex-start', fontSize: 14, color: 'var(--color-ink-primary)', lineHeight: 1.6 }}>
+              <span style={{ width: 6, height: 6, borderRadius: '50%', background: dotColor, flexShrink: 0, marginTop: 8 }} />
+              {item}
+            </li>
+          ))}
+        </ul>
+      </div>
+      {footer && (
+        <p style={{ marginTop: 10, fontSize: 11, color: 'var(--color-ink-tertiary)', fontStyle: 'italic', lineHeight: 1.5, padding: '0 4px' }}>{footer}</p>
       )}
     </div>
   )
@@ -506,7 +694,7 @@ function DiagnosisInput({ value, onChange, onKeyDown, disabled }: {
               type="button"
               onMouseDown={e => { e.preventDefault(); selectItem(d) }}
               onMouseEnter={() => setActiveIdx(i)}
-              className={`w-full px-4 py-2.5 text-left text-[13px] transition-colors ${i === activeIdx ? 'bg-primary-600/30 text-primary-100' : 'text-ink-primary hover:bg-surface-3'}`}
+              className={`w-full px-4 py-2.5 text-left text-[13px] transition-colors ${i === activeIdx ? 'bg-primary-50 text-primary-700' : 'text-ink-primary hover:bg-surface-3'}`}
             >
               {d}
             </button>
@@ -738,7 +926,7 @@ function ECGPanel({ ecgFindings, aiReport, image, diagnosisSubmitted, onZoom }: 
         <img
           src={image.path}
           alt="12-lead ECG"
-          className="w-full max-h-[420px] object-contain bg-[#fafaf5]"
+          className="w-full max-h-[420px] object-contain bg-surface-2"
         />
       </div>
       {!diagnosisSubmitted ? (
@@ -1204,9 +1392,9 @@ function HelpModal({ section, onClose }: { section: string; onClose: () => void 
               <p className="text-sm text-ink-secondary leading-relaxed">{s.body}</p>
             </div>
           ))}
-          <div className="rounded-lg border border-primary-600/60 bg-primary-900/20 px-4 py-3">
-            <div className="mb-1 text-xs font-semibold text-primary-400">Pro tip</div>
-            <p className="text-sm text-primary-200 leading-relaxed">{content.tip}</p>
+          <div className="rounded-lg border border-primary-200 bg-primary-50 px-4 py-3">
+            <div className="mb-1 text-xs font-semibold text-primary-700">Pro tip</div>
+            <p className="text-sm text-primary-700 leading-relaxed">{content.tip}</p>
           </div>
         </div>
       </div>
@@ -1227,6 +1415,7 @@ export default function MedTrainer() {
   const [chatLoading, setChatLoading] = useState(false)
   const [userDiagnosis, setUserDiagnosis] = useState('')
   const [gradingResult, setGradingResult] = useState<GradingResult | null>(null)
+  const [expandedCategory, setExpandedCategory] = useState<DimensionKey | null>(null)
   const [gradingLoading, setGradingLoading] = useState(false)
   const [revealed, setRevealed] = useState(false)
 
@@ -1684,6 +1873,13 @@ Return ONLY valid JSON — no markdown, no explanation:
     resolvedSystemRef.current = resolvedSystem
     const resolvedDifficulty = overrideDifficulty ?? difficulty
 
+    setCaseDifficulty(resolvedDifficulty)
+    setNotes({
+      mode: resolvedDifficulty === 'Advanced' ? 'soap' : 'free',
+      content: resolvedDifficulty === 'Advanced' ? SOAP_TEMPLATE : '',
+      open: false,
+    })
+
     // Capture pending redo params and clear refs for this generation
     const overrideDx = overrideDiagnosis ?? pendingDiagnosisRef.current
     const capturedRedoOf = pendingRedoOfRef.current
@@ -1730,13 +1926,6 @@ Return ONLY valid JSON — no markdown, no explanation:
     const caseId = diagnosis && !overrideDx ? makeCaseId(resolvedSystem, resolvedDifficulty, diagnosis, 0) : null
     setActiveCaseId(caseId)
 
-    setCaseDifficulty(resolvedDifficulty)
-    setNotes({
-      mode: resolvedDifficulty === 'Advanced' ? 'soap' : 'free',
-      content: resolvedDifficulty === 'Advanced' ? SOAP_TEMPLATE : '',
-      open: false,
-    })
-
     // If a case was in progress, record it as abandoned before replacing the session
     if (analyticsSessionRef.current !== null) {
       recordAbandonedSession(analyticsSessionRef.current, activeSectionRef.current)
@@ -1759,43 +1948,12 @@ Return ONLY valid JSON — no markdown, no explanation:
 Return ONLY valid JSON. No markdown, no code fences, no explanation. Just the raw JSON object.
 Invent a completely unique patient name. ${namesClause} Never reuse first names or last names across cases.`
 
-    const difficultyRules: Record<string, string> = {
-      Foundations: `DIFFICULTY — FOUNDATIONS:
-- Common, high-prevalence diagnosis
-- Classic textbook symptom presentation
-- No significant comorbidities
-- Lab values clearly point toward diagnosis
-- 1-2 obvious differentials
-- Output required: Diagnosis only`,
-      Clinical: `DIFFICULTY — CLINICAL:
-- Moderate prevalence diagnosis
-- DIAGNOSIS SCOPE: Must be a diagnosis a general internist, hospitalist, or emergency physician encounters regularly. DO NOT generate rare diseases (prevalence <1:10,000), subspecialty-only diagnoses, or conditions requiring fellowship-level expertise (e.g., antisynthetase syndrome, Erdheim-Chester disease, HLH, Castleman disease). Appropriate examples: community-acquired pneumonia, CHF exacerbation, DVT/PE, type 2 diabetes complication, UTI/pyelonephritis, appendicitis, cellulitis, migraine, hypertensive urgency, GERD, pancreatitis, asthma exacerbation, ACS, hepatitis.
-- 1-2 atypical or missing classic features
-- One comorbidity that adds complexity
-- Some lab values are ambiguous or mildly misleading
-- 3-4 differentials worth considering
-- Output required: SOAP note + Diagnosis`,
-      Advanced: `DIFFICULTY — ADVANCED:
-- ONE uncommon or rare diagnosis (not multiple stacked rare conditions)
-- Comorbidities must be common conditions (hypertension, diabetes, COPD, CKD, etc.) — never combine multiple rare diagnoses
-- Atypical presentation with red herrings
-- Lab/imaging findings require synthesis
-- The case MUST contain at least one pathognomonic or definitively discriminating result that rules in the correct diagnosis over the top differential
-- Must justify top 3 differentials with evidence
-- Output required: SOAP note + Diagnosis + Differential justification`,
-    }
-
-    const hpiSpec =
-      resolvedDifficulty === 'Foundations'
-        ? '"<2-3 sentences. HARD MAXIMUM 60 WORDS — count every word and cut if over. State ONLY: the chief complaint, primary symptom(s), and duration. STRICTLY FORBIDDEN: associated symptoms, review of systems positives, family history, social history details, exam findings, and ANY detail that narrows the differential to a single diagnosis (e.g. heat intolerance, exophthalmos, tremor, toxin/substance names, radiation, aggravating/relieving factors). Everything forbidden here belongs in hiddenHistory.fullHistory so the patient can reveal it during the clinical interview.>"'
-        : resolvedDifficulty === 'Clinical'
-        ? '"<2-3 sentences. HARD MAXIMUM 40 WORDS — count every word and cut if over. State ONLY: age, sex, primary symptom(s), and duration. STRICTLY FORBIDDEN: toxin or substance names, ingestion or exposure details, witness accounts, progression timeline, pertinent positives/negatives, characterization, radiation, aggravating/relieving factors, physical findings on arrival. CORRECT EXAMPLE (32 words): A 34-year-old male presents to the emergency department with a 6-hour history of tinnitus, nausea, vomiting, and confusion. His girlfriend reports he has been increasingly agitated since this afternoon. WRONG — anything beyond that.>"'
-        : '"<1-2 sentences. HARD MAXIMUM 20 WORDS. State age, sex, and ONE vague non-specific complaint. Do NOT name any substance, specific symptom cluster, or detail that points toward the diagnosis. CORRECT EXAMPLE: A 34-year-old male is brought in by his girlfriend appearing confused and agitated.>"'
-
+    const diffCount = resolvedDifficulty === 'Foundations' ? '2-3' : resolvedDifficulty === 'Clinical' ? '3-4' : '4-5'
     const redoClause = isRedo ? ' Use a fresh patient demographic profile and a different clinical presentation than a typical textbook case for this diagnosis.' : ''
-    const prompt = `Generate a realistic ${resolvedSystem} clinical case${diagnosis ? ` for the diagnosis: "${diagnosis}"` : ''}.${redoClause} Strictly follow the difficulty rules below.
+    const diagnosisLine = diagnosis ? ` for the diagnosis: "${diagnosis}"` : ''
+    const prompt = `Generate a realistic ${resolvedSystem} clinical case${diagnosisLine}.${redoClause} Strictly follow the difficulty rules below.
 
-${difficultyRules[resolvedDifficulty] ?? difficultyRules['Foundations']}
+${DIFFICULTY_RULES[resolvedDifficulty] ?? DIFFICULTY_RULES['Foundations']}
 
 Return this exact JSON structure with all fields populated. For labResults, every panel must list every individual analyte as a separate component (e.g. CBC must expand into WBC, Hemoglobin, Hematocrit, Platelets, etc.). Single-value tests also use a one-item components array.
 CRITICAL: Every lab name listed in availableLabs MUST have a corresponding entry in labResults. Every imaging study in availableImaging MUST have a result in imagingResults (or procedureResults if it is a procedure). Do not list a test without also providing its result. Imaging studies (X-Ray, CT, MRI, Ultrasound, ECG) must ONLY appear in availableImaging and imagingResults — NEVER in availableLabs or labResults.
@@ -1814,6 +1972,7 @@ HPI WORD LIMIT RULE: The hpi field is a HARD MAXIMUM of 40 words for Clinical an
 MANAGEMENT TEACHING POINT RULE: At least ONE of the four teachingPoints MUST be a concrete management/treatment point — name a specific first-line agent, dose, threshold, target, or guideline-anchored decision rule (e.g., "Initiate IV labetalol; reduce MAP by no more than 25% in the first hour" | "tPA window is 4.5h from last-known-well; absolute contraindications include BP >185/110, recent surgery <14 days, active bleeding"). A pearl that only describes pathophysiology, epidemiology, or diagnostic criteria does NOT satisfy this rule. Generic statements like "treat the underlying cause" are insufficient.
 KEY QUESTIONS COVERAGE RULE: Every clinically pivotal item in hiddenHistory (predisposing structural lesion, prior TIA or sentinel event, critical precipitant, key exposure, family thrombophilia, prior episode) MUST be elicitable through at least one entry in keyQuestions. Walk through hiddenHistory.fullHistory, familyHistory, medications, and hiddenSymptoms — for any finding that materially changes the diagnosis, risk stratification, or management, write a directed question that would surface it. Generic questions like "Any other symptoms?" do NOT count.
 DANGEROUS MIMIC RULE: At least ONE differential MUST be the single most dangerous "can't-miss" mimic of the primary diagnosis — a condition that, if missed, causes serious immediate harm and shares enough features to plausibly mislead a clinician before the key discriminating test is ordered (e.g., STEMI for Acute Pericarditis; Cauda Equina Syndrome for Lumbar Disc Herniation with Radiculopathy; Pulmonary Embolism for PCP Pneumonia; HHS for DKA). Identify this mimic explicitly in differentialExplanations and name the one finding or test that definitively distinguishes it from the correct diagnosis.
+PMH LEAK RULE: The pastMedicalHistory fields (conditions, surgeries, hospitalizations) MUST NOT leak the diagnosis through negation or denial. NEVER write phrases like "No prior [organ/system] disease", "No history of [organ/system]", "Denies [organ/system] disorders", "Never had [organ/system]", "Negative for [organ/system]", or any similar exclusion where the organ/system overlaps the diagnosis. Negative pertinents belong in reviewOfSystems, NEVER in pastMedicalHistory. If the patient has no chronic conditions, conditions MUST be EXACTLY "None." — no extra text, no negative pertinents, no medication mentions. Field lane enforcement: conditions = chronic diagnoses ONLY (never medications); surgeries = prior procedures ONLY; hospitalizations = prior inpatient stays ONLY. Medications including oral contraceptives, vitamins, and supplements belong in currentMedications.medications or currentMedications.otc, NEVER in pastMedicalHistory.conditions.
 {
   "patientInfo": {
     "name": "First Last",
@@ -1823,7 +1982,9 @@ DANGEROUS MIMIC RULE: At least ONE differential MUST be the single most dangerou
     "height": "<height in feet and inches e.g. 5'9\">",
     "heightInches": <total height in inches as integer e.g. 69>
   },
-  "hpi": ${hpiSpec},
+  "hpi": "<2-3 sentences. HARD MAXIMUM 60 WORDS — count every word and cut if over. State ONLY: the chief complaint, primary symptom(s), and duration. STRICTLY FORBIDDEN: associated symptoms, review of systems positives, family history, social history details, exam findings, and ANY detail that narrows the differential to a single diagnosis (e.g. heat intolerance, exophthalmos, tremor, toxin/substance names, radiation, aggravating/relieving factors). Everything forbidden here belongs in hiddenHistory.fullHistory.>",
+  "clinicalHpi": "<2-3 sentences. HARD MAXIMUM 40 WORDS — count every word and cut if over. State ONLY: age, sex, primary symptom(s), and duration. STRICTLY FORBIDDEN: toxin or substance names, ingestion or exposure details, witness accounts, progression timeline, pertinent positives/negatives, characterization, radiation, aggravating/relieving factors, physical findings on arrival, and comorbidity adjectives (diabetic, hypertensive, obese, asthmatic, cirrhotic, hypothyroid, alcoholic) or chronic disease names — those belong only in pastMedicalHistory.conditions. CORRECT EXAMPLE (32 words): A 34-year-old male presents to the emergency department with a 6-hour history of tinnitus, nausea, vomiting, and confusion. His girlfriend reports he has been increasingly agitated since this afternoon.>",
+  "advancedHpi": "<1 sentence. HARD MAXIMUM 20 WORDS. State age, sex, and ONE vague non-specific complaint (+ optional duration). STRICTLY FORBIDDEN: contextual hooks, recent events, exposures, travel, dental or surgical history, medication names, lab/vital values, family/social context, comorbidity adjectives (diabetic, hypertensive, obese, asthmatic, cirrhotic, hypothyroid, alcoholic), or chronic disease names — every such detail belongs in hiddenHistory.fullHistory. ALWAYS write 'X-year-old', NEVER 'Xyo'. CORRECT EXAMPLE: '52-year-old male with three weeks of fatigue.'>",
   "vitals": {
     "bp": "<systolic/diastolic mmHg>",
     "hr": <beats per minute>,
@@ -1833,7 +1994,10 @@ DANGEROUS MIMIC RULE: At least ONE differential MUST be the single most dangerou
     "weight": "<lbs>"
   },
   "diagnosis": "<specific primary diagnosis>",
-  "differentials": ["<dx 1>", "<dx 2>", "<dx 3>", "<dx 4>", "<dx 5>"],
+  "differentials": ["<dx 1>", "<dx 2>", ...GENERATE EXACTLY ${diffCount} DIFFERENTIALS — no more, no fewer],
+  "differentialExplanations": ["<dx 1>: <why it belongs on the differential and the one finding that distinguishes it from the correct diagnosis>", ...one entry per differential matching the differentials array length],
+  "expectedLabs": ["<exact lab name copied character-for-character from availableLabs that a competent physician MUST order>", ...3-7 key labs in clinical priority order],
+  "expectedImaging": ["<exact imaging study name copied from availableImaging that should be ordered>", ...0-3 key studies — use empty array [] if imaging is not standard for this diagnosis],
   "keyQuestions": [
     "<directed question that elicits a pivotal hiddenHistory item — see KEY QUESTIONS COVERAGE RULE>",
     "<directed question that elicits a pivotal hiddenHistory item>",
@@ -1912,9 +2076,9 @@ DANGEROUS MIMIC RULE: At least ONE differential MUST be the single most dangerou
   "fundusFindings": "<If ophthalmoscopy or fundoscopy is relevant, describe objectively what is seen — e.g. 'Bilateral flame hemorrhages, cotton-wool spots, disc swelling, and AV nicking on dilated funduscopy.' or 'Increased cup-to-disc ratio >0.7 with superior rim thinning and temporal pallor.' Omit or leave blank if not relevant. NEVER name the diagnosis.>",
   "biopsyFindings": "<If histopathology (H&E biopsy) is relevant, describe objectively what the pathology shows — e.g. 'Dysplastic glandular epithelium with nuclear pleomorphism, increased mitotic figures, and cribriform architecture.' or 'Bridging fibrosis with nodular regeneration and hepatocyte ballooning on H&E.' Omit or leave blank if not relevant. NEVER name the diagnosis.>",
   "pastMedicalHistory": {
-    "conditions": "<chronic diagnoses and health problems, or 'None'>",
-    "surgeries": "<prior surgeries and procedures, or 'None'>",
-    "hospitalizations": "<prior hospitalizations and ER visits, or 'None'>"
+    "conditions": "<chronic diagnoses ONLY. If none, write exactly 'None.' and nothing else. NEVER negate a disease category ('No prior X disease', 'Denies X'). NEVER include medications — those go in currentMedications. See PMH LEAK RULE>",
+    "surgeries": "<prior surgeries ONLY. If none, write exactly 'None.' and nothing else. NEVER negate a procedure category. See PMH LEAK RULE>",
+    "hospitalizations": "<prior inpatient stays ONLY. If none, write exactly 'None.' and nothing else. NEVER write 'No prior hospitalizations for X'. See PMH LEAK RULE>"
   },
   "currentMedications": {
     "medications": "<prescription medications with doses and frequencies, or 'None'>",
@@ -1977,7 +2141,10 @@ DANGEROUS MIMIC RULE: At least ONE differential MUST be the single most dangerou
         (u) => recordApiCall('generation', u))
       const match = text.match(/\{[\s\S]*\}/)
       if (!match) throw new Error('No JSON in response')
-      const parsed = JSON.parse(match[0]) as CaseData
+      const rawParsed = JSON.parse(match[0]) as CaseData
+      const parsed = sanitizePmhLeak(
+        reconcileHistoryConsistency(rawParsed as unknown as Record<string, unknown>)
+      ) as unknown as CaseData
 
       // Merge relevantTests results into labResults/imagingResults and the available lists
       // so that ordering them works the same as any other case-generated test.
@@ -2384,7 +2551,6 @@ Student message: "${msg}"`
             pausedSeconds: timerState.pausedSeconds,
             timedOut,
           }
-          result.score = (result.score ?? 0) + eff.score
         }
       }
 
@@ -2839,7 +3005,7 @@ Student message: "${msg}"`
                     const isOrdered = allOrdered(lab)
                     const isSelected = selectedTests.has(lab)
                     return (
-                      <label key={lab} className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${isOrdered ? 'border-confirmed-border bg-confirmed-bg cursor-default' : isSelected ? 'border-primary-400 bg-primary-900/20' : 'border-surface-4 bg-surface-1 hover:border-surface-4'}`}>
+                      <label key={lab} className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${isOrdered ? 'border-confirmed-border bg-confirmed-bg cursor-default' : isSelected ? 'border-primary-400 bg-primary-50' : 'border-surface-4 bg-surface-1 hover:border-surface-4'}`}>
                         <input type="checkbox" checked={isSelected || isOrdered} disabled={isOrdered} onChange={() => !isOrdered && toggleTest(lab)} className="accent-primary-500" />
                         <span className="text-sm text-ink-primary">{lab}</span>
                         {isOrdered && <Badge text="Ordered" color="green" />}
@@ -2854,7 +3020,7 @@ Student message: "${msg}"`
                     const isOrdered = allOrdered(img)
                     const isSelected = selectedTests.has(img)
                     return (
-                      <label key={img} className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${isOrdered ? 'border-confirmed-border bg-confirmed-bg cursor-default' : isSelected ? 'border-primary-400 bg-primary-900/20' : 'border-surface-4 bg-surface-1 hover:border-surface-4'}`}>
+                      <label key={img} className={`flex cursor-pointer items-center gap-3 rounded-md border px-3 py-2.5 transition-colors ${isOrdered ? 'border-confirmed-border bg-confirmed-bg cursor-default' : isSelected ? 'border-primary-400 bg-primary-50' : 'border-surface-4 bg-surface-1 hover:border-surface-4'}`}>
                         <input type="checkbox" checked={isSelected || isOrdered} disabled={isOrdered} onChange={() => !isOrdered && toggleTest(img)} className="accent-primary-500" />
                         <span className="text-sm text-ink-primary">{img}</span>
                         {isOrdered && <Badge text="Ordered" color="green" />}
@@ -2880,8 +3046,8 @@ Student message: "${msg}"`
                 </div>
               </div>
               {selectedTests.size > 0 && (
-                <div className="flex items-center justify-between rounded-lg border border-primary-600 bg-primary-900/20 px-4 py-3">
-                  <span className="text-sm text-primary-300">{selectedTests.size} test{selectedTests.size > 1 ? 's' : ''} selected</span>
+                <div className="flex items-center justify-between rounded-lg border border-primary-300 bg-primary-50 px-4 py-3">
+                  <span className="text-sm text-primary-700">{selectedTests.size} test{selectedTests.size > 1 ? 's' : ''} selected</span>
                   <button onClick={orderTests} className="rounded-md bg-primary-500 px-4 py-1.5 text-sm font-medium text-white hover:bg-primary-400 transition-colors">
                     Order Selected Tests
                   </button>
@@ -3050,8 +3216,8 @@ Student message: "${msg}"`
         const orderedList = Array.from(orderedTests)
         return (
           <div className="space-y-4">
-            <div className="rounded-md border border-primary-700/40 bg-primary-900/10 px-4 py-3">
-              <p className="text-xs text-primary-300">
+            <div className="rounded-md border border-primary-200 bg-primary-50 px-4 py-3">
+              <p className="text-xs text-primary-700">
                 <span className="font-semibold">Advanced difficulty:</span> no pre-listed lab panels — search and type test names from memory. Imaging modalities are listed below for reference.
               </p>
             </div>
@@ -3318,13 +3484,13 @@ Student message: "${msg}"`
                     </div>
                   ))}
                   {loadingOnDemand.map(t => (
-                    <div key={t} className="rounded-md border border-primary-700/40 bg-primary-900/10 px-4 py-3">
+                    <div key={t} className="rounded-md border border-primary-200 bg-primary-50 px-4 py-3">
                       <div className="flex items-center gap-2">
-                        <svg className="w-3.5 h-3.5 animate-spin text-primary-400 flex-shrink-0" fill="none" viewBox="0 0 24 24">
+                        <svg className="w-3.5 h-3.5 animate-spin text-primary-600 flex-shrink-0" fill="none" viewBox="0 0 24 24">
                           <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                           <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
                         </svg>
-                        <span className="text-xs font-semibold uppercase tracking-wide text-primary-400">{t}</span>
+                        <span className="text-xs font-semibold uppercase tracking-wide text-primary-700">{t}</span>
                         <span className="text-xs text-ink-tertiary">Generating result...</span>
                       </div>
                     </div>
@@ -3640,173 +3806,163 @@ Student message: "${msg}"`
                 </div>
               </SectionCard>
             ) : (
-              <div className="space-y-4">
-                {/* 1. Score header + benchmark label */}
-                {(() => {
-                  const s = gradingResult.score
-                  const d = caseDifficulty
-                  const label =
-                    d === 'Foundations'
-                      ? s >= 90 ? 'Excellent' : s >= 75 ? 'Strong pass' : s >= 60 ? 'Pass' : 'Needs review'
-                      : d === 'Clinical'
-                      ? s >= 88 ? 'Excellent' : s >= 72 ? 'Strong pass' : s >= 55 ? 'Pass' : 'Needs review'
-                      : s >= 85 ? 'Excellent' : s >= 68 ? 'Strong pass' : s >= 50 ? 'Pass' : 'Needs review'
-                  return (
-                    <div className={`rounded-lg border p-5 ${gradingResult.correct ? 'border-confirmed-border bg-green-950/30' : 'border-red-700 bg-red-950/30'}`}>
-                      <div className="flex items-center justify-between mb-3">
-                        <h3 className="text-lg font-bold text-ink-primary">
-                          {gradingResult.correct ? '✓ Correct Diagnosis' : '✗ Incorrect Diagnosis'}
-                        </h3>
-                        <div className="text-right">
-                          <div className={`text-3xl font-bold tabular-nums ${s >= 70 ? 'text-confirmed' : s >= 50 ? 'text-caution' : 'text-critical'}`}>
-                            {s}/100
-                          </div>
-                          <div className={`text-xs mt-0.5 ${s >= 70 ? 'text-confirmed' : s >= 50 ? 'text-caution' : 'text-ink-tertiary'}`}>
-                            {label}
-                          </div>
-                        </div>
+              <div className="rounded-2xl border border-rule bg-paper text-ink shadow-sm overflow-hidden">
+
+                {/* A — Header bar */}
+                <div style={{ background: 'var(--color-paper-2)', borderBottom: '1px solid var(--color-rule)', padding: '12px 20px' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
+                    <div>
+                      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ink-3)', marginBottom: 4 }}>
+                        {'CASE · ' + (resolvedSystemRef.current || 'General') + ' · ' + caseDifficulty}
                       </div>
-                      <div className="mb-3 flex flex-wrap gap-2 text-sm">
-                        <span className="text-ink-secondary">Your diagnosis:</span>
-                        <span className="font-medium text-ink-primary">{userDiagnosis}</span>
-                        <span className="text-ink-tertiary">→</span>
-                        <span className="text-ink-secondary">Correct:</span>
-                        <span className="font-medium text-confirmed">{caseData.diagnosis}</span>
+                      <div style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 20, fontWeight: 600, color: 'var(--color-ink)', lineHeight: 1.2 }}>
+                        {(caseData?.patientInfo?.name ?? '') + (caseData?.patientInfo?.name ? ', ' : '') + (caseData?.patientInfo?.age ?? '') + (caseData?.patientInfo?.gender === 'male' ? 'M' : caseData?.patientInfo?.gender === 'female' ? 'F' : (caseData?.patientInfo?.gender?.charAt(0).toUpperCase() ?? ''))}
                       </div>
-                      <p className="text-sm leading-relaxed text-ink-secondary">{gradingResult.feedback}</p>
-                      {gradingResult.efficiency && (() => {
-                        const eff = gradingResult.efficiency!
-                        const total = eff.elapsedSeconds + eff.pausedSeconds
-                        return (
-                          <p className="mt-2 text-xs text-ink-tertiary">
-                            Active time: {fmtTime(eff.elapsedSeconds)}
-                            {eff.pausedSeconds > 0 ? `  |  Paused: ${fmtTime(eff.pausedSeconds)}  |  Total elapsed: ${fmtTime(total)}` : ''}
-                          </p>
-                        )
-                      })()}
                     </div>
-                  )
-                })()}
-
-                {/* 2. What you did well */}
-                {(gradingResult.strengths?.length > 0 || gradingResult.efficiency?.score === 10) && (
-                  <SectionCard title="What You Did Well">
-                    <ul className="space-y-2">
-                      {gradingResult.strengths?.map((s, i) => (
-                        <li key={i} className="flex gap-2 text-sm text-ink-secondary">
-                          <span className="text-confirmed flex-shrink-0">✓</span>
-                          {s}
-                        </li>
-                      ))}
-                      {gradingResult.efficiency?.score === 10 && (
-                        <li className="flex gap-2 text-sm text-ink-secondary">
-                          <span className="text-confirmed flex-shrink-0">✓</span>
-                          Completed the case efficiently within the allotted time
-                        </li>
+                    <div style={{ textAlign: 'right', flexShrink: 0 }}>
+                      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ink-3)', marginBottom: 4 }}>
+                        SUBMITTED DIAGNOSIS
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
+                        <span style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 15, fontWeight: 600, color: 'var(--color-ink)' }}>{userDiagnosis}</span>
+                        <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: '50%', background: gradingResult.correct ? 'var(--color-confirmed)' : 'var(--color-critical)', color: 'white', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+                          {gradingResult.correct ? '✓' : '✗'}
+                        </span>
+                      </div>
+                      <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ink-3)', marginTop: 10, marginBottom: 4 }}>
+                        CORRECT DIAGNOSIS
+                      </div>
+                      <div style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 15, fontWeight: 600, color: 'var(--color-ink)' }}>
+                        {caseData?.diagnosis ?? '—'}
+                      </div>
+                      {gradingResult.efficiency && (
+                        <div style={{ fontSize: 11, color: 'var(--color-ink-3)', fontFamily: 'JetBrains Mono, monospace', marginTop: 2 }}>
+                          {fmtTime(gradingResult.efficiency.elapsedSeconds)}
+                        </div>
                       )}
-                    </ul>
-                    {gradingResult.efficiency?.timedOut && (
-                      <p className="mt-3 text-xs text-ink-tertiary italic border-t border-surface-4 pt-3">
-                        The case timed out before submission. Time management is a clinical skill that improves with practice. Focus on high-yield questions early and order targeted tests rather than a broad workup.
-                      </p>
-                    )}
-                  </SectionCard>
-                )}
+                    </div>
+                  </div>
+                </div>
 
-                {/* 3. Scorecard */}
-                {gradingResult.dimensions && (
-                  <SectionCard title="Scorecard">
-                    <div className="space-y-4">
-                      {([
-                        ['historyInterview',      'History & Interview',    18],
-                        ['testOrdering',          'Test Ordering',          18],
-                        ['diagnosisAccuracy',     'Diagnosis Accuracy',     27],
-                        ['diagnosisCompleteness', 'Diagnosis Completeness', 13],
-                        ['clinicalReasoning',     'Clinical Reasoning',     14],
-                      ] as const).map(([key, label, max]) => {
+                {/* B — Body: ring (left) + categories (right) */}
+                <div className="grid grid-cols-1 md:grid-cols-[240px_1fr]">
+                  {/* Left: score ring + verdict + meta */}
+                  <div className="flex flex-col items-center gap-2 py-8 px-6 border-b md:border-b-0 md:border-r border-rule">
+                    <ScoreRing score={gradingResult.score} />
+                    <div style={{ marginTop: 6, fontSize: 15, fontWeight: 500, color: 'var(--color-ink)' }}>
+                      {gradingResult.score >= 80 ? 'Strong pass' : gradingResult.score >= 70 ? 'Pass' : gradingResult.score >= 50 ? 'Needs review' : 'Did not pass'}
+                    </div>
+                    <div style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 11, color: 'var(--color-ink-3)', textAlign: 'center', lineHeight: 1.6, marginTop: 2 }}>
+                      {gradingResult.score}/100 rubric
+                      {gradingResult.efficiency && (<><br/>{caseDifficulty} · {fmtTime(gradingResult.efficiency.elapsedSeconds)}</>)}
+                    </div>
+                  </div>
+
+                  {/* Right: rubric rows + efficiency + overall feedback */}
+                  <div className="flex flex-col">
+                    <div className="flex flex-col divide-y divide-rule">
+                      {gradingResult.dimensions && getRubric(caseDifficulty).map(({ key, label, max }) => {
                         const dim = gradingResult.dimensions![key]
                         if (!dim) return null
                         const pct = Math.min(100, (dim.score / max) * 100)
-                        const barColor = pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-caution' : 'bg-red-500'
-                        const scoreColor = pct >= 80 ? 'text-confirmed' : pct >= 50 ? 'text-caution' : 'text-critical'
                         return (
-                          <div key={key}>
-                            <div className="flex items-center gap-3 mb-1">
-                              <span className="w-44 flex-shrink-0 text-sm font-medium text-ink-primary">{label}</span>
-                              <div className="flex-1 h-2 rounded-full bg-surface-4 overflow-hidden">
-                                <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
-                              </div>
-                              <span className={`w-14 text-right text-sm font-bold tabular-nums ${scoreColor}`}>{dim.score}/{max}</span>
-                            </div>
-                            <p className="pl-44 text-xs text-ink-secondary">{dim.feedback}</p>
-                          </div>
+                          <CategoryRow
+                            key={key}
+                            label={label}
+                            dim={dim}
+                            max={max}
+                            pct={pct}
+                            expanded={expandedCategory === key}
+                            onToggle={() => setExpandedCategory(expandedCategory === key ? null : key)}
+                          />
                         )
                       })}
-                      {/* Dimension sum verification */}
-                      {(() => {
-                        const dims = [
-                          ['historyInterview', 18],
-                          ['testOrdering', 18],
-                          ['diagnosisAccuracy', 27],
-                          ['diagnosisCompleteness', 13],
-                          ['clinicalReasoning', 14],
-                        ] as const
-                        const scores = dims.map(([k]) => gradingResult.dimensions![k]?.score ?? 0)
-                        const total = scores.reduce((a, b) => a + b, 0)
-                        return (
-                          <div className="border-t border-surface-4/60 pt-3 mt-1">
-                            <div className="flex items-center gap-3">
-                              <span className="w-44 flex-shrink-0 text-xs text-ink-tertiary">AI-graded subtotal</span>
-                              <span className="text-xs text-ink-tertiary flex-1">
-                                {scores.join(' + ')} = <span className="text-ink-secondary font-semibold">{total}/90</span>
-                              </span>
-                            </div>
-                          </div>
-                        )
-                      })()}
-
-                      {/* Efficiency axis — Clinical/Advanced only */}
                       {gradingResult.efficiency && (() => {
                         const eff = gradingResult.efficiency!
                         const pct = (eff.score / 10) * 100
-                        const barColor = pct >= 80 ? 'bg-green-500' : pct >= 50 ? 'bg-caution' : 'bg-red-500'
+                        const barColor = pct >= 80 ? 'bg-confirmed' : pct >= 50 ? 'bg-caution' : 'bg-critical'
                         const scoreColor = pct >= 80 ? 'text-confirmed' : pct >= 50 ? 'text-caution' : 'text-critical'
                         return (
-                          <div>
-                            <div className="flex items-center gap-3 mb-1">
-                              <span className="w-44 flex-shrink-0 text-sm font-medium text-ink-primary">Efficiency</span>
-                              <div className="flex-1 h-2 rounded-full bg-surface-4 overflow-hidden">
-                                <div className={`h-full rounded-full transition-all ${barColor}`} style={{ width: `${pct}%` }} />
-                              </div>
-                              <span className={`w-14 text-right text-sm font-bold tabular-nums ${scoreColor}`}>{eff.score}/10</span>
+                          <div className="flex items-center gap-3 px-4 py-3 bg-paper-2">
+                            <span className="w-40 shrink-0 text-xs font-medium text-ink-3">Efficiency</span>
+                            <div className="flex-1 h-1.5 rounded-full bg-paper-3 overflow-hidden">
+                              <div className={'h-full rounded-full ' + barColor} style={{ width: pct + '%' }} />
                             </div>
-                            <p className="pl-44 text-xs text-ink-secondary">{eff.feedback}</p>
-                            <p className="pl-44 text-xs text-ink-tertiary mt-0.5">
-                              Completed in {fmtTime(eff.elapsedSeconds)} active time
-                              {eff.pausedSeconds > 0 ? ` (${fmtTime(eff.pausedSeconds)} paused)` : ''}
-                            </p>
-                            <p className="pl-44 text-xs text-ink-tertiary mt-1">
-                              Scoring: {caseDifficulty === 'Clinical'
-                                ? '>9 min left → 10pts | >5 min → 8pts | >2 min → 6pts | <2 min → 4pts | timed out → 2pts'
-                                : '>6 min left → 10pts | >3 min → 8pts | >1 min → 6pts | <1 min → 4pts | timed out → 2pts'}
-                            </p>
+                            <span className={'w-14 text-right font-mono text-xs tabular-nums ' + scoreColor}>
+                              {eff.score}<span className="text-ink-3">/10</span>
+                            </span>
+                            <span className="text-[10px] text-ink-3 italic whitespace-nowrap">not in /100</span>
                           </div>
                         )
                       })()}
                     </div>
-                  </SectionCard>
+                    {/* Overall feedback prose — full width under the rubric rows */}
+                    {gradingResult.feedback && (
+                      <div style={{ borderTop: '1px solid var(--color-rule)', padding: '14px 20px', background: 'var(--color-paper-2)' }}>
+                        <p style={{ fontSize: 13, color: 'var(--color-ink-2)', lineHeight: 1.7, fontStyle: 'italic', margin: 0 }}>
+                          {gradingResult.feedback}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* C — Feedback section carousel */}
+                {((gradingResult.strengths?.length ?? 0) > 0 || gradingResult.efficiency?.score === 10
+                  || (gradingResult.missedQuestions?.length ?? 0) > 0
+                  || (gradingResult.teachingPoints?.length ?? 0) > 0) && (
+                  <div style={{ borderTop: '1px solid var(--color-rule)', paddingTop: 12, paddingBottom: 4, background: 'var(--color-paper)' }}>
+                    {(() => {
+                      const strengthsAll = [
+                        ...(gradingResult.strengths ?? []),
+                        ...(gradingResult.efficiency?.score === 10 ? ['Completed the case efficiently within the allotted time'] : []),
+                      ]
+                      const feedSections: FeedbackSection[] = []
+                      if (strengthsAll.length > 0) feedSections.push({
+                        title: 'Strengths', items: strengthsAll, tone: 'confirmed', icon: '✓',
+                        footer: gradingResult.efficiency?.timedOut ? 'The case timed out before submission. Time management is a clinical skill that improves with practice. Focus on high-yield questions early and order targeted tests rather than a broad workup.' : undefined,
+                      })
+                      if ((gradingResult.missedQuestions?.length ?? 0) > 0) feedSections.push({
+                        title: 'What you missed', items: gradingResult.missedQuestions!, tone: 'caution', icon: '!',
+                      })
+                      if ((gradingResult.teachingPoints?.length ?? 0) > 0) feedSections.push({
+                        title: 'Teaching points', items: gradingResult.teachingPoints!, tone: 'insight', icon: '★',
+                      })
+                      return <FeedbackCarousel sections={feedSections} />
+                    })()}
+                  </div>
                 )}
 
-                {/* Oral Presentation (Advanced difficulty only) */}
-                {gradingResult.presentation?.scores && (
-                  <SectionCard title="Oral Presentation">
-                    <div className="mb-4 flex items-center gap-3">
-                      <div className={`text-2xl font-bold ${(gradingResult.presentation.presentationTotal ?? 0) >= 70 ? 'text-confirmed' : (gradingResult.presentation.presentationTotal ?? 0) >= 50 ? 'text-caution' : 'text-critical'}`}>
-                        {gradingResult.presentation.presentationTotal ?? 0}/100
-                      </div>
-                      <span className="text-xs text-ink-tertiary">Presentation Score</span>
+                {/* Differentials */}
+                {gradingResult.differentials?.length > 0 && (
+                  <div className="border-t border-rule px-5 py-4">
+                    <h3 className="font-serif text-sm font-semibold text-ink mb-3">Differential Diagnosis Discussion</h3>
+                    <div className="space-y-2">
+                      {gradingResult.differentials.map((dx, i) => {
+                        const colonIdx = dx.indexOf(':')
+                        const name = colonIdx !== -1 ? dx.slice(0, colonIdx).trim() : dx
+                        const explanation = colonIdx !== -1 ? dx.slice(colonIdx + 1).trim() : ''
+                        return (
+                          <div key={i} style={{ background: 'var(--color-paper-2)', border: '1px solid var(--color-rule)', borderRadius: 8, padding: '10px 14px' }}>
+                            <div style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 15, fontWeight: 600, color: '#7A6A95', marginBottom: explanation ? 4 : 0 }}>{name}</div>
+                            {explanation && <p style={{ fontSize: 12, color: 'var(--color-ink-secondary)', lineHeight: 1.6 }}>{explanation}</p>}
+                          </div>
+                        )
+                      })}
                     </div>
-                    <div className="grid grid-cols-2 gap-3 mb-4">
+                  </div>
+                )}
+
+                {/* Oral Presentation (Advanced) */}
+                {gradingResult.presentation?.scores && (
+                  <div className="border-t border-rule px-5 py-4">
+                    <h3 className="font-serif text-sm font-semibold text-ink mb-3">
+                      Oral Presentation
+                      <span className="ml-2 font-mono font-normal text-xs text-ink-3">
+                        {gradingResult.presentation.presentationTotal ?? 0}/100
+                      </span>
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2 mb-3">
                       {(
                         [
                           ['Accuracy', gradingResult.presentation.scores.accuracy],
@@ -3814,89 +3970,43 @@ Student message: "${msg}"`
                           ['Conciseness', gradingResult.presentation.scores.conciseness],
                           ['Safety', gradingResult.presentation.scores.safety],
                         ] as [string, number][]
-                      ).map(([axis, score]) => (
-                        <div key={axis} className="rounded-md bg-surface-1 p-3">
-                          <div className="text-xs text-ink-tertiary uppercase tracking-wider mb-1">{axis}</div>
-                          <div className="flex items-center gap-2">
-                            <span className={`text-lg font-bold ${score >= 18 ? 'text-confirmed' : score >= 12 ? 'text-caution' : 'text-critical'}`}>
-                              {score}/25
-                            </span>
-                            <div className="flex-1 rounded-full bg-surface-4 h-1.5">
-                              <div
-                                className={`h-1.5 rounded-full ${score >= 18 ? 'bg-green-500' : score >= 12 ? 'bg-caution' : 'bg-red-500'}`}
-                                style={{ width: `${(score / 25) * 100}%` }}
-                              />
-                            </div>
+                      ).map(([axis, score]) => {
+                        const pct = (score / 25) * 100
+                        const c = pct >= 72 ? 'text-confirmed' : pct >= 48 ? 'text-caution' : 'text-critical'
+                        return (
+                          <div key={axis} className="rounded-lg bg-paper-2 border border-rule px-3 py-2">
+                            <div className="text-xs text-ink-3 mb-1">{axis}</div>
+                            <span className={'text-base font-semibold font-mono ' + c}>{score}/25</span>
                           </div>
-                        </div>
-                      ))}
+                        )
+                      })}
                     </div>
                     {gradingResult.presentation.presentationFeedback && (
-                      <p className="text-sm leading-relaxed text-ink-secondary mb-3">{gradingResult.presentation.presentationFeedback}</p>
+                      <p className="text-sm text-ink-2 leading-relaxed">{gradingResult.presentation.presentationFeedback}</p>
                     )}
                     {gradingResult.presentation.criticalMisses && gradingResult.presentation.criticalMisses.length > 0 && (
-                      <div className="mt-3 rounded-md border border-red-800 bg-red-950/30 p-3">
-                        <div className="mb-2 text-xs font-semibold uppercase tracking-wide text-critical">Critical Misses</div>
+                      <div className="mt-3 rounded-lg border border-critical/30 bg-critical/5 px-3 py-2.5">
+                        <div className="text-xs font-semibold uppercase tracking-wide text-critical mb-2">Critical Misses</div>
                         <ul className="space-y-1">
                           {gradingResult.presentation.criticalMisses.map((miss, i) => (
                             <li key={i} className="flex gap-2 text-sm text-critical">
-                              <span className="flex-shrink-0">!</span>
-                              {miss}
+                              <span className="flex-shrink-0">!</span>{miss}
                             </li>
                           ))}
                         </ul>
                       </div>
                     )}
-                  </SectionCard>
-                )}
-
-                {/* 4. Missed questions */}
-                {gradingResult.missedQuestions?.length > 0 && (
-                  <SectionCard title="Questions That Would Have Changed Management">
-                    <ul className="space-y-2">
-                      {gradingResult.missedQuestions.map((q, i) => (
-                        <li key={i} className="flex gap-2 text-sm text-ink-secondary">
-                          <span className="text-caution flex-shrink-0">•</span>
-                          {q}
-                        </li>
-                      ))}
-                    </ul>
-                  </SectionCard>
-                )}
-
-                {/* 5. Teaching points */}
-                <SectionCard title="Teaching Points">
-                  <ul className="space-y-2">
-                    {gradingResult.teachingPoints?.map((pt, i) => (
-                      <li key={i} className="flex gap-2 text-sm text-ink-secondary">
-                        <span className="text-primary-400 flex-shrink-0 font-bold">{i + 1}.</span>
-                        {pt}
-                      </li>
-                    ))}
-                  </ul>
-                </SectionCard>
-
-                {/* Differentials */}
-                <SectionCard title="Differential Diagnosis Discussion">
-                  <div className="space-y-3">
-                    {gradingResult.differentials?.map((dx, i) => {
-                      const [name, explanation] = dx.includes(':') ? dx.split(/: (.+)/) : [dx, '']
-                      return (
-                        <div key={i} className="rounded-md bg-surface-1 p-3">
-                          <div className="mb-1 text-sm font-semibold text-purple-300">{name}</div>
-                          {explanation && <p className="text-sm text-ink-secondary">{explanation}</p>}
-                        </div>
-                      )
-                    })}
                   </div>
-                </SectionCard>
-
-                {/* Your Case Notes */}
-                {notes.content.trim() && notes.content !== SOAP_TEMPLATE && (
-                  <NotesResultPanel content={notes.content} />
                 )}
 
-                {/* Case feedback widget */}
+                {/* Case Notes */}
+                {notes.content.trim() && notes.content !== SOAP_TEMPLATE && (
+                  <div className="border-t border-rule px-5 py-4">
+                    <ScorecardNotesPanel content={notes.content} />
+                  </div>
+                )}
+
+                {/* Rate This Case */}
                 {(() => {
                   const FEEDBACK_DIMS = [
                     { key: 'overall',               label: 'Overall Case' },
@@ -3926,8 +4036,8 @@ Student message: "${msg}"`
                   }
                   const hasAnyRating = Object.values(feedbackRatings).some(v => v > 0)
                   return (
-                    <div className="rounded-lg border border-surface-4 bg-surface-1 p-5">
-                      <div className="mb-4 text-sm font-semibold text-ink-primary">Rate This Case</div>
+                    <div className="border-t border-rule px-5 py-4">
+                      <div className="eyebrow" style={{ marginBottom: 14 }}>Rate This Case</div>
                       {feedbackSubmitted ? (
                         <p className="text-sm text-confirmed text-center py-2">Thank you for your feedback!</p>
                       ) : (
@@ -3938,7 +4048,7 @@ Student message: "${msg}"`
                               const hov = feedbackHover[key] ?? 0
                               return (
                                 <div key={key} className="flex items-center justify-between gap-3">
-                                  <span className="text-xs text-ink-secondary w-40 shrink-0">{label}</span>
+                                  <span className="text-xs text-ink-2 w-40 shrink-0">{label}</span>
                                   <div className="flex gap-1">
                                     {[1, 2, 3, 4, 5].map(star => (
                                       <button
@@ -3947,9 +4057,9 @@ Student message: "${msg}"`
                                         onMouseLeave={() => setFeedbackHover(h => ({ ...h, [key]: 0 }))}
                                         onClick={() => setFeedbackRatings(r => ({ ...r, [key]: star }))}
                                         className="text-xl leading-none transition-colors"
-                                        aria-label={`${star} star`}
+                                        aria-label={star + ' star'}
                                       >
-                                        <span className={(hov || active) >= star ? 'text-caution' : 'text-ink-tertiary'}>
+                                        <span className={(hov || active) >= star ? 'text-caution' : 'text-ink-3'}>
                                           ★
                                         </span>
                                       </button>
@@ -3964,12 +4074,12 @@ Student message: "${msg}"`
                             onChange={e => setFeedbackText(e.target.value)}
                             placeholder="Any comments or suggestions? (optional)"
                             rows={3}
-                            className="w-full rounded-md border border-surface-4 bg-surface-2 px-3 py-2 text-sm text-ink-primary placeholder-ink-muted focus:border-primary-400 focus:outline-none resize-none mb-3"
+                            className="w-full rounded-md border border-rule bg-paper-2 px-3 py-2 text-sm text-ink placeholder-ink-3 focus:border-sc-accent focus:outline-none resize-none mb-3"
                           />
                           <button
                             onClick={submitFeedback}
                             disabled={!hasAnyRating || feedbackSubmitting}
-                            className="w-full rounded-md bg-primary-600 px-4 py-2 text-sm font-medium text-white hover:bg-primary-500 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                            className="w-full rounded-md bg-sc-accent px-4 py-2 text-sm font-medium text-white hover:bg-sc-accent-hover disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
                           >
                             {feedbackSubmitting ? 'Submitting…' : 'Submit Feedback'}
                           </button>
@@ -3979,16 +4089,31 @@ Student message: "${msg}"`
                   )
                 })()}
 
-                <button
-                  onClick={() => {
-                    setGradingResult(null)
-                    setUserDiagnosis('')
-                    setUserPresentation('')
-                  }}
-                  className="w-full rounded-md border border-surface-5 px-4 py-2 text-sm text-ink-secondary hover:border-surface-5 hover:text-ink-primary transition-colors"
-                >
-                  Try Again
-                </button>
+                {/* D — Action bar */}
+                <div style={{ display: 'flex', justifyContent: 'flex-end', gap: 8, padding: '12px 20px', background: 'var(--color-paper-2)', borderTop: '1px solid var(--color-rule)', borderRadius: '0 0 1rem 1rem', flexWrap: 'wrap' }}>
+                  <Link
+                    href="/"
+                    style={{ border: '1px solid var(--color-rule)', borderRadius: 8, padding: '8px 16px', fontSize: 13, color: 'var(--color-ink-2)', textDecoration: 'none', background: 'transparent', display: 'inline-block', lineHeight: '1.4' }}
+                    className="hover:bg-paper-3 transition-colors"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
+                    href="/history"
+                    style={{ border: '1px solid var(--color-rule)', borderRadius: 8, padding: '8px 16px', fontSize: 13, color: 'var(--color-ink-2)', textDecoration: 'none', background: 'transparent', display: 'inline-block', lineHeight: '1.4' }}
+                    className="hover:bg-paper-3 transition-colors"
+                  >
+                    Case History
+                  </Link>
+                  <button
+                    onClick={() => generateCase()}
+                    style={{ background: 'var(--color-primary)', color: 'var(--color-primary-foreground)', border: 'none', borderRadius: 10, padding: '8px 18px', fontSize: 13, fontWeight: 600, letterSpacing: '-0.01em', cursor: 'pointer', lineHeight: '1.4' }}
+                    className="hover:opacity-90 transition-opacity"
+                  >
+                    Next case →
+                  </button>
+                </div>
+
               </div>
             )}
           </div>
@@ -4001,7 +4126,7 @@ Student message: "${msg}"`
       {/* Header */}
       <header className="flex flex-shrink-0 items-center gap-3 border-b border-surface-4 bg-surface-1 px-4 py-2.5">
         <div className="flex items-center gap-2 mr-2">
-          <div className="h-8 w-8 rounded-md bg-gradient-to-br from-primary-400 to-primary-700 flex items-center justify-center text-ink-inverse text-sm font-bold shadow-lg shadow-primary-900/30">Rx</div>
+          <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center text-white text-sm font-bold">Rx</div>
           <span className="font-serif text-[15px] font-semibold text-ink-primary whitespace-nowrap">MedTrainer</span>
         </div>
         <select
@@ -4062,7 +4187,7 @@ Student message: "${msg}"`
           {caseData && (caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') && !caseStarted && (
             <button
               onClick={() => { startTimer(caseDifficulty); setCaseStarted(true); setTimeout(() => chatInputRef.current?.focus(), 50) }}
-              className="rounded-md border border-primary-600 bg-primary-900/30 px-2.5 py-1 text-[11px] font-medium text-primary-300 hover:bg-primary-900/50 transition-colors"
+              className="rounded-md border border-primary-300 bg-primary-50 px-2.5 py-1 text-[11px] font-medium text-primary-700 hover:bg-primary-100 transition-colors"
             >
               Start Timer
             </button>
@@ -4085,7 +4210,7 @@ Student message: "${msg}"`
               {timerState.status === 'paused' ? (
                 <button
                   onClick={resumeTimer}
-                  className="flex items-center gap-1 rounded-md border border-primary-600 bg-primary-900/30 px-2.5 py-1 text-[11px] font-medium text-primary-300 hover:bg-primary-900/50 transition-colors"
+                  className="flex items-center gap-1 rounded-md border border-primary-300 bg-primary-50 px-2.5 py-1 text-[11px] font-medium text-primary-700 hover:bg-primary-100 transition-colors"
                 >
                   <svg className="w-3 h-3 fill-current" viewBox="0 0 16 16"><path d="M3 2.5l10 5.5-10 5.5V2.5z"/></svg>
                   Resume
@@ -4282,7 +4407,7 @@ Student message: "${msg}"`
               <div className="flex h-full flex-col items-center justify-center gap-5 text-center">
                 <div className="h-20 w-20 rounded-full bg-surface-2 flex items-center justify-center text-4xl border border-surface-4">🏥</div>
                 <div>
-                  <h1 className="font-serif text-2xl font-semibold text-ink-primary">MedTrainer</h1>
+                  <h1 className="heading-display text-[26px]">Clinical <span className="heading-accent">reasoning</span> practice</h1>
                   <p className="mt-2 text-[13px] text-ink-secondary max-w-md">Select a system and difficulty, then generate a clinical case to begin your diagnostic journey.</p>
                 </div>
                 <button
@@ -4339,7 +4464,7 @@ Student message: "${msg}"`
                   <div
                     className={`max-w-[88%] rounded-lg px-3 py-2 text-[11px] leading-relaxed ${
                       msg.role === 'user'
-                        ? 'bg-primary-600 text-primary-50'
+                        ? 'bg-primary-500 text-white'
                         : 'bg-surface-2 text-ink-primary border border-surface-4'
                     }`}
                   >
@@ -4482,7 +4607,7 @@ Student message: "${msg}"`
                   line.type === 'input'   ? 'text-ink-secondary' :
                   line.type === 'error'   ? 'text-critical' :
                   line.type === 'success' ? 'text-confirmed' :
-                  line.type === 'info'    ? 'text-cyan-400' :
+                  line.type === 'info'    ? 'text-primary-500' :
                   'text-ink-primary'
                 }
               >
@@ -4559,7 +4684,7 @@ Student message: "${msg}"`
             <img
               src={zoomedImage.src}
               alt={zoomedImage.alt}
-              className="max-h-[90vh] max-w-full rounded-lg object-contain bg-[#fafaf5] shadow-2xl"
+              className="max-h-[90vh] max-w-full rounded-lg object-contain bg-surface-2 shadow-2xl"
             />
             <p className="mt-2 text-center text-xs text-ink-tertiary">{zoomedImage.alt} — click outside to close</p>
           </div>

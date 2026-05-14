@@ -43,9 +43,18 @@ export default function WeeklyGoal({ sessions }: { sessions: Session[] }) {
     setEditing(false)
   }
 
+  const goalMet = done >= goal
+  const doneColor = goalMet ? 'var(--green)' : done > 0 ? 'var(--accent)' : 'var(--muted)'
+  const barColor  = goalMet ? 'var(--green)' : 'var(--accent)'
+
   return (
     <div className="dx-card dx-weekly-goal">
       <div className="dx-card-header">
+        <span className="dx-card-hicon" style={{ background: 'rgba(61,152,144,0.14)', color: 'var(--accent)' }}>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="14" height="14">
+            <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
+          </svg>
+        </span>
         Weekly goal
         {editing ? (
           <input
@@ -63,12 +72,12 @@ export default function WeeklyGoal({ sessions }: { sessions: Session[] }) {
       </div>
       <div className="dx-card-body">
         <div className="dx-weekly-count">
-          <span className="dx-weekly-done">{done}</span>
+          <span className="dx-weekly-done" style={{ color: doneColor }}>{done}</span>
           <span className="dx-weekly-sep"> / {goal}</span>
-          <span className="dx-weekly-label"> cases this week</span>
+          <span className="dx-weekly-label">{goalMet ? ' cases — goal met! 🎉' : ' cases this week'}</span>
         </div>
         <div className="dx-weekly-bar">
-          <div className="dx-weekly-bar-fill" style={{ width: `${pct * 100}%` }} />
+          <div className="dx-weekly-bar-fill" style={{ width: `${pct * 100}%`, background: barColor }} />
         </div>
       </div>
     </div>

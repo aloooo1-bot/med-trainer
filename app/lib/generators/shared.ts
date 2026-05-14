@@ -50,13 +50,14 @@ CLINICAL HPI WORD LIMIT RULE: The clinicalHpi field is a HARD MAXIMUM of 40 word
 FOUNDATIONS HPI WORD LIMIT RULE: The hpi field is a HARD MAXIMUM of 60 words. State ONLY: the chief complaint, primary symptom(s), and duration. Move everything else into hiddenHistory.fullHistory.
 MANAGEMENT TEACHING POINT RULE: At least ONE of the four teachingPoints MUST be a concrete management/treatment point — name a specific first-line agent, dose, threshold, target, or guideline-anchored decision rule (e.g., "Initiate IV labetalol; reduce MAP by no more than 25% in the first hour" | "tPA window is 4.5h from last-known-well; absolute contraindications include BP >185/110, recent surgery <14 days, active bleeding"). A pearl that only describes pathophysiology, epidemiology, or diagnostic criteria does NOT satisfy this rule. Generic statements like "treat the underlying cause" are insufficient.
 KEY QUESTIONS COVERAGE RULE: Every clinically pivotal item in hiddenHistory (predisposing structural lesion, prior TIA or sentinel event, critical precipitant, key exposure, family thrombophilia, prior episode) MUST be elicitable through at least one entry in keyQuestions. Walk through hiddenHistory.fullHistory, familyHistory, medications, and hiddenSymptoms — for any finding that materially changes the diagnosis, risk stratification, or management, write a directed question that would surface it. Generic questions like "Any other symptoms?" do NOT count.
-DANGEROUS MIMIC RULE: At least ONE differential MUST be the single most dangerous "can't-miss" mimic of the primary diagnosis — a condition that, if missed, causes serious immediate harm and shares enough features to plausibly mislead a clinician before the key discriminating test is ordered (e.g., STEMI for Acute Pericarditis; Cauda Equina Syndrome for Lumbar Disc Herniation with Radiculopathy; Pulmonary Embolism for PCP Pneumonia; HHS for DKA). Identify this mimic explicitly in differentialExplanations and name the one finding or test that definitively distinguishes it from the correct diagnosis.`
+DANGEROUS MIMIC RULE: At least ONE differential MUST be the single most dangerous "can't-miss" mimic of the primary diagnosis — a condition that, if missed, causes serious immediate harm and shares enough features to plausibly mislead a clinician before the key discriminating test is ordered (e.g., STEMI for Acute Pericarditis; Cauda Equina Syndrome for Lumbar Disc Herniation with Radiculopathy; Pulmonary Embolism for PCP Pneumonia; HHS for DKA). Identify this mimic explicitly in differentialExplanations and name the one finding or test that definitively distinguishes it from the correct diagnosis.
+PMH LEAK RULE: The pastMedicalHistory fields (conditions, surgeries, hospitalizations) MUST NOT leak the diagnosis through negation or denial. NEVER write phrases like "No prior [organ/system] disease", "No history of [organ/system]", "Denies [organ/system] disorders", "Never had [organ/system]", "Negative for [organ/system]", or any similar exclusion where the organ/system overlaps the diagnosis. Negative pertinents belong in reviewOfSystems, NEVER in pastMedicalHistory. If the patient has no chronic conditions, conditions MUST be EXACTLY "None." — no extra text, no negative pertinents, no medication mentions. Field lane enforcement: conditions = chronic diagnoses ONLY (never medications); surgeries = prior procedures ONLY; hospitalizations = prior inpatient stays ONLY. Medications including oral contraceptives, vitamins, and supplements belong in currentMedications.medications or currentMedications.otc, NEVER in pastMedicalHistory.conditions.`
 
 export const JSON_SCHEMA_TEMPLATE = `{
   "patientInfo": { "name": "First Last", "age": <number>, "gender": "Male or Female", "chiefComplaint": "<brief>", "height": "<e.g. 5'9\\">", "heightInches": <integer> },
   "hpi": "<2-3 sentences. HARD MAXIMUM 60 WORDS. State ONLY: chief complaint, primary symptom(s), and duration.>",
-  "clinicalHpi": "<2-3 sentences, MAXIMUM 40 WORDS>",
-  "advancedHpi": "<HARD LIMIT 20 WORDS: age, sex, vague symptom, one misleading detail>",
+  "clinicalHpi": "<2-3 sentences, MAXIMUM 40 WORDS. Do NOT use comorbidity adjectives (diabetic, hypertensive, obese, asthmatic, cirrhotic, etc.) or name chronic diseases — those belong in pastMedicalHistory.conditions, which the student must elicit.>",
+  "advancedHpi": "<HARD LIMIT 20 WORDS: age, sex, ONE vague non-specific complaint, optional duration. Write 'X-year-old', never 'Xyo'. STRICTLY FORBIDDEN: contextual hooks, recent events, exposures, travel, dental or surgical history, medications, lab/vital values, family or social context — every such detail belongs in hiddenHistory.fullHistory. Do NOT use comorbidity adjectives or name chronic diseases.>",
   "vitals": { "bp": "<sys/dia mmHg>", "hr": <bpm>, "rr": <brpm>, "temp": <F>, "spo2": <pct>, "weight": "<lbs>" },
   "diagnosis": "<specific primary diagnosis>",
   "differentials": ["<dx 1>", "<dx 2>", ...EXACTLY DIFF_COUNT],
@@ -102,7 +103,7 @@ export const JSON_SCHEMA_TEMPLATE = `{
   "skinFindings": "<dermoscopy/skin findings or blank>",
   "fundusFindings": "<fundus findings or blank>",
   "biopsyFindings": "<histopathology findings or blank>",
-  "pastMedicalHistory": { "conditions": "<chronic diagnoses>", "surgeries": "<prior surgeries>", "hospitalizations": "<prior hospitalizations>" },
+  "pastMedicalHistory": { "conditions": "<chronic diagnoses ONLY. If none, write exactly 'None.' and nothing else. NEVER negate a disease category ('No prior X disease', 'Denies X'). NEVER include medications — those go in currentMedications. See PMH LEAK RULE>", "surgeries": "<prior surgeries ONLY. If none, write exactly 'None.' and nothing else. NEVER negate a procedure category. See PMH LEAK RULE>", "hospitalizations": "<prior inpatient stays ONLY. If none, write exactly 'None.' and nothing else. NEVER write 'No prior hospitalizations for X'. See PMH LEAK RULE>" },
   "currentMedications": { "medications": "<prescriptions with doses>", "otc": "<OTC/supplements>" },
   "socialHistory": { "smoking": "<tobacco use>", "alcohol": "<drinks/week>", "drugs": "<recreational>", "occupation": "<job>", "living": "<living situation>", "other": "<travel, diet, exposures>" },
   "relevantTests": [
@@ -129,6 +130,76 @@ const FUTURE_OP        = /\b(may require|might need|could require|planned|will u
 const SURG_SENT_DENIAL = /\b(no|not|never|denies?|without)\b.{0,100}\b(surgery|surgeries|surgical|procedure|procedures|operation|operations|fasciotomy|splenectomy|appendectomy|cholecystectomy)\b/i
 const HOSP_SENT_DENIAL = /\b(no|not|never|denies?|without)\b.{0,100}\b(hospitalization|hospitalizations|hospitalized|inpatient|admitted)\b/i
 const AUTO_PROCEDURE   = /\bautosplenectomy\b/i
+
+const ORGAN_SYSTEM_MAP: Array<[RegExp, string[]]> = [
+  [/thyroid|graves|hashimoto|thyrotoxicos|hyperthyroid|hypothyroid/i, ['thyroid']],
+  [/\bstemi\b|\bnstemi\b|\bmi\b|myocard|angina|coronary\s+artery|acute\s+coronary/i, ['cardiac', 'coronary', 'heart']],
+  [/\brenal\b|kidney|nephro|glomerulo|\bckd\b|\baki\b/i, ['renal', 'kidney']],
+  [/pulmonary\s+embol|\bpe\b|pulmonary\s+hypertens|\bcopd\b|\basthma\b|pneumonia|\brespiratory\b/i, ['pulmonary', 'lung', 'respiratory']],
+  [/\bdka\b|\bhhs\b|\bdiabetes\b|diabetic|hyperglycemi/i, ['diabetic', 'diabetes', 'glucose']],
+  [/hepat|liver\b|cirrhosis|biliary/i, ['hepatic', 'liver']],
+  [/pancrea/i, ['pancreatic', 'pancreas']],
+  [/gastro|esophag|stomach|bowel|colon|intestin|crohn|colitis/i, ['gastrointestinal', 'bowel', 'colon']],
+  [/\bstroke\b|\btia\b|cerebral|seizure|\bepilepsy\b/i, ['neurological', 'brain', 'cerebral']],
+  [/leukemia|lymphoma/i, ['hematologic', 'blood']],
+  [/\barthritis\b|\blupus\b|\bsle\b/i, ['rheumatologic', 'arthritis']],
+  [/adrenal|cortisol|cushing|addison/i, ['adrenal']],
+  [/pituitary/i, ['pituitary']],
+  [/breast\s+cancer|ductal\s+carcinoma/i, ['breast']],
+  [/prostate\s+cancer/i, ['prostate']],
+  [/ovarian|uterine/i, ['ovarian', 'uterine']],
+]
+
+const PMH_NEGATION_RE = /\b(no\b|never\b|denies?\b|denial\b|without\b|negative\s+for|absent\b|free\s+of|has\s+not\s+(?:had|been)|no\s+history\s+of|no\s+prior|no\s+past|no\s+known|no\s+previous)\b/i
+
+const MEDICATION_NAMES_RE = /\b(oral\s+contraceptive|OCP|birth\s+control\s+pill|combined\s+oral|aspirin\b|ibuprofen\b|naproxen\b|acetaminophen\b|tylenol\b|statin\b|atorvastatin|simvastatin|rosuvastatin|metformin\b|insulin\b|levothyroxine|synthroid|warfarin\b|apixaban\b|rivaroxaban\b|lisinopril\b|amlodipine\b|metoprolol\b|atenolol\b|losartan\b|omeprazole\b|pantoprazole\b|vitamin\s+[A-Z]|vitamin\s+d|folic\s+acid|iron\s+supplement|calcium\s+supplement|supplement\b)/i
+
+const CHRONIC_DISEASE_RE = /\b(hypertension\b|diabetes\b|COPD\b|CKD\b|chronic\s+kidney|asthma\b|obesity\b|CAD\b|CHF\b|heart\s+failure|cancer\b|carcinoma\b|lymphoma\b|leukemia\b|cirrhosis\b|epilepsy\b|hypothyroid|hyperthyroid|psoriasis\b|crohn\b|colitis\b|fibromyalgia\b|lupus\b|rheumatoid\b|sickle\s+cell|gout\b|HIV\b|hepatitis\b|atrial\s+fibrillation|afib\b|depression\b|anxiety\b|schizophrenia\b)/i
+
+function getDiagnosisKeywords(diagnosis: string): string[] {
+  const keywords: string[] = []
+  for (const [pattern, kws] of ORGAN_SYSTEM_MAP) {
+    if (pattern.test(diagnosis)) keywords.push(...kws)
+  }
+  if (keywords.length === 0) {
+    diagnosis.split(/\s+/)
+      .filter(w => w.length > 4 && !/^(acute|with|from|into|over|that|this|type|stage|grade|class|level|form|mild|moderate|severe|chronic|primary|secondary|associated)$/i.test(w))
+      .forEach(w => keywords.push(w.replace(/[^a-z]/gi, '').toLowerCase()))
+  }
+  return [...new Set(keywords)]
+}
+
+export function sanitizePmhLeak(caseData: Record<string, unknown>): Record<string, unknown> {
+  const pmh = caseData.pastMedicalHistory as Record<string, string> | undefined
+  if (!pmh) return caseData
+
+  const diagnosis = (caseData.diagnosis as string | undefined) ?? ''
+  const keywords = getDiagnosisKeywords(diagnosis)
+
+  let updated = false
+  const newPmh = { ...pmh }
+
+  const fields = ['conditions', 'surgeries', 'hospitalizations'] as const
+  for (const field of fields) {
+    const val = (newPmh[field] ?? '') as string
+    if (!val || /^none\.?\s*$/i.test(val.trim())) continue
+
+    // Negation-leak: negation token AND diagnosis keyword co-occur
+    if (PMH_NEGATION_RE.test(val) && keywords.some(kw => new RegExp(`\\b${kw}`, 'i').test(val))) {
+      newPmh[field] = 'None.'
+      updated = true
+      continue
+    }
+
+    // Medication-bleed in conditions: medication present without any real chronic diagnosis
+    if (field === 'conditions' && MEDICATION_NAMES_RE.test(val) && !CHRONIC_DISEASE_RE.test(val)) {
+      newPmh[field] = 'None.'
+      updated = true
+    }
+  }
+
+  return updated ? { ...caseData, pastMedicalHistory: newPmh } : caseData
+}
 
 export function reconcileHistoryConsistency(caseData: Record<string, unknown>): Record<string, unknown> {
   const pmh    = caseData.pastMedicalHistory as Record<string, string> | undefined

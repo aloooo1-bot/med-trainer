@@ -83,3 +83,65 @@ test('buildOralPrompt includes patient info and presentation text', () => {
   assert.ok(prompt.includes('STEMI (inferior)'))
   assert.ok(prompt.includes('crushing chest pain'))
 })
+
+// ── Per-difficulty weight and structure tests ─────────────────────────────────
+
+test('Foundations prompt: declares 4 categories summing to 100, no Clinical Reasoning', () => {
+  const p = buildRubricPrompt({ ...baseInput, difficulty: 'Foundations' })
+  assert.ok(p.includes('must sum to 100'))
+  assert.ok(p.includes('History & Interview (historyInterview): 24 points'))
+  assert.ok(p.includes('Test Ordering (testOrdering): 24 points'))
+  assert.ok(p.includes('Diagnosis Accuracy (diagnosisAccuracy): 36 points'))
+  assert.ok(p.includes('Diagnosis Completeness (diagnosisCompleteness): 16 points'))
+  assert.ok(!p.includes('Clinical Reasoning (clinicalReasoning)'))
+  assert.ok(!p.match(/CLINICAL REASONING \(\/[0-9]+\):/))
+})
+
+test('Foundations Return JSON template omits clinicalReasoning', () => {
+  const p = buildRubricPrompt({ ...baseInput, difficulty: 'Foundations' })
+  const returnBlock = p.split('Return:')[1]
+  assert.ok(returnBlock, 'Return block must exist')
+  assert.ok(!returnBlock.includes('"clinicalReasoning"'))
+})
+
+test('Clinical prompt: declares 5 categories summing to 100, includes Clinical Reasoning', () => {
+  const p = buildRubricPrompt({ ...baseInput, difficulty: 'Clinical' })
+  assert.ok(p.includes('must sum to 100'))
+  assert.ok(p.includes('History & Interview (historyInterview): 20 points'))
+  assert.ok(p.includes('Diagnosis Accuracy (diagnosisAccuracy): 30 points'))
+  assert.ok(p.includes('Clinical Reasoning (clinicalReasoning): 15 points'))
+  assert.ok(p.match(/CLINICAL REASONING \(\/15\):/))
+})
+
+test('Clinical Return JSON template includes clinicalReasoning', () => {
+  const p = buildRubricPrompt({ ...baseInput, difficulty: 'Clinical' })
+  const returnBlock = p.split('Return:')[1]
+  assert.ok(returnBlock.includes('"clinicalReasoning"'))
+})
+
+test('Advanced prompt: same weights as Clinical', () => {
+  const p = buildRubricPrompt({ ...baseInput, difficulty: 'Advanced' })
+  assert.ok(p.includes('Clinical Reasoning (clinicalReasoning): 15 points'))
+  assert.ok(p.match(/CLINICAL REASONING \(\/15\):/))
+})
+
+// ── Bug 1: added specificity rules ───────────────────────────────────────────
+
+test('ADDED SPECIFICITY RULE present in prompt', () => {
+  const p = buildRubricPrompt(baseInput)
+  assert.ok(p.includes('ADDED SPECIFICITY RULE'))
+  assert.ok(p.includes('clinically accurate and supported by the case'))
+})
+
+test('ABBREVIATION RULE present in prompt', () => {
+  const p = buildRubricPrompt(baseInput)
+  assert.ok(p.includes('ABBREVIATION RULE'))
+  assert.ok(p.includes('parentheses'))
+  assert.ok(p.includes('EDH'))
+})
+
+test('INCORRECT ADDED SPECIFICITY rule present in prompt', () => {
+  const p = buildRubricPrompt(baseInput)
+  assert.ok(p.includes('INCORRECT ADDED SPECIFICITY'))
+  assert.ok(p.includes('clinically wrong'))
+})

@@ -1,0 +1,42 @@
+{
+  "colon_cancer": [
+    "colon_cancer_000.png",
+    "colon_cancer_001.png",
+    "colon_cancer_002.png",
+    "colon_cancer_003.png",
+    "colon_cancer_004.png",
+    "colon_cancer_005.png"
+  ],
+  "liver": [
+    "liver_000.png",
+    "liver_001.png",
+    "liver_002.png",
+    "liver_003.png",
+    "liver_004.png",
+    "liver_005.png"
+  ],
+  "gastric": [
+    "gastric_000.png",
+    "gastric_001.png",
+    "gastric_002.png",
+    "gastric_003.png",
+    "gastric_004.png",
+    "gastric_005.png"
+  ],
+  "breast_cancer": [
+    "breast_cancer_000.png",
+    "breast_cancer_001.png",
+    "breast_cancer_002.png",
+    "breast_cancer_003.png",
+    "breast_cancer_004.png",
+    "breast_cancer_005.png"
+  ],
+  "normal": [
+    "normal_000.png",
+    "normal_001.png",
+    "normal_002.png",
+    "normal_003.png",
+    "normal_004.png",
+    "normal_005.png"
+  ]
+}

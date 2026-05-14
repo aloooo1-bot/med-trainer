@@ -76,9 +76,7 @@ export default function ProgressPage() {
         <div className="dx-content">
 
           <div>
-            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--text)', fontFamily: 'DM Serif Display, serif' }}>
-              Progress
-            </h1>
+            <h1 className="heading-display text-[22px]"><span className="heading-accent">Progress</span> over time</h1>
             <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--muted)' }}>Your learning trajectory over time</p>
           </div>
 

@@ -1,0 +1,74 @@
+{
+  "generatedAt": "2026-05-06T03:20:45.087Z",
+  "cases": [
+    {
+      "id": "respiratory-foundations-spontaneous-pneumothorax-0",
+      "system": "Respiratory",
+      "difficulty": "Foundations",
+      "diagnosis": "Spontaneous Pneumothorax",
+      "differentials": [
+        "Pulmonary Embolism",
+        "Pleuritis / Pleurisy",
+        "Musculoskeletal Chest Wall Pain"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Pulmonary Embolism",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Pulmonary embolism is the critical can't-miss diagnosis as it shares acute pleuritic chest pain and dyspnea with spontaneous pneumothorax, can be rapidly fatal if untreated, and cannot be reliably distinguished from pneumothorax without imaging.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Musculoskeletal Chest Wall Pain",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Musculoskeletal chest wall pain is the most common cause of chest pain in young patients seen in primary care and emergency settings, making it the first diagnosis a general practitioner would consider in a young person with chest pain.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Pleuritis / Pleurisy",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Pleuritis shares the hallmark feature of sharp, pleuritic chest pain worsening with inspiration but is distinguished from pneumothorax by the presence of normal or increased breath sounds, absence of hyperresonance to percussion, and no pleural line on chest X-ray — forcing the student to master physical exam and radiographic criteria.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    }
+  ],
+  "themes": {
+    "totalReviewed": 1,
+    "casesWithAnyGap": 0,
+    "gapRatePct": 0,
+    "missingDangerousMimic": {
+      "count": 0,
+      "pct": 0
+    },
+    "missingCommonAlternative": {
+      "count": 0,
+      "pct": 0
+    },
+    "missingCriteriaFoil": {
+      "count": 0,
+      "pct": 0
+    },
+    "bySystem": {
+      "Respiratory": {
+        "missing": 0,
+        "total": 1
+      }
+    },
+    "byDifficulty": {
+      "Foundations": {
+        "missing": 0,
+        "total": 1
+      },
+      "Clinical": {
+        "missing": 0,
+        "total": 0
+      },
+      "Advanced": {
+        "missing": 0,
+        "total": 0
+      }
+    },
+    "topSuggestedMimics": [],
+    "topSuggestedCommon": [],
+    "topSuggestedFoils": []
+  }
+}

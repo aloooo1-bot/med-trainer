@@ -1,5 +1,5 @@
 import type { GradingInput, GradingResult } from './types'
-import { GRADING_SYSTEM_PROMPT, buildRubricPrompt, buildOralPrompt } from './rubric'
+import { GRADING_SYSTEM_PROMPT, buildRubricPrompt, buildOralPrompt, getRubric } from './rubric'
 import type { RawUsage } from '../lib/analytics'
 
 async function callClaudeGrading(
@@ -20,6 +20,20 @@ async function callClaudeGrading(
 }
 
 export type GradingUsageCallback = (type: 'grading_main' | 'grading_oral', usage: RawUsage) => void
+
+export function clampDimensions(result: GradingResult, difficulty: string): void {
+  if (!result.dimensions) return
+  for (const { key, max } of getRubric(difficulty)) {
+    const dim = result.dimensions[key]
+    if (dim && typeof dim.score === 'number') {
+      const clamped = Math.max(0, Math.min(max, dim.score))
+      if (clamped !== dim.score) {
+        console.warn(`[GRADING] ${key} score ${dim.score} out of [0,${max}] — clamped to ${clamped}`)
+        dim.score = clamped
+      }
+    }
+  }
+}
 
 export async function gradeCase(
   input: GradingInput,
@@ -42,6 +56,9 @@ export async function gradeCase(
   const match = text.match(/\{[\s\S]*\}/)
   if (!match) throw new Error('No JSON in grading response')
   const result = JSON.parse(match[0]) as GradingResult
+
+  // Clamp dimension scores before summing — model can return out-of-range values
+  clampDimensions(result, input.difficulty)
 
   // Always derive total from dimension sum — never trust Claude's independent calculation
   if (result.dimensions) {

@@ -1,0 +1,39 @@
+{
+  "diabetic_retinopathy": [
+    "diabetic_retinopathy_000.png",
+    "diabetic_retinopathy_001.png",
+    "diabetic_retinopathy_002.png",
+    "diabetic_retinopathy_003.png",
+    "diabetic_retinopathy_004.png",
+    "diabetic_retinopathy_005.png"
+  ],
+  "glaucoma": [
+    "glaucoma_000.png",
+    "glaucoma_001.png",
+    "glaucoma_002.png"
+  ],
+  "amd": [
+    "amd_000.png",
+    "amd_001.png",
+    "amd_002.png",
+    "amd_003.png",
+    "amd_004.png",
+    "amd_005.png"
+  ],
+  "hypertensive": [
+    "hypertensive_000.png",
+    "hypertensive_001.png",
+    "hypertensive_002.png",
+    "hypertensive_003.png",
+    "hypertensive_004.png",
+    "hypertensive_005.png"
+  ],
+  "normal": [
+    "normal_000.png",
+    "normal_001.png",
+    "normal_002.png",
+    "normal_003.png",
+    "normal_004.png",
+    "normal_005.png"
+  ]
+}

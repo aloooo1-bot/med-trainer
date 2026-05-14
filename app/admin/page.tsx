@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useMemo } from 'react'
 import {
@@ -191,16 +191,16 @@ export default function AdminPage() {
   }
 
   if (!loaded) {
-    return <div className="min-h-screen bg-gray-950 flex items-center justify-center text-gray-500 text-sm">Loading…</div>
+    return <div className="min-h-screen bg-surface-0 flex items-center justify-center text-ink-tertiary text-sm">Loading…</div>
   }
 
   if (sessions.length === 0 && abandoned.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-950 flex items-center justify-center">
+      <div className="min-h-screen bg-surface-0 flex items-center justify-center">
         <div className="text-center">
-          <div className="text-3xl text-gray-700 mb-3">📊</div>
-          <p className="text-gray-400 text-sm mb-1">No sessions recorded yet.</p>
-          <p className="text-gray-600 text-xs">Generate and submit cases to start collecting analytics.</p>
+          <div className="text-3xl text-ink-muted mb-3">📊</div>
+          <p className="text-ink-secondary text-sm mb-1">No sessions recorded yet.</p>
+          <p className="text-ink-tertiary text-xs">Generate and submit cases to start collecting analytics.</p>
           <a href="/" className="mt-6 inline-block text-xs text-blue-400 hover:text-blue-300 underline">← Back to trainer</a>
         </div>
       </div>
@@ -210,12 +210,12 @@ export default function AdminPage() {
   const allTypes = Object.keys(CALL_TYPE_LABELS) as APICallType[]
 
   return (
-    <div className="min-h-screen bg-gray-950 text-gray-200">
+    <div className="min-h-screen bg-surface-0 text-ink-primary">
       {/* Header */}
-      <header className="border-b border-gray-800 bg-gray-900 px-6 py-4 flex items-center justify-between">
+      <header className="border-b border-surface-3 bg-surface-1 px-6 py-4 flex items-center justify-between">
         <div>
-          <h1 className="text-base font-bold text-gray-100">Session Analytics</h1>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <h1 className="heading-display text-[18px]">Session <span className="heading-accent">analytics</span></h1>
+          <p className="text-xs text-ink-tertiary mt-0.5">
             {sessions.length} completed · {abandoned.length} abandoned
             {stats && ` · ${fmtDate(stats.startDate)} → ${fmtDate(stats.endDate)}`}
           </p>
@@ -223,7 +223,7 @@ export default function AdminPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => { setSessions(loadSessionRecords()); setAbandoned(loadAbandonedSessions()) }}
-            className="text-xs text-gray-500 hover:text-gray-300 border border-gray-700 rounded px-3 py-1.5 transition-colors"
+            className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors"
           >
             Refresh
           </button>
@@ -233,7 +233,19 @@ export default function AdminPage() {
           >
             Clear data
           </button>
-          <a href="/" className="text-xs text-gray-500 hover:text-gray-300 border border-gray-700 rounded px-3 py-1.5 transition-colors">
+          <a href="/admin/ratings" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
+            Ratings Admin
+          </a>
+          <a href="/ratings" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
+            Ratings
+          </a>
+          <a href="/review" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
+            Review
+          </a>
+          <a href="/history" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
+            History
+          </a>
+          <a href="/" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
             ← Trainer
           </a>
         </div>
@@ -254,9 +266,9 @@ export default function AdminPage() {
             { label: 'Input tokens (total)', value: stats.totalInputTok.toLocaleString() },
             { label: 'Output tokens (total)', value: stats.totalOutputTok.toLocaleString() },
           ].map(({ label, value }) => (
-            <div key={label} className="rounded-lg border border-gray-800 bg-gray-900 p-4">
-              <div className="text-xs text-gray-500 mb-1">{label}</div>
-              <div className="text-lg font-bold text-gray-100 tabular-nums">{value}</div>
+            <div key={label} className="rounded-lg border border-surface-3 bg-surface-1 p-4">
+              <div className="text-xs text-ink-tertiary mb-1">{label}</div>
+              <div className="text-lg font-bold text-ink-primary tabular-nums">{value}</div>
             </div>
           ))}
         </div>
@@ -265,13 +277,13 @@ export default function AdminPage() {
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
 
           {/* By difficulty */}
-          <section className="rounded-lg border border-gray-800 bg-gray-900 overflow-hidden">
-            <div className="border-b border-gray-800 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          <section className="rounded-lg border border-surface-3 bg-surface-1 overflow-hidden">
+            <div className="border-b border-surface-3 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-ink-secondary">
               By Difficulty
             </div>
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-gray-800 text-gray-500">
+                <tr className="border-b border-surface-3 text-ink-tertiary">
                   <th className="px-5 py-2.5 text-left font-medium">Level</th>
                   <th className="px-3 py-2.5 text-right font-medium">n</th>
                   <th className="px-3 py-2.5 text-right font-medium">Avg cost</th>
@@ -282,13 +294,13 @@ export default function AdminPage() {
               </thead>
               <tbody>
                 {stats.byDiff.map(row => (
-                  <tr key={row.diff} className="border-b border-gray-800/50 hover:bg-gray-800/30">
+                  <tr key={row.diff} className="border-b border-surface-3/50 hover:bg-surface-2/50">
                     <td className={`px-5 py-2.5 font-semibold ${DIFFICULTY_COLOR[row.diff]}`}>{row.diff}</td>
-                    <td className="px-3 py-2.5 text-right text-gray-400 tabular-nums">{row.count}</td>
-                    <td className="px-3 py-2.5 text-right tabular-nums text-gray-200">{fmt$(row.avgCost, 4)}</td>
-                    <td className="px-3 py-2.5 text-right tabular-nums text-gray-300">{row.avgQuestions.toFixed(1)}</td>
-                    <td className="px-3 py-2.5 text-right tabular-nums text-gray-300">{fmtPct(row.accuracy * 100)}</td>
-                    <td className="px-4 py-2.5 text-right tabular-nums text-gray-400">{fmtElapsed(Math.round(row.avgElapsed))}</td>
+                    <td className="px-3 py-2.5 text-right text-ink-secondary tabular-nums">{row.count}</td>
+                    <td className="px-3 py-2.5 text-right tabular-nums text-ink-primary">{fmt$(row.avgCost, 4)}</td>
+                    <td className="px-3 py-2.5 text-right tabular-nums text-ink-secondary">{row.avgQuestions.toFixed(1)}</td>
+                    <td className="px-3 py-2.5 text-right tabular-nums text-ink-secondary">{fmtPct(row.accuracy * 100)}</td>
+                    <td className="px-4 py-2.5 text-right tabular-nums text-ink-secondary">{fmtElapsed(Math.round(row.avgElapsed))}</td>
                   </tr>
                 ))}
               </tbody>
@@ -296,13 +308,13 @@ export default function AdminPage() {
           </section>
 
           {/* Cost by call type */}
-          <section className="rounded-lg border border-gray-800 bg-gray-900 overflow-hidden">
-            <div className="border-b border-gray-800 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          <section className="rounded-lg border border-surface-3 bg-surface-1 overflow-hidden">
+            <div className="border-b border-surface-3 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-ink-secondary">
               Cost by Call Type
             </div>
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-gray-800 text-gray-500">
+                <tr className="border-b border-surface-3 text-ink-tertiary">
                   <th className="px-5 py-2.5 text-left font-medium">Type</th>
                   <th className="px-3 py-2.5 text-right font-medium">Calls</th>
                   <th className="px-3 py-2.5 text-right font-medium">Total cost</th>
@@ -319,11 +331,11 @@ export default function AdminPage() {
                   .filter(r => r.count > 0)
                   .sort((a, b) => b.cost - a.cost)
                   .map(row => (
-                    <tr key={row.type} className="border-b border-gray-800/50 hover:bg-gray-800/30">
+                    <tr key={row.type} className="border-b border-surface-3/50 hover:bg-surface-2/50">
                       <td className={`px-5 py-2.5 font-medium ${CALL_TYPE_COLOR[row.type]}`}>{CALL_TYPE_LABELS[row.type]}</td>
-                      <td className="px-3 py-2.5 text-right text-gray-400 tabular-nums">{row.count.toLocaleString()}</td>
-                      <td className="px-3 py-2.5 text-right tabular-nums text-gray-200">{fmt$(row.cost, 4)}</td>
-                      <td className="px-4 py-2.5 text-right tabular-nums text-gray-400">
+                      <td className="px-3 py-2.5 text-right text-ink-secondary tabular-nums">{row.count.toLocaleString()}</td>
+                      <td className="px-3 py-2.5 text-right tabular-nums text-ink-primary">{fmt$(row.cost, 4)}</td>
+                      <td className="px-4 py-2.5 text-right tabular-nums text-ink-secondary">
                         {fmtPct(stats.totalCost > 0 ? (row.cost / stats.totalCost) * 100 : 0)}
                       </td>
                     </tr>
@@ -334,8 +346,8 @@ export default function AdminPage() {
         </div>
 
         {/* Question count histogram */}
-        <section className="rounded-lg border border-gray-800 bg-gray-900 p-5">
-          <div className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-5">
+        <section className="rounded-lg border border-surface-3 bg-surface-1 p-5">
+          <div className="text-xs font-semibold uppercase tracking-wider text-ink-secondary mb-5">
             Question Count Distribution
           </div>
           <div className="flex items-end gap-3 h-32">
@@ -343,31 +355,31 @@ export default function AdminPage() {
               const pct = bucket.count / stats.qMax
               return (
                 <div key={bucket.label} className="flex flex-col items-center gap-1.5 flex-1">
-                  <span className="text-[10px] text-gray-500 tabular-nums">{bucket.count}</span>
+                  <span className="text-[10px] text-ink-tertiary tabular-nums">{bucket.count}</span>
                   <div
                     className="w-full rounded-t bg-blue-700/60 hover:bg-blue-600/70 transition-colors min-h-[2px]"
                     style={{ height: `${Math.max(2, pct * 100)}%` }}
                   />
-                  <span className="text-[10px] text-gray-500">{bucket.label}</span>
+                  <span className="text-[10px] text-ink-tertiary">{bucket.label}</span>
                 </div>
               )
             })}
           </div>
-          <p className="text-[10px] text-gray-600 mt-3">x-axis = questions asked to the patient; y-axis = session count</p>
+          <p className="text-[10px] text-ink-tertiary mt-3">x-axis = questions asked to the patient; y-axis = session count</p>
         </section>
 
         {/* By system */}
         {stats.bySys.length > 0 && (
-          <section className="rounded-lg border border-gray-800 bg-gray-900 overflow-hidden">
-            <div className="border-b border-gray-800 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          <section className="rounded-lg border border-surface-3 bg-surface-1 overflow-hidden">
+            <div className="border-b border-surface-3 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-ink-secondary">
               Avg Cost by Body System
             </div>
             <div className="p-5 grid grid-cols-2 gap-x-8 gap-y-2 md:grid-cols-3">
               {stats.bySys.map(row => (
                 <div key={row.sys} className="flex items-center justify-between text-xs">
-                  <span className="text-gray-400 truncate pr-2">{row.sys}</span>
-                  <span className="text-gray-200 tabular-nums whitespace-nowrap">
-                    {fmt$(row.avgCost, 4)} <span className="text-gray-600">×{row.count}</span>
+                  <span className="text-ink-secondary truncate pr-2">{row.sys}</span>
+                  <span className="text-ink-primary tabular-nums whitespace-nowrap">
+                    {fmt$(row.avgCost, 4)} <span className="text-ink-tertiary">×{row.count}</span>
                   </span>
                 </div>
               ))}
@@ -378,22 +390,22 @@ export default function AdminPage() {
 
         {/* Abandonment */}
         {abandonStats && (
-          <section className="rounded-lg border border-gray-800 bg-gray-900 overflow-hidden">
-            <div className="border-b border-gray-800 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+          <section className="rounded-lg border border-surface-3 bg-surface-1 overflow-hidden">
+            <div className="border-b border-surface-3 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-ink-secondary">
               Abandonment
             </div>
             <div className="p-5 space-y-5">
               <div className="flex items-start gap-8">
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Abandoned</div>
+                  <div className="text-xs text-ink-tertiary mb-1">Abandoned</div>
                   <div className="text-2xl font-bold text-orange-400 tabular-nums">{abandoned.length}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Completed</div>
-                  <div className="text-2xl font-bold text-gray-100 tabular-nums">{sessions.length}</div>
+                  <div className="text-xs text-ink-tertiary mb-1">Completed</div>
+                  <div className="text-2xl font-bold text-ink-primary tabular-nums">{sessions.length}</div>
                 </div>
                 <div>
-                  <div className="text-xs text-gray-500 mb-1">Abandonment rate</div>
+                  <div className="text-xs text-ink-tertiary mb-1">Abandonment rate</div>
                   <div className="text-2xl font-bold text-orange-300 tabular-nums">{fmtPct(abandonStats.abandonRate * 100)}</div>
                 </div>
               </div>
@@ -401,14 +413,14 @@ export default function AdminPage() {
               <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
                 {/* By stage */}
                 <div>
-                  <div className="text-xs font-medium text-gray-500 mb-2">By stage at abandonment</div>
+                  <div className="text-xs font-medium text-ink-tertiary mb-2">By stage at abandonment</div>
                   {Object.entries(abandonStats.tabCounts).length === 0
-                    ? <p className="text-xs text-gray-600">No data</p>
+                    ? <p className="text-xs text-ink-tertiary">No data</p>
                     : Object.entries(abandonStats.tabCounts)
                         .sort((a, b) => b[1] - a[1])
                         .map(([tab, count]) => (
-                          <div key={tab} className="flex items-center justify-between text-xs py-1.5 border-b border-gray-800/50">
-                            <span className="text-gray-400">{TAB_LABELS[tab] ?? tab}</span>
+                          <div key={tab} className="flex items-center justify-between text-xs py-1.5 border-b border-surface-3/50">
+                            <span className="text-ink-secondary">{TAB_LABELS[tab] ?? tab}</span>
                             <span className="text-orange-300 tabular-nums font-semibold">{count}</span>
                           </div>
                         ))
@@ -417,17 +429,17 @@ export default function AdminPage() {
 
                 {/* By system */}
                 <div>
-                  <div className="text-xs font-medium text-gray-500 mb-2">By body system</div>
+                  <div className="text-xs font-medium text-ink-tertiary mb-2">By body system</div>
                   {abandonStats.bySys.length === 0
-                    ? <p className="text-xs text-gray-600">No data</p>
+                    ? <p className="text-xs text-ink-tertiary">No data</p>
                     : abandonStats.bySys.slice(0, 12).map(row => (
-                        <div key={row.sys} className="flex items-center justify-between text-xs py-1.5 border-b border-gray-800/50">
-                          <span className="text-gray-400 truncate pr-3">{row.sys}</span>
-                          <span className="tabular-nums whitespace-nowrap text-gray-500">
+                        <div key={row.sys} className="flex items-center justify-between text-xs py-1.5 border-b border-surface-3/50">
+                          <span className="text-ink-secondary truncate pr-3">{row.sys}</span>
+                          <span className="tabular-nums whitespace-nowrap text-ink-tertiary">
                             <span className="text-orange-400 font-semibold">{row.abandonedCount}</span>
-                            <span className="text-gray-600">/{row.abandonedCount + row.completedCount}</span>
+                            <span className="text-ink-tertiary">/{row.abandonedCount + row.completedCount}</span>
                             {' '}
-                            <span className="text-gray-600">({fmtPct(row.rate * 100)})</span>
+                            <span className="text-ink-tertiary">({fmtPct(row.rate * 100)})</span>
                           </span>
                         </div>
                       ))
@@ -440,14 +452,14 @@ export default function AdminPage() {
 
         {stats && (<>
         {/* Top expensive sessions */}
-        <section className="rounded-lg border border-gray-800 bg-gray-900 overflow-hidden">
-          <div className="border-b border-gray-800 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <section className="rounded-lg border border-surface-3 bg-surface-1 overflow-hidden">
+          <div className="border-b border-surface-3 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-ink-secondary">
             Top Sessions by Cost
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-gray-800 text-gray-500">
+                <tr className="border-b border-surface-3 text-ink-tertiary">
                   <th className="px-5 py-2.5 text-left font-medium">Date</th>
                   <th className="px-3 py-2.5 text-left font-medium">Difficulty</th>
                   <th className="px-3 py-2.5 text-left font-medium">System</th>
@@ -460,19 +472,19 @@ export default function AdminPage() {
               </thead>
               <tbody>
                 {stats.topSessions.map(session => (
-                  <tr key={session.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-                    <td className="px-5 py-2.5 text-gray-500 whitespace-nowrap">{fmtDate(session.startedAt)}</td>
-                    <td className={`px-3 py-2.5 font-medium ${DIFFICULTY_COLOR[session.difficulty] ?? 'text-gray-400'}`}>
+                  <tr key={session.id} className="border-b border-surface-3/50 hover:bg-surface-2/50">
+                    <td className="px-5 py-2.5 text-ink-tertiary whitespace-nowrap">{fmtDate(session.startedAt)}</td>
+                    <td className={`px-3 py-2.5 font-medium ${DIFFICULTY_COLOR[session.difficulty] ?? 'text-ink-secondary'}`}>
                       {session.difficulty}
                     </td>
-                    <td className="px-3 py-2.5 text-gray-400 max-w-[100px] truncate">{session.system}</td>
-                    <td className="px-3 py-2.5 text-right font-bold text-gray-100 tabular-nums">{fmt$(session.totalCostUSD, 4)}</td>
-                    <td className="px-3 py-2.5 text-right tabular-nums text-gray-300">{session.questionCount}</td>
-                    <td className="px-3 py-2.5 text-right tabular-nums text-gray-400">{fmtElapsed(session.elapsedSeconds)}</td>
+                    <td className="px-3 py-2.5 text-ink-secondary max-w-[100px] truncate">{session.system}</td>
+                    <td className="px-3 py-2.5 text-right font-bold text-ink-primary tabular-nums">{fmt$(session.totalCostUSD, 4)}</td>
+                    <td className="px-3 py-2.5 text-right tabular-nums text-ink-secondary">{session.questionCount}</td>
+                    <td className="px-3 py-2.5 text-right tabular-nums text-ink-secondary">{fmtElapsed(session.elapsedSeconds)}</td>
                     <td className="px-3 py-2.5 text-right tabular-nums">
                       <span className={session.correct ? 'text-green-400' : 'text-red-400'}>{session.score}</span>
                     </td>
-                    <td className="px-4 py-2.5 text-gray-400 max-w-[160px] truncate" title={session.diagnosis}>
+                    <td className="px-4 py-2.5 text-ink-secondary max-w-[160px] truncate" title={session.diagnosis}>
                       {session.diagnosis}
                     </td>
                   </tr>
@@ -483,14 +495,14 @@ export default function AdminPage() {
         </section>
 
         {/* Recent sessions */}
-        <section className="rounded-lg border border-gray-800 bg-gray-900 overflow-hidden">
-          <div className="border-b border-gray-800 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-gray-400">
+        <section className="rounded-lg border border-surface-3 bg-surface-1 overflow-hidden">
+          <div className="border-b border-surface-3 px-5 py-3 text-xs font-semibold uppercase tracking-wider text-ink-secondary">
             Recent Sessions (last 20)
           </div>
           <div className="overflow-x-auto">
             <table className="w-full text-xs">
               <thead>
-                <tr className="border-b border-gray-800 text-gray-500">
+                <tr className="border-b border-surface-3 text-ink-tertiary">
                   <th className="px-5 py-2.5 text-left font-medium">Date</th>
                   <th className="px-3 py-2.5 text-left font-medium">Diff</th>
                   <th className="px-3 py-2.5 text-left font-medium">System</th>
@@ -507,19 +519,19 @@ export default function AdminPage() {
                   const byCost = (type: APICallType) =>
                     session.apiCalls.filter(c => c.type === type).reduce((s, c) => s + c.costUSD, 0)
                   return (
-                    <tr key={session.id} className="border-b border-gray-800/50 hover:bg-gray-800/30">
-                      <td className="px-5 py-2 text-gray-500 whitespace-nowrap">{fmtDate(session.startedAt)}</td>
-                      <td className={`px-3 py-2 font-medium ${DIFFICULTY_COLOR[session.difficulty] ?? 'text-gray-400'}`}>
+                    <tr key={session.id} className="border-b border-surface-3/50 hover:bg-surface-2/50">
+                      <td className="px-5 py-2 text-ink-tertiary whitespace-nowrap">{fmtDate(session.startedAt)}</td>
+                      <td className={`px-3 py-2 font-medium ${DIFFICULTY_COLOR[session.difficulty] ?? 'text-ink-secondary'}`}>
                         {session.difficulty.slice(0, 4)}
                       </td>
-                      <td className="px-3 py-2 text-gray-400 max-w-[90px] truncate">{session.system}</td>
-                      <td className="px-3 py-2 text-right font-bold text-gray-100 tabular-nums">{fmt$(session.totalCostUSD, 4)}</td>
+                      <td className="px-3 py-2 text-ink-secondary max-w-[90px] truncate">{session.system}</td>
+                      <td className="px-3 py-2 text-right font-bold text-ink-primary tabular-nums">{fmt$(session.totalCostUSD, 4)}</td>
                       <td className="px-3 py-2 text-right text-blue-400 tabular-nums">{fmt$(byCost('generation'), 4)}</td>
                       <td className="px-3 py-2 text-right text-green-400 tabular-nums">{fmt$(byCost('chat'), 4)}</td>
                       <td className="px-3 py-2 text-right text-yellow-400 tabular-nums">
                         {fmt$(byCost('grading_main') + byCost('grading_oral'), 4)}
                       </td>
-                      <td className="px-3 py-2 text-right tabular-nums text-gray-300">{session.questionCount}</td>
+                      <td className="px-3 py-2 text-right tabular-nums text-ink-secondary">{session.questionCount}</td>
                       <td className="px-3 py-2 text-right tabular-nums">
                         <span className={session.correct ? 'text-green-400' : 'text-red-400'}>{session.score}</span>
                       </td>
@@ -532,7 +544,7 @@ export default function AdminPage() {
         </section>
         </>)}
 
-        <p className="text-[10px] text-gray-700 pb-4">
+        <p className="text-[10px] text-ink-muted pb-4">
           Pricing: claude-sonnet-4-6 · Input $3.00/MTok · Output $15.00/MTok · Cache write $3.75/MTok · Cache read $0.30/MTok
         </p>
       </main>
@@ -540,14 +552,14 @@ export default function AdminPage() {
       {/* Confirm clear */}
       {showConfirmClear && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-sm">
-          <div className="mx-4 w-full max-w-sm rounded-xl border border-red-900 bg-gray-900 p-6 shadow-2xl">
+          <div className="mx-4 w-full max-w-sm rounded-xl border border-red-900 bg-surface-1 p-6 shadow-2xl">
             <h3 className="mb-2 text-base font-semibold text-red-400">Clear all analytics data?</h3>
-            <p className="mb-5 text-sm text-gray-400">This permanently removes all {sessions.length} completed and {abandoned.length} abandoned sessions from localStorage. This cannot be undone.</p>
+            <p className="mb-5 text-sm text-ink-secondary">This permanently removes all {sessions.length} completed and {abandoned.length} abandoned sessions from localStorage. This cannot be undone.</p>
             <div className="flex gap-3">
               <button onClick={handleClear} className="flex-1 rounded-md bg-red-700 px-4 py-2 text-sm font-semibold text-white hover:bg-red-600 transition-colors">
                 Delete all
               </button>
-              <button onClick={() => setShowConfirmClear(false)} className="flex-1 rounded-md border border-gray-600 px-4 py-2 text-sm text-gray-400 hover:border-gray-400 hover:text-gray-200 transition-colors">
+              <button onClick={() => setShowConfirmClear(false)} className="flex-1 rounded-md border border-surface-3 px-4 py-2 text-sm text-ink-secondary hover:border-surface-4 hover:text-ink-primary transition-colors">
                 Cancel
               </button>
             </div>

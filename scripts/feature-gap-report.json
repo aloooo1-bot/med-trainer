@@ -1,0 +1,1032 @@
+{
+  "generatedAt": "2026-05-06T03:06:48.283Z",
+  "sampleSize": 12,
+  "perCase": [
+    {
+      "id": "neurologic-clinical-acute-ischemic-stroke-0",
+      "system": "Neurologic",
+      "difficulty": "Clinical",
+      "diagnosis": "Acute Ischemic Stroke",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing tPA eligibility criteria and contraindications (e.g., recent surgery, active bleeding, BP >185/110 requiring treatment before thrombolysis), since BP is 188/102 in this case and management of hypertension prior to tPA is a critical decision point learners must practice."
+          },
+          {
+            "severity": "high",
+            "area": "key questions",
+            "suggestion": "Add a key question asking about the prior day's right hand clumsiness directly — this hidden TIA symptom is the highest-yield teaching moment in the case and is never surfaced in the key questions, causing learners to miss the concept of TIA as a stroke warning requiring urgent workup."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add large vessel occlusion (LVO) as a distinct differential consideration or management branch, since the NIHSS of 14 and gaze deviation strongly suggest an LVO candidate for mechanical thrombectomy, and this decision point is entirely absent from the differentials and teaching points."
+          },
+          {
+            "severity": "medium",
+            "area": "imaging",
+            "suggestion": "Add CTA Head and Neck to the expected imaging list with an explanation, as it is standard-of-care in a patient with NIHSS 14 and gaze deviation to evaluate for large vessel occlusion and thrombectomy candidacy — its omission from expected imaging creates a significant clinical reasoning gap."
+          },
+          {
+            "severity": "low",
+            "area": "hpi clarity",
+            "suggestion": "Clarify in the clinical HPI that the last known well time is 7:15 AM (not 'approximately 90 minutes ago') to reinforce the critical teaching distinction between time of symptom onset and last known well time, which directly governs tPA and thrombectomy eligibility windows."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Last-Known-Well Timeline Builder",
+            "rationale": "Stroke management is uniquely time-critical; the 'last known well' timestamp directly determines tPA and thrombectomy eligibility windows. A visual timeline tool where students log symptom onset, arrival, and intervention decision points—then receive feedback on whether they acted within guideline windows (4.5h tPA, 24h thrombectomy)—teaches the urgency mindset that static Q&A cannot.",
+            "caseEvidence": "Acute Ischemic Stroke diagnosis makes thrombolytic eligibility windows (NIHSS, onset-to-needle time) central to correct management; none of the existing features model time-sensitive treatment decision-making beyond a passive countdown timer."
+          },
+          {
+            "name": "Structured Neurological Exam Selector",
+            "rationale": "The neurologic exam in stroke requires systematic assessment of specific deficits (facial droop, arm drift, speech, gaze deviation) that map directly to NIHSS scoring. An interactive exam panel where students select and perform discrete neuro exam components—and receive findings only for those they choose—teaches structured neurological assessment and penalizes omissions, complementing the existing ROS gating model for a domain where exam selection is as critical as history.",
+            "caseEvidence": "Neurologic system case with an acute focal deficit diagnosis where NIHSS components (motor, speech, cranial nerves, neglect) are the primary diagnostic and severity-staging tool; no existing feature models a structured physical/neuro exam beyond free-text ordering."
+          },
+          {
+            "name": "Imaging Sequence Interpretation Guide",
+            "rationale": "Stroke imaging requires interpreting multiple modalities in a specific sequence (NCCT to rule out hemorrhage → DWI/ADC for core → MRA/CTA for vessel occlusion → perfusion for penumbra). An interactive overlay prompting students to interpret each scan in sequence, state their conclusion, and explain how it changes management teaches the radiology decision tree rather than passive image viewing.",
+            "caseEvidence": "8 imaging studies in a stroke case almost certainly includes CT non-contrast, DWI, ADC, and vascular imaging; the existing image zoom/lightbox feature displays images but provides no guidance on interpretation sequence or clinical integration logic."
+          },
+          {
+            "name": "Contraindication Checklist for Thrombolytics",
+            "rationale": "tPA administration requires rapidly ruling out a structured list of absolute and relative contraindications (recent surgery, anticoagulant use, BP thresholds, prior stroke/ICH, glucose extremes). A hidden contraindication checklist that students must actively populate from their history and labs—graded for completeness—teaches the real-world pre-treatment safety protocol and connects history-taking to immediate life-or-death decisions.",
+            "caseEvidence": "Acute Ischemic Stroke at Clinical difficulty with 20 labs and an ECG (relevant for afib as etiology and anticoagulation status) makes tPA eligibility assessment the defining management task; no existing feature structures the safety-screening workflow that precedes treatment decisions."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "Navigating 14 lab groups across 20 labs within a 22-minute timer",
+            "reason": "The high ratio of lab groups to total labs suggests many small, granular groupings (e.g., coagulation, lipid panel, CBC, BMP each separated). Students must click through numerous panels to find stroke-relevant values like glucose and INR, creating cognitive overload under time pressure when rapid treatment decisions (tPA eligibility) depend on specific results.",
+            "confidence": "high"
+          },
+          {
+            "moment": "Integrating ECG findings with neurologic workup",
+            "reason": "In an Acute Ischemic Stroke case, the ECG is critical for identifying cardioembolic etiology (e.g., atrial fibrillation), but students anchored on a neurologic framework may deprioritize or delay opening it. The structural placement of ECG outside standard neuro lab flow can cause students to either miss it entirely or interpret its relevance too late to inform differential reasoning.",
+            "confidence": "high"
+          },
+          {
+            "moment": "Differential submission with only 3 diagnoses allowed",
+            "reason": "Stroke mimics (hypoglycemia, Todd's paralysis, hemiplegic migraine, hypertensive encephalopathy) are clinically significant and structurally tempting given 13 ROS categories surfacing broad symptom data. A constrained differential of 3 forces early commitment, and students may struggle to confidently exclude hemorrhagic stroke as a separate entry versus a subtype, creating hesitation at submission.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "infectious-clinical-infective-endocarditis-0",
+      "system": "Infectious",
+      "difficulty": "Clinical",
+      "diagnosis": "Infective Endocarditis",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly covering antibiotic prophylaxis indications and the AHA guidelines — the case hinges on a prophylaxis failure in a patient with a bicuspid aortic valve, yet no teaching point addresses which cardiac conditions require prophylaxis, what constitutes adequate prophylaxis, or why a single dose of amoxicillin in a patient with an unrecognized structural lesion was insufficient."
+          },
+          {
+            "severity": "high",
+            "area": "imaging",
+            "suggestion": "Add MRI Lumbar Spine to the expected imaging list, since the HPI, hidden history, and a dedicated teaching point all emphasize vertebral osteomyelitis as a septic embolic complication that must be actively ruled out, making lumbar MRI a clinically essential — not merely available — study in this case."
+          },
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on the neurological complications of IE — the case includes a hidden TIA history, intermittent confusion, and a Roth spot, but no teaching point addresses the spectrum of embolic CNS complications (stroke, TIA, mycotic aneurysm), when to obtain brain MRI, or how neurological involvement affects surgical timing decisions."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a directed question asking the patient about prior echocardiograms or known structural heart disease (e.g., 'Have you ever had an ultrasound of your heart or been told you have a bicuspid or abnormal heart valve?'), since the bicuspid aortic valve is the pivotal predisposing lesion and will only be disclosed on direct questioning, yet no key question currently targets this specific history."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add acute decompensated heart failure secondary to valvular regurgitation as a differential or complicating diagnosis, since the patient has bibasilar crackles, elevated JVP, peripheral edema, new holosystolic murmur, and an SpO2 of 95% — the hemodynamic consequences of mitral regurgitation from IE are educationally distinct from the infectious diagnosis itself and represent a critical management decision point that is absent from the differential discussion."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Duke Criteria Builder",
+            "rationale": "Infective Endocarditis has a validated, widely-taught diagnostic framework (Modified Duke Criteria) with major and minor criteria. Showing learners how their gathered history, exam findings, and labs map onto this criteria set post-submission would reinforce structured diagnostic reasoning specific to IE and similar criteria-based diagnoses.",
+            "caseEvidence": "IE is the canonical criteria-based infectious diagnosis; the case has hasDerm, hasFundus, hasHematology, and hasUrine — all of which map directly to Duke minor/major criteria (e.g., Janeway lesions, Roth spots, embolic phenomena, immunologic phenomena)"
+          },
+          {
+            "name": "Peripheral Findings Annotation Tool",
+            "rationale": "IE is heavily dependent on recognizing peripheral stigmata (Osler nodes, Janeway lesions, Roth spots, splinter hemorrhages). An interactive image overlay where learners tap/label findings on derm and fundus images — with instant feedback on what they identified or missed — would deepen physical exam interpretation skills beyond passive image viewing.",
+            "caseEvidence": "hasDerm and hasFundus are both true; these modalities in an IE case almost certainly depict classic peripheral stigmata that are high-yield exam findings learners frequently miss"
+          },
+          {
+            "name": "Empiric Antibiotic Regimen Builder",
+            "rationale": "Antibiotic selection for IE is nuanced and guideline-driven (native vs. prosthetic valve, MSSA vs. MRSA vs. streptococcal coverage). A post-diagnosis step where learners construct an empiric regimen by choosing drug, dose, and duration — graded against AHA/ESC guidelines — would add therapeutic decision-making that is absent from the current diagnostic-only workflow.",
+            "caseEvidence": "IE requires prolonged, organism-specific IV antibiotic therapy; with 22 labs likely including blood cultures and sensitivities, the case has the data substrate to support regimen grading"
+          },
+          {
+            "name": "Timeline & Embolic Complication Mapper",
+            "rationale": "IE often presents after a prolonged prodrome and carries risk of systemic emboli (CNS, renal, splenic). A visual timeline tool where learners plot symptom onset, bacteremia duration, and identify at-risk embolic territories based on ordered imaging would build the systems-thinking needed to anticipate complications and prioritize urgent interventions.",
+            "caseEvidence": "imagingCount of 7 is high for a Clinical-level case, strongly suggesting multi-organ imaging to evaluate embolic sequelae; IE's subacute presentation with 5 key questions and 4 differentials suggests temporal reasoning is central to the case"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionGuesses": [
+          {
+            "moment": "ordering labs and imaging — prioritizing blood cultures and echocardiography",
+            "reason": "With 22 labs across 14 groups and 7 imaging studies, students must identify blood cultures (multiple sets) and echocardiogram as high-yield early orders. IE diagnosis is critically dependent on Duke Criteria, and students unfamiliar with the protocol may waste time ordering irrelevant panels or miss the specific sequencing (e.g., ordering echo before cultures), creating both cognitive overload and time pressure within the 22-minute window.",
+            "confidence": "high"
+          },
+          {
+            "moment": "interpreting special images — likely echocardiogram findings",
+            "reason": "The presence of special images (almost certainly transthoracic or transesophageal echo showing vegetations) requires students to synthesize visual findings with clinical data to apply Duke Criteria major criteria. Students may not recognize subtle echo findings or know how to weight them diagnostically, causing a stall between imaging review and differential narrowing.",
+            "confidence": "high"
+          },
+          {
+            "moment": "differential submission — distinguishing IE from other bacteremic or cardiac diagnoses",
+            "reason": "With only 4 differentials and a 13-category ROS, students may unlock broad symptom data (fever, embolic phenomena, cardiac symptoms) that superficially supports multiple diagnoses like septic emboli, rheumatic heart disease, or systemic vasculitis. The narrow differential count means students must commit with precision, and without explicit Duke Criteria scaffolding in the UI, the mapping from evidence to final diagnosis may feel underdetermined.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "endocrine-metabolic-clinical-cushing-s-syndrome-0",
+      "system": "Endocrine / Metabolic",
+      "difficulty": "Clinical",
+      "diagnosis": "Cushing's Syndrome",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add exogenous/iatrogenic Cushing's Syndrome as a differential diagnosis, since it is the most common cause overall and the case specifically notes no steroid use — teaching the exclusion process is a critical step that is currently absent from the differential list."
+          },
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly explaining the ACTH-based algorithmic approach to localizing the source of Cushing's Syndrome (ACTH-dependent vs. ACTH-independent), including when to use high-dose DST, CRH stimulation, and IPSS, as these advanced localization steps are listed in available labs but never contextualized in the teaching content."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a question screening for ectopic ACTH sources (e.g., 'Have you had any unexplained cough, weight loss, or been told you have a lung nodule?') since small-cell lung cancer and carcinoid tumors are high-yield causes of ectopic ACTH that learners must consider before attributing hypercortisolism to a pituitary source."
+          },
+          {
+            "severity": "medium",
+            "area": "lab selection",
+            "suggestion": "Add expected lab results with numeric values for the confirmatory tests (e.g., 24-hour urine free cortisol >3x upper limit of normal, late-night salivary cortisol >0.13 mcg/dL, morning cortisol >1.8 mcg/dL post-1mg DST) so learners can practice interpreting thresholds rather than only selecting the correct tests."
+          },
+          {
+            "severity": "low",
+            "area": "vitals",
+            "suggestion": "Add a fingerstick or fasting glucose value to the vitals or initial data, as the hidden history references emerging glucose intolerance and this finding would reinforce the metabolic consequences of chronic hypercortisolism as an early teaching cue."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Hormonal Cascade Visualizer",
+            "rationale": "Cushing's Syndrome involves a multi-step HPA axis dysregulation (CRH → ACTH → cortisol feedback loop). A dynamic diagram that lights up or annotates nodes as the student orders relevant labs (e.g., 24h urine cortisol, late-night salivary cortisol, low-dose dexamethasone suppression) would make the feedback mechanism tangible and reinforce why each test targets a specific axis node.",
+            "caseEvidence": "22 labs and 7 imaging studies across a pure endocrine diagnosis imply a step-wise biochemical workup; the educational gap is understanding *why* each test is ordered in sequence, not just *that* it is ordered."
+          },
+          {
+            "name": "Derm Annotation Tool",
+            "rationale": "Cushing's Syndrome presents with pathognomonic skin findings (striae, easy bruising, plethora, hirsutism). Allowing students to tap/click on the dermatology image to label findings and receive AI feedback on which they correctly identified versus missed would convert a passive image into an active diagnostic exercise.",
+            "caseEvidence": "hasDerm: true in an endocrine case where skin signs are among the earliest and most diagnostically specific clues; currently image zoom only provides lightbox viewing without interactive annotation."
+          },
+          {
+            "name": "Suppression/Stimulation Test Interpreter",
+            "rationale": "Endocrine workups frequently hinge on dynamic function tests (e.g., dexamethasone suppression, CRH stimulation) whose results are only meaningful relative to a cutoff and a clinical context. An inline interpreter that asks the student to predict the expected result before revealing it, then explains the physiological rationale, would reinforce test selection logic unique to endocrinology.",
+            "caseEvidence": "The combination of 22 labs, a confirmed endocrine diagnosis, and hasRelevantTests: true strongly implies dynamic suppression/stimulation tests are present in the lab panel — a test type that has no dedicated pedagogical wrapper in the existing feature set."
+          },
+          {
+            "name": "Complication Mapping Overlay",
+            "rationale": "Cushing's Syndrome causes multi-system complications (hypertension, osteoporosis, hyperglycemia, immunosuppression, psychiatric changes) that span several organ systems. A post-submission overlay mapping the patient's abnormal findings to downstream complication categories would help students connect isolated data points (ECG, urine, fundus, metabolic labs) into a unified picture of chronic cortisol excess.",
+            "caseEvidence": "hasECG: true, hasFundus: true, hasUrine: true, and 22 labs collectively represent multi-organ impact; the existing teaching points and differential discussion surface diagnoses but do not explicitly map findings to complication pathophysiology."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "Lab ordering and interpretation across 14 groups / 22 labs",
+            "reason": "Cushing's Syndrome requires navigating a layered hormonal workup (cortisol, ACTH, dexamethasone suppression, DHEA-S, electrolytes, glucose) spread across 14 lab groups. Students unfamiliar with the stepwise endocrine testing logic may over-order or miss the functional hierarchy — e.g., ordering imaging before establishing biochemical confirmation — causing time loss within the 22-minute window.",
+            "confidence": "high"
+          },
+          {
+            "moment": "Interpreting special images alongside 7 imaging studies",
+            "reason": "Cushing's involves both anatomical localization (pituitary MRI, adrenal CT) and potentially special functional imaging. With 7 studies and special images flagged, students may struggle to sequence imaging correctly — particularly distinguishing pituitary-dependent vs. adrenal vs. ectopic source — without clear biochemical anchoring first, creating interpretive confusion about which image is decision-relevant.",
+            "confidence": "high"
+          },
+          {
+            "moment": "Differential narrowing with only 4 options",
+            "reason": "A 4-option differential in Cushing's likely includes look-alike diagnoses (e.g., pseudo-Cushing's, obesity with metabolic syndrome, adrenal incidentaloma, ACTH-secreting tumor variants). The constrained differential may create false confidence or premature closure if students fixate on classic features before fully integrating the lab hierarchy, especially given the broad 13-category ROS that may surface confounding symptoms.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "neurologic-foundations-acute-ischemic-stroke-0",
+      "system": "Neurologic",
+      "difficulty": "Foundations",
+      "diagnosis": "Acute Ischemic Stroke",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly explaining tPA eligibility criteria and contraindications (e.g., recent surgery, bleeding history, BP >185/110 requiring treatment before administration), since this patient's BP of 188/102 and the hidden TIA history are directly relevant decision points that go unaddressed."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add 'Hemiplegic Migraine' or 'CNS mass lesion (tumor/abscess) with acute decompensation' as a differential to broaden the stroke mimic discussion beyond the three listed, which are narrowly focused and miss commonly tested alternatives at the Foundations level."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a question about the prior day's hand clumsiness (the hidden TIA), explicitly prompting learners to screen for preceding transient symptoms, since eliciting a prior TIA is a critical history-taking skill that directly changes risk stratification and management."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on the role of CTA head and neck in identifying large vessel occlusion (LVO) and guiding mechanical thrombectomy eligibility, as CTA is listed in available imaging but its clinical significance and the thrombectomy window (up to 24 hours in select patients) are never discussed."
+          },
+          {
+            "severity": "low",
+            "area": "imaging",
+            "suggestion": "Include expected imaging results for the Non-Contrast CT Head and DWI-MRI (e.g., 'CT shows no hemorrhage; DWI shows restricted diffusion in the left MCA territory') so learners can practice interpreting results rather than only selecting the correct studies."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Stroke Timeline Reconstructor",
+            "rationale": "Acute ischemic stroke management is time-critical; learners at the Foundations level need to internalize the 'time is brain' concept by mapping symptom onset, last-known-well, and treatment windows onto a visual timeline, making eligibility criteria for tPA and thrombectomy concrete rather than abstract.",
+            "caseEvidence": "Diagnosis is Acute Ischemic Stroke at Foundations difficulty — learners are new to the concept that minutes directly affect neuron loss and intervention eligibility, making a temporal reasoning scaffold high-value."
+          },
+          {
+            "name": "Neuroanatomical Deficit Mapper",
+            "rationale": "Stroke localization requires linking clinical deficits to vascular territories; an interactive brain diagram where learners tag which region they suspect is affected based on the patient's symptoms would reinforce the anatomy-to-presentation mapping that defines neurologic reasoning, especially critical at Foundations level.",
+            "caseEvidence": "Neurologic system case with 8 imaging studies and 3 differentials — imaging in stroke directly correlates to anatomical territory, and Foundations learners need a bridging tool between symptom pattern and imaging findings before they can meaningfully interpret CT/MRI results."
+          },
+          {
+            "name": "Critical Action Checklist with Sequencing Feedback",
+            "rationale": "Stroke care demands a specific sequence of actions (glucose check, BP assessment, CT head before tPA, etc.); a hidden checklist revealed post-case that scores not just what was done but the order it was done in would teach Foundations learners that protocol adherence and timing sequence are as important as the diagnosis itself.",
+            "caseEvidence": "20 labs, 8 imaging studies, and an ECG create a high-volume ordering environment where a Foundations learner has no scaffolding to understand which tests are urgent vs. confirmatory, and in what sequence they should be obtained in a real stroke code."
+          },
+          {
+            "name": "NIH Stroke Scale Interactive Walkthrough",
+            "rationale": "The NIHSS is the standardized bedside tool for stroke severity and directly informs treatment decisions, yet it is procedural and unfamiliar to Foundations learners; an interactive simulated NIHSS administration using the AI patient's documented deficits would teach both the instrument and its clinical interpretation in context.",
+            "caseEvidence": "Foundations-level Neurologic case with Acute Ischemic Stroke diagnosis — learners at this stage have likely never administered or interpreted an NIHSS score, and without it they cannot connect examination findings to severity grading or understand why certain interventions are offered."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "ordering labs",
+            "reason": "14 lab groups containing 20 total labs creates a high-volume selection task for a Foundations-level student who lacks clinical heuristics for which panels are stroke-relevant; they are likely to over-order or freeze choosing between redundant-seeming groups",
+            "confidence": "high"
+          },
+          {
+            "moment": "interpreting or ordering ECG",
+            "reason": "Foundations students may not immediately connect ECG ordering to stroke workup (atrial fibrillation as embolic source); the ECG's presence may feel out of place in a Neurologic case, causing hesitation about whether it's relevant or a distractor",
+            "confidence": "high"
+          },
+          {
+            "moment": "diagnosis submission with only 3 differentials",
+            "reason": "Acute Ischemic Stroke shares surface features with hemorrhagic stroke and TIA, and a Foundations student may struggle to confidently exclude those two with only imaging and labs available, making the final commitment feel underdetermined despite the narrow differential slot count",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "gastrointestinal-advanced-primary-sclerosing-cholangitis-0",
+      "system": "Gastrointestinal",
+      "difficulty": "Advanced",
+      "diagnosis": "Primary Sclerosing Cholangitis",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing the management approach for PSC, including the lack of proven medical therapies (ursodeoxycholic acid controversy), endoscopic dilation for dominant strictures, and liver transplantation as the only curative option, since advanced learners must understand not just diagnosis but treatment decision-making."
+          },
+          {
+            "severity": "high",
+            "area": "lab selection",
+            "suggestion": "Add IgG4 Serum Level to the expectedLabs list, as distinguishing IgG4-related sclerosing cholangitis from PSC is a critical and commonly tested advanced clinical decision point that is currently omitted from the expected workup despite being listed as an available lab."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a key question specifically asking about prior episodes of bacterial cholangitis (fever, rigors, RUQ pain) to help distinguish PSC from secondary sclerosing cholangitis and to establish baseline disease behavior, which directly impacts risk stratification and management."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add IgG4-related sclerosing cholangitis as a differential diagnosis with an explanation, as it is radiographically and clinically nearly identical to PSC, responds to steroids unlike PSC, and represents a high-yield advanced distinction that experienced clinicians must recognize and is currently absent from the differential list."
+          },
+          {
+            "severity": "low",
+            "area": "vitals",
+            "suggestion": "Include a height or BMI value alongside the weight to allow learners to assess whether the reported 12-pound weight loss represents a clinically significant percentage of body weight, which is relevant for staging disease severity and concern for malignancy."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Cholangiogram Annotation Tool",
+            "rationale": "PSC is definitively characterized by its 'beads-on-a-string' biliary ductal pattern on MRCP/ERCP. An interactive annotation layer where learners must identify and label strictures, dilations, and dominant strictures on the cholangiogram image before submitting diagnosis would reinforce the pathognomonic imaging findings central to this diagnosis.",
+            "caseEvidence": "imagingCount of 7 in a PSC case almost certainly includes MRCP or ERCP-equivalent imaging; the biliary tree pattern is the cornerstone of PSC diagnosis and requires active visual interpretation skill beyond passive lightbox zoom"
+          },
+          {
+            "name": "Lab Trend Visualizer",
+            "rationale": "PSC presents with a cholestatic pattern (elevated ALP, GGT, bilirubin) that evolves over time and must be distinguished from hepatocellular injury. A timeline graph showing selected labs trending across simulated weeks/months would teach learners to recognize cholestatic vs hepatocellular patterns and appreciate disease chronicity — critical for PSC vs PBC vs AIH differentiation.",
+            "caseEvidence": "labCount of 22 with hasHematology and hasUrine true suggests a rich multi-system workup; PSC's hallmark is a persistently elevated ALP disproportionate to transaminases, a pattern only legible when labs are viewed as a trend rather than a single snapshot"
+          },
+          {
+            "name": "Pathology Hotspot Quiz",
+            "rationale": "PSC liver biopsy shows periductal 'onion-skin' fibrosis — a highly specific but visually subtle finding. After biopsy results unlock post-diagnosis, presenting the histology image with clickable hotspot zones and asking learners to identify the pathological structures (fibrous obliteration, bile ductopenia) would solidify histopathologic recognition skills essential at advanced level.",
+            "caseEvidence": "hasBiopsy is true and the diagnosis is PSC, whose biopsy finding of concentric periductal fibrosis is both pathognomonic and frequently tested; passive display of a biopsy result wastes a high-yield learning moment"
+          },
+          {
+            "name": "IBD Co-morbidity Branch",
+            "rationale": "Approximately 70-80% of PSC cases are associated with IBD, most commonly ulcerative colitis. A conditional follow-up vignette or decision node that reveals colonoscopy findings and asks learners how the PSC diagnosis changes their IBD management approach (surveillance intervals, colectomy considerations, cholangiocarcinoma risk stratification) would teach the critical PSC-IBD nexus absent from single-encounter cases.",
+            "caseEvidence": "Primary Sclerosing Cholangitis as the diagnosis and differentialCount of 5 suggest a complex GI presentation where comorbidity management is a key advanced-level competency; the case as structured captures diagnosis but misses the longitudinal management reasoning that defines advanced GI practice"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "Imaging interpretation — distinguishing MRCP/cholangiogram findings",
+            "reason": "PSC diagnosis hinges on recognizing characteristic 'beading' of bile ducts on cholangiography. With 7 imaging studies and special images included, students must identify the correct modality to prioritize and interpret subtle ductal irregularities — a highly specialized read that is easy to misattribute to other biliary pathology like PBC or cholangiocarcinoma",
+            "confidence": "high"
+          },
+          {
+            "moment": "Lab ordering and pattern recognition across 14 lab groups",
+            "reason": "PSC lacks a pathognomonic lab marker; the diagnostic signal is a cholestatic pattern (elevated ALP, GGT, bilirubin) combined with p-ANCA and IgG4 context spread across 22 labs in 14 groups. Students under a 15-minute timer are likely to over-order or miss the specific panel that points away from hepatocellular causes, creating both time pressure and interpretive confusion",
+            "confidence": "high"
+          },
+          {
+            "moment": "Differential narrowing at diagnosis submission — separating PSC from PBC",
+            "reason": "With a 5-diagnosis differential in an advanced biliary case, PSC vs. PBC is a structurally predictable confusion point. Both present with cholestasis and fatigue; the distinguishing factors (AMA negativity, IBD association, ductal imaging) require synthesizing biopsy, labs, and imaging simultaneously — a cognitive load spike that coincides with the final submission moment under timer pressure",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "musculoskeletal-advanced-antiphospholipid-syndrome-0",
+      "system": "Musculoskeletal",
+      "difficulty": "Advanced",
+      "diagnosis": "Antiphospholipid Syndrome",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "other",
+            "suggestion": "Remove or replace the 'advancedHpi' field ('34-year-old woman with joint pain. She recently switched to a new brand of multivitamin.') — it is misleadingly sparse, introduces a clinically irrelevant red herring with no educational payoff, and contradicts the richly detailed main HPI, degrading case coherence for learners."
+          },
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly explaining the Sapporo/revised Sapporo (Sydney) diagnostic criteria for APS, including the distinction between clinical categories (thrombotic APS vs. obstetric APS) and the laboratory titer thresholds required (medium-to-high positive, >40 GPL/MPL or >99th percentile), since the current points reference the criteria incompletely without specifying titer requirements."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add Sneddon Syndrome as a differential, as it classically presents with livedo racemosa plus ischemic stroke in young women and closely mimics APS — its absence leaves a critical vascular-neurological differential unaddressed at an advanced level."
+          },
+          {
+            "severity": "medium",
+            "area": "lab selection",
+            "suggestion": "Add the aPTT Mixing Study to the expected labs list, since the case already teaches that a non-correcting aPTT is a key diagnostic clue for lupus anticoagulant; requiring learners to select and interpret this test actively reinforces that teaching point rather than leaving it purely didactic."
+          },
+          {
+            "severity": "low",
+            "area": "key questions",
+            "suggestion": "Add a key question asking specifically about prior neurological events such as transient ischemic attacks, amaurosis fugax, or unexplained headaches, since cerebrovascular thrombosis is a major APS clinical criterion and the hidden history documents occasional headaches that warrant direct elicitation at the advanced level."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Thrombosis Timeline Builder",
+            "rationale": "Antiphospholipid Syndrome hinges on recognizing a pattern of recurrent thrombotic events and pregnancy losses over time. A drag-and-drop timeline tool where learners sequence the patient's clotting events, symptoms, and prior lab results would reinforce the clinical criteria (Sapporo/revised Sapporo) and distinguish APS from a single thrombotic episode.",
+            "caseEvidence": "APS diagnosis requires temporal pattern recognition across venous/arterial thromboses; a single-snapshot HPI interview cannot teach this longitudinal reasoning as effectively as an interactive timeline."
+          },
+          {
+            "name": "Derm Lesion Annotator",
+            "rationale": "APS presents with pathognomonic skin findings (livedo reticularis, skin necrosis, splinter hemorrhages). Allowing learners to click on regions of the derm image, label the finding, and receive AI feedback on whether the label and its diagnostic implication are correct would deepen visual-clinical correlation that the basic image zoom alone cannot provide.",
+            "caseEvidence": "hasDerm is true; livedo reticularis is a classic APS skin finding whose recognition and correct naming is a high-yield teaching moment that passive image viewing underutilizes."
+          },
+          {
+            "name": "Lab Interpretation Cascade",
+            "rationale": "APS workup requires a two-step confirmatory process: positive antiphospholipid antibodies must be repeated at ≥12 weeks. A branching lab decision tree that prompts learners to decide which follow-up tests to order after an initial positive result—and explains why a single positive is insufficient—would teach confirmatory testing logic not captured by free-text test ordering alone.",
+            "caseEvidence": "labCount is 22, including lupus anticoagulant, anticardiolipin IgG/IgM, and anti-β2GP1 panels; APS is uniquely defined by repeat serology, making confirmatory-test sequencing a core competency for this case."
+          },
+          {
+            "name": "Anticoagulation Risk-Benefit Simulator",
+            "rationale": "Management of APS requires balancing long-term anticoagulation (warfarin vs. DOAC) against bleeding risk. An interactive decision node where learners choose an agent, set a target INR, and receive simulated outcome feedback (thrombosis recurrence rate, bleeding events) would extend learning into the therapeutic reasoning phase, which is especially important at Advanced difficulty.",
+            "caseEvidence": "APS is a chronic condition requiring indefinitely anticoagulation decisions; the Advanced difficulty level and high lab/imaging count signal a complex management case where post-diagnosis therapeutic reasoning is an equally critical learning objective."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "diagnosis submission",
+            "reason": "Antiphospholipid Syndrome is a rare autoimmune/hematologic condition filed under a Musculoskeletal case, creating a category mismatch in the student's mental model. Students may anchor on joint or inflammatory differentials and fail to consider a thrombophilic syndrome, making final diagnosis selection counterintuitive even after seeing relevant labs.",
+            "confidence": "high"
+          },
+          {
+            "moment": "ordering labs across 8 groups with 22 total labs",
+            "reason": "APS confirmation requires specific immunologic panels (anticardiolipin antibodies, lupus anticoagulant, beta-2 glycoprotein) that are likely buried non-obviously within lab groups. Students unfamiliar with APS workup may exhaust time ordering MSK-typical labs (CRP, ESR, RF, ANA) before identifying the confirmatory tests, especially under a 15-minute timer.",
+            "confidence": "high"
+          },
+          {
+            "moment": "interpreting the ECG and special images together",
+            "reason": "APS can cause cardiac valve abnormalities and thromboembolic events, so the ECG and special images (likely MRI or vascular imaging) may show findings that are individually ambiguous. Students may struggle to synthesize these non-MSK modalities into a coherent picture within a musculoskeletal case frame, leading to misinterpretation or dismissal of relevant findings.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "toxicologic-foundations-benzodiazepine-overdose-0",
+      "system": "Toxicologic",
+      "difficulty": "Foundations",
+      "diagnosis": "Benzodiazepine Overdose",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing supportive care as the primary management strategy (airway positioning, supplemental oxygen, IV fluids, continuous monitoring), since flumazenil is rarely used and learners need to know what active treatment actually looks like for this diagnosis."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add hypoglycemia and/or hyponatremia to the differentials, as these are critical must-not-miss metabolic causes of acute altered mental status that must be excluded before attributing unresponsiveness to toxicologic etiology at the Foundations level."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on recognizing and managing the co-ingestion of alcohol with benzodiazepines, since the hidden history reveals wine consumption and this synergistic CNS/respiratory depression is the highest-acuity risk in this specific case."
+          },
+          {
+            "severity": "medium",
+            "area": "hpi clarity",
+            "suggestion": "Reconcile the contradiction between the basic HPI ('somnolent but arousable') and the advanced HPI ('unresponsiveness') so all difficulty tiers present a consistent clinical picture and learners are not confused about the actual level of consciousness at presentation."
+          },
+          {
+            "severity": "low",
+            "area": "other",
+            "suggestion": "Add a mandatory psychiatric safety assessment teaching point covering the obligation to initiate a formal suicide risk evaluation and psychiatry consultation once the patient is medically stabilized, since this is an intentional overdose with documented suicidal ideation and is absent from the teaching points entirely."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Toxidrome Visual Identification Widget",
+            "rationale": "Foundations learners in toxicology need to pattern-match clinical presentations to classic toxidromes before they can reliably reach a diagnosis. A visual reference panel showing the sedative-hypnotic toxidrome (miosis, CNS depression, respiratory depression, hypotension) alongside competing toxidromes would scaffold recognition skills without giving away the answer.",
+            "caseEvidence": "Benzodiazepine overdose at Foundations difficulty with a narrow differential of only 3 entries suggests learners need help distinguishing overlapping sedative presentations; a toxidrome comparison tool directly addresses this gap."
+          },
+          {
+            "name": "Antidote & Reversal Agent Decision Step",
+            "rationale": "Toxicologic cases uniquely involve antidote selection as a core clinical decision. Adding a prompted post-diagnosis step where learners must select and justify the reversal agent (e.g., flumazenil) — with graded feedback on indication, contraindications, and risks — captures a critical management competency absent from the current diagnosis-only endpoint.",
+            "caseEvidence": "Benzodiazepine overdose has a specific antagonist (flumazenil) with nuanced contraindications; the case has hasRelevantTests true and 18 labs, indicating clinical depth that supports an actionable management layer beyond mere diagnosis."
+          },
+          {
+            "name": "Urine Tox Screen Interpretation Overlay",
+            "rationale": "Urine drug screens are central to toxicology workups but are frequently misread by novices due to cross-reactants and sensitivity limits. An interactive overlay on the urine result that prompts the learner to interpret which substances are confirmed vs. presumptive, and flags common false positives, would build lab-critical-thinking skills specific to this system.",
+            "caseEvidence": "hasUrine is true in a Toxicologic case; Foundations learners are the population most likely to over-interpret a positive benzodiazepine immunoassay without understanding its limitations."
+          },
+          {
+            "name": "Timeline Reconstruction Tool",
+            "rationale": "Ingestion time, substance half-life, and symptom onset sequence are diagnostically critical in overdose cases and are concepts Foundations learners frequently neglect. A drag-and-drop timeline where learners place ingestion, symptom onset, and clinical deterioration events — then receive feedback on pharmacokinetic plausibility — would teach temporal reasoning unique to toxicology.",
+            "caseEvidence": "Benzodiazepine overdose diagnosis depends heavily on correlating reported ingestion time with observed CNS depression depth; this temporal reasoning is not captured by any existing feature and is especially formative at the Foundations level."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "Lab ordering from 12 groups across 18 labs",
+            "reason": "Foundations-level students encountering a 12-group lab panel for a toxicologic case may over-order broadly due to uncertainty about which panels are diagnostically relevant for benzodiazepine overdose; the large group count relative to the narrow diagnosis creates decision paralysis or shotgun ordering",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG interpretation in a CNS-depressant overdose context",
+            "reason": "Benzodiazepine overdose typically produces a relatively unremarkable ECG, so students expecting pathognomonic findings will spend disproportionate time searching for abnormalities that aren't there, or misattribute normal QTc/rate findings as significant",
+            "confidence": "high"
+          },
+          {
+            "moment": "Differential submission with only 3 options",
+            "reason": "Foundations students may confuse benzodiazepine overdose with other CNS depressant toxidromes (e.g., opioid, barbiturate, alcohol) and the constrained differential of 3 forces a commitment they aren't confident making, especially without a clear distinguishing lab or imaging anchor in the case structure",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "hematologic-oncologic-foundations-deep-vein-thrombosis-0",
+      "system": "Hematologic / Oncologic",
+      "difficulty": "Foundations",
+      "diagnosis": "Deep Vein Thrombosis",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly addressing the hidden symptom of exertional dyspnea and chest tightness as red flags for pulmonary embolism complicating DVT, including when to escalate to CTPA and how to risk-stratify with the Wells PE score."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add superficial thrombophlebitis as a third differential to teach learners how to distinguish it from DVT clinically (superficial palpable cord, less systemic concern) and reinforce why imaging is definitive."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point covering the Virchow's triad framework completely — this case has all three elements (stasis from travel and sedentary work, hypercoagulability from family history/possible thrombophilia, and endothelial factors from dehydration/alcohol), but the current points only explicitly name venous stasis."
+          },
+          {
+            "severity": "medium",
+            "area": "lab selection",
+            "suggestion": "Add a teaching point or expected lab note explaining that thrombophilia workup (Protein C/S, Factor V Leiden, antiphospholipid antibodies) should generally be deferred until after acute anticoagulation is complete to avoid false results, so learners understand when and why these available labs are ordered."
+          },
+          {
+            "severity": "low",
+            "area": "hpi clarity",
+            "suggestion": "Incorporate the patient's 6-month sedentary work-from-home history and the exertional dyspnea directly into the clinical HPI to ensure learners recognize cumulative immobility and a PE-warning symptom as part of the presenting story rather than leaving them hidden."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Anticoagulation Decision Tree",
+            "rationale": "DVT management hinges on risk-stratified anticoagulation choices (LMWH vs. warfarin vs. DOACs, duration, bleeding risk contraindications). A visual, interactive decision tree post-diagnosis would help Foundations learners understand the clinical reasoning behind treatment sequencing before they reach Clinical-level cases.",
+            "caseEvidence": "DVT is a primarily management-heavy diagnosis with nuanced anticoagulation pathways; the Foundations difficulty means learners need scaffolded treatment logic, not just diagnostic recognition."
+          },
+          {
+            "name": "Pre-test Probability Calculator Widget",
+            "rationale": "DVT workup is canonically tied to structured scoring tools like the Wells Score. An embedded, fillable probability calculator that maps to the student's chat responses and auto-populates criteria would teach learners to think probabilistically before ordering imaging, a core skill for this diagnosis.",
+            "caseEvidence": "With 5 imaging studies and 19 labs, the case offers a rich test set, but without a pre-test probability scaffold, Foundations learners may order indiscriminately rather than learning evidence-based test sequencing."
+          },
+          {
+            "name": "Annotated Imaging Walkthrough",
+            "rationale": "Compression ultrasound is the gold-standard DVT diagnostic modality. A post-submission step-by-step annotated walkthrough of the relevant imaging (highlighting non-compressibility, echogenic thrombus) would close the gap between ordering a test and actually interpreting it — a skill gap common at the Foundations level.",
+            "caseEvidence": "imagingCount of 5 indicates significant imaging is present, yet with only 2 differentials and no biopsy, imaging interpretation is the primary diagnostic skill being tested, making annotation high-leverage."
+          },
+          {
+            "name": "Complication Cascade Visualizer",
+            "rationale": "DVT's key danger is pulmonary embolism. A post-case visual showing how untreated DVT can cascade to PE (with probability estimates and timeline) would reinforce the urgency framework and safety reasoning that Foundations learners often underweight when the patient appears stable.",
+            "caseEvidence": "Hematologic/Oncologic system with a DVT diagnosis and an ECG in the case (suggesting PE was a live differential) signals that the cascade to cardiopulmonary compromise is a core teaching objective not fully captured by 4 static teaching points."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "ordering labs — selecting among 19 labs across 12 groups",
+            "reason": "At Foundations level, students lack heuristics for which lab panels are DVT-relevant. With 12 lab groups and 19 individual labs, the breadth likely includes coagulation studies, CBC, metabolic panels, and possibly thrombophilia workup — students may over-order broadly or miss targeted coagulation labs (D-dimer, PT/INR) because they don't yet know which group to look in",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG interpretation — deciding its relevance to a DVT case",
+            "reason": "DVT cases with ECGs are structurally unexpected for most Foundations students; the ECG is likely present to rule out PE-related findings (sinus tachycardia, S1Q3T3) or cardiac mimics, but students at this level may either over-interpret it as central to the diagnosis or dismiss it entirely without understanding its role in the differential",
+            "confidence": "high"
+          },
+          {
+            "moment": "diagnosis submission — committing with only 2 differentials available",
+            "reason": "A 2-differential structure forces early binary commitment, which can feel premature at Foundations level when students are still pattern-building. DVT vs. a likely mimic (cellulitis, muscular strain, or superficial thrombophlebitis) requires confident clinical reasoning the student may not yet have, leading to hesitation or second-guessing before submission",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "cardiovascular-clinical-hypertensive-emergency-0",
+      "system": "Cardiovascular",
+      "difficulty": "Clinical",
+      "diagnosis": "Hypertensive Emergency",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly stating the BP reduction target for hypertensive emergency (reduce MAP by no more than 20-25% in the first hour, then gradually to 160/100 mmHg over the next 2-6 hours) to give learners a concrete, actionable management benchmark."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add hypertensive emergency with acute kidney injury or PRES (Posterior Reversible Encephalopathy Syndrome) as a differential to broaden the diagnostic reasoning beyond the three listed, since the case includes fundoscopic and renal findings that make these highly relevant teaching comparisons."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a question screening for cocaine or sympathomimetic drug use (e.g., 'Have you used any recreational drugs, particularly cocaine or amphetamines?') since these are high-yield precipitants of hypertensive emergency that learners must learn to exclude."
+          },
+          {
+            "severity": "medium",
+            "area": "imaging",
+            "suggestion": "Add CT Head without Contrast to the expected imaging list, as the presentation includes 'worst headache of his life' language in the hidden history and papilledema, making it a critical step to rule out subarachnoid hemorrhage before attributing symptoms solely to hypertensive emergency."
+          },
+          {
+            "severity": "low",
+            "area": "hpi clarity",
+            "suggestion": "Reconcile the contradiction between the advanced HPI framing the headache as 'worst headache of his life' (a red-flag thunderclap descriptor) and the hidden history clarifying it is throbbing rather than thunderclap — the visible HPI should explicitly note this distinction so learners can practice risk-stratifying the headache character."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Funduscopic Finding Annotation Tool",
+            "rationale": "Hypertensive emergency is one of the few conditions where funduscopic examination directly grades severity (Keith-Wagener-Barker classification), making it a critical diagnostic and staging skill. A static image with no interactivity misses the opportunity to teach learners to identify papilledema, AV nicking, flame hemorrhages, and cotton-wool spots as distinct findings.",
+            "caseEvidence": "hasFundus: true in a Hypertensive Emergency case means the fundus image carries direct grading relevance — learners need guided annotation, not just a lightbox zoom, to distinguish Grade III from Grade IV retinopathy"
+          },
+          {
+            "name": "Tiered Target-Organ Damage Checklist",
+            "rationale": "Hypertensive emergency is defined by end-organ damage, not BP number alone. Learners must actively map test results (troponin, creatinine, urinalysis, ECG, fundus) to specific target organs (heart, kidney, brain, eyes). A structured checklist that learners fill in pre-submission would reinforce this diagnostic framework and expose gaps in their organ-systems thinking.",
+            "caseEvidence": "labCount 19 + imagingCount 6 + hasECG + hasFundus + hasUrine collectively represent multi-organ workup; without a synthesis tool learners may order correctly but fail to connect results to a unified TOD picture"
+          },
+          {
+            "name": "IV Antihypertensive Titration Simulator",
+            "rationale": "The therapeutic crux of hypertensive emergency is controlled BP reduction — dropping MAP by no more than 25% in the first hour to avoid cerebral/coronary hypoperfusion. No existing feature teaches this nuanced management step. An interactive dose-titration mini-simulation (nicardipine or labetalol drip rate → BP response curve) would add high-yield pharmacologic reasoning unavailable elsewhere in the trainer.",
+            "caseEvidence": "Hypertensive Emergency diagnosis requires acute IV management decisions that are high-stakes, time-sensitive, and commonly tested; a case at Clinical difficulty with this diagnosis is incomplete without at least one management reasoning checkpoint"
+          },
+          {
+            "name": "ECG–Lab Correlation Prompt",
+            "rationale": "In hypertensive emergency, ECG findings (LVH with strain pattern, ST changes) must be interpreted alongside troponin and BNP to distinguish hypertensive heart disease from ACS — a critical and commonly missed distinction. A post-ECG prompt asking learners to state which lab values they want next and why would build systematic correlation skills that image-zoom alone cannot provide.",
+            "caseEvidence": "hasECG: true + hasRelevantTests: true + differentialCount: 3 implies ACS is likely in the differential; the ECG-to-lab reasoning chain is the exact junction where learners at Clinical level make dangerous anchoring errors"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "lab ordering and interpretation",
+            "reason": "19 labs across 12 groups creates high cognitive load for triaging which panels are urgent; students may over-order or miss the targeted panels (e.g., BMP for creatinine, UA for proteinuria) that specifically distinguish hypertensive emergency from urgency, leading to time pressure with only 22 minutes",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG and special imaging integration",
+            "reason": "With both ECG and special images (likely fundoscopic or chest X-ray for end-organ damage), students must synthesize multiple imaging modalities simultaneously; the critical step of connecting imaging findings to end-organ damage criteria may be non-obvious, causing students to passively view rather than actively interpret them as diagnostic gatekeepers",
+            "confidence": "high"
+          },
+          {
+            "moment": "diagnosis submission with only 3 differentials",
+            "reason": "A narrow differential of 3 forces students to commit early between hypertensive emergency vs. urgency vs. secondary hypertensive crisis; the structural distinction (end-organ damage presence) is subtle and depends on lab/imaging integration that may not yet be complete when students feel pressured to submit near the timer limit",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "psychiatric-clinical-generalized-anxiety-disorder-0",
+      "system": "Psychiatric",
+      "difficulty": "Clinical",
+      "diagnosis": "Generalized Anxiety Disorder",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly covering the DSM-5 diagnostic criteria for GAD (≥3 of 6 somatic symptoms for adults, 6-month duration, functional impairment) so learners can apply the criteria systematically rather than pattern-matching to the case narrative."
+          },
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point addressing the role of validated screening tools (GAD-7 score of 18 indicates severe anxiety) in guiding treatment decisions and monitoring response, including what score thresholds should prompt pharmacotherapy initiation versus watchful waiting."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add Pheochromocytoma as a differential with an explanation linking episodic palpitations, diaphoresis, hypertension (138/86), and tremor to the catecholamine-excess mechanism, and clarify how 24-hour urine catecholamines distinguish it from GAD."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a direct question about alcohol use pattern and its relationship to symptom timing, since the patient's 2–3 glasses of wine weekly and anxiety symptom fluctuation could reflect rebound anxiety from alcohol withdrawal that learners should be trained to elicit."
+          },
+          {
+            "severity": "low",
+            "area": "other",
+            "suggestion": "Include expected lab result values (e.g., TSH within normal range, normal free T4) so learners can practice interpreting results and understand how normal thyroid studies redirect the diagnosis toward GAD rather than leaving the outcome ambiguous."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Validated Psychiatric Scale Simulator",
+            "rationale": "GAD is diagnosed and monitored using standardized tools like the GAD-7 and PHQ-9. Learners should practice administering, scoring, and interpreting these scales as part of workup, reinforcing that psychiatric diagnosis relies on structured clinical instruments rather than labs or imaging.",
+            "caseEvidence": "Diagnosis is GAD with 19 labs and 4 imaging studies — a case where learners may over-rely on objective tests when the diagnostic anchor should be a validated symptom scale ordered and interpreted by the student."
+          },
+          {
+            "name": "Medication Risk-Benefit Dialogue Tool",
+            "rationale": "GAD management involves nuanced pharmacotherapy decisions (SSRIs, SNRIs, buspirone, benzodiazepines) with significant trade-offs around dependence, onset latency, and patient preference. A structured tool prompting learners to weigh and articulate treatment options against patient context adds prescribing literacy missing from the current feature set.",
+            "caseEvidence": "Psychiatric system with GAD diagnosis — a condition where first-line vs. adjunct medication selection, as well as non-pharmacologic options like CBT, is a core clinical competency distinct from diagnosis itself."
+          },
+          {
+            "name": "Biopsychosocial Formulation Builder",
+            "rationale": "Psychiatric cases require learners to organize findings across biological, psychological, and social dimensions rather than a purely organ-system framework. A guided formulation panel would teach this psychiatric-specific reasoning structure that the standard SOAP note does not capture.",
+            "caseEvidence": "System is Psychiatric — the biopsychosocial model is the foundational framework for psychiatric case conceptualization and is not represented by existing notes or reasoning scoring features."
+          },
+          {
+            "name": "Safety Screening Checkpoint",
+            "rationale": "Any anxiety disorder workup requires mandatory suicidality and self-harm screening. A gated safety assessment step — prompted after the HPI phase — would ensure learners habitually perform and document this critical psychiatric safety evaluation before proceeding to diagnosis.",
+            "caseEvidence": "Psychiatric system with GAD diagnosis — comorbid depression and suicidality must be actively ruled out; the existing gating logic does not enforce this clinically mandatory psychiatric safety step as a discrete, scored workflow checkpoint."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "ordering labs and imaging",
+            "reason": "19 labs across 6 groups plus 4 imaging studies is unusually high for a primary psychiatric diagnosis like GAD, which is typically diagnosed clinically. Students will likely over-order or under-order while trying to rule out organic causes, unsure which workup is truly expected to unlock progress or satisfy the case.",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG ordering decision",
+            "reason": "The presence of an ECG in a GAD case creates ambiguity — students must infer whether it is required to rule out cardiac mimics (e.g., arrhythmia causing anxiety) or is an optional red herring. Without clear cues, students may skip it and stall, or waste time on it when the timer is tight at 22 minutes.",
+            "confidence": "high"
+          },
+          {
+            "moment": "differential submission with only 4 diagnoses",
+            "reason": "GAD shares significant symptom overlap with Panic Disorder, Social Anxiety, and organic causes like hyperthyroidism or cardiac conditions. A constrained differential of 4 forces students to commit early, and the clinical-level difficulty means the case likely includes subtle misleading features that make narrowing to GAD non-obvious before full workup is complete.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "psychiatric-advanced-generalized-anxiety-disorder-0",
+      "system": "Psychiatric",
+      "difficulty": "Advanced",
+      "diagnosis": "Generalized Anxiety Disorder",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point explicitly walking through DSM-5 diagnostic criteria for GAD (6+ months, ≥3 of 6 symptoms, functional impairment, not attributable to substance/medical condition) so learners understand the structured diagnostic framework rather than pattern-recognition alone."
+          },
+          {
+            "severity": "high",
+            "area": "differentials",
+            "suggestion": "Add Pheochromocytoma as a differential given the combination of episodic palpitations, diaphoresis, hypertension (138/86), tremor, and available 24-hour urine catecholamines in the lab list — its omission leaves a clinically dangerous gap for an advanced case."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point addressing the elevated BP (138/86) in context — clarify whether it represents anxiety-driven sympathetic activation, caffeine effect, or an independent finding requiring follow-up, as learners will notice the vital and need explicit guidance on how to interpret it within the GAD workup."
+          },
+          {
+            "severity": "medium",
+            "area": "key questions",
+            "suggestion": "Add a targeted question screening for comorbid Major Depressive Disorder (e.g., 'Have you felt persistently sad, hopeless, or lost interest in things you used to enjoy?') since GAD has a 60%+ comorbidity rate with MDD, PHQ-9 is already scored at 6, and this is a critical management-altering distinction at the advanced level."
+          },
+          {
+            "severity": "low",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point on treatment sequencing that distinguishes first-line CBT modalities specific to GAD (worry postponement, intolerance of uncertainty therapy) from generic CBT, and addresses the clinical decision of when to combine pharmacotherapy with psychotherapy versus monotherapy based on severity (GAD-7 ≥15)."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Psychiatric Screening Tool Simulator",
+            "rationale": "GAD diagnosis relies heavily on validated instruments (GAD-7, HAM-A, PHQ-9 for comorbid depression). Learners should practice administering and interpreting these scales interactively rather than just receiving a narrative summary, reinforcing the structured assessment approach used in real psychiatric workups.",
+            "caseEvidence": "Psychiatric system + GAD diagnosis where objective scoring tools are a core diagnostic standard, yet no structured scale administration exists in the current feature set"
+          },
+          {
+            "name": "Biopsychosocial Formulation Builder",
+            "rationale": "Psychiatric Advanced cases require a formulation beyond a SOAP note — learners should map predisposing, precipitating, perpetuating, and protective factors. A guided template scored against the model formulation would develop the conceptual framework central to psychiatric reasoning.",
+            "caseEvidence": "Advanced Psychiatric difficulty with GAD diagnosis where psychosocial context (stressors, coping, supports) is diagnostically and therapeutically decisive, not captured by standard SOAP or clinical reasoning fields"
+          },
+          {
+            "name": "Safety & Risk Assessment Checklist",
+            "rationale": "Anxiety presentations require explicit suicidality, homicidality, and self-harm risk screening. A dedicated, gated risk-assessment panel that must be completed before diagnosis submission — and is graded separately — reinforces the non-negotiable safety evaluation step in psychiatric encounters.",
+            "caseEvidence": "Psychiatric system case where missing a safety screen is a critical clinical error, yet the existing oral presentation critical-miss list has no mechanism to enforce or score the safety assessment workflow during the case itself"
+          },
+          {
+            "name": "Test Overuse Penalty Explainer",
+            "rationale": "With 19 labs and 4 imaging studies for a GAD case, over-ordering is a primary learning pitfall. A post-grading panel that itemizes each ordered test as 'indicated,' 'low-yield,' or 'not indicated' with one-sentence rationale teaches appropriate workup scoping — especially important when ruling out medical mimics (hyperthyroidism, cardiac causes) without unnecessary resource use.",
+            "caseEvidence": "High labCount (19) and imagingCount (4) relative to a primarily clinical psychiatric diagnosis where the key skill is knowing when to stop ordering, not which test to add next"
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "lab ordering and selection from 19 labs across 6 groups",
+            "reason": "GAD is a clinical diagnosis not requiring extensive lab workup; students may over-order or under-order because the large lab panel signals 'rule out organic cause' but the grouping logic for a psychiatric case is non-obvious — which groups are relevant (thyroid, metabolic, drug screen) versus noise is unclear without clear anchoring cues",
+            "confidence": "high"
+          },
+          {
+            "moment": "ECG interpretation and relevance determination",
+            "reason": "An ECG in a GAD case creates cognitive dissonance — students must recognize it serves to rule out cardiac mimics (e.g., arrhythmia-driven anxiety) or pre-treatment QTc baseline, but the case structure doesn't signal this intent; advanced students may over-interpret findings or waste significant time on a test that has a narrow ruling-out role",
+            "confidence": "high"
+          },
+          {
+            "moment": "ROS unlock and navigation across 13 categories",
+            "reason": "With a 15-minute timer and 13 ROS categories, students face a pacing crisis — psychiatric cases require thorough mood, sleep, cognitive, and somatic symptom exploration, but 13 categories strongly tempts over-documentation; students may stall trying to distinguish which categories are diagnostically load-bearing for GAD versus filler, burning disproportionate time before reaching diagnosis submission",
+            "confidence": "medium"
+          }
+        ]
+      }
+    },
+    {
+      "id": "endocrine-metabolic-advanced-primary-hyperaldosteronism-conn-s-syndrome-0",
+      "system": "Endocrine / Metabolic",
+      "difficulty": "Advanced",
+      "diagnosis": "Primary Hyperaldosteronism (Conn's Syndrome)",
+      "lensA": {
+        "contentGaps": [
+          {
+            "severity": "high",
+            "area": "lab selection",
+            "suggestion": "Add a teaching point explicitly explaining why ACE inhibitors (lisinopril) and beta-blockers (metoprolol) — both currently prescribed — can suppress renin and falsely elevate or confound the ARR, and specify the recommended medication washout or interpretation caveat before testing."
+          },
+          {
+            "severity": "high",
+            "area": "imaging",
+            "suggestion": "Include Adrenal Vein Sampling (AVS) in the expectedImaging list, as it is the gold standard for subtype differentiation and its absence from expected studies creates a gap in the diagnostic workup pathway taught to learners."
+          },
+          {
+            "severity": "medium",
+            "area": "teaching points",
+            "suggestion": "Add a teaching point covering the confirmatory testing algorithm after a positive ARR — specifically the saline infusion suppression test already listed in available labs — including what result confirms autonomous aldosterone secretion and the physiologic rationale behind it."
+          },
+          {
+            "severity": "medium",
+            "area": "differentials",
+            "suggestion": "Add Gitelman or Liddle syndrome as a differential to teach learners to distinguish genetic tubulopathies that mimic primary hyperaldosteronism biochemically (hypokalemia, hypertension) but present in younger patients with different renin-aldosterone profiles."
+          },
+          {
+            "severity": "low",
+            "area": "vitals",
+            "suggestion": "Add orthostatic blood pressure measurements to the vitals, as volume and autonomic status are clinically relevant in hyperaldosteronism and their inclusion would prompt learners to consider volume-mediated hypertension mechanisms during physical assessment."
+          }
+        ]
+      },
+      "lensB": {
+        "featureSuggestions": [
+          {
+            "name": "Guided Lab Interpretation Overlay",
+            "rationale": "Primary hyperaldosteronism hinges on correctly interpreting the aldosterone-to-renin ratio alongside potassium and sodium trends — a multi-step numeric reasoning chain that many learners fail to execute systematically. An interactive overlay that prompts the student to annotate which specific lab values support or refute each differential, then scores that annotation post-submission, would reinforce the quantitative diagnostic logic unique to endocrine/metabolic workups.",
+            "caseEvidence": "19 labs and 6 imaging studies create a high data-density environment; the diagnosis depends on recognizing a specific lab pattern (elevated aldosterone, suppressed renin, hypokalemia) that is easily missed without structured interpretation scaffolding."
+          },
+          {
+            "name": "Sequential Test Unlocking with Confirmatory Test Logic",
+            "rationale": "Conn's syndrome has a well-defined two-stage workup: screening (ARR), confirmatory (salt-loading or fludrocortisone suppression), then subtype localization (adrenal CT, then AVS if needed). A feature that mirrors this clinical staging — flagging to the learner when they've jumped to advanced imaging before confirming biochemical diagnosis — would teach the real-world stepwise protocol rather than allowing scattershot ordering.",
+            "caseEvidence": "The case has both urine tests and 6 imaging studies (likely including adrenal CT and possibly AVS-related imaging), making it ideal to illustrate the mandatory sequence of biochemical confirmation before anatomic localization."
+          },
+          {
+            "name": "Fundoscopic Finding Annotation Tool",
+            "rationale": "Hypertensive end-organ damage visible on fundoscopy is a critical safety finding in Conn's syndrome that changes urgency of management. An annotation tool allowing students to click on and label fundoscopic findings (e.g., AV nicking, papilledema, cotton-wool spots) — then receive AI feedback on their interpretation — would add active learning to what is currently a passive image-view experience.",
+            "caseEvidence": "hasFundus is true, and the case involves chronic secondary hypertension from hyperaldosteronism, making hypertensive retinopathy a clinically meaningful finding that warrants more than a lightbox zoom."
+          },
+          {
+            "name": "ECG-to-Pathophysiology Linkage Quiz",
+            "rationale": "Hypokalemia in Conn's syndrome produces characteristic ECG changes (U waves, T-wave flattening, QT prolongation). A post-ECG micro-quiz that asks the learner to identify the finding, name the electrolyte disturbance responsible, and explain the mechanism — scored before the case is submitted — would close the loop between ECG abnormality and underlying metabolic etiology, a connection that is frequently tested and frequently missed.",
+            "caseEvidence": "hasECG is true and hasUrine is true alongside an endocrine/metabolic diagnosis known to cause hypokalemia; the ECG is almost certainly showing hypokalemic changes that require mechanistic explanation, not just visual recognition."
+          }
+        ]
+      },
+      "lensC": {
+        "frictionPoints": [
+          {
+            "moment": "Lab ordering and interpretation — specifically navigating 13 lab groups with 19 labs to identify aldosterone, renin, and aldosterone-to-renin ratio",
+            "reason": "Primary Hyperaldosteronism requires knowing to order a specific, non-obvious hormonal ratio test. Students unfamiliar with the aldosterone/renin axis may order broad metabolic panels first, waste time, and miss the diagnostic key. The high lab group count amplifies decision paralysis under a 15-minute timer.",
+            "confidence": "high"
+          },
+          {
+            "moment": "Imaging selection — choosing between 6 imaging options and identifying adrenal protocol CT or adrenal vein sampling as appropriate next steps",
+            "reason": "The case has special images flagged, suggesting adrenal-specific imaging exists but may be buried among 6 options. Students commonly default to chest X-ray or standard abdominal CT rather than adrenal-specific protocols, and adrenal vein sampling is rarely intuitive for students at this stage. Picking the wrong imaging delays the diagnostic path.",
+            "confidence": "high"
+          },
+          {
+            "moment": "Differential submission — distinguishing Primary Hyperaldosteronism from secondary hyperaldosteronism, Cushing's syndrome, or essential hypertension with hypokalemia",
+            "reason": "With 5 differentials available and overlapping electrolyte/BP findings, students may anchor on secondary hyperaldosteronism (which shares many features) or Cushing's syndrome if they note any cortisol-adjacent findings. The ECG presence (likely showing hypokalemic changes) may paradoxically distract toward a cardiac or non-endocrine framing before the aldosterone workup clarifies the diagnosis.",
+            "confidence": "medium"
+          }
+        ]
+      }
+    }
+  ],
+  "aggregation": {
+    "themes": [
+      {
+        "lens": "content",
+        "theme": "Missing critical management/treatment teaching points",
+        "affectedCases": [
+          "neurologic-clinical-acute-ischemic-stroke-0",
+          "neurologic-foundations-acute-ischemic-stroke-0",
+          "gastrointestinal-advanced-primary-sclerosing-cholangitis-0",
+          "cardiovascular-clinical-hypertensive-emergency-0",
+          "toxicologic-foundations-benzodiazepine-overdose-0",
+          "hematologic-oncologic-foundations-deep-vein-thrombosis-0",
+          "endocrine-metabolic-advanced-primary-hyperaldosteronism-conn-s-syndrome-0"
+        ],
+        "frequency": "7 of 12 cases",
+        "suggestedAction": "Establish a mandatory 'Management & Treatment' teaching point template for every case that specifies at least one concrete, quantified treatment target or first-line intervention protocol (e.g., BP reduction MAP targets, tPA eligibility windows, anticoagulation agent selection) before content is published."
+      },
+      {
+        "lens": "content",
+        "theme": "High-yield differential diagnoses omitted",
+        "affectedCases": [
+          "endocrine-metabolic-clinical-cushing-s-syndrome-0",
+          "neurologic-foundations-acute-ischemic-stroke-0",
+          "gastrointestinal-advanced-primary-sclerosing-cholangitis-0",
+          "musculoskeletal-advanced-antiphospholipid-syndrome-0",
+          "toxicologic-foundations-benzodiazepine-overdose-0",
+          "hematologic-oncologic-foundations-deep-vein-thrombosis-0",
+          "cardiovascular-clinical-hypertensive-emergency-0",
+          "psychiatric-clinical-generalized-anxiety-disorder-0",
+          "psychiatric-advanced-generalized-anxiety-disorder-0",
+          "endocrine-metabolic-advanced-primary-hyperaldosteronism-conn-s-syndrome-0"
+        ],
+        "frequency": "10 of 12 cases",
+        "suggestedAction": "Add a differential completeness review step to the case QA workflow requiring a second-author check that: (1) the most dangerous mimic, (2) the most common alternative, and (3) one criteria-distinguishing foil are all represented in the differential list before publication."
+      },
+      {
+        "lens": "content",
+        "theme": "Key questions do not surface highest-yield hidden history",
+        "affectedCases": [
+          "neurologic-clinical-acute-ischemic-stroke-0",
+          "neurologic-foundations-acute-ischemic-stroke-0",
+          "infectious-clinical-infective-endocarditis-0",
+          "musculoskeletal-advanced-antiphospholipid-syndrome-0",
+          "cardiovascular-clinical-hypertensive-emergency-0",
+          "psychiatric-clinical-generalized-anxiety-disorder-0",
+          "psychiatric-advanced-generalized-anxiety-disorder-0"
+        ],
+        "frequency": "7 of 12 cases",
+        "suggestedAction": "Require case authors to map each hidden history item to at least one key question; any hidden finding flagged as a 'pivotal predisposing lesion,' 'prior TIA,' or 'critical precipitant' must be directly elicitable via a targeted key question before the case passes QA."
+      },
+      {
+        "lens": "content",
+        "theme": "Expected imaging list incomplete for standard-of-care workup",
+        "affectedCases": [
+          "neurologic-clinical-acute-ischemic-stroke-0",
+          "neurologic-foundations-acute-ischemic-stroke-0",
+          "infectious-clinical-infective-endocarditis-0",
+          "cardiovascular-clinical-hypertensive-emergency-0",
+          "endocrine-metabolic-advanced-primary-hyperaldosteronism-conn-s-syndrome-0"
+        ],
+        "frequency": "5 of 12 cases",
+        "suggestedAction": "Cross-reference each case's expected imaging list against the relevant specialty society guideline (AHA/ASA, ESC, Endocrine Society) and add any modality classified as Class I or standard-of-care, with a one-sentence clinical rationale attached to each expected study."
+      },
+      {
+        "lens": "feature",
+        "theme": "Interactive annotation missing for high-signal images (fundus, derm, pathology)",
+        "affectedCases": [
+          "infectious-clinical-infective-endocarditis-0",
+          "endocrine-metabolic-clinical-cushing-s-syndrome-0",
+          "musculoskeletal-advanced-antiphospholipid-syndrome-0",
+          "cardiovascular-clinical-hypertensive-emergency-0",
+          "endocrine-metabolic-advanced-primary-hyperaldosteronism-conn-s-syndrome-0",
+          "gastrointestinal-advanced-primary-sclerosing-cholangitis-0"
+        ],
+        "frequency": "6 of 12 cases",
+        "suggestedAction": "Build a reusable image annotation widget (tap-to-label with AI feedback) deployable across fundus, derm, pathology, and cholangiogram image types, and integrate it into all cases where hasDerm, hasFundus, or hasBiopsy is true as a default active-learning replacement for the current lightbox-only viewer."
+      },
+      {
+        "lens": "feature",
+        "theme": "No structured psychiatric safety screening checkpoint",
+        "affectedCases": [
+          "psychiatric-clinical-generalized-anxiety-disorder-0",
+          "psychiatric-advanced-generalized-anxiety-disorder-0",
+          "toxicologic-foundations-benzodiazepine-overdose-0"
+        ],
+        "frequency": "3 of 12 cases",
+        "suggestedAction": "Implement a gated safety assessment module (suicidality, self-harm, homicidality) that is automatically triggered for all Psychiatric-system cases and any case with an intentional overdose flag, scored as a mandatory checkpoint before the differential submission step."
+      }
+    ]
+  }
+}

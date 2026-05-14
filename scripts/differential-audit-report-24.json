@@ -1,0 +1,767 @@
+{
+  "generatedAt": "2026-05-06T03:22:09.704Z",
+  "cases": [
+    {
+      "id": "respiratory-foundations-spontaneous-pneumothorax-0",
+      "system": "Respiratory",
+      "difficulty": "Foundations",
+      "diagnosis": "Spontaneous Pneumothorax",
+      "differentials": [
+        "Pulmonary Embolism",
+        "Pleuritis / Pleurisy",
+        "Musculoskeletal Chest Wall Pain"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Pulmonary Embolism",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Pulmonary embolism is the single most dangerous can't-miss mimic, as it shares acute pleuritic chest pain and dyspnea with spontaneous pneumothorax and carries immediate mortality risk if anticoagulation is delayed while awaiting the chest X-ray that discriminates between the two.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Musculoskeletal Chest Wall Pain",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Musculoskeletal chest wall pain is the most epidemiologically common diagnosis a general practitioner would first consider in a young patient presenting with acute pleuritic chest pain, making it an essential alternative on this list.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Pleuritis / Pleurisy",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Pleuritis shares sharp, pleuritic chest pain worsening with inspiration and is ruled out by the chest X-ray finding of a visible pleural line with absent lung markings — and by the absence of fever, infection, or autoimmune features — forcing the student to distinguish inflammation of the pleura from air in the pleural space.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "local-fundus-hypertensive-0",
+      "system": "Cardiovascular",
+      "difficulty": "Clinical",
+      "diagnosis": "Grade III Hypertensive Retinopathy",
+      "differentials": [
+        "Diabetic Retinopathy",
+        "Central Retinal Vein Occlusion",
+        "Hypertensive Emergency with End-Organ Damage (CNS)",
+        "Increased Intracranial Pressure / Papilledema from Secondary Cause"
+      ],
+      "differentialCount": 4,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Hypertensive Emergency with End-Organ Damage (CNS)",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Hypertensive Emergency with CNS involvement (hypertensive encephalopathy) shares the same precipitating cause and many features — severe uncontrolled hypertension, bilateral visual disturbance, and occipital headache — but demands immediate parenteral antihypertensive therapy rather than urgent oral management, making failure to distinguish it potentially fatal.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Diabetic Retinopathy",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Diabetic retinopathy is the most epidemiologically prevalent cause of retinal hemorrhages and exudates in a 54-year-old with a 7-year history of type 2 diabetes mellitus, and would be the first diagnosis a general practitioner encounters when seeing bilateral visual blurring with fundoscopic changes in a diabetic patient.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Increased Intracranial Pressure / Papilledema from Secondary Cause",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Grade IV (vs. Grade III) Hypertensive Retinopathy is distinguished from Grade III solely by the presence of papilledema on fundoscopy, making 'Papilledema from Secondary Cause' an ideal foil that forces students to apply the Keith-Wagener-Barker criterion precisely — disc edema upgrades the classification and changes management urgency.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "img-MPX1896_synpic27389-advanced",
+      "system": "Respiratory",
+      "difficulty": "Advanced",
+      "diagnosis": "Congenital diaphragmatic hernia",
+      "differentials": [
+        "Congenital diaphragmatic hernia",
+        "Congenital pulmonary airway malformation (CPAM)",
+        "Tension pneumothorax",
+        "Meconium aspiration syndrome"
+      ],
+      "differentialCount": 4,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Tension pneumothorax",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Tension pneumothorax presents with acute respiratory failure, cyanosis, and mediastinal shift — identical to CDH at first presentation — but requires immediate needle decompression rather than intubation-first management, making misidentification in either direction immediately life-threatening.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Meconium aspiration syndrome",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Meconium aspiration syndrome is among the most common causes of severe respiratory distress at term, and though amniotic fluid was clear here, it is the condition a general practitioner would reach for first when a term neonate presents with cyanosis and poor respiratory effort.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Congenital pulmonary airway malformation (CPAM)",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "CPAM shares cystic/opaque intrathoracic lesions and respiratory distress on chest X-ray but is distinguished from CDH by the presence of bowel gas above the diaphragm, the scaphoid abdomen, and the absence of an intact diaphragm on imaging — forcing students to apply those discriminating criteria precisely.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "cardiovascular-clinical-acute-pericarditis-0",
+      "system": "Cardiovascular",
+      "difficulty": "Clinical",
+      "diagnosis": "Acute Pericarditis",
+      "differentials": [
+        "Acute Myocarditis",
+        "Pulmonary Embolism",
+        "Pleuritis / Viral Pleuritis",
+        "Diabetic Ketoacidosis with Non-Cardiac Chest Pain"
+      ],
+      "differentialCount": 4,
+      "review": {
+        "hasDangerousMimic": false,
+        "dangerousMimicPresent": null,
+        "suggestedDangerousMimic": "Acute MI / STEMI",
+        "dangerousMimicRationale": "Acute MI shares chest pain, troponin elevation, and ECG changes with acute pericarditis, and misidentifying diffuse saddle-shaped ST elevation as STEMI — or vice versa — can lead to inappropriate thrombolysis or missed reperfusion, causing immediate life-threatening harm.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Pleuritis / Viral Pleuritis",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Viral pleuritis is the most common condition a general practitioner would consider first given sharp, positional, post-viral chest pain, making it an appropriate and epidemiologically relevant common alternative already present in the list.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Acute Myocarditis",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Acute myocarditis shares post-viral chest pain and troponin elevation with pericarditis but is distinguished by ventricular dysfunction on echocardiography, absence of a friction rub, and a differing ECG pattern without classic saddle-shaped ST elevation and PR depression, forcing students to apply specific diagnostic criteria cold.",
+        "overallVerdict": "major-gap",
+        "suggestedReplacementOrAddition": "Replace 'Diabetic Ketoacidosis with Non-Cardiac Chest Pain' with 'Acute MI / STEMI,' as DKA is a metabolic distractor with low mimicry of pericarditis's core presentation, while STEMI is the single most dangerous condition that shares ECG and troponin findings and must be actively excluded before treating pericarditis."
+      },
+      "gapCount": 1
+    },
+    {
+      "id": "img-MPX1723_synpic34922-advanced",
+      "system": "Neurologic",
+      "difficulty": "Advanced",
+      "diagnosis": "Subarachnoid hemorrhage",
+      "differentials": [
+        "Subarachnoid hemorrhage",
+        "Migraine with aura",
+        "Bacterial meningitis",
+        "Reversible cerebral vasoconstriction syndrome (RCVS)"
+      ],
+      "differentialCount": 4,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Bacterial meningitis",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Bacterial meningitis shares thunderclap-onset severe headache, meningismus, photophobia, and altered mental status with SAH, and if mistaken for a benign headache syndrome before LP/imaging, it is rapidly fatal.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Migraine with aura",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Migraine is the most epidemiologically prevalent cause of severe headache in the ED and is the condition a general practitioner would most reflexively consider first, especially given this patient's remote migraine history.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Reversible cerebral vasoconstriction syndrome (RCVS)",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "RCVS classically presents with recurrent thunderclap headaches and can cause subarachnoid blood on imaging, but is distinguished from aneurysmal SAH by the absence of a saccular aneurysm on CTA/DSA and the characteristic 'string-of-beads' pattern of reversible multifocal vasoconstriction, forcing students to know the angiographic and clinical distinguishing criteria precisely.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "musculoskeletal-clinical-lumbar-disc-herniation-with-radiculopathy-0",
+      "system": "Musculoskeletal",
+      "difficulty": "Clinical",
+      "diagnosis": "Lumbar Disc Herniation with Radiculopathy",
+      "differentials": [
+        "Lumbar Spinal Stenosis",
+        "Piriformis Syndrome",
+        "Lumbar Facet Joint Arthropathy"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": false,
+        "dangerousMimicPresent": null,
+        "suggestedDangerousMimic": "Cauda Equina Syndrome",
+        "dangerousMimicRationale": "Cauda Equina Syndrome can present identically to lumbar disc herniation with radiculopathy in its early stages but requires emergency surgical decompression within hours to prevent permanent bowel, bladder, and sexual dysfunction — missing it is catastrophic, and the initial unilateral S1 radiculopathy picture can mask its onset.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Lumbar Spinal Stenosis",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Lumbar spinal stenosis is the most epidemiologically common condition a general practitioner would place first on the differential for lower extremity radicular pain in the context of low back pathology, particularly in middle-aged to older patients, making its presence appropriate.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Piriformis Syndrome",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Piriformis Syndrome shares the same distribution of posterior leg pain and is ruled out by a negative FAIR test and the absence of pain specifically with hip internal rotation/adduction, while the positive Valsalva-worsening and positive SLR in this case definitively distinguish disc herniation from this extraspinal compression etiology.",
+        "overallVerdict": "major-gap",
+        "suggestedReplacementOrAddition": "Replace 'Lumbar Facet Joint Arthropathy' with 'Cauda Equina Syndrome,' as facet arthropathy rarely produces true dermatomal radiculopathy with motor deficits and adds less discriminatory educational value than the critical can't-miss diagnosis of Cauda Equina Syndrome given this patient's presentation."
+      },
+      "gapCount": 1
+    },
+    {
+      "id": "respiratory-advanced-spontaneous-pneumothorax-0",
+      "system": "Respiratory",
+      "difficulty": "Advanced",
+      "diagnosis": "Spontaneous Pneumothorax",
+      "differentials": [
+        "Pulmonary Embolism",
+        "Pleuritis / Pleurisy",
+        "Musculoskeletal Chest Wall Pain"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Pulmonary Embolism",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Pulmonary embolism is the critical can't-miss diagnosis as it shares acute pleuritic chest pain, dyspnea, and hypoxia with spontaneous pneumothorax, and missing it in favor of a benign diagnosis can result in fatal hemodynamic collapse.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Musculoskeletal Chest Wall Pain",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Musculoskeletal chest wall pain is the most common diagnosis a general practitioner would first consider in a young patient presenting with sharp, positional chest pain, making it an essential high-prevalence foil in this differential.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Pleuritis / Pleurisy",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Pleuritis shares the hallmark pleuritic, inspiratory chest pain and can mimic spontaneous pneumothorax closely, but is distinguished by the absence of hyperresonance to percussion, absent breath sounds, and a visible pleural line on chest X-ray — forcing the student to apply specific physical exam and imaging criteria to differentiate the two.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "local-urine-uti-0",
+      "system": "Renal",
+      "difficulty": "Foundations",
+      "diagnosis": "Acute Uncomplicated Cystitis (UTI)",
+      "differentials": [
+        "Acute Pyelonephritis",
+        "Urethritis / Sexually Transmitted Infection",
+        "Vaginitis"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Acute Pyelonephritis",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Acute pyelonephritis shares dysuria, frequency, and urgency with uncomplicated cystitis but can progress to urosepsis and septic shock if missed or undertreated, and is clinically distinguished only by the presence of fever, rigors, flank pain, and costovertebral angle tenderness.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Vaginitis",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Vaginitis (bacterial vaginosis, candidiasis, trichomoniasis) is among the most common causes of dysuria in young women seen in primary care and is a frequent reason for misdiagnosis or co-diagnosis with UTI.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Urethritis / Sexually Transmitted Infection",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Urethritis (e.g., chlamydial or gonococcal) mimics cystitis with dysuria and frequency but is distinguished by a gradual onset, new sexual partner exposure, presence of urethral discharge, and a 'sterile pyuria' pattern on urinalysis with a negative standard urine culture.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "hematologic-oncologic-foundations-immune-thrombocytopenia-itp-0",
+      "system": "Hematologic / Oncologic",
+      "difficulty": "Foundations",
+      "diagnosis": "Immune Thrombocytopenia (ITP)",
+      "differentials": [
+        "Thrombotic Thrombocytopenic Purpura (TTP)",
+        "Drug-Induced Thrombocytopenia",
+        "Aplastic Anemia"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Thrombotic Thrombocytopenic Purpura (TTP)",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "TTP presents with thrombocytopenia and purpura just like ITP but carries near-100% mortality if untreated, and is distinguished only by the presence of microangiopathic hemolytic anemia (schistocytes on smear), fever, and neurological/renal involvement — features that require active exclusion before diagnosing ITP.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Drug-Induced Thrombocytopenia",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Drug-induced thrombocytopenia is one of the most common causes of isolated thrombocytopenia encountered in clinical practice, and its mechanism (hapten-mediated antibody destruction of platelets) closely mirrors ITP, making it the first alternative a general practitioner would consider after obtaining a medication history.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Aplastic Anemia",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Aplastic anemia shares thrombocytopenia and bleeding symptoms with ITP but is definitively distinguished by pancytopenia on CBC (anemia and leukopenia in addition to low platelets) and a hypocellular bone marrow biopsy, forcing the student to recognize that ITP presents with isolated thrombocytopenia and an otherwise normal CBC.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "hematologic-oncologic-advanced-paroxysmal-nocturnal-hemoglobinuria-0",
+      "system": "Hematologic / Oncologic",
+      "difficulty": "Advanced",
+      "diagnosis": "Paroxysmal Nocturnal Hemoglobinuria",
+      "error": "No JSON object found in response"
+    },
+    {
+      "id": "infectious-foundations-cellulitis-0",
+      "system": "Infectious",
+      "difficulty": "Foundations",
+      "diagnosis": "Cellulitis",
+      "differentials": [
+        "Deep Vein Thrombosis (DVT)",
+        "Necrotizing Fasciitis",
+        "Stasis Dermatitis"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Necrotizing Fasciitis",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Necrotizing fasciitis is the classic life-threatening mimic of cellulitis, sharing erythema, warmth, and swelling but requiring urgent surgical debridement if missed, and it is correctly included in the differential.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Stasis Dermatitis",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Stasis dermatitis is among the most common conditions confused with lower extremity cellulitis in clinical practice, frequently causing erythema and warmth in the lower legs due to venous insufficiency rather than infection.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Deep Vein Thrombosis (DVT)",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "DVT shares unilateral lower extremity erythema, warmth, and swelling with cellulitis but is distinguished by the absence of fever/systemic signs of infection, the presence of a discrete wound entry point, and confirmation via duplex ultrasound — forcing students to apply Wells criteria and understand overlapping presentations.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "gastrointestinal-advanced-small-bowel-obstruction-0",
+      "system": "Gastrointestinal",
+      "difficulty": "Advanced",
+      "diagnosis": "Small Bowel Obstruction",
+      "differentials": [
+        "Acute Gastroenteritis",
+        "Paralytic Ileus",
+        "Large Bowel Obstruction",
+        "Mesenteric Ischemia"
+      ],
+      "differentialCount": 4,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Mesenteric Ischemia",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Mesenteric ischemia shares abdominal pain, vomiting, and distension with SBO, can be precipitated by the same pathophysiology (strangulation), and if missed leads to bowel infarction and death — making it the archetypal can't-miss mimic requiring urgent CT with contrast to distinguish.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Acute Gastroenteritis",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Acute gastroenteritis is the most epidemiologically common diagnosis a general practitioner would consider first given nausea, vomiting, abdominal cramping, and the reported preceding 'diarrhea,' making it the classic and highly prevalent alternative that must be consciously excluded.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Large Bowel Obstruction",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Large bowel obstruction shares obstipation, distension, and vomiting with SBO but is distinguished by the location of dilated loops and transition point on CT (proximal vs. distal to the ileocecal valve), as well as the competence of the ileocecal valve, forcing students to know the radiographic and clinical distinguishing criteria precisely.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "respiratory-clinical-community-acquired-pneumonia-0",
+      "system": "Respiratory",
+      "difficulty": "Clinical",
+      "diagnosis": "Community-Acquired Pneumonia",
+      "differentials": [
+        "Acute Bronchitis",
+        "Pulmonary Embolism",
+        "Congestive Heart Failure with pulmonary edema"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Pulmonary Embolism",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Pulmonary embolism shares pleuritic chest pain, dyspnea, tachypnea, and hypoxia with CAP and is immediately life-threatening if missed; it cannot be excluded without CT-PA or V/Q imaging, making it the quintessential can't-miss mimic here.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Acute Bronchitis",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Acute bronchitis is the most epidemiologically common diagnosis a general practitioner would consider first in a patient presenting with productive cough and is the primary outpatient alternative before chest X-ray confirms consolidation.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Congestive Heart Failure with pulmonary edema",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "CHF with pulmonary edema shares dyspnea, orthopnea, and bilateral crackles with CAP but is distinguished by the absence of lobar consolidation on chest X-ray, the presence of cardiomegaly and bilateral interstitial edema, BNP elevation, and lack of fever with rigors and purulent sputum — forcing the student to know these discriminating criteria precisely.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "infectious-clinical-pneumocystis-jirovecii-pneumonia-pcp-0",
+      "system": "Infectious",
+      "difficulty": "Clinical",
+      "diagnosis": "Pneumocystis Jirovecii Pneumonia (PCP)",
+      "differentials": [
+        "Community-Acquired Pneumonia (CAP)",
+        "Pulmonary Tuberculosis",
+        "Lymphocytic Interstitial Pneumonitis",
+        "COVID-19 Pneumonia"
+      ],
+      "differentialCount": 4,
+      "review": {
+        "hasDangerousMimic": false,
+        "dangerousMimicPresent": null,
+        "suggestedDangerousMimic": "Pulmonary Embolism (PE)",
+        "dangerousMimicRationale": "PE shares progressive exertional dyspnea, hypoxia, and can present with bilateral infiltrates in cases of pulmonary infarction or hemorrhage, and missing it in favor of an infectious etiology while withholding anticoagulation carries immediate mortality risk — the distinction requires CTPA, which overlaps with the initial workup.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Community-Acquired Pneumonia (CAP)",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "CAP is the first diagnosis any general practitioner would consider in a patient presenting with dyspnea, cough, fever, and bilateral infiltrates regardless of immune status, making it the most epidemiologically common alternative.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Lymphocytic Interstitial Pneumonitis",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Lymphocytic Interstitial Pneumonitis (LIP) shares bilateral ground-glass opacities, progressive dyspnea, and association with HIV/immunodeficiency but is distinguished from PCP by its insidious chronic course, CD4 count typically above 200 cells/µL, negative beta-D-glucan and BAL cytology, and lack of response to TMP-SMX.",
+        "overallVerdict": "major-gap",
+        "suggestedReplacementOrAddition": "Replace 'COVID-19 Pneumonia' with 'Pulmonary Embolism (PE)', as COVID-19 pneumonia — while sharing bilateral GGOs — lacks the immediate can't-miss urgency of PE and adds less discriminatory educational value in this HIV-focused case."
+      },
+      "gapCount": 1
+    },
+    {
+      "id": "gastrointestinal-foundations-acute-cholecystitis-0",
+      "system": "Gastrointestinal",
+      "difficulty": "Foundations",
+      "diagnosis": "Acute Cholecystitis",
+      "differentials": [
+        "Biliary Colic",
+        "Acute Pancreatitis",
+        "Peptic Ulcer Disease"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": false,
+        "dangerousMimicPresent": null,
+        "suggestedDangerousMimic": "Acute Myocardial Infarction (inferior/posterior STEMI)",
+        "dangerousMimicRationale": "Inferior or posterior MI can present with epigastric or RUQ pain, nausea, vomiting, and diaphoresis — especially in diabetic patients with atypical pain perception — and can be fatally missed if the clinician anchors on a GI etiology before obtaining an ECG and troponins.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Biliary Colic",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Biliary colic is the most epidemiologically common RUQ pain syndrome and is the immediate precursor diagnosis on the same pathophysiologic spectrum, making it the condition a general practitioner would consider first before establishing that inflammation has developed.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Biliary Colic",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Biliary colic shares the same fatty-meal trigger, RUQ pain, and prior episodic history but is distinguished from acute cholecystitis by the absence of fever, leukocytosis, Murphy's sign, and persistent (>6 hours) constant pain, forcing students to know the Tokyo Guidelines diagnostic criteria cold.",
+        "overallVerdict": "minor-gap",
+        "suggestedReplacementOrAddition": "Replace Peptic Ulcer Disease with Acute Myocardial Infarction, as PUD is already partially covered by the antacid-nonresponse teaching point and the dangerous cardiac mimic is the highest-stakes gap in a diabetic female patient."
+      },
+      "gapCount": 1
+    },
+    {
+      "id": "img-MPX1896_synpic27390-advanced",
+      "system": "Respiratory",
+      "difficulty": "Advanced",
+      "diagnosis": "Congenital diaphragmatic hernia",
+      "differentials": [
+        "Congenital diaphragmatic hernia",
+        "Meconium aspiration syndrome",
+        "Congenital pulmonary airway malformation (CPAM)",
+        "Persistent pulmonary hypertension of the newborn (PPHN)"
+      ],
+      "differentialCount": 4,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Congenital pulmonary airway malformation (CPAM)",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "CPAM presents with neonatal respiratory distress and abnormal chest radiograph findings that can mimic CDH (cystic lucencies in the chest, mediastinal shift), and misidentifying it as CDH or vice versa before cross-sectional imaging or surgical exploration could lead to inappropriate management decisions with life-threatening consequences.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Meconium aspiration syndrome",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Meconium aspiration syndrome is the most common cause of severe neonatal respiratory distress requiring intubation at birth, and any general practitioner would consider it first in a term infant with respiratory failure, making it the highest-prevalence alternative in this clinical context.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Persistent pulmonary hypertension of the newborn (PPHN)",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "PPHN shares respiratory distress, hypoxemia, and right heart strain with CDH but is distinguished by a normal chest radiograph (no herniated bowel, no mediastinal shift, no scaphoid abdomen), forcing students to recognize that PPHN in CDH is a secondary complication rather than a primary competing diagnosis.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "respiratory-clinical-lung-abscess-0",
+      "system": "Respiratory",
+      "difficulty": "Clinical",
+      "diagnosis": "Lung Abscess",
+      "differentials": [
+        "Community-Acquired Pneumonia (CAP) with parapneumonic effusion",
+        "Pulmonary Tuberculosis",
+        "Empyema",
+        "Cavitary lung malignancy (primary or metastatic)"
+      ],
+      "differentialCount": 4,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Empyema",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Empyema is the most dangerous mimic because it presents with fever, chest pain, and a cavitary/fluid-containing lesion but requires urgent surgical drainage rather than antibiotics alone — misclassifying an empyema as a lung abscess and withholding chest tube placement can lead to rapid septic deterioration and death.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Community-Acquired Pneumonia (CAP) with parapneumonic effusion",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "CAP is the diagnosis a general practitioner would reflexively reach for first given fever, productive cough, and focal consolidation — and indeed this patient was already empirically treated for CAP at urgent care, making its inclusion epidemiologically essential.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Cavitary lung malignancy (primary or metastatic)",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Cavitary malignancy shares the thick-walled cavitary lesion on imaging and constitutional symptoms (weight loss, smoking history) but is distinguished from lung abscess by the absence of an air-fluid level with surrounding acute consolidation, lack of response to antibiotics, and ultimately bronchoscopy/biopsy histology — forcing the student to know these discriminating criteria precisely.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "img-MPX1508_synpic48380",
+      "system": "Gastrointestinal",
+      "difficulty": "Clinical",
+      "diagnosis": "Hepatic cirrhosis with splenomegaly",
+      "differentials": [
+        "Hepatic cirrhosis with splenomegaly",
+        "Lymphoma with hepatosplenic involvement",
+        "Schistosomiasis with portal hypertension",
+        "Budd-Chiari syndrome"
+      ],
+      "differentialCount": 4,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Budd-Chiari syndrome",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Budd-Chiari syndrome presents with hepatomegaly, ascites, and splenomegaly nearly identical to cirrhosis but requires urgent anticoagulation and/or interventional management—missing it can lead to fulminant hepatic failure and death, and it is only distinguished by Doppler imaging showing hepatic vein occlusion.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Schistosomiasis with portal hypertension",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Given the patient's Nigerian origin, schistosomiasis is the most epidemiologically common alternative a general practitioner in that context would consider first, as it is endemic in sub-Saharan Africa and produces portal hypertension with splenomegaly closely mimicking cirrhosis.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Schistosomiasis with portal hypertension",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Schistosomiasis shares hepatosplenomegaly and portal hypertension with cirrhosis but is distinguished by preserved hepatocyte synthetic function (normal albumin, INR, bilirubin), periportal 'pipestem' fibrosis on imaging, positive serology/stool ova, and disproportionate splenomegaly—forcing students to apply specific discriminating criteria.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "neurologic-foundations-bacterial-meningitis-0",
+      "system": "Neurologic",
+      "difficulty": "Foundations",
+      "diagnosis": "Bacterial Meningitis",
+      "differentials": [
+        "Viral (Aseptic) Meningitis",
+        "Subarachnoid Hemorrhage"
+      ],
+      "differentialCount": 2,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Subarachnoid Hemorrhage",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Subarachnoid hemorrhage classically presents with 'worst headache of life,' fever, meningismus, and altered consciousness, making it a life-threatening mimic that must be excluded before or alongside bacterial meningitis workup.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Viral (Aseptic) Meningitis",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Viral (aseptic) meningitis is the most epidemiologically common cause of meningitis overall and shares fever, headache, photophobia, and meningismus with bacterial meningitis, making it the first alternative a general practitioner would consider.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Viral (Aseptic) Meningitis",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Viral (aseptic) meningitis is distinguished from bacterial meningitis by CSF findings — lymphocytic pleocytosis, normal glucose, mildly elevated protein, and negative Gram stain/culture — forcing students to know the specific CSF criteria cold.",
+        "overallVerdict": "minor-gap",
+        "suggestedReplacementOrAddition": "Consider adding Herpes Simplex Encephalitis as a third differential, as it shares fever, altered mental status, and headache but is distinguished by temporal lobe involvement on MRI and CSF PCR, and its urgency demands empiric acyclovir — a high-yield teaching point at the Foundations level; no replacement is needed if the list can be expanded beyond two items."
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "img-MPX1749_synpic15006",
+      "system": "Cardiovascular",
+      "difficulty": "Clinical",
+      "diagnosis": "Giant left atrium with mitral valve disease",
+      "differentials": [
+        "Rheumatic mitral stenosis with giant left atrium",
+        "Chronic severe mitral regurgitation",
+        "Esophageal carcinoma or achalasia",
+        "Dilated cardiomyopathy with functional MR"
+      ],
+      "differentialCount": 4,
+      "review": {
+        "hasDangerousMimic": false,
+        "dangerousMimicPresent": null,
+        "suggestedDangerousMimic": "Left atrial myxoma causing mitral inflow obstruction",
+        "dangerousMimicRationale": "Left atrial myxoma can perfectly mimic mitral stenosis with dyspnea, positional symptoms, a tumor 'plop' mistaken for an opening snap, and embolic events — but requires urgent surgical excision and will be catastrophically missed if attributed to rheumatic disease without echocardiography.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Dilated cardiomyopathy with functional MR",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Dilated cardiomyopathy with functional mitral regurgitation is the most common cause a general practitioner would consider first when encountering progressive dyspnea, cardiomegaly on chest X-ray, and a mitral regurgitation murmur without a clear rheumatic history.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Chronic severe mitral regurgitation",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Chronic severe mitral regurgitation shares nearly all features (giant LA, dyspnea, AF, cardiomegaly) but is distinguished from mixed rheumatic disease by echocardiographic planimetry showing a wide-open mitral valve without a doming leaflet or reduced valve area (<1.5 cm²), forcing students to apply the specific MVA criterion that defines stenosis.",
+        "overallVerdict": "minor-gap",
+        "suggestedReplacementOrAddition": "Replace 'Esophageal carcinoma or achalasia' with 'Left atrial myxoma causing mitral inflow obstruction,' since esophageal pathology lacks cardiovascular danger and the dysphagia in this case is better contextualized as a consequence of LA enlargement rather than a primary competing diagnosis."
+      },
+      "gapCount": 1
+    },
+    {
+      "id": "neurologic-clinical-acute-ischemic-stroke-0",
+      "system": "Neurologic",
+      "difficulty": "Clinical",
+      "diagnosis": "Acute Ischemic Stroke",
+      "differentials": [
+        "Hemorrhagic Stroke (Intracerebral Hemorrhage)",
+        "Todd's Paralysis (Post-ictal Paresis)",
+        "Hypoglycemia-induced focal neurological deficit"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Hemorrhagic Stroke (Intracerebral Hemorrhage)",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Intracerebral hemorrhage presents with identical acute focal neurological deficits and is the single most dangerous mimic because administering thrombolytics to a hemorrhagic stroke patient is immediately life-threatening, making it the most critical can't-miss diagnosis before treatment.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Hypoglycemia-induced focal neurological deficit",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Hypoglycemia is the most common and epidemiologically frequent stroke mimic encountered in emergency practice, capable of producing focal deficits including hemiplegia and aphasia, and is the first condition every general practitioner and EMS provider checks via point-of-care glucose before any other workup.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Todd's Paralysis (Post-ictal Paresis)",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Todd's paralysis shares acute unilateral hemiplegia and aphasia with ischemic stroke but is distinguished by a single defining criterion — a witnessed preceding seizure — which is absent in this case, forcing students to elicit seizure history as a mandatory discriminating feature.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "img-CXR216_IM-0777-2001",
+      "system": "Cardiovascular",
+      "difficulty": "Foundations",
+      "diagnosis": "Cardiomegaly",
+      "differentials": [
+        "Congestive Heart Failure",
+        "Pericardial Effusion",
+        "Dilated Cardiomyopathy"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Pericardial Effusion",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Pericardial effusion, particularly when large or under tension (cardiac tamponade), is a life-threatening mimic that produces a globular enlarged cardiac silhouette on chest X-ray identical to cardiomegaly and can cause fatal hemodynamic collapse if not identified before echocardiography is performed.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Congestive Heart Failure",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Congestive heart failure is the most epidemiologically prevalent condition presenting with the same constellation of symptoms (dyspnea, orthopnea, PND, lower extremity edema, and an enlarged cardiac silhouette on imaging) that a general practitioner would consider first.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Dilated Cardiomyopathy",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Dilated cardiomyopathy shares virtually all clinical and radiographic features of hypertensive cardiomegaly but is distinguished by echocardiographic findings of global systolic dysfunction with reduced EF in the absence of a clear hypertensive/pressure-overload etiology, forcing students to apply specific echocardiographic and etiologic criteria to differentiate it.",
+        "overallVerdict": "minor-gap",
+        "suggestedReplacementOrAddition": "Consider adding Hypertensive Heart Disease as an explicit differential given the hidden history of long-standing uncontrolled hypertension, as it represents the most likely underlying mechanism and would sharpen the student's ability to link etiology to radiographic cardiomegaly; if the list must remain at 3 items, it could replace Dilated Cardiomyopathy since hypertensive heart disease subsumes that teaching point more contextually."
+      },
+      "gapCount": 0
+    },
+    {
+      "id": "endocrine-metabolic-advanced-diabetic-ketoacidosis-0",
+      "system": "Endocrine / Metabolic",
+      "difficulty": "Advanced",
+      "diagnosis": "Diabetic Ketoacidosis",
+      "differentials": [
+        "Hyperosmolar Hyperglycemic State (HHS)",
+        "Alcoholic Ketoacidosis",
+        "Acute Gastroenteritis"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": false,
+        "dangerousMimicPresent": null,
+        "suggestedDangerousMimic": "Hyperosmolar Hyperglycemic State (HHS)",
+        "dangerousMimicRationale": "HHS is already present and is a legitimate dangerous mimic sharing hyperglycemia and altered sensorium, but the single most dangerous can't-miss mimic is actually Hyperosmolar Hyperglycemic State — however, the true dangerous mimic that is absent is Sepsis with lactic acidosis, which can present with tachycardia, vomiting, abdominal pain, and anion gap metabolic acidosis and is immediately life-threatening if empiric antibiotics and resuscitation are delayed while the team anchors on a metabolic cause.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Acute Gastroenteritis",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Acute gastroenteritis is the most epidemiologically common diagnosis a general practitioner would first consider in a young patient presenting with nausea, vomiting, and abdominal pain, making its inclusion educationally appropriate.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Hyperosmolar Hyperglycemic State (HHS)",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "HHS shares marked hyperglycemia and dehydration with DKA but is distinguished by the absence of significant ketonemia/ketonuria, a pH typically above 7.3, serum bicarbonate above 18, and osmolality often exceeding 320 mOsm/kg — forcing the student to know DKA's diagnostic triad precisely.",
+        "overallVerdict": "minor-gap",
+        "suggestedReplacementOrAddition": "Replace 'Acute Gastroenteritis' with 'Sepsis with anion gap metabolic acidosis' to introduce the most dangerous can't-miss mimic, as gastroenteritis is already implied in the symptom overlap discussion and sepsis represents an immediately life-threatening alternative etiology for the acidosis and systemic findings."
+      },
+      "gapCount": 1
+    },
+    {
+      "id": "cardiovascular-clinical-hypertensive-emergency-0",
+      "system": "Cardiovascular",
+      "difficulty": "Clinical",
+      "diagnosis": "Hypertensive Emergency",
+      "differentials": [
+        "Hypertensive Urgency",
+        "Subarachnoid Hemorrhage",
+        "Hypertensive Encephalopathy"
+      ],
+      "differentialCount": 3,
+      "review": {
+        "hasDangerousMimic": true,
+        "dangerousMimicPresent": "Subarachnoid Hemorrhage",
+        "suggestedDangerousMimic": null,
+        "dangerousMimicRationale": "Subarachnoid hemorrhage classically presents with sudden severe headache and can cause reactive hypertension, making it a life-threatening mimic that must be excluded before attributing the presentation solely to hypertensive emergency.",
+        "hasCommonAlternative": true,
+        "commonAlternativePresent": "Hypertensive Urgency",
+        "suggestedCommonAlternative": null,
+        "commonAlternativeRationale": "Hypertensive urgency is the most epidemiologically common condition a general practitioner would consider first in a patient with severely elevated blood pressure and headache, differing from emergency only by the absence of confirmed end-organ damage.",
+        "hasCriteriaFoil": true,
+        "criteriaFoilPresent": "Hypertensive Urgency",
+        "suggestedCriteriaFoil": null,
+        "criteriaFoilRationale": "Hypertensive urgency shares the markedly elevated blood pressure and headache but is distinguished from hypertensive emergency by the absence of acute target-organ damage (e.g., papilledema, AKI, neurological deficits), forcing students to apply the precise definitional criterion.",
+        "overallVerdict": "complete",
+        "suggestedReplacementOrAddition": null
+      },
+      "gapCount": 0
+    }
+  ],
+  "themes": {
+    "totalReviewed": 23,
+    "casesWithAnyGap": 6,
+    "gapRatePct": 26,
+    "missingDangerousMimic": {
+      "count": 6,
+      "pct": 26
+    },
+    "missingCommonAlternative": {
+      "count": 0,
+      "pct": 0
+    },
+    "missingCriteriaFoil": {
+      "count": 0,
+      "pct": 0
+    },
+    "bySystem": {
+      "Respiratory": {
+        "missing": 0,
+        "total": 6
+      },
+      "Cardiovascular": {
+        "missing": 2,
+        "total": 5
+      },
+      "Neurologic": {
+        "missing": 0,
+        "total": 3
+      },
+      "Musculoskeletal": {
+        "missing": 1,
+        "total": 1
+      },
+      "Renal": {
+        "missing": 0,
+        "total": 1
+      },
+      "Hematologic / Oncologic": {
+        "missing": 0,
+        "total": 1
+      },
+      "Infectious": {
+        "missing": 1,
+        "total": 2
+      },
+      "Gastrointestinal": {
+        "missing": 1,
+        "total": 3
+      },
+      "Endocrine / Metabolic": {
+        "missing": 1,
+        "total": 1
+      }
+    },
+    "byDifficulty": {
+      "Foundations": {
+        "missing": 1,
+        "total": 7
+      },
+      "Clinical": {
+        "missing": 4,
+        "total": 10
+      },
+      "Advanced": {
+        "missing": 1,
+        "total": 6
+      }
+    },
+    "topSuggestedMimics": [
+      "Acute MI / STEMI",
+      "Cauda Equina Syndrome",
+      "Pulmonary Embolism (PE)",
+      "Acute Myocardial Infarction (inferior/posterior STEMI)",
+      "Left atrial myxoma causing mitral inflow obstruction",
+      "Hyperosmolar Hyperglycemic State (HHS)"
+    ],
+    "topSuggestedCommon": [],
+    "topSuggestedFoils": []
+  }
+}

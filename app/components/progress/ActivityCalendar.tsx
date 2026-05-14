@@ -1,20 +1,19 @@
 'use client'
 
 import { useMemo } from 'react'
+import { useChartTheme } from '@/app/lib/useChartTheme'
 
 type Session = { score: number; completed_at: string }
 
 const MIN_DAYS = 14
-
-function hexScore(s: number) {
-  return s < 60 ? '#f43f5e' : s < 75 ? '#f59e0b' : '#22c87d'
-}
 
 function dayKey(d: Date) {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })
 }
 
 export default function ActivityCalendar({ sessions }: { sessions: Session[] }) {
+  const theme = useChartTheme()
+
   const { activeMap, distinctDays } = useMemo(() => {
     const m: Record<string, number[]> = {}
     for (const s of sessions) {
@@ -37,6 +36,10 @@ export default function ActivityCalendar({ sessions }: { sessions: Session[] }) 
     d.setDate(d.getDate() - (83 - i))
     return d
   })
+
+  function hexScore(s: number) {
+    return s < 60 ? theme.critical : s < 75 ? theme.caution : theme.confirmed
+  }
 
   return (
     <div className="dx-card">
@@ -65,7 +68,7 @@ export default function ActivityCalendar({ sessions }: { sessions: Session[] }) 
                     width: 12,
                     height: 12,
                     borderRadius: 3,
-                    background: score != null ? hexScore(score) : '#222636',
+                    background: score != null ? hexScore(score) : theme.surfaceFaint,
                     opacity: score != null ? 0.85 : 0.35,
                     cursor: score != null ? 'pointer' : 'default',
                   }}
@@ -76,7 +79,7 @@ export default function ActivityCalendar({ sessions }: { sessions: Session[] }) 
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: 5, marginTop: 14, fontSize: 11, color: 'var(--muted)' }}>
           <span>Less</span>
-          {(['#222636', '#f43f5e', '#f59e0b', '#22c87d'] as const).map((bg, i) => (
+          {([theme.surfaceFaint, theme.critical, theme.caution, theme.confirmed] as const).map((bg, i) => (
             <span key={i} style={{ width: 12, height: 12, borderRadius: 3, background: bg, display: 'inline-block', opacity: i === 0 ? 0.35 : 0.85 }} />
           ))}
           <span>More</span>

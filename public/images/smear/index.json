@@ -1,0 +1,22 @@
+{
+  "malaria_falciparum": [
+    "malaria_falciparum_000.png",
+    "malaria_falciparum_001.png",
+    "malaria_falciparum_002.png",
+    "malaria_falciparum_003.png",
+    "malaria_falciparum_004.png",
+    "malaria_falciparum_005.png",
+    "malaria_falciparum_006.png",
+    "malaria_falciparum_007.png"
+  ],
+  "normal": [
+    "normal_000.png",
+    "normal_001.png",
+    "normal_002.png",
+    "normal_003.png",
+    "normal_004.png",
+    "normal_005.png",
+    "normal_006.png",
+    "normal_007.png"
+  ]
+}

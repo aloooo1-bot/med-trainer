@@ -1,0 +1,110 @@
+{
+  "diabetic_retinopathy/diabetic_retinopathy_000.png": {
+    "label": "Diabetic retinopathy — fundus photograph",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "diabetic_retinopathy/diabetic_retinopathy_001.png": {
+    "label": "Diabetic retinopathy — fundus photograph",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "diabetic_retinopathy/diabetic_retinopathy_002.png": {
+    "label": "Diabetic retinopathy — fundus photograph",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "diabetic_retinopathy/diabetic_retinopathy_003.png": {
+    "label": "Diabetic retinopathy — fundus photograph",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "diabetic_retinopathy/diabetic_retinopathy_004.png": {
+    "label": "Diabetic retinopathy — fundus photograph",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "diabetic_retinopathy/diabetic_retinopathy_005.png": {
+    "label": "Diabetic retinopathy — fundus photograph",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "glaucoma/glaucoma_000.png": {
+    "label": "Glaucoma — optic disc cupping on fundoscopy",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "glaucoma/glaucoma_001.png": {
+    "label": "Glaucoma — optic disc cupping on fundoscopy",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "glaucoma/glaucoma_002.png": {
+    "label": "Glaucoma — optic disc cupping on fundoscopy",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "amd/amd_000.png": {
+    "label": "Age-related macular degeneration (AMD) — fundus photograph",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "amd/amd_001.png": {
+    "label": "Age-related macular degeneration (AMD) — fundus photograph",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "amd/amd_002.png": {
+    "label": "Age-related macular degeneration (AMD) — fundus photograph",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "amd/amd_003.png": {
+    "label": "Age-related macular degeneration (AMD) — fundus photograph",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "amd/amd_004.png": {
+    "label": "Age-related macular degeneration (AMD) — fundus photograph",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "amd/amd_005.png": {
+    "label": "Age-related macular degeneration (AMD) — fundus photograph",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "hypertensive/hypertensive_000.png": {
+    "label": "Hypertensive retinopathy — fundoscopy",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "hypertensive/hypertensive_001.png": {
+    "label": "Hypertensive retinopathy — fundoscopy",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "hypertensive/hypertensive_002.png": {
+    "label": "Hypertensive retinopathy — fundoscopy",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "hypertensive/hypertensive_003.png": {
+    "label": "Hypertensive retinopathy — fundoscopy",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "hypertensive/hypertensive_004.png": {
+    "label": "Hypertensive retinopathy — fundoscopy",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "hypertensive/hypertensive_005.png": {
+    "label": "Hypertensive retinopathy — fundoscopy",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "normal/normal_000.png": {
+    "label": "Normal fundus — optic disc and retinal vessels",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "normal/normal_001.png": {
+    "label": "Normal fundus — optic disc and retinal vessels",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "normal/normal_002.png": {
+    "label": "Normal fundus — optic disc and retinal vessels",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "normal/normal_003.png": {
+    "label": "Normal fundus — optic disc and retinal vessels",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "normal/normal_004.png": {
+    "label": "Normal fundus — optic disc and retinal vessels",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  },
+  "normal/normal_005.png": {
+    "label": "Normal fundus — optic disc and retinal vessels",
+    "source": "NIH Open-i / PubMed Central (open access)"
+  }
+}

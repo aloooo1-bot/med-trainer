@@ -5,6 +5,7 @@ import {
   Chart, LineController, LineElement, PointElement,
   CategoryScale, LinearScale, Filler, Tooltip,
 } from 'chart.js'
+import { useChartTheme } from '@/app/lib/useChartTheme'
 
 Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearScale, Filler, Tooltip)
 
@@ -19,20 +20,19 @@ function rollingAvg(scores: number[]): number[] {
   })
 }
 
-function hexScore(s: number) {
-  return s < 60 ? '#f43f5e' : s < 75 ? '#f59e0b' : '#22c87d'
-}
-
 export default function ScoreOverTime({ sessions }: { sessions: Session[] }) {
   const chronoCases = useMemo(() => [...sessions].reverse(), [sessions])
   const ref = useRef<HTMLCanvasElement>(null)
   const chartRef = useRef<Chart | null>(null)
+  const theme = useChartTheme()
 
   useEffect(() => {
     if (!ref.current || chronoCases.length < MIN_CASES) return
     chartRef.current?.destroy()
     const scores = chronoCases.map(c => c.score)
-    const pointColors = scores.map(hexScore)
+    const pointColors = scores.map(s =>
+      s < 60 ? theme.critical : s < 75 ? theme.caution : theme.confirmed
+    )
     chartRef.current = new Chart(ref.current, {
       type: 'line',
       data: {
@@ -41,8 +41,8 @@ export default function ScoreOverTime({ sessions }: { sessions: Session[] }) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           {
             data: scores,
-            borderColor: '#4f9cf9',
-            backgroundColor: 'rgba(79,156,249,0.08)',
+            borderColor: theme.primary,
+            backgroundColor: theme.isDark ? 'rgba(184,196,222,0.10)' : 'rgba(19,28,40,0.10)',
             fill: true,
             tension: 0.4,
             pointRadius: 5,
@@ -52,7 +52,7 @@ export default function ScoreOverTime({ sessions }: { sessions: Session[] }) {
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           {
             data: rollingAvg(scores),
-            borderColor: 'rgba(34,200,125,0.5)',
+            borderColor: theme.confirmed + '80',
             borderDash: [4, 4],
             pointRadius: 0,
             fill: false,
@@ -65,8 +65,8 @@ export default function ScoreOverTime({ sessions }: { sessions: Session[] }) {
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          x: { ticks: { color: '#6b7080', font: { size: 10 } }, grid: { color: 'rgba(255,255,255,0.05)' } },
-          y: { min: 0, max: 100, ticks: { color: '#6b7080', stepSize: 25 }, grid: { color: 'rgba(255,255,255,0.05)' } },
+          x: { ticks: { color: theme.inkTertiary, font: { size: 10 } }, grid: { color: theme.gridLine } },
+          y: { min: 0, max: 100, ticks: { color: theme.inkTertiary, stepSize: 25 }, grid: { color: theme.gridLine } },
         },
         plugins: {
           legend: { display: false },
@@ -77,7 +77,7 @@ export default function ScoreOverTime({ sessions }: { sessions: Session[] }) {
       },
     })
     return () => chartRef.current?.destroy()
-  }, [chronoCases])
+  }, [chronoCases, theme])
 
   if (chronoCases.length < MIN_CASES) {
     const remaining = MIN_CASES - chronoCases.length
@@ -97,11 +97,11 @@ export default function ScoreOverTime({ sessions }: { sessions: Session[] }) {
         <span>Score Over Time</span>
         <div style={{ display: 'flex', gap: 16, fontSize: 11, color: 'var(--muted)', fontWeight: 400 }}>
           <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#4f9cf9', display: 'inline-block' }} />
+            <span style={{ width: 8, height: 8, borderRadius: '50%', background: 'var(--color-primary)', display: 'inline-block' }} />
             Individual score
           </span>
           <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-            <span style={{ width: 18, borderTop: '2px dashed rgba(34,200,125,0.6)', display: 'inline-block' }} />
+            <span style={{ width: 18, borderTop: '2px dashed rgba(45,122,74,0.6)', display: 'inline-block' }} />
             3-case avg
           </span>
         </div>

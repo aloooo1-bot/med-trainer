@@ -1,0 +1,122 @@
+{
+  "melanoma/melanoma_000.jpg": {
+    "label": "Melanoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "melanoma/melanoma_001.jpg": {
+    "label": "Melanoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "melanoma/melanoma_002.jpg": {
+    "label": "Melanoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "melanoma/melanoma_003.jpg": {
+    "label": "Melanoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "melanoma/melanoma_004.jpg": {
+    "label": "Melanoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "melanoma/melanoma_005.jpg": {
+    "label": "Melanoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "basal_cell/basal_cell_000.jpg": {
+    "label": "Basal cell carcinoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "basal_cell/basal_cell_001.jpg": {
+    "label": "Basal cell carcinoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "basal_cell/basal_cell_002.jpg": {
+    "label": "Basal cell carcinoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "basal_cell/basal_cell_003.jpg": {
+    "label": "Basal cell carcinoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "basal_cell/basal_cell_004.jpg": {
+    "label": "Basal cell carcinoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "basal_cell/basal_cell_005.jpg": {
+    "label": "Basal cell carcinoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "squamous_cell/squamous_cell_000.jpg": {
+    "label": "Squamous cell carcinoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "squamous_cell/squamous_cell_001.jpg": {
+    "label": "Squamous cell carcinoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "squamous_cell/squamous_cell_002.jpg": {
+    "label": "Squamous cell carcinoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "squamous_cell/squamous_cell_003.jpg": {
+    "label": "Squamous cell carcinoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "squamous_cell/squamous_cell_004.jpg": {
+    "label": "Squamous cell carcinoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "squamous_cell/squamous_cell_005.jpg": {
+    "label": "Squamous cell carcinoma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "nevus/nevus_000.jpg": {
+    "label": "Benign melanocytic nevus (mole) — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "nevus/nevus_001.jpg": {
+    "label": "Benign melanocytic nevus (mole) — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "nevus/nevus_002.jpg": {
+    "label": "Benign melanocytic nevus (mole) — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "nevus/nevus_003.jpg": {
+    "label": "Benign melanocytic nevus (mole) — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "nevus/nevus_004.jpg": {
+    "label": "Benign melanocytic nevus (mole) — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "nevus/nevus_005.jpg": {
+    "label": "Benign melanocytic nevus (mole) — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "normal/normal_000.jpg": {
+    "label": "Dermatofibroma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "normal/normal_001.jpg": {
+    "label": "Dermatofibroma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "normal/normal_002.jpg": {
+    "label": "Dermatofibroma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "normal/normal_003.jpg": {
+    "label": "Dermatofibroma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "normal/normal_004.jpg": {
+    "label": "Dermatofibroma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  },
+  "normal/normal_005.jpg": {
+    "label": "Dermatofibroma — dermoscopy",
+    "source": "ISIC Archive (International Skin Imaging Collaboration) — CC-BY license"
+  }
+}

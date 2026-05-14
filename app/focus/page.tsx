@@ -1,4 +1,4 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useMemo } from 'react'
 import '@/app/dashboard.css'
@@ -17,6 +17,7 @@ import {
   loadFocusSkips,
   saveFocusSkip,
 } from '@/app/lib/focusSettings'
+import { useChartTheme } from '@/app/lib/useChartTheme'
 
 function cssScore(score: number): string {
   if (score < 60) return 'var(--red)'
@@ -51,15 +52,15 @@ const MISSED_PATTERNS = [
   { theme: 'Prior cardiac procedures',    count: 1, example: '"Prior PCI or CABG history?"',            systems: ['Cardiovascular'] },
 ]
 
-const LEVEL_COLOR: Record<string, string> = {
-  Foundations: '#3b82f6',
-  Clinical: '#f59e0b',
-  Advanced: '#a855f7',
-}
-
 const DAY_INDEX: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }
 
 export default function FocusAreasPage() {
+  const theme = useChartTheme()
+  const LEVEL_COLOR: Record<string, string> = {
+    Foundations: theme.primary,
+    Clinical: theme.caution,
+    Advanced: theme.purple,
+  }
   const [displayName, setDisplayName] = useState('User')
   const [tier, setTier] = useState('free')
   const [settings, setSettings] = useState<FocusSettings>(DEFAULT_FOCUS_SETTINGS)
@@ -137,9 +138,7 @@ export default function FocusAreasPage() {
 
           {/* Title */}
           <div>
-            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--text)', fontFamily: 'DM Serif Display, serif' }}>
-              Focus Areas
-            </h1>
+            <h1 className="heading-display text-[22px]"><span className="heading-accent">Focus</span> areas</h1>
             <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--muted)' }}>What to study next and why</p>
           </div>
 
@@ -154,8 +153,8 @@ export default function FocusAreasPage() {
             <div style={{ padding: '4px 0' }}>
               {prioritized.map((s, i) => {
                 const urgency = s.urgency > 50 ? 'HIGH' : s.urgency > 25 ? 'MED' : 'LOW'
-                const urgencyColor = urgency === 'HIGH' ? '#f43f5e' : urgency === 'MED' ? '#f59e0b' : '#22c87d'
-                const urgencyBg   = urgency === 'HIGH' ? 'rgba(244,63,94,0.12)' : urgency === 'MED' ? 'rgba(245,158,11,0.12)' : 'rgba(34,200,125,0.12)'
+                const urgencyColor = urgency === 'HIGH' ? theme.critical : urgency === 'MED' ? theme.caution : theme.confirmed
+                const urgencyBg   = urgency === 'HIGH' ? 'var(--critical-bg)' : urgency === 'MED' ? 'var(--caution-bg)' : 'var(--confirmed-bg)'
                 const recLevel = s.score < 60 ? 'Foundations' : s.score < 80 ? 'Clinical' : 'Advanced'
                 const recCases = Math.min(3, Math.max(1, Math.ceil(s.urgency / 30)))
                 const recMinutes = estimateMinutes(s.name, recCases)
@@ -164,18 +163,18 @@ export default function FocusAreasPage() {
                     display: 'flex', alignItems: 'center', gap: 14,
                     padding: '12px 24px', borderBottom: '1px solid var(--border)',
                   }}>
-                    <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 13, color: 'var(--muted)', width: 28, flexShrink: 0 }}>
+                    <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: 'var(--muted)', width: 28, flexShrink: 0 }}>
                       #{i + 1}
                     </span>
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div style={{ fontWeight: 600, fontSize: 13, color: 'var(--text)', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                         {s.name}
                       </div>
-                      <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2, fontFamily: 'DM Mono, monospace' }}>
+                      <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2, fontFamily: 'JetBrains Mono, monospace' }}>
                         ~{recCases} {recCases === 1 ? 'case' : 'cases'}, ~{recMinutes} min
                       </div>
                     </div>
-                    <span style={{ fontFamily: 'DM Mono, monospace', fontWeight: 700, fontSize: 13, color: cssScore(s.score), flexShrink: 0 }}>
+                    <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, fontSize: 13, color: cssScore(s.score), flexShrink: 0 }}>
                       {s.score}
                     </span>
                     <span style={{
@@ -196,7 +195,7 @@ export default function FocusAreasPage() {
                         fontSize: 12, fontWeight: 600, color: 'var(--accent)',
                         background: 'rgba(79,156,249,0.1)', border: '1px solid rgba(79,156,249,0.2)',
                         borderRadius: 6, padding: '5px 12px', cursor: 'pointer', flexShrink: 0,
-                        fontFamily: 'Sora, sans-serif',
+                        fontFamily: 'Inter, sans-serif',
                       }}
                     >
                       Start Case →
@@ -232,12 +231,12 @@ export default function FocusAreasPage() {
               <div className="dx-card-header">Where You&apos;re Losing Points</div>
               <div style={{ padding: '8px 0' }}>
                 {categoryLoss.map(({ key, label, avgLoss }) => {
-                  const lossColor = avgLoss > 40 ? '#f43f5e' : avgLoss > 20 ? '#f59e0b' : '#22c87d'
+                  const lossColor = avgLoss > 40 ? theme.critical : avgLoss > 20 ? theme.caution : theme.confirmed
                   return (
                     <div key={key} style={{ padding: '12px 24px', borderBottom: '1px solid var(--border)' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                         <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{label}</span>
-                        <span style={{ fontFamily: 'DM Mono, monospace', fontSize: 12, fontWeight: 700, color: lossColor }}>
+                        <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: lossColor }}>
                           Avg loss: {avgLoss}%
                         </span>
                       </div>
@@ -263,13 +262,13 @@ export default function FocusAreasPage() {
                       <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{p.theme}</span>
                       <span style={{
                         fontSize: 10, fontWeight: 700, padding: '2px 7px', borderRadius: 4, flexShrink: 0, marginLeft: 8,
-                        color: p.count >= 2 ? '#f43f5e' : '#f59e0b',
-                        background: p.count >= 2 ? 'rgba(244,63,94,0.12)' : 'rgba(245,158,11,0.12)',
+                        color: p.count >= 2 ? theme.critical : theme.caution,
+                        background: p.count >= 2 ? 'var(--critical-bg)' : 'var(--caution-bg)',
                       }}>
                         Missed {p.count}×
                       </span>
                     </div>
-                    <div style={{ fontSize: 11, fontFamily: 'DM Mono, monospace', color: 'var(--muted)', fontStyle: 'italic', marginBottom: 6 }}>
+                    <div style={{ fontSize: 11, fontFamily: 'JetBrains Mono, monospace', color: 'var(--muted)', fontStyle: 'italic', marginBottom: 6 }}>
                       {p.example}
                     </div>
                     <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
@@ -320,7 +319,7 @@ export default function FocusAreasPage() {
                       style={{
                         fontSize: 11, fontWeight: 600, color: 'var(--accent)',
                         background: 'rgba(79,156,249,0.1)', border: '1px solid rgba(79,156,249,0.2)',
-                        borderRadius: 5, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Sora, sans-serif',
+                        borderRadius: 5, padding: '4px 10px', cursor: 'pointer', fontFamily: 'Inter, sans-serif',
                       }}
                     >
                       Study this →

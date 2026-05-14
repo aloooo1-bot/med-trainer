@@ -1,9 +1,10 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect, useMemo, useCallback, Fragment } from 'react'
 import '@/app/dashboard.css'
 import { type CaseSessionRecord, type APICallRecord, loadSessionRecords } from '../lib/analytics'
 import type { GradingResult } from '../grading/types'
+import { getRubric } from '../grading/rubric'
 import { createClient } from '../lib/supabase/client'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import ReportCaseModal from '@/app/components/dashboard/ReportCaseModal'
@@ -43,13 +44,6 @@ const DIFFICULTY_COLOR: Record<string, string> = {
   Advanced: 'var(--red)',
 }
 
-const DIM_META: { key: keyof NonNullable<GradingResult['dimensions']>; label: string; max: number }[] = [
-  { key: 'historyInterview',      label: 'History & Interview',    max: 18 },
-  { key: 'testOrdering',          label: 'Test Ordering',          max: 18 },
-  { key: 'diagnosisAccuracy',     label: 'Diagnosis Accuracy',     max: 27 },
-  { key: 'diagnosisCompleteness', label: 'Completeness',           max: 13 },
-  { key: 'clinicalReasoning',     label: 'Clinical Reasoning',     max: 14 },
-]
 
 // ── Scorecard detail ──────────────────────────────────────────────────────────
 
@@ -117,14 +111,15 @@ function ScoreDetail({
               <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>
                 Scorecard
               </div>
-              {DIM_META.map(({ key, label, max }) => {
+              {getRubric(session.difficulty).map(({ key, label, max }) => {
                 const dim = gr.dimensions![key]
+                if (!dim) return null
                 const pct = (dim.score / max) * 100
                 return (
                   <div key={key} style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
                       <span style={{ color: 'var(--text-secondary)' }}>{label}</span>
-                      <span style={{ fontWeight: 600, fontFamily: 'DM Mono, monospace', color: scoreColorVar(dim.score / max * 100) }}>
+                      <span style={{ fontWeight: 600, fontFamily: 'JetBrains Mono, monospace', color: scoreColorVar(dim.score / max * 100) }}>
                         {dim.score}<span style={{ color: 'var(--muted)' }}>/{max}</span>
                       </span>
                     </div>
@@ -142,7 +137,7 @@ function ScoreDetail({
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: 12 }}>
                     <span style={{ color: 'var(--text-secondary)' }}>Efficiency</span>
-                    <span style={{ fontWeight: 600, fontFamily: 'DM Mono, monospace', color: scoreColorVar(gr.efficiency.score * 10) }}>
+                    <span style={{ fontWeight: 600, fontFamily: 'JetBrains Mono, monospace', color: scoreColorVar(gr.efficiency.score * 10) }}>
                       {gr.efficiency.score}<span style={{ color: 'var(--muted)' }}>/10</span>
                     </span>
                   </div>
@@ -501,9 +496,7 @@ export default function HistoryPage() {
 
           {/* Page title */}
           <div style={{ marginBottom: 24 }}>
-            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'DM Serif Display, serif' }}>
-              Case History
-            </h1>
+            <h1 className="heading-display text-[22px]">Case <span className="heading-accent">history</span></h1>
             <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--muted)' }}>
               {sessions.length === 50 ? 'Last 50 completed cases' : `${sessions.length} completed case${sessions.length !== 1 ? 's' : ''}`}
             </p>
@@ -514,20 +507,20 @@ export default function HistoryPage() {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
               <div className="dx-card" style={{ padding: '16px 20px' }}>
                 <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Completed</div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'DM Mono, monospace' }}>{stats.total}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'JetBrains Mono, monospace' }}>{stats.total}</div>
               </div>
               <div className="dx-card" style={{ padding: '16px 20px' }}>
                 <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Avg Score</div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: scoreColorVar(stats.avgScore), fontFamily: 'DM Mono, monospace' }}>{stats.avgScore.toFixed(1)}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: scoreColorVar(stats.avgScore), fontFamily: 'JetBrains Mono, monospace' }}>{stats.avgScore.toFixed(1)}</div>
               </div>
               <div className="dx-card" style={{ padding: '16px 20px' }}>
                 <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Recent trend</div>
                 {recentTrend === null ? (
-                  <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--muted)', fontFamily: 'DM Mono, monospace' }}>
+                  <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--muted)', fontFamily: 'JetBrains Mono, monospace' }}>
                     —<span style={{ fontSize: 11, marginLeft: 6, fontWeight: 400 }}>(need 10)</span>
                   </div>
                 ) : (
-                  <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'DM Mono, monospace', color: recentTrend > 0 ? 'var(--green)' : recentTrend < 0 ? 'var(--red)' : 'var(--muted)' }}>
+                  <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace', color: recentTrend > 0 ? 'var(--green)' : recentTrend < 0 ? 'var(--red)' : 'var(--muted)' }}>
                     {recentTrend > 0 ? `+${recentTrend}` : recentTrend} pts
                   </div>
                 )}
@@ -699,8 +692,8 @@ export default function HistoryPage() {
                           {session.difficulty.slice(0, 4)}
                         </span>
                       </span>
-                      <span style={{ fontFamily: 'DM Mono, monospace', fontWeight: 700, color: scoreColorVar(session.score) }}>
-                        {session.score}
+                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 17, letterSpacing: '-0.01em', color: scoreColorVar(session.score) }}>
+                        {session.score}<span style={{ fontSize: 10, fontWeight: 500, opacity: 0.6, marginLeft: 1, verticalAlign: 'top', lineHeight: '2' }}>%</span>
                       </span>
                       <span>
                         <span className={`dx-result-badge ${session.correct ? 'correct' : 'incorrect'}`}>

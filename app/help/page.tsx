@@ -1,19 +1,26 @@
-'use client'
+﻿'use client'
 
 import { useState, useEffect } from 'react'
 import '@/app/dashboard.css'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import { createClient } from '@/app/lib/supabase/client'
 
-const RUBRIC_DIMS = [
-  { name: 'History & Interview', pts: 18, desc: 'Did you ask the right questions? Covers chief complaint, HPI, relevant past history, medications, social history, and pertinent negatives.' },
-  { name: 'Test Ordering',       pts: 18, desc: 'Did you order the core diagnostic workup? Scored against a curated "must-order" list for the diagnosis. Supplementary / subspecialty tests are not required for full marks.' },
-  { name: 'Diagnosis Accuracy',  pts: 27, desc: 'Is your submitted diagnosis correct? Clinically equivalent terms are accepted. Partial credit for the right organ system or syndrome with a meaningfully wrong pathological process.' },
-  { name: 'Diagnosis Completeness', pts: 13, desc: 'How complete and specific is your diagnosis? At Foundations, a correct core diagnosis earns 9-13. At Advanced, etiology, staging, or complication details are expected.' },
-  { name: 'Clinical Reasoning',  pts: 14, desc: 'Do your interview choices and written reasoning link specific findings to the diagnosis? Penalised for fabricated findings or wrong conclusions, not for brevity.' },
+const FOUNDATIONS_DIMS = [
+  { name: 'History & Interview',    pts: 24, desc: 'Did you ask the right questions? Covers chief complaint, HPI, relevant past history, medications, social history, and pertinent negatives.' },
+  { name: 'Test Ordering',          pts: 24, desc: 'Did you order the core diagnostic workup? Scored against a curated "must-order" list for the diagnosis. Supplementary / subspecialty tests are not required for full marks.' },
+  { name: 'Diagnosis Accuracy',     pts: 36, desc: 'Is your submitted diagnosis correct? Clinically equivalent terms are accepted. Partial credit for the right organ system or syndrome with a meaningfully wrong pathological process.' },
+  { name: 'Diagnosis Completeness', pts: 16, desc: 'At Foundations, a correct core diagnosis earns full or near-full marks — you are not required to add etiology, staging, or severity details.' },
 ]
 
-const EFFICIENCY_NOTE = 'Efficiency (up to +10 pts): Bonus for completing the case efficiently — asking targeted questions and avoiding unnecessary workup. Not included in the /90 base; added on top.'
+const CLINICAL_ADVANCED_DIMS = [
+  { name: 'History & Interview',    pts: 20, desc: 'Did you ask the right questions? Covers chief complaint, HPI, relevant past history, medications, social history, and pertinent negatives.' },
+  { name: 'Test Ordering',          pts: 20, desc: 'Did you order the core diagnostic workup? Scored against a curated "must-order" list for the diagnosis. Supplementary / subspecialty tests are not required for full marks.' },
+  { name: 'Diagnosis Accuracy',     pts: 30, desc: 'Is your submitted diagnosis correct? Clinically equivalent terms are accepted. Partial credit for the right organ system or syndrome with a meaningfully wrong pathological process.' },
+  { name: 'Diagnosis Completeness', pts: 15, desc: 'How complete and specific is your diagnosis? At Clinical, a correct core diagnosis earns 10–15. At Advanced, etiology, staging, or complication details are expected.' },
+  { name: 'Clinical Reasoning',     pts: 15, desc: 'Do your interview choices and written reasoning link specific findings to the diagnosis? Penalised for fabricated findings or wrong conclusions, not for brevity.' },
+]
+
+const EFFICIENCY_NOTE = 'Efficiency (/10, shown separately): At Clinical and Advanced difficulty, a timer tracks how quickly you complete the case. Efficiency is displayed as a separate /10 indicator on the scorecard and is not included in the /100 score.'
 
 const FAQS = [
   {
@@ -67,9 +74,7 @@ export default function HelpPage() {
         <div className="dx-content">
 
           <div style={{ marginBottom: 28 }}>
-            <h1 style={{ margin: 0, fontSize: 22, fontWeight: 700, color: 'var(--text)', fontFamily: 'DM Serif Display, serif' }}>
-              Help & Documentation
-            </h1>
+            <h1 className="heading-display text-[22px]"><span className="heading-accent">Help</span> &amp; documentation</h1>
             <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--muted)' }}>
               How MedTrainer works, scoring explained, and common questions
             </p>
@@ -80,12 +85,25 @@ export default function HelpPage() {
             <div className="dx-card-header">
               <div style={{ fontWeight: 700 }}>How scoring works</div>
               <div style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)', marginTop: 2 }}>
-                Each case is graded out of 90 base points across 5 dimensions, plus an efficiency bonus
+                Each case is graded out of 100 points. The categories differ by difficulty.
               </div>
             </div>
             <div className="dx-card-body">
               <div className="dx-help-section">
-                {RUBRIC_DIMS.map(d => (
+                <div style={{ fontWeight: 600, fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>
+                  Foundations — 4 categories, 100 pts total
+                </div>
+                {FOUNDATIONS_DIMS.map(d => (
+                  <div className="dx-help-rubric-row" key={d.name}>
+                    <span className="dx-help-dim-name">{d.name}</span>
+                    <span className="dx-help-dim-pts">/{d.pts} pts</span>
+                    <span className="dx-help-dim-desc">{d.desc}</span>
+                  </div>
+                ))}
+                <div style={{ fontWeight: 600, fontSize: 12, color: 'var(--text-secondary)', marginTop: 14, marginBottom: 6 }}>
+                  Clinical &amp; Advanced — 5 categories, 100 pts total
+                </div>
+                {CLINICAL_ADVANCED_DIMS.map(d => (
                   <div className="dx-help-rubric-row" key={d.name}>
                     <span className="dx-help-dim-name">{d.name}</span>
                     <span className="dx-help-dim-pts">/{d.pts} pts</span>
@@ -103,7 +121,7 @@ export default function HelpPage() {
                   ].map(t => (
                     <div key={t.label} style={{ background: 'var(--surface2)', borderRadius: 8, padding: '10px 14px', border: '1px solid var(--border)', textAlign: 'center' }}>
                       <div style={{ fontSize: 12, fontWeight: 700, color: t.color, marginBottom: 2 }}>{t.label}</div>
-                      <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'DM Mono, monospace' }}>{t.threshold}</div>
+                      <div style={{ fontSize: 11, color: 'var(--muted)', fontFamily: 'JetBrains Mono, monospace' }}>{t.threshold}</div>
                     </div>
                   ))}
                 </div>
@@ -150,7 +168,7 @@ export default function HelpPage() {
                 <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>
                   Each system you&apos;ve practiced is assigned an <strong style={{ color: 'var(--text)' }}>urgency score</strong>:
                 </p>
-                <div style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 8, padding: '12px 16px', fontFamily: 'DM Mono, monospace', fontSize: 13, color: 'var(--accent)' }}>
+                <div style={{ background: 'var(--surface2)', border: '1px solid var(--border)', borderRadius: 8, padding: '12px 16px', fontFamily: 'JetBrains Mono, monospace', fontSize: 13, color: 'var(--accent)' }}>
                   urgency = (100 − avg_score) × (1.2 if only 1 case, else 1.0)
                 </div>
                 <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>

@@ -170,6 +170,27 @@ export const CLINICAL_CATEGORIES: { name: string; tests: string[] }[] = [
   },
 ]
 
+// Imaging modalities that have real image libraries in this system.
+// Used by the Clinical order panel to show a non-case-specific imaging reference.
+export const IMAGING_WITH_IMAGES: string[] = [
+  'Chest X-Ray (PA and Lateral)',
+  'CT Chest without Contrast',
+  'CT Chest with Contrast',
+  'CT Abdomen and Pelvis without Contrast',
+  'CT Abdomen and Pelvis with Contrast',
+  'CT Head without Contrast',
+  'CT Pulmonary Angiography (CTPA)',
+  'MRI Brain with and without Contrast',
+  'MRI Spine',
+  'Renal Ultrasound',
+  'Abdominal Ultrasound',
+  'Pelvic Ultrasound',
+  'Echocardiogram (Transthoracic)',
+  'Echocardiogram (Transesophageal)',
+  'Venous Doppler Ultrasound Bilateral Lower Extremities',
+  'Electrocardiogram (ECG/EKG)',
+]
+
 export const MASTER_TEST_LIST: TestEntry[] = [
   // ── HEMATOLOGY ──
   { name: 'Complete Blood Count (CBC)', abbreviations: ['CBC'], synonyms: ['complete blood count', 'blood count', 'hemogram', 'full blood count'], category: 'Hematology' },
@@ -300,6 +321,51 @@ export const MASTER_TEST_LIST: TestEntry[] = [
   { name: 'Nerve Conduction Study (NCS)', abbreviations: ['NCS'], synonyms: ['nerve conduction study', 'ncs', 'nerve conduction', 'peripheral neuropathy test', 'electrophysiology'], category: 'Procedures & Special Tests' },
   { name: 'EMG', abbreviations: ['EMG'], synonyms: ['emg', 'electromyography', 'muscle electrophysiology', 'neuromuscular test', 'motor unit testing'], category: 'Procedures & Special Tests' },
 
+  // ── CHEMISTRY & METABOLIC (additional) ──
+  { name: 'Procalcitonin', abbreviations: ['PCT'], synonyms: ['procalcitonin', 'pct', 'bacterial infection marker', 'sepsis marker', 'antibiotic guidance marker'], category: 'Metabolic & Chemistry' },
+  { name: 'GGT (Gamma-Glutamyl Transferase)', abbreviations: ['GGT', 'GGTP'], synonyms: ['ggt', 'gamma glutamyl transferase', 'gamma gt', 'ggtp', 'liver enzyme', 'alcohol liver marker', 'biliary disease marker'], category: 'Metabolic & Chemistry' },
+  { name: 'Free T3 (Triiodothyronine)', abbreviations: ['fT3', 'T3'], synonyms: ['free t3', 'free triiodothyronine', 'ft3', 't3 level', 'thyroid function'], category: 'Metabolic & Chemistry' },
+  { name: 'Serum Ferritin', abbreviations: [], synonyms: ['ferritin', 'serum ferritin', 'iron stores', 'iron deficiency ferritin', 'iron overload marker', 'hemochromatosis marker'], category: 'Metabolic & Chemistry' },
+  { name: 'Transferrin Saturation', abbreviations: ['TSAT'], synonyms: ['transferrin saturation', 'tsat', 'iron saturation', 'iron overload marker', 'hemochromatosis workup', 'iron binding saturation'], category: 'Metabolic & Chemistry' },
+  { name: 'Serum Ionized Calcium', abbreviations: ['iCa'], synonyms: ['ionized calcium', 'free calcium', 'ica', 'calcium ionized', 'critical care calcium', 'ionized ca'], category: 'Metabolic & Chemistry' },
+  { name: 'Serum Cortisol (AM, 8am)', abbreviations: ['AM cortisol'], synonyms: ['am cortisol', 'morning cortisol', 'serum cortisol', '8am cortisol', 'adrenal insufficiency screen', 'cortisol level', 'addison workup'], category: 'Metabolic & Chemistry' },
+  { name: 'Point-of-Care Glucose (Fingerstick)', abbreviations: ['POC glucose', 'FSBS'], synonyms: ['fingerstick glucose', 'bedside glucose', 'poc glucose', 'point of care glucose', 'blood sugar check', 'capillary glucose', 'fingerstick blood sugar'], category: 'Metabolic & Chemistry' },
+  { name: 'Creatine Kinase (CK) Total', abbreviations: ['CK', 'CPK'], synonyms: ['creatine kinase', 'ck total', 'cpk', 'total ck', 'muscle damage marker', 'rhabdomyolysis marker', 'myositis marker', 'creatine phosphokinase'], category: 'Metabolic & Chemistry' },
+
+  // ── URINALYSIS & RENAL (additional) ──
+  { name: 'Urine Pregnancy Test (hCG)', abbreviations: ['UPT', 'urine hCG'], synonyms: ['urine pregnancy test', 'upt', 'urine hcg', 'qualitative pregnancy test', 'bedside pregnancy test', 'point of care pregnancy', 'qualitative hcg urine'], category: 'Urinalysis & Renal' },
+  { name: 'Fractional Excretion of Sodium (FENa)', abbreviations: ['FENa'], synonyms: ['fena', 'fractional excretion sodium', 'fractional excretion of sodium', 'prerenal azotemia test', 'acute kidney injury classification', 'aki workup fena'], category: 'Urinalysis & Renal' },
+
+  // ── ABG & RESPIRATORY (additional) ──
+  { name: 'Venous Blood Gas (VBG)', abbreviations: ['VBG'], synonyms: ['venous blood gas', 'vbg', 'central venous gas', 'peripheral venous gas', 'venous ph', 'venous gas'], category: 'ABG & Respiratory' },
+  { name: 'Diffusing Capacity (DLCO)', abbreviations: ['DLCO', 'DLco'], synonyms: ['dlco', 'diffusing capacity', 'diffusion capacity', 'carbon monoxide diffusion', 'lung diffusion test', 'pulmonary diffusion capacity', 'transfer factor'], category: 'ABG & Respiratory' },
+
+  // ── IMMUNOLOGY & SEROLOGY (additional) ──
+  { name: 'Thyroid Stimulating Immunoglobulin (TSI)', abbreviations: ['TSI', 'TRAb'], synonyms: ['thyroid stimulating immunoglobulin', 'tsi', 'trab', 'thyroid receptor antibody', 'graves disease antibody', 'thyrotropin receptor antibody', 'tsh receptor antibody'], category: 'Immunology & Serology' },
+  { name: 'Anti-Smooth Muscle Antibody (ASMA)', abbreviations: ['ASMA'], synonyms: ['anti smooth muscle antibody', 'asma', 'autoimmune hepatitis antibody', 'smooth muscle antibody', 'anti-actin antibody'], category: 'Immunology & Serology' },
+  { name: 'Anti-Mitochondrial Antibody (AMA)', abbreviations: ['AMA'], synonyms: ['anti mitochondrial antibody', 'ama', 'primary biliary cholangitis antibody', 'pbc antibody', 'biliary cirrhosis antibody', 'anti-m2 antibody'], category: 'Immunology & Serology' },
+  { name: 'Anti-Tissue Transglutaminase IgA (anti-tTG)', abbreviations: ['anti-tTG', 'tTG IgA'], synonyms: ['anti ttg', 'tissue transglutaminase iga', 'celiac antibody', 'celiac disease test', 'anti-transglutaminase', 'ttg', 'gluten enteropathy test', 'celiac screen'], category: 'Immunology & Serology' },
+  { name: 'HLA-B27', abbreviations: ['HLA-B27'], synonyms: ['hla-b27', 'hla b27', 'human leukocyte antigen b27', 'spondyloarthropathy marker', 'ankylosing spondylitis marker', 'reactive arthritis marker', 'psoriatic arthritis marker'], category: 'Immunology & Serology' },
+
+  // ── INFECTIOUS DISEASE (additional) ──
+  { name: 'Hepatitis C RNA (Quantitative PCR)', abbreviations: ['HCV RNA', 'HCV PCR'], synonyms: ['hepatitis c rna', 'hcv rna', 'hcv pcr', 'hcv viral load', 'hepatitis c viral load', 'hcv quantitative pcr'], category: 'Infectious Disease' },
+  { name: 'Hepatitis B DNA (Quantitative)', abbreviations: ['HBV DNA'], synonyms: ['hepatitis b dna', 'hbv dna', 'hepatitis b viral load', 'hbv viral load', 'hepatitis b pcr', 'hbv quantitative'], category: 'Infectious Disease' },
+  { name: 'H. pylori Urea Breath Test', abbreviations: ['UBT'], synonyms: ['h pylori breath test', 'urea breath test', 'ubt', 'helicobacter pylori breath test', 'h pylori ubt', 'hp breath test'], category: 'Infectious Disease' },
+  { name: 'H. pylori Stool Antigen Test', abbreviations: [], synonyms: ['h pylori stool antigen', 'helicobacter pylori stool', 'h pylori stool test', 'stool h pylori', 'hp stool antigen', 'helicobacter antigen stool'], category: 'Infectious Disease' },
+  { name: 'MRSA Nasal Swab PCR', abbreviations: ['MRSA swab'], synonyms: ['mrsa nasal swab', 'mrsa screening', 'mrsa pcr', 'methicillin resistant staphylococcus aureus screen', 'nasal mrsa', 'mrsa surveillance swab'], category: 'Infectious Disease' },
+
+  // ── IMAGING (additional) ──
+  { name: 'Abdominal X-Ray (KUB)', abbreviations: ['KUB', 'AXR'], synonyms: ['abdominal x-ray', 'kub', 'kidney ureter bladder', 'plain film abdomen', 'flat plate abdomen', 'axr', 'bowel obstruction x-ray', 'abdominal film'], category: 'Imaging' },
+  { name: 'Thyroid Ultrasound', abbreviations: [], synonyms: ['thyroid ultrasound', 'thyroid us', 'thyroid sonogram', 'thyroid nodule ultrasound', 'neck ultrasound thyroid', 'thyroid imaging'], category: 'Imaging' },
+  { name: 'High-Resolution CT Chest (HRCT)', abbreviations: ['HRCT'], synonyms: ['hrct', 'high resolution ct chest', 'high resolution ct', 'interstitial lung disease ct', 'ild ct', 'hrct chest', 'high res ct'], category: 'Imaging' },
+  { name: 'Cardiac MRI', abbreviations: ['CMR'], synonyms: ['cardiac mri', 'heart mri', 'cmr', 'cardiac magnetic resonance', 'myocarditis mri', 'cardiomyopathy mri', 'cardiac mr'], category: 'Imaging' },
+  { name: 'MRCP (Magnetic Resonance Cholangiopancreatography)', abbreviations: ['MRCP'], synonyms: ['mrcp', 'magnetic resonance cholangiopancreatography', 'biliary mri', 'pancreatic mri', 'bile duct mri', 'cholangiopancreatography mri'], category: 'Imaging' },
+
+  // ── PROCEDURES & SPECIAL TESTS (additional) ──
+  { name: '6-Minute Walk Test (6MWT)', abbreviations: ['6MWT', '6MW'], synonyms: ['6 minute walk test', '6mwt', 'six minute walk', 'exercise tolerance test', 'functional capacity walk', 'walk test distance'], category: 'Procedures & Special Tests' },
+  { name: 'Columbia Suicide Severity Rating Scale (C-SSRS)', abbreviations: ['C-SSRS'], synonyms: ['columbia suicide severity rating', 'c-ssrs', 'suicide risk assessment', 'ssrs', 'suicidality scale', 'columbia suicide scale', 'suicide screening'], category: 'Procedures & Special Tests' },
+  { name: 'Fibroscan (Transient Elastography)', abbreviations: ['FibroScan'], synonyms: ['fibroscan', 'transient elastography', 'liver stiffness measurement', 'liver fibrosis test', 'hepatic elastography', 'vibration controlled elastography'], category: 'Procedures & Special Tests' },
+
   // ── ADVANCED-ONLY ──
   { name: 'Anti-Phospholipid Antibodies (aCL, anti-β2GP1, LA)', abbreviations: ['APS panel', 'aPL'], synonyms: ['antiphospholipid antibodies', 'acl antibody', 'beta2 glycoprotein', 'lupus anticoagulant', 'aps panel', 'antiphospholipid syndrome'], category: 'Advanced Immunology' },
   { name: 'Anti-Histone Antibody', abbreviations: [], synonyms: ['anti histone', 'drug induced lupus antibody', 'histone antibody'], category: 'Advanced Immunology' },
@@ -422,6 +488,32 @@ export const MASTER_TEST_LIST: TestEntry[] = [
   { name: 'Skin Scraping / KOH Prep', abbreviations: ['KOH'], synonyms: ['koh prep', 'skin scraping', 'koh test', 'fungal skin test', 'dermatophyte test', 'tinea test'], category: 'Advanced Procedures' },
   { name: 'Tzanck Smear', abbreviations: [], synonyms: ['tzanck smear', 'tzanck test', 'herpes smear', 'vesicular rash workup'], category: 'Advanced Procedures' },
   { name: "Wood's Lamp Examination", abbreviations: ["Wood's lamp"], synonyms: ["wood's lamp", 'woodslamp', 'uv light skin exam', 'fluorescence skin exam', 'tinea capitis screen'], category: 'Advanced Procedures' },
+
+  // ── ADVANCED HEMATOLOGY / COAGULATION (additional) ──
+  { name: 'ADAMTS13 Activity Level', abbreviations: ['ADAMTS13'], synonyms: ['adamts13', 'adamts-13', 'ttp workup', 'thrombotic thrombocytopenic purpura test', 'vwf cleaving protease', 'thrombotic microangiopathy workup'], category: 'Advanced Hematology' },
+  { name: 'von Willebrand Factor Studies (vWF:Ag, vWF:RCo)', abbreviations: ['vWF', 'vWD panel'], synonyms: ['von willebrand factor', 'vwf antigen', 'vwf ristocetin cofactor', 'vwd workup', 'von willebrand disease panel', 'vwf activity', 'bleeding disorder workup'], category: 'Advanced Coagulation' },
+  { name: 'Platelet Function Assay (PFA-100)', abbreviations: ['PFA-100', 'PFA'], synonyms: ['platelet function assay', 'pfa-100', 'pfa100', 'platelet aggregation test', 'platelet adhesion test', 'closure time platelet'], category: 'Advanced Coagulation' },
+
+  // ── ADVANCED ENDOCRINE (additional) ──
+  { name: 'Plasma Free Metanephrines', abbreviations: ['metanephrines'], synonyms: ['plasma free metanephrines', 'metanephrines plasma', 'free metanephrines', 'pheochromocytoma test', 'pheo workup', 'catecholamine metabolites', 'normetanephrines plasma'], category: 'Advanced Endocrine' },
+
+  // ── ADVANCED IMMUNOLOGY (additional) ──
+  { name: 'Anti-NMDA Receptor Antibody', abbreviations: ['anti-NMDAR'], synonyms: ['anti nmda receptor antibody', 'anti-nmdar antibody', 'autoimmune encephalitis antibody', 'nmda receptor antibody', 'anti-nmdar encephalitis test', 'nmdar antibody csf'], category: 'Advanced Immunology' },
+
+  // ── ADVANCED METABOLIC (additional) ──
+  { name: '24-Hour Urine Copper', abbreviations: [], synonyms: ['24 hour urine copper', 'urine copper', 'wilson disease urine copper', 'copper excretion urine', 'wilson workup urine', '24h urine copper'], category: 'Advanced Metabolic' },
+  { name: 'Serum ACE Level (Angiotensin-Converting Enzyme)', abbreviations: ['ACE'], synonyms: ['serum ace', 'ace level', 'angiotensin converting enzyme', 'sarcoidosis marker', 'ace enzyme level', 'angiotensin converting enzyme level'], category: 'Advanced Metabolic' },
+  { name: 'Urine 5-HIAA (24-hour)', abbreviations: ['5-HIAA'], synonyms: ['urine 5-hiaa', '5-hydroxyindoleacetic acid', '5hiaa', 'carcinoid marker', 'carcinoid syndrome test', 'serotonin metabolite urine', 'neuroendocrine tumor marker urine'], category: 'Advanced Metabolic' },
+  { name: 'Urine Porphobilinogen (PBG) / ALA', abbreviations: ['PBG', 'ALA'], synonyms: ['urine porphobilinogen', 'pbg', 'ala', 'aminolevulinic acid', 'acute porphyria test', 'porphyria workup', 'urine porphyrins', 'acute intermittent porphyria test', 'pbg urine'], category: 'Advanced Metabolic' },
+
+  // ── ADVANCED CHEMISTRY (additional) ──
+  { name: 'Urine Protein Electrophoresis (UPEP)', abbreviations: ['UPEP'], synonyms: ['urine protein electrophoresis', 'upep', 'urine electrophoresis', 'bence jones protein', 'myeloma urine screen', 'free light chains urine', 'upep immunofixation'], category: 'Advanced Chemistry' },
+
+  // ── ADVANCED INFECTIOUS DISEASE (additional) ──
+  { name: 'HIV CD4 Count / CD4:CD8 Ratio', abbreviations: ['CD4', 'CD4 count'], synonyms: ['cd4 count', 'cd4 cd8 ratio', 'hiv staging', 't cell count', 'lymphocyte subset hiv', 'immune status hiv', 'cd4 lymphocyte count'], category: 'Advanced Infectious Disease' },
+
+  // ── ADVANCED IMAGING (additional) ──
+  { name: 'CT Angiography Abdomen / Mesenteric Vessels', abbreviations: ['CTA abdomen', 'mesenteric CTA'], synonyms: ['ct angiography abdomen', 'mesenteric angiography', 'mesenteric cta', 'cta mesenteric vessels', 'mesenteric ischemia ct', 'bowel ischemia ct', 'mesenteric ct angiography'], category: 'Advanced Imaging' },
 ]
 
 export function searchTests(query: string, list: TestEntry[] = MASTER_TEST_LIST): TestEntry[] {

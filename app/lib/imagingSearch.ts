@@ -5,6 +5,9 @@ export interface OpenIResult {
   caption: string
   modality: string
   abstract?: string
+  agentVerified?: boolean
+  confidence?: number
+  verificationReason?: string
 }
 
 type ModalityKey = 'xray' | 'ct' | 'mri' | 'us'
@@ -145,7 +148,9 @@ const TEST_PARAMS_MAP: Array<[string[], TestParams]> = [
     { it: 'u', coll: 'mpx', modality: 'us' },
   ],
   [
-    ['venous doppler', 'lower extremity ultrasound', 'leg ultrasound', 'dvt ultrasound'],
+    ['venous doppler', 'lower extremity ultrasound', 'leg ultrasound', 'dvt ultrasound',
+     'venous duplex', 'duplex ultrasound', 'doppler ultrasound', 'venous compression ultrasound',
+     'bilateral lower extremities', 'lower extremity venous'],
     { it: 'u', coll: 'mpx', modality: 'us' },
   ],
   [
