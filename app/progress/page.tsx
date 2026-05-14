@@ -1,12 +1,14 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import dynamic from 'next/dynamic'
 import '@/app/dashboard.css'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import { createClient } from '@/app/lib/supabase/client'
 import type { GradingResult } from '@/app/grading/types'
-import ScoreOverTime from '@/app/components/progress/ScoreOverTime'
-import ComponentScoreTrends from '@/app/components/progress/ComponentScoreTrends'
+
+const ScoreOverTime = dynamic(() => import('@/app/components/progress/ScoreOverTime'), { ssr: false })
+const ComponentScoreTrends = dynamic(() => import('@/app/components/progress/ComponentScoreTrends'), { ssr: false })
 import PerformanceBreakdown from '@/app/components/progress/PerformanceBreakdown'
 import ActivityCalendar from '@/app/components/progress/ActivityCalendar'
 
