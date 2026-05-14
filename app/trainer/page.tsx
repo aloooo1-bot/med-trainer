@@ -897,10 +897,11 @@ PMH LEAK RULE: The pastMedicalHistory fields (conditions, surgeries, hospitaliza
       return parsed
     } catch (e) {
       console.error('Case generation failed:', e)
+      const msg = e instanceof Error ? e.message : String(e)
       setGenerationError(
-        e instanceof Error && e.message.includes('429')
+        msg.includes('429')
           ? 'API rate limit reached. Wait a moment and try again.'
-          : 'Failed to generate case. Check your connection and try again.'
+          : `Failed to generate case: ${msg}`
       )
       return null
     } finally {
