@@ -430,3 +430,16 @@ export function slugify(str: string): string {
 export function makeCaseId(system: string, difficulty: string, diagnosis: string, variantIndex: number): string {
   return `${slugify(system)}-${slugify(difficulty)}-${slugify(diagnosis)}-${variantIndex}`
 }
+
+export function findCaseInManifest(id: string): { system: string; difficulty: string; diagnosis: string } | null {
+  for (const [system, byDiff] of Object.entries(MANIFEST)) {
+    for (const [difficulty, diagnoses] of Object.entries(byDiff)) {
+      for (const diagnosis of diagnoses) {
+        if (makeCaseId(system, difficulty, diagnosis, 0) === id) {
+          return { system, difficulty, diagnosis }
+        }
+      }
+    }
+  }
+  return null
+}
