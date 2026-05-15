@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createAdminClient } from '@/app/lib/supabase/admin'
 import { createClient } from '@/app/lib/supabase/server'
+import { isAnonymousCaseId } from '@/app/lib/anonymousCases'
 
 // status: 'hit'  = cached case found and returned
 // status: 'miss' = slot exists but not yet generated (proceed to Claude)
@@ -13,15 +14,17 @@ export async function GET(req: NextRequest) {
   // If Supabase isn't configured, treat as miss so the app still works without it
   if (!process.env.SUPABASE_SERVICE_ROLE_KEY) return NextResponse.json({ status: 'miss' })
 
-  // Cookie-only session check (no network verify) — middleware already refreshed
-  // the session, and case_data is not user-specific so a forged cookie can't escalate.
+  // Cookie-only session check — middleware already refreshed the session.
+  // Anonymous users can only read the 3 fixed demo case IDs.
   const supabase = await createClient()
   const { data: { session } } = await supabase.auth.getSession()
-  if (!session) return NextResponse.json({ status: 'miss' }, { status: 401 })
+  if (!session && !isAnonymousCaseId(id)) {
+    return NextResponse.json({ status: 'miss' }, { status: 401 })
+  }
 
   try {
-    const supabase = createAdminClient()
-    const queryPromise = supabase
+    const admin = createAdminClient()
+    const queryPromise = admin
       .from('cases')
       .select('case_data, is_generated, imaging_cache, verified_images')
       .eq('id', id)
@@ -42,8 +45,13 @@ export async function GET(req: NextRequest) {
       }
 
     if (error) {
-      // Row not found (PGRST116) means the slot was never seeded — treat as miss
-      if (error.message.includes('PGRST116') || error.message.toLowerCase().includes('no rows')) {
+      const msg = error.message.toLowerCase()
+      if (
+        msg.includes('pgrst116') ||
+        msg.includes('no rows') ||
+        msg.includes('cannot coerce the result to a single json object') ||
+        msg.includes('multiple (or no) rows returned')
+      ) {
         return NextResponse.json({ status: 'miss' })
       }
       // Timeout — fall through to live generation
