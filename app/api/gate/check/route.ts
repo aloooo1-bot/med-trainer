@@ -1,14 +1,40 @@
 import { createClient } from '@/app/lib/supabase/server'
+import { ANON_CASE_IDS, ANON_CASE_LIMIT } from '@/app/lib/anonymousCases'
 import { cookies } from 'next/headers'
 import { NextResponse } from 'next/server'
 
-const ANON_COOKIE = 'anon_case_used'
+const ANON_COOKIE = 'anon_cases_used'
 const FREE_DAILY_LIMIT = 2
 
 export async function POST() {
-  // Dev override — set NEXT_PUBLIC_DEV_TIER=pro in .env.local to bypass gating locally
-  if (process.env.NEXT_PUBLIC_DEV_TIER === 'pro') {
+  // Dev override — set NEXT_PUBLIC_DEV_TIER=pro|free|anonymous in .env.local to test tiers locally
+  const devTier = process.env.NEXT_PUBLIC_DEV_TIER
+  if (devTier === 'pro') {
     return NextResponse.json({ allowed: true, tier: 'pro', firstCaseDone: true })
+  }
+  if (devTier === 'free') {
+    return NextResponse.json({ allowed: true, tier: 'free', casesLeft: FREE_DAILY_LIMIT, firstCaseDone: false })
+  }
+  if (devTier === 'anonymous') {
+    const cookieStore = await cookies()
+    const used = parseInt(cookieStore.get(ANON_COOKIE)?.value ?? '0', 10)
+    if (used >= ANON_CASE_LIMIT) {
+      return NextResponse.json({ allowed: false, reason: 'anon_used', tier: 'anonymous', casesLeft: 0 })
+    }
+    const res = NextResponse.json({
+      allowed: true,
+      tier: 'anonymous',
+      casesLeft: ANON_CASE_LIMIT - used - 1,
+      firstCaseDone: false,
+      nextCaseId: ANON_CASE_IDS[used],
+    })
+    res.cookies.set(ANON_COOKIE, String(used + 1), {
+      httpOnly: true,
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 7,
+      path: '/',
+    })
+    return res
   }
 
   const supabase = await createClient()
@@ -17,24 +43,21 @@ export async function POST() {
   // ── Anonymous ─────────────────────────────────────────────────────────────
   if (!user) {
     const cookieStore = await cookies()
-    const used = cookieStore.get(ANON_COOKIE)?.value === '1'
-    if (used) {
-      return NextResponse.json({
-        allowed: false,
-        reason: 'anon_used',
-        tier: 'anonymous',
-      })
+    const used = parseInt(cookieStore.get(ANON_COOKIE)?.value ?? '0', 10)
+    if (used >= ANON_CASE_LIMIT) {
+      return NextResponse.json({ allowed: false, reason: 'anon_used', tier: 'anonymous', casesLeft: 0 })
     }
     const res = NextResponse.json({
       allowed: true,
       tier: 'anonymous',
-      casesLeft: 0,   // After this one there are none left
+      casesLeft: ANON_CASE_LIMIT - used - 1,
       firstCaseDone: false,
+      nextCaseId: ANON_CASE_IDS[used],
     })
-    res.cookies.set(ANON_COOKIE, '1', {
+    res.cookies.set(ANON_COOKIE, String(used + 1), {
       httpOnly: true,
       sameSite: 'lax',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
       path: '/',
     })
     return res
@@ -53,7 +76,6 @@ export async function POST() {
 
   const tier: 'free' | 'pro' = profile.tier ?? 'free'
 
-  // Pro users always allowed
   if (tier === 'pro') {
     return NextResponse.json({
       allowed: true,
@@ -82,7 +104,6 @@ export async function POST() {
     })
   }
 
-  // Increment counter (reset date if new day)
   const updatePayload = sameDay
     ? { cases_used_today: usedToday + 1 }
     : { cases_used_today: 1, cases_today_reset_at: now.toISOString() }
