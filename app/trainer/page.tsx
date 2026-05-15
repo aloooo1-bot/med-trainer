@@ -21,7 +21,8 @@ import {
   type SpecialImage, type SpecialModality,
   getSpecialModality, getSpecialCategory, getRandomSpecialImage,
 } from '../lib/specialImageLookup'
-import { MANIFEST, makeCaseId } from '../lib/caseManifest'
+import { MANIFEST, makeCaseId, findCaseInManifest } from '../lib/caseManifest'
+import { ANON_CASE_IDS, ANON_CASE_LIMIT } from '../lib/anonymousCases'
 import { jitterCase } from '../lib/caseJitter'
 import { reconcileHistoryConsistency, sanitizePmhLeak, DIFFICULTY_RULES } from '../lib/generators/shared'
 import { type GradingResult, type GradingInput, stripToBasic } from '../grading/types'
@@ -200,8 +201,8 @@ export default function MedTrainer() {
   }, [])
 
   // Gate / tier state
-  type GateStatus = { tier: 'anonymous' | 'free' | 'pro'; casesLeft: number; firstCaseDone: boolean; loaded: boolean }
-  const [gateStatus, setGateStatus] = useState<GateStatus>({ tier: 'anonymous', casesLeft: 0, firstCaseDone: false, loaded: false })
+  type GateStatus = { tier: 'anonymous' | 'free' | 'pro'; casesLeft: number; firstCaseDone: boolean; loaded: boolean; nextCaseId?: string }
+  const [gateStatus, setGateStatus] = useState<GateStatus>({ tier: 'anonymous', casesLeft: ANON_CASE_LIMIT, firstCaseDone: false, loaded: false })
   const [gateBlocked, setGateBlocked] = useState(false)
 
   // True when a Clinical/Advanced case exists but the timer hasn't been started yet
@@ -235,7 +236,7 @@ export default function MedTrainer() {
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (!data) return
-        setGateStatus({ tier: data.tier, casesLeft: data.casesLeft ?? 0, firstCaseDone: data.firstCaseDone ?? false, loaded: true })
+        setGateStatus({ tier: data.tier, casesLeft: data.casesLeft ?? 0, firstCaseDone: data.firstCaseDone ?? false, loaded: true, nextCaseId: data.nextCaseId })
         if (data.tier === 'free' || data.tier === 'anonymous') {
           setDifficulty('Foundations')
           setSystem('Any')
@@ -526,6 +527,8 @@ Return ONLY valid JSON — no markdown, no explanation:
   }, [orderedTests, caseData])
 
   const generateCase = async (overrideSystem?: string, overrideDifficulty?: string, overrideDiagnosis?: string): Promise<CaseData | null> => {
+    let gateTier: string | undefined
+    let gateNextCaseId: string | undefined
     try {
       const gateRes = await fetch('/api/gate/check', { method: 'POST', signal: AbortSignal.timeout(5_000) })
       const gate = await gateRes.json()
@@ -533,7 +536,9 @@ Return ONLY valid JSON — no markdown, no explanation:
         setGateBlocked(true)
         return null
       }
-      setGateStatus(prev => ({ ...prev, tier: gate.tier, casesLeft: gate.casesLeft ?? 0, firstCaseDone: gate.firstCaseDone ?? false }))
+      gateTier = gate.tier
+      gateNextCaseId = gate.nextCaseId
+      setGateStatus(prev => ({ ...prev, tier: gate.tier, casesLeft: gate.casesLeft ?? 0, firstCaseDone: gate.firstCaseDone ?? false, nextCaseId: gate.nextCaseId }))
     } catch {
       // Network error — fail open
     }
@@ -573,6 +578,31 @@ Return ONLY valid JSON — no markdown, no explanation:
     setFundusCache({})
     setDermCache({})
     setUrineImgCache({})
+
+    // ── Anonymous demo path — serve one of the 3 fixed cases from Supabase, no Claude ──
+    if (gateTier === 'anonymous' && gateNextCaseId) {
+      const anonCaseId = gateNextCaseId
+      const found = findCaseInManifest(anonCaseId)
+      resolvedSystemRef.current = found?.system ?? 'Cardiovascular'
+      setCaseDifficulty(found?.difficulty ?? 'Foundations')
+      setNotes({ mode: 'free', content: '', open: false })
+      setActiveCaseId(anonCaseId)
+      try {
+        const lookupRes = await fetch(`/api/cases/lookup?id=${encodeURIComponent(anonCaseId)}`)
+        if (lookupRes.ok) {
+          const { status, caseData: cached, imagingCache: prefetched } = await lookupRes.json()
+          if (status === 'hit' && cached) {
+            setImagingCache(prefetched ?? {})
+            setCaseData(cached as CaseData)
+            setGenerating(false)
+            return cached as CaseData
+          }
+        }
+      } catch { /* fall through to error */ }
+      setGenerationError('Demo case unavailable — please try again or sign up for full access.')
+      setGenerating(false)
+      return null
+    }
 
     const baseSystem = overrideSystem ?? system
     const resolvedSystem = baseSystem === 'Any'
@@ -1655,33 +1685,35 @@ Student message: "${msg}"`
           <div className="h-8 w-8 rounded-md bg-primary flex items-center justify-center text-white text-sm font-bold">Rx</div>
           <span className="font-serif text-[15px] font-semibold text-ink-primary whitespace-nowrap">MedTrainer</span>
         </div>
-        <select
-          value={system}
-          onChange={e => setSystem(e.target.value)}
-          disabled={gateStatus.tier !== 'pro'}
-          title={gateStatus.tier !== 'pro' ? 'Upgrade to Pro to choose a specific system' : undefined}
-          className="rounded-md border border-surface-4 bg-surface-2 px-3 py-1.5 text-[11px] text-ink-secondary focus:border-primary-400 focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-        >
-          {SYSTEMS.map(s => <option key={s}>{s}</option>)}
-        </select>
-        <div className="relative group">
+        {gateStatus.tier !== 'anonymous' && (<>
           <select
-            value={difficulty}
-            onChange={e => setDifficulty(e.target.value)}
+            value={system}
+            onChange={e => setSystem(e.target.value)}
             disabled={gateStatus.tier !== 'pro'}
-            title={gateStatus.tier !== 'pro' ? 'Upgrade to Pro to access Clinical and Advanced difficulties' : undefined}
+            title={gateStatus.tier !== 'pro' ? 'Upgrade to Pro to choose a specific system' : undefined}
             className="rounded-md border border-surface-4 bg-surface-2 px-3 py-1.5 text-[11px] text-ink-secondary focus:border-primary-400 focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {DIFFICULTIES.map(d => <option key={d}>{d}</option>)}
+            {SYSTEMS.map(s => <option key={s}>{s}</option>)}
           </select>
-          <div className="absolute left-0 top-full mt-1 z-20 hidden group-hover:block w-80 rounded-md border border-surface-4 bg-surface-2 px-4 py-3 shadow-xl pointer-events-none">
-            {DIFFICULTIES.map(d => (
-              <div key={d} className={`py-1 text-[11px] leading-snug ${d === difficulty ? 'text-primary-300' : 'text-ink-tertiary'}`}>
-                {DIFFICULTY_INFO[d]}
-              </div>
-            ))}
+          <div className="relative group">
+            <select
+              value={difficulty}
+              onChange={e => setDifficulty(e.target.value)}
+              disabled={gateStatus.tier !== 'pro'}
+              title={gateStatus.tier !== 'pro' ? 'Upgrade to Pro to access Clinical and Advanced difficulties' : undefined}
+              className="rounded-md border border-surface-4 bg-surface-2 px-3 py-1.5 text-[11px] text-ink-secondary focus:border-primary-400 focus:outline-none transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {DIFFICULTIES.map(d => <option key={d}>{d}</option>)}
+            </select>
+            <div className="absolute left-0 top-full mt-1 z-20 hidden group-hover:block w-80 rounded-md border border-surface-4 bg-surface-2 px-4 py-3 shadow-xl pointer-events-none">
+              {DIFFICULTIES.map(d => (
+                <div key={d} className={`py-1 text-[11px] leading-snug ${d === difficulty ? 'text-primary-300' : 'text-ink-tertiary'}`}>
+                  {DIFFICULTY_INFO[d]}
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        </>)}
         <button
           onClick={() => {
             if (notes.content.trim() && notes.content !== SOAP_TEMPLATE) {
@@ -1696,6 +1728,16 @@ Student message: "${msg}"`
           {generating ? 'Generating...' : 'Generate Case'}
         </button>
         <div className="ml-auto flex items-center gap-2">
+          {gateStatus.loaded && gateStatus.tier === 'anonymous' && (() => {
+            const idx = activeCaseId ? ANON_CASE_IDS.indexOf(activeCaseId as typeof ANON_CASE_IDS[number]) : -1
+            const label = idx >= 0 ? `Case ${idx + 1} of ${ANON_CASE_LIMIT}` : `${ANON_CASE_LIMIT} sample cases`
+            return (
+              <span className="text-[10px] text-ink-tertiary border border-surface-4 rounded px-2 py-1">
+                Free preview: {label} —{' '}
+                <a href="/auth/login" className="underline hover:text-ink-secondary">Sign up for full access</a>
+              </span>
+            )
+          })()}
           {gateStatus.loaded && gateStatus.tier === 'free' && (
             <span className="text-[10px] text-ink-tertiary border border-surface-4 rounded px-2 py-1">
               {gateStatus.casesLeft} case{gateStatus.casesLeft !== 1 ? 's' : ''} left today
@@ -2173,8 +2215,8 @@ Student message: "${msg}"`
             <div className="text-3xl mb-3">&#x1F512;</div>
             {gateStatus.tier === 'anonymous' ? (
               <>
-                <h3 className="text-base font-semibold text-ink-primary mb-2">You&apos;ve used your free case</h3>
-                <p className="text-sm text-ink-secondary mb-5">Create a free account to get 2 cases per day and track your progress.</p>
+                <h3 className="text-base font-semibold text-ink-primary mb-2">You&apos;ve completed your 3 demo cases</h3>
+                <p className="text-sm text-ink-secondary mb-5">Create a free account to unlock all systems, difficulty levels, and case history tracking.</p>
                 <div className="flex gap-3">
                   <a href="/auth/login" className="flex-1 rounded-md bg-primary-500 py-2 text-sm font-semibold text-ink-inverse hover:bg-primary-400 transition-colors">Create Account</a>
                   <button onClick={() => setGateBlocked(false)} className="flex-1 rounded-md border border-surface-4 py-2 text-sm text-ink-secondary hover:text-ink-primary transition-colors">Close</button>
