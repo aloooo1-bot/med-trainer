@@ -92,6 +92,7 @@ CLINICAL REASONING (/${cr.max}):
 - If no reasoning text was provided AT CLINICAL OR ADVANCED DIFFICULTY (where the field exists but was left blank) and the interview/test ordering was coherent, score ${Math.round(cr.max * 0.47)}-${Math.round(cr.max * 0.67)}/${cr.max} based on observable reasoning
 - IMAGING IMAGES NOTE: Visual images shown alongside imaging studies are sourced from published medical literature by keyword match and may not exactly depict this case's findings. Evaluate the student's imaging interpretation against the radiology reports in "Tests ordered" above (the authoritative ground truth), not against any specific visual details the student may describe. Do not penalize a student for image-specific descriptions that differ from the reports — the image may simply have been non-representative.
 - ANTI-FABRICATION RULE: Before penalizing the trainee for citing fabricated information, verify the claim is not present anywhere in the Background History block above (which includes past medical history, medications, surgeries, hospitalizations, social history, family history, allergies, and hidden symptoms). Only flag information as fabricated if it is genuinely absent from ALL case fields — HPI, Background History, lab/imaging results, and the interview transcript.
+- ANCHORING BIAS IDENTIFICATION: If the student's transcript shows a clear anchoring pattern — commits early to one diagnosis based on a single finding and fails to revise despite accumulating contradicting evidence — the clinicalReasoning feedback MUST name it as anchoring bias and specify the evidence that should have prompted reassessment. Example: "Your early commitment to SAH appears to have anchored your workup — the non-thunderclap onset and normal CT at 6h without LP significantly lowers post-test probability; bacterial meningitis should have moved up the differential when fever and nuchal rigidity were confirmed."
 ` : ''
 
   const crJsonField = cr
@@ -161,6 +162,7 @@ DIAGNOSIS ACCURACY (/${da.max}):
 - INCORRECT ADDED SPECIFICITY: Only deduct if the added qualifier is clinically wrong for this case (e.g., "Chronic" when the case is clearly acute, a laterality that contradicts imaging) — score ${daPartialMin}-${daPartialMax} like other partial-credit cases. If the added qualifier names a different pathological process (e.g., "Subdural" instead of "Epidural"), treat as wrong core entity.
 - STEMI and NSTEMI are NOT clinically equivalent — they differ in ECG findings, management (cath lab activation vs. medical), and outcomes. A student who submits NSTEMI when the correct diagnosis is any form of STEMI (or vice versa) has made a fundamental error: set correct: false AND cap diagnosisAccuracy at ${daStemiCap}/${da.max}. This rule overrides the general leniency rule above.
 - STEMI TERRITORIAL QUALIFIER FEEDBACK: When the correctDiagnosis includes a territorial qualifier (Inferior / Anterior / Lateral / Posterior / RV) and the student's submitted diagnosis omits it, the diagnosisAccuracy feedback MUST (a) name the missing qualifier explicitly, (b) state the management implication tied to that territory (e.g., "Inferior STEMI with RV involvement: avoid nitrates and high-dose morphine because preload-dependent hemodynamics can collapse with vasodilation" / "Anterior STEMI: higher risk for cardiogenic shock and LV dysfunction; consider mechanical support thresholds"), and (c) name the exact point deduction tied to the missing qualifier. Do NOT call this omission "minor" without naming the management consequence — the verbal "minor" framing combined with a numeric deduction creates contradictory feedback to the learner.
+- STEMI TERRITORY REQUIRED FOR CORRECT (Clinical/Advanced): When correctDiagnosis contains a territorial qualifier (Inferior / Anterior / Lateral / Posterior / RV) and the student's diagnosis omits it, set correct: false at Clinical or Advanced difficulty — territory determines management (nitrate avoidance in inferior/RV STEMI, mechanical support thresholds in anterior STEMI). At Foundations difficulty, territory omission is partial credit: correct: true, but reduce diagnosisAccuracy to the ${daPartialMin}–${daPartialMax} band and name the territory per STEMI TERRITORIAL QUALIFIER FEEDBACK.
 - Closely related descriptions of the same syndrome are clinically equivalent and must be marked correct: e.g. "obstructive pyelonephritis," "complicated pyelonephritis with bacteremia," "urosepsis secondary to pyelonephritis," and "acute pyelonephritis with bacteremia" all describe the same core entity — accept any of them as correct.
 
 DIAGNOSIS COMPLETENESS (/${dc.max}):
@@ -181,6 +183,8 @@ SCORE↔FEEDBACK CONSISTENCY RULE:
 - If dimension feedback uses praise language ("strong", "excellent", "thorough", "asked all key questions", "outstanding"), the score for that dimension MUST be ≥ 90% of its max value. Praise language paired with a sub-90% score is internally inconsistent.
 - If a dimension score is below 80% of max, the feedback for that dimension MUST cite a specific, concrete deduction — name the missed question, the omitted test, or the specific reasoning gap. Vague language like "minor deduction" or "slightly incomplete" is insufficient when ≥ 20% of the dimension's points are removed.
 - Never write "minor deduction" or "small reduction" when the deduction is ≥ 4 points on a /24 dimension (or ≥ 4 points on a /20 dimension, or ≥ 6 points on a /30 dimension). Call out the specific gap by name.
+- VERIFY before returning: scan each dimension's feedback text and score. If any dimension uses praise language with a score < 90% of max, revise the score upward or replace the praise text. If any score is < 80% of max without a named concrete deduction in the feedback, add the specific gap before submitting.
+- DIMENSION WEIGHT CONSISTENCY: Apply the same rubric thresholds consistently regardless of how many cases you have graded in this session. Do not drift toward leniency or severity across cases — each grading call must be evaluated independently against the fixed band definitions above.
 
 KEY-QUESTION ELICITATION RULE (grader-side):
 - When the missedQuestions list references a fact, symptom, or history item that was ONLY present in hiddenSymptoms or hiddenHistory and was NEVER listed as one of the keyQuestions the student was given, do NOT penalise the student for missing it in historyInterview.
@@ -232,6 +236,28 @@ HARD FLOOR — CORRECT DIAGNOSIS:
 - If correct=true, the sum of all dimension scores MUST be ≥ ${hardFloorGeneric}/100. Verify the arithmetic before returning. If your sum is below ${hardFloorGeneric}, redistribute upward starting from testOrdering then historyInterview.
 - At Foundations difficulty, a student who names the correct diagnosis and ordered the core confirmatory tests MUST score ≥ ${hardFloorFoundCorr}/100 even if they asked few questions or skipped supplementary tests.
 - A testOrdering score of ≤ ${toFloor}/${to.max} is only valid if the student missed 2+ core expected tests (from the must-order list above) — not for missing supplementary/advanced tests.
+
+WRONG DIAGNOSIS TOTAL SCORE CAP:
+- When correct=false (wrong primary diagnosis), the total score MUST NOT exceed 60/100, regardless of how high workup sub-scores are. A student who named the wrong pathological entity cannot receive a passing total. After drafting dimension scores: if their sum exceeds 60, reduce historyInterview first, then testOrdering, until the total equals 60.
+- PARTIAL-CREDIT EXCEPTION: When the student named the correct organ system or syndrome but the wrong pathological process (diagnosisAccuracy in the ${daPartialMin}–${daPartialMax} partial-credit band), the cap is 70/100 instead of 60/100.
+- VERIFY before returning: if correct=false, confirm total score ≤ 60 (or ≤ 70 for partial-credit cases). If your draft exceeds the cap, revise before submitting.
+
+PIVOTAL TEST MANDATORY DEDUCTION:
+- A "pivotal test" is the single confirmatory test whose absence makes it impossible to differentiate the primary diagnosis from a dangerous alternative at this difficulty level. Examples: LP in suspected bacterial meningitis (to rule out SAH and get CSF culture), CT-PA in suspected PE, troponin in chest-pain presentations.
+- If the pivotal test is absent from the student's ordered set AND the student's diagnosis was wrong: testOrdering MUST be in the lower band (≤ ${toLowMax}/${to.max}) — it cannot be near-full even if other workup was appropriate.
+- If the pivotal test is absent but the diagnosis was still correct (lucky reasoning): note the missing test in testOrdering feedback and reduce by at least 3 points below the upper band.
+
+KEY-QUESTION PROPORTIONAL FLOOR RULE:
+- Count the keyQuestions that the student neither proactively asked nor incidentally surfaced. Call this N_missed.
+- If N_missed ≥ 2: historyInterview MUST be ≤ ${hiFloor}/${hi.max}. A student who missed half or more of the listed key questions cannot score in the upper band.
+- VERIFY before returning: count N_missed from the transcript. If N_missed ≥ 2 and your draft historyInterview > ${hiFloor}, lower it before submitting.
+
+VITALS CROSS-REFERENCE RULE:
+- Vital signs (HR, BP, RR, temperature, SpO2, weight, BMI) are pre-presented to the student and appear in the case data above. Before issuing any fabrication warning for a vital sign the student cited, verify the cited value against the case vitals. Only flag as fabricated if the cited value is materially wrong (e.g., student says BP 180/110 when actual BP was 120/80). Do NOT penalize a student for citing a vital sign that matches or closely approximates the case data — they are reading it, not inventing it.
+
+STUDENT LAB MISREAD FLAG:
+- If the student's reasoning or transcript cites a specific lab value that materially differs from the actual result in "Tests ordered" (e.g., states "uric acid elevated at 8.2" when actual result is 4.8 mg/dL; states "troponin normal" when troponin is elevated), note the discrepancy in dimension feedback: "Note: You cited [test] as [student value], but the actual result was [actual value] — please re-read the lab panel carefully."
+- This note does NOT independently reduce the dimension score. However, if the student's diagnosis or management was predicated entirely on the misread value, deduct from clinicalReasoning proportionally.
 
 MISSED QUESTIONS — only list a question if ALL of the following are true:
 1. The answer was not already available from the physical exam or HPI
