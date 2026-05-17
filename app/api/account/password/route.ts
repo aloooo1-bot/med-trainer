@@ -8,10 +8,22 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { password }: { password: string } = await req.json()
+  const { currentPassword, password }: { currentPassword: string; password: string } = await req.json()
 
+  if (!currentPassword) {
+    return Response.json({ error: 'Current password is required' }, { status: 400 })
+  }
   if (!password || password.length < 8) {
     return Response.json({ error: 'Password must be at least 8 characters' }, { status: 400 })
+  }
+
+  // Verify current password before allowing change
+  const email = user.email
+  if (!email) return Response.json({ error: 'Cannot verify identity' }, { status: 400 })
+
+  const { error: verifyError } = await supabase.auth.signInWithPassword({ email, password: currentPassword })
+  if (verifyError) {
+    return Response.json({ error: 'Current password is incorrect' }, { status: 400 })
   }
 
   const { error } = await supabase.auth.updateUser({ password })

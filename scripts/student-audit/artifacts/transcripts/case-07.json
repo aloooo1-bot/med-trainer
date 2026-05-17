@@ -1,0 +1,322 @@
+{
+  "caseNum": 7,
+  "system": "Infectious",
+  "difficulty": "Foundations",
+  "transcript": [
+    {
+      "role": "student",
+      "content": "Have you noticed any pain or fullness in your left upper abdomen — like under your left rib cage? I want to make sure your spleen isn't enlarged."
+    },
+    {
+      "role": "patient",
+      "content": "Yeah, actually... now that you mention it, there is kind of a weird fullness or pressure on my left side, kind of under my ribs. I didn't really think much of it because everything else has been hurting so bad, especially my throat. Is that something I should be worried about?"
+    },
+    {
+      "role": "student",
+      "content": "Have you been in close contact with anyone recently who was sick, or have you kissed anyone in the past few weeks? I know it's personal, but mono spreads through saliva."
+    },
+    {
+      "role": "patient",
+      "content": "Yeah, I mean... I started seeing someone new about two or three weeks ago, and we were kissing pretty regularly. I don't know if they were sick or anything, I haven't really talked to them about it. Is that how you think I got this?"
+    },
+    {
+      "role": "student",
+      "content": "Have you noticed any yellowing of your eyes or skin, or has your urine looked darker than usual?"
+    },
+    {
+      "role": "patient",
+      "content": "No, I don't think so... my eyes look normal as far as I can tell, and I haven't really noticed anything weird with my urine color. Should I be checking for that? Is that something that can happen with mono?"
+    }
+  ],
+  "testsOrdered": [
+    "CBC with Differential",
+    "Monospot (Heterophile Antibody Test)",
+    "EBV Serology Panel",
+    "Comprehensive Metabolic Panel (CMP)",
+    "Throat Culture / Rapid Strep",
+    "Abdominal Ultrasound"
+  ],
+  "diagnosis": "Infectious Mononucleosis caused by Epstein-Barr Virus (EBV)",
+  "reasoning": "The classic triad of severe pharyngitis, fever, and posterior cervical lymphadenopathy in a young college-aged patient already raised mono on my differential, but the amoxicillin-associated maculopapular rash is essentially pathognomonic for EBV mono — this reaction occurs in about 80-90% of mono patients given aminopenicillins. The Monospot test would be my quickest confirmation, though I know it can be falsely negative early in illness, so EBV serology (VCA IgM/IgG) gives more reliable confirmation. The CBC with differential should show lymphocytosis with atypical lymphocytes, which would strongly support the diagnosis. I ordered a CMP to check liver enzymes since EBV commonly causes hepatitis, and an abdominal ultrasound to assess for splenomegaly — this is critical because splenic rupture is a rare but life-threatening complication, and this patient needs activity restrictions. I still ordered the rapid strep and throat culture because strep can co-exist with mono and that changes management slightly.",
+  "studentNotes": "",
+  "caseData": {
+    "patientInfo": {
+      "name": "Oleksandr Kovalenko",
+      "age": 22,
+      "gender": "Male",
+      "chiefComplaint": "Sore throat, fever, and extreme fatigue for 5 days"
+    },
+    "hpi": "Oleksandr Kovalenko is a 22-year-old male college student presenting with a 5-day history of severe sore throat, high fever, and profound fatigue. He reports that his throat pain is the worst he has ever experienced, making it difficult to swallow even liquids. He also notes swollen and tender lymph nodes in his neck, which he first noticed 3 days ago. He denies cough, rhinorrhea, or ear pain. He visited the student health clinic 2 days ago and was prescribed amoxicillin for presumed strep throat, after which he developed a diffuse rash over his trunk and extremities.",
+    "vitals": {
+      "bp": "112/70",
+      "hr": 102,
+      "rr": 18,
+      "temp": 102.4,
+      "spo2": 98,
+      "weight": "165 lbs"
+    },
+    "diagnosis": "Infectious Mononucleosis (EBV)",
+    "differentials": [
+      "Streptococcal pharyngitis",
+      "CMV mononucleosis",
+      "Viral pharyngitis (adenovirus)",
+      "Acute HIV infection"
+    ],
+    "keyQuestions": [
+      "Have you had any recent close contact with someone who had a similar illness or shared drinks/utensils?",
+      "Did your rash appear before or after starting the amoxicillin?",
+      "Do you have any pain in your left upper abdomen or have you been told your spleen is enlarged?",
+      "Have you been sexually active recently, and do you have any risk factors for HIV exposure?"
+    ],
+    "teachingPoints": [
+      "Infectious mononucleosis caused by Epstein-Barr virus (EBV) classically presents with the triad of fever, exudative pharyngitis, and cervical lymphadenopathy in young adults; profound fatigue is a hallmark feature that helps differentiate it from bacterial pharyngitis.",
+      "Amoxicillin or ampicillin administration in EBV mononucleosis triggers a maculopapular rash in up to 80-90% of patients — this drug-rash interaction is pathognomonic and is not a true penicillin allergy; the mechanism is immune complex-mediated rather than IgE-mediated.",
+      "Splenomegaly occurs in 50-60% of cases and carries a risk of splenic rupture; patients should be counseled to avoid contact sports and strenuous activity for at least 3-4 weeks or until clearance by imaging, as splenic rupture — though rare — is the most serious complication.",
+      "The heterophile antibody test (Monospot) is highly specific (>95%) but has variable sensitivity early in illness (as low as 70-80% in the first week); EBV-specific antibodies (VCA IgM) are more sensitive in seronegative cases early in disease course."
+    ],
+    "availableLabs": [
+      "CBC with Differential",
+      "Comprehensive Metabolic Panel (CMP)",
+      "Monospot (Heterophile Antibody Test)",
+      "EBV Serology Panel",
+      "Throat Culture / Rapid Strep"
+    ],
+    "availableImaging": [
+      "Abdominal Ultrasound",
+      "Chest X-Ray"
+    ],
+    "labGroups": [
+      {
+        "name": "Hematology",
+        "tests": [
+          "CBC with Differential"
+        ]
+      },
+      {
+        "name": "Metabolic",
+        "tests": [
+          "Comprehensive Metabolic Panel (CMP)"
+        ]
+      },
+      {
+        "name": "Infectious Workup",
+        "tests": [
+          "Monospot (Heterophile Antibody Test)",
+          "EBV Serology Panel",
+          "Throat Culture / Rapid Strep"
+        ]
+      }
+    ],
+    "labResults": {
+      "CBC with Differential": {
+        "components": [
+          {
+            "name": "WBC",
+            "value": "14.8",
+            "unit": "x10³/µL",
+            "referenceRange": "4.5-11.0",
+            "status": "high"
+          },
+          {
+            "name": "Lymphocytes",
+            "value": "62",
+            "unit": "%",
+            "referenceRange": "20-40",
+            "status": "high"
+          },
+          {
+            "name": "Atypical Lymphocytes",
+            "value": "18",
+            "unit": "%",
+            "referenceRange": "0-5",
+            "status": "high"
+          },
+          {
+            "name": "Hgb",
+            "value": "14.2",
+            "unit": "g/dL",
+            "referenceRange": "13.5-17.5",
+            "status": "normal"
+          },
+          {
+            "name": "Platelets",
+            "value": "138",
+            "unit": "x10³/µL",
+            "referenceRange": "150-400",
+            "status": "low"
+          }
+        ]
+      },
+      "Comprehensive Metabolic Panel (CMP)": {
+        "components": [
+          {
+            "name": "ALT",
+            "value": "98",
+            "unit": "U/L",
+            "referenceRange": "7-56",
+            "status": "high"
+          },
+          {
+            "name": "AST",
+            "value": "87",
+            "unit": "U/L",
+            "referenceRange": "10-40",
+            "status": "high"
+          },
+          {
+            "name": "Alkaline Phosphatase",
+            "value": "142",
+            "unit": "U/L",
+            "referenceRange": "44-147",
+            "status": "high"
+          },
+          {
+            "name": "Total Bilirubin",
+            "value": "1.4",
+            "unit": "mg/dL",
+            "referenceRange": "0.2-1.2",
+            "status": "high"
+          },
+          {
+            "name": "Creatinine",
+            "value": "0.9",
+            "unit": "mg/dL",
+            "referenceRange": "0.7-1.3",
+            "status": "normal"
+          }
+        ]
+      },
+      "Monospot (Heterophile Antibody Test)": {
+        "components": [
+          {
+            "name": "Heterophile Antibody",
+            "value": "Positive",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "abnormal"
+          }
+        ]
+      },
+      "EBV Serology Panel": {
+        "components": [
+          {
+            "name": "VCA IgM (Viral Capsid Antigen IgM)",
+            "value": "Positive",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "abnormal"
+          },
+          {
+            "name": "VCA IgG",
+            "value": "Positive",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "abnormal"
+          },
+          {
+            "name": "EA-D IgG (Early Antigen)",
+            "value": "Positive",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "abnormal"
+          },
+          {
+            "name": "EBNA IgG (Nuclear Antigen)",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative (acute) / Positive (past)",
+            "status": "normal"
+          }
+        ]
+      },
+      "Throat Culture / Rapid Strep": {
+        "components": [
+          {
+            "name": "Rapid Strep Antigen",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          },
+          {
+            "name": "Throat Culture (48h)",
+            "value": "No Group A Streptococcus isolated",
+            "unit": "",
+            "referenceRange": "No pathogen isolated",
+            "status": "normal"
+          }
+        ]
+      }
+    },
+    "imagingResults": {
+      "Abdominal Ultrasound": "The spleen measures 16.2 cm in longitudinal diameter, consistent with moderate splenomegaly (normal upper limit 12 cm). No splenic laceration or perisplenic free fluid is identified. Mild hepatomegaly is noted with the liver span measuring 17 cm in the midclavicular line; no focal hepatic lesions or biliary ductal dilation.",
+      "Chest X-Ray": "No acute cardiopulmonary process identified. Lungs are clear bilaterally without consolidation, effusion, or pneumothorax. Mediastinal contour is within normal limits; no hilar lymphadenopathy appreciable on plain film."
+    },
+    "procedureResults": {},
+    "hiddenHistory": {
+      "fullHistory": "No prior hospitalizations or surgeries. No known chronic medical conditions.",
+      "socialHistory": "Non-smoker; occasional alcohol use on weekends (2-3 drinks). College student living in a dormitory. No illicit drug use. Reports kissing a new partner approximately 2-3 weeks prior to symptom onset. No recent international travel.",
+      "familyHistory": "No family history of hematologic malignancy or immunodeficiency. Mother has hypothyroidism.",
+      "medications": "Amoxicillin 500mg TID (started 2 days ago by student health clinic); Ibuprofen 400mg PRN for fever and pain.",
+      "hiddenSymptoms": "Patient will confirm mild left upper quadrant fullness/discomfort if asked specifically about abdominal pain; patient will also confirm periorbital edema (Hoagland's sign) if asked about facial swelling.",
+      "allergies": "NKDA (amoxicillin rash is drug-reaction, not allergy)"
+    },
+    "imagingCategory": "Splenomegaly on ultrasound",
+    "ecgFindings": "",
+    "hematologyFindings": "Peripheral smear demonstrates lymphocytosis with numerous large atypical lymphocytes (Downey cells) featuring abundant pale blue cytoplasm, irregular nuclear contours, and prominent nucleoli — consistent with reactive lymphocytosis in the setting of EBV infectious mononucleosis. No blasts or abnormal clonal population identified.",
+    "urineFindings": "",
+    "skinFindings": "",
+    "fundusFindings": "",
+    "biopsyFindings": ""
+  },
+  "correctDiagnosis": "Infectious Mononucleosis (EBV)",
+  "workingDiagnosis": "Infectious Mononucleosis (EBV)",
+  "clinicalImpression": "My first thought was strep throat given his age, sore throat, fever, and swollen lymph nodes — that's super common in college students. But the amoxicillin rash is a huge red flag for mono. I've read that if you give amoxicillin or ampicillin to someone with mono, they almost always develop a diffuse maculopapular rash, which sounds exactly like what happened here. I'm not 100% certain, but this constellation really points toward EBV mononucleosis rather than bacterial pharyngitis.",
+  "grading": {
+    "score": 92,
+    "correct": true,
+    "feedback": "Excellent work — you correctly identified infectious mononucleosis caused by EBV and asked two of the most high-yield questions: exposure history (kissing) and abdominal symptoms to assess for splenomegaly. The test ordering was comprehensive and well-targeted. To round out your workup in future cases, consider asking about the timeline of the rash relative to antibiotic initiation (pathognomonic clue) and HIV risk factors, which can present similarly and should be on the differential.",
+    "strengths": [
+      "Correctly elicited the kissing exposure history ~2-3 weeks prior, which is classic for EBV transmission and strongly supports the diagnosis",
+      "Proactively asked about left upper quadrant fullness to screen for splenomegaly — a critical management-relevant finding given splenic rupture risk",
+      "Asked about jaundice and dark urine to assess for hepatic involvement, which was clinically appropriate given the presentation",
+      "Arrived at a precise and fully correct diagnosis — 'Infectious Mononucleosis caused by Epstein-Barr Virus (EBV)' — with appropriate specificity"
+    ],
+    "dimensions": {
+      "historyInterview": {
+        "score": 19,
+        "feedback": "You asked the two most important questions (exposure and splenomegaly symptoms) effectively, but missed asking about the rash timeline relative to amoxicillin initiation — a pathognomonic clue — and did not screen for HIV risk factors, which is a relevant safety-critical differential in this presentation."
+      },
+      "testOrdering": {
+        "score": 24,
+        "feedback": "The workup was comprehensive and fully appropriate: CBC with differential, Monospot, EBV serology, CMP, throat culture/rapid strep, and abdominal ultrasound all directly confirmed the diagnosis and assessed for complications."
+      },
+      "diagnosisAccuracy": {
+        "score": 36,
+        "feedback": "The diagnosis 'Infectious Mononucleosis caused by Epstein-Barr Virus (EBV)' is correct and includes clinically supported added specificity identifying the causative pathogen — this is a strength."
+      },
+      "diagnosisCompleteness": {
+        "score": 13,
+        "feedback": "The core diagnosis is correctly and cleanly named; at Foundations level this is complete, though noting the amoxicillin rash or splenomegaly as complications would have further demonstrated clinical integration."
+      }
+    },
+    "missedQuestions": [
+      "Did your rash appear before or after you started the amoxicillin? (The timing is pathognomonic for the EBV-amoxicillin drug reaction and distinguishes it from a true penicillin allergy — management-relevant)",
+      "Do you have any risk factors for HIV exposure, such as unprotected sex or multiple partners? (Acute HIV can mimic infectious mononucleosis and should be considered in a sexually active young adult)"
+    ],
+    "teachingPoints": [
+      "Infectious mononucleosis caused by Epstein-Barr virus (EBV) classically presents with the triad of fever, exudative pharyngitis, and cervical lymphadenopathy in young adults; profound fatigue is a hallmark feature that helps differentiate it from bacterial pharyngitis.",
+      "Amoxicillin or ampicillin administration in EBV mononucleosis triggers a maculopapular rash in up to 80-90% of patients — this drug-rash interaction is pathognomonic and is not a true penicillin allergy; the mechanism is immune complex-mediated rather than IgE-mediated.",
+      "Splenomegaly occurs in 50-60% of cases and carries a risk of splenic rupture; patients should be counseled to avoid contact sports and strenuous activity for at least 3-4 weeks or until clearance by imaging, as splenic rupture — though rare — is the most serious complication.",
+      "The heterophile antibody test (Monospot) is highly specific (>95%) but has variable sensitivity early in illness (as low as 70-80% in the first week); EBV-specific antibodies (VCA IgM) are more sensitive in seronegative cases early in disease course."
+    ],
+    "differentials": [
+      "Streptococcal pharyngitis: shares fever, sore throat, and cervical lymphadenopathy, but lacks the profound fatigue, atypical lymphocytosis, and positive Monospot; negative rapid strep and throat culture effectively rule this out here.",
+      "CMV mononucleosis: produces a nearly identical clinical syndrome but typically has a negative heterophile antibody test; distinguished by CMV-specific serology (IgM/IgG) and is more common in older adults.",
+      "Acute HIV infection (Acute Retroviral Syndrome): can mimic mononucleosis with fever, pharyngitis, and lymphadenopathy; distinguished by HIV RNA/p24 antigen testing and relevant sexual/exposure history — should always be considered in sexually active young adults.",
+      "Viral pharyngitis (adenovirus): causes fever and sore throat but typically includes conjunctivitis and rhinorrhea; lacks atypical lymphocytosis, splenomegaly, and positive EBV serology."
+    ]
+  },
+  "score": 92,
+  "correct": true
+}

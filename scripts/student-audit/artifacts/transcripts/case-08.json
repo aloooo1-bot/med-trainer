@@ -1,0 +1,410 @@
+{
+  "caseNum": 8,
+  "system": "Hematologic / Oncologic",
+  "difficulty": "Foundations",
+  "transcript": [
+    {
+      "role": "student",
+      "content": "Has anyone in your family ever been diagnosed with a blood disorder, like sickle cell disease or anemia that runs in the family?"
+    },
+    {
+      "role": "patient",
+      "content": "Yeah, actually both my parents have what they call \"sickle cell trait\" — I think that means they carry it but don't fully have the disease. And my mom's brother, my uncle, he actually had the full sickle cell disease and he passed away from complications when he was in his 30s. It's something the family doesn't really talk about much, but I know it's there."
+    },
+    {
+      "role": "student",
+      "content": "Did anything happen in the days or weeks before your symptoms started — like eating fava beans, taking any medications like antimalarials or antibiotics, or getting sick with an infection?"
+    },
+    {
+      "role": "patient",
+      "content": "No, I didn't eat anything unusual that I can think of, and I haven't been sick recently — no fever or anything like that. I'm not taking any prescription medications, just ibuprofen sometimes when I get headaches. I haven't taken any antibiotics or anything like that either."
+    },
+    {
+      "role": "student",
+      "content": "Have you noticed if your urine is darkest in the morning or after physical activity, and have you had any pain in your chest, joints, or abdomen during this time?"
+    },
+    {
+      "role": "patient",
+      "content": "Yeah, now that you mention it, the dark urine does seem worse in the mornings when I first wake up. And I've actually had some aching in my lower back and thighs on and off, but I just figured it was growing pains or from sitting at my desk studying for long hours."
+    }
+  ],
+  "testsOrdered": [
+    "CBC with Differential",
+    "Hemolysis Panel",
+    "Reticulocyte Count",
+    "Peripheral Blood Smear",
+    "Hemoglobin Electrophoresis",
+    "Comprehensive Metabolic Panel (CMP)",
+    "Urinalysis",
+    "Abdominal Ultrasound"
+  ],
+  "diagnosis": "Hereditary Spherocytosis (or possibly G6PD deficiency — but leaning toward hereditary spherocytosis given the chronic gradual presentation, splenomegaly, and lack of precipitating trigger)",
+  "reasoning": "The combination of jaundice, pallor, dark urine, and LUQ fullness (splenomegaly) strongly confirms a hemolytic anemia. The hemolysis panel would show elevated indirect bilirubin, elevated LDH, and low haptoglobin, and the reticulocyte count should be elevated as the marrow compensates. The peripheral blood smear is critical here — if it shows spherocytes, that points toward hereditary spherocytosis, which fits the gradual onset without a clear trigger. Hemoglobin electrophoresis would help rule in or out sickle cell disease or HbC disease. I moved away from sickle cell as the top diagnosis because he has no prior episodes and no precipitating painful crisis, though I know sickle cell can sometimes present this way. G6PD deficiency is still on my differential since it's common in West Africans, but the absence of an oxidative stressor trigger makes it less likely.",
+  "studentNotes": "",
+  "caseData": {
+    "patientInfo": {
+      "name": "Oladele Fashola",
+      "age": 19,
+      "gender": "Male",
+      "chiefComplaint": "Fatigue, pallor, and yellowing of eyes for 2 weeks"
+    },
+    "hpi": "Oladele Fashola is a 19-year-old male of West African descent who presents with a 2-week history of progressive fatigue, pallor, and yellow discoloration of his eyes. He reports dark-colored urine over the past several days and mild left upper quadrant fullness. He denies fever, weight loss, lymph node swelling, or recent illness. His symptoms began gradually without a clear precipitant, though he notes they have been worsening and significantly impacting his daily activities. He has no prior similar episodes and has not taken any new medications.",
+    "vitals": {
+      "bp": "118/74",
+      "hr": 102,
+      "rr": 18,
+      "temp": 98.8,
+      "spo2": 99,
+      "weight": "154 lbs"
+    },
+    "diagnosis": "Sickle Cell Disease (Hemolytic Crisis)",
+    "differentials": [
+      "Autoimmune Hemolytic Anemia (AIHA)",
+      "Hereditary Spherocytosis",
+      "G6PD Deficiency",
+      "Thalassemia Major"
+    ],
+    "keyQuestions": [
+      "Do you have any known family history of sickle cell disease or sickle cell trait?",
+      "Have you experienced any prior episodes of severe bone pain, hand/foot swelling, or hospitalizations as a child?",
+      "Have you noticed any triggers such as cold exposure, dehydration, or physical exertion before this episode?",
+      "Have you had any prior newborn screening or hemoglobin electrophoresis testing done?"
+    ],
+    "teachingPoints": [
+      "Sickle cell disease (HbSS) results from a point mutation in the beta-globin gene, causing polymerization of deoxygenated hemoglobin S, leading to red cell sickling, hemolysis, vaso-occlusion, and end-organ damage. Hemoglobin electrophoresis is the gold-standard confirmatory test demonstrating predominantly HbS with absent HbA.",
+      "Classic laboratory findings of hemolytic anemia in sickle cell disease include low hemoglobin, elevated reticulocyte count (compensatory erythropoiesis), elevated indirect bilirubin (hemolysis byproduct), elevated LDH, and low haptoglobin — all reflecting intravascular and extravascular red cell destruction.",
+      "The peripheral blood smear in sickle cell disease characteristically shows sickle-shaped (crescent) red cells and Howell-Jolly bodies reflecting functional asplenia, which develops due to repeated splenic infarction from vaso-occlusion — a finding that distinguishes SCD from most other hemolytic anemias.",
+      "Hydroxyurea is the cornerstone disease-modifying therapy for SCD; it increases fetal hemoglobin (HbF) levels, which inhibit HbS polymerization and reduce the frequency of vaso-occlusive crises and acute chest syndrome."
+    ],
+    "availableLabs": [
+      "CBC with Differential",
+      "Comprehensive Metabolic Panel (CMP)",
+      "Hemolysis Panel",
+      "Hemoglobin Electrophoresis",
+      "Reticulocyte Count",
+      "Urinalysis"
+    ],
+    "availableImaging": [
+      "Peripheral Blood Smear",
+      "Abdominal Ultrasound",
+      "Chest X-Ray"
+    ],
+    "labGroups": [
+      {
+        "name": "CBC with Differential",
+        "tests": [
+          "CBC with Differential"
+        ]
+      },
+      {
+        "name": "Comprehensive Metabolic Panel (CMP)",
+        "tests": [
+          "Comprehensive Metabolic Panel (CMP)"
+        ]
+      },
+      {
+        "name": "Hemolysis Panel",
+        "tests": [
+          "Hemolysis Panel"
+        ]
+      },
+      {
+        "name": "Hemoglobin Electrophoresis",
+        "tests": [
+          "Hemoglobin Electrophoresis"
+        ]
+      },
+      {
+        "name": "Reticulocyte Count",
+        "tests": [
+          "Reticulocyte Count"
+        ]
+      },
+      {
+        "name": "Urinalysis",
+        "tests": [
+          "Urinalysis"
+        ]
+      }
+    ],
+    "labResults": {
+      "CBC with Differential": {
+        "components": [
+          {
+            "name": "WBC",
+            "value": "11.8",
+            "unit": "x10³/µL",
+            "referenceRange": "4.5-11.0",
+            "status": "high"
+          },
+          {
+            "name": "Hemoglobin",
+            "value": "7.1",
+            "unit": "g/dL",
+            "referenceRange": "13.5-17.5",
+            "status": "low"
+          },
+          {
+            "name": "Hematocrit",
+            "value": "21.4",
+            "unit": "%",
+            "referenceRange": "41-53",
+            "status": "low"
+          },
+          {
+            "name": "MCV",
+            "value": "79",
+            "unit": "fL",
+            "referenceRange": "80-100",
+            "status": "low"
+          },
+          {
+            "name": "Platelets",
+            "value": "420",
+            "unit": "x10³/µL",
+            "referenceRange": "150-400",
+            "status": "high"
+          }
+        ]
+      },
+      "Comprehensive Metabolic Panel (CMP)": {
+        "components": [
+          {
+            "name": "Sodium",
+            "value": "138",
+            "unit": "mEq/L",
+            "referenceRange": "136-145",
+            "status": "normal"
+          },
+          {
+            "name": "Potassium",
+            "value": "4.1",
+            "unit": "mEq/L",
+            "referenceRange": "3.5-5.0",
+            "status": "normal"
+          },
+          {
+            "name": "BUN",
+            "value": "14",
+            "unit": "mg/dL",
+            "referenceRange": "7-20",
+            "status": "normal"
+          },
+          {
+            "name": "Creatinine",
+            "value": "0.9",
+            "unit": "mg/dL",
+            "referenceRange": "0.7-1.3",
+            "status": "normal"
+          },
+          {
+            "name": "Total Bilirubin",
+            "value": "4.8",
+            "unit": "mg/dL",
+            "referenceRange": "0.1-1.2",
+            "status": "high"
+          },
+          {
+            "name": "Direct Bilirubin",
+            "value": "0.4",
+            "unit": "mg/dL",
+            "referenceRange": "0.0-0.3",
+            "status": "high"
+          }
+        ]
+      },
+      "Hemolysis Panel": {
+        "components": [
+          {
+            "name": "LDH",
+            "value": "620",
+            "unit": "U/L",
+            "referenceRange": "140-280",
+            "status": "high"
+          },
+          {
+            "name": "Haptoglobin",
+            "value": "< 8",
+            "unit": "mg/dL",
+            "referenceRange": "30-200",
+            "status": "low"
+          },
+          {
+            "name": "Indirect Bilirubin",
+            "value": "4.4",
+            "unit": "mg/dL",
+            "referenceRange": "0.1-1.0",
+            "status": "high"
+          },
+          {
+            "name": "Direct Antiglobulin Test (DAT/Coombs)",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          }
+        ]
+      },
+      "Hemoglobin Electrophoresis": {
+        "components": [
+          {
+            "name": "HbA",
+            "value": "0",
+            "unit": "%",
+            "referenceRange": "95-98",
+            "status": "low"
+          },
+          {
+            "name": "HbS",
+            "value": "92",
+            "unit": "%",
+            "referenceRange": "0",
+            "status": "high"
+          },
+          {
+            "name": "HbF",
+            "value": "6",
+            "unit": "%",
+            "referenceRange": "< 2",
+            "status": "high"
+          },
+          {
+            "name": "HbA2",
+            "value": "2",
+            "unit": "%",
+            "referenceRange": "2-3.5",
+            "status": "normal"
+          }
+        ]
+      },
+      "Reticulocyte Count": {
+        "components": [
+          {
+            "name": "Reticulocyte Percentage",
+            "value": "12.4",
+            "unit": "%",
+            "referenceRange": "0.5-2.5",
+            "status": "high"
+          },
+          {
+            "name": "Absolute Reticulocyte Count",
+            "value": "320",
+            "unit": "x10³/µL",
+            "referenceRange": "25-75",
+            "status": "high"
+          }
+        ]
+      },
+      "Urinalysis": {
+        "components": [
+          {
+            "name": "Color",
+            "value": "Dark brown",
+            "unit": "",
+            "referenceRange": "Yellow/amber",
+            "status": "abnormal"
+          },
+          {
+            "name": "Urobilinogen",
+            "value": "4+",
+            "unit": "",
+            "referenceRange": "Trace",
+            "status": "high"
+          },
+          {
+            "name": "Blood",
+            "value": "2+",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "abnormal"
+          },
+          {
+            "name": "Protein",
+            "value": "Trace",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "abnormal"
+          },
+          {
+            "name": "Bilirubin",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          }
+        ]
+      }
+    },
+    "imagingResults": {
+      "Peripheral Blood Smear": "Peripheral smear demonstrates numerous sickle-shaped (crescent) erythrocytes consistent with HbSS disease. Howell-Jolly bodies are present within red cells indicating functional asplenia. No spherocytes or elliptocytes identified. Polychromasia is noted consistent with reticulocytosis.",
+      "Abdominal Ultrasound": "Spleen measures 8.2 cm and appears echogenic and heterogeneous, consistent with prior repeated infarctions and autosplenectomy in the setting of sickle cell disease. No acute splenic sequestration identified. Liver is normal in size and echogenicity. Mild gallbladder wall thickening with multiple small echogenic foci consistent with pigmented gallstones, a common complication of chronic hemolysis.",
+      "Chest X-Ray": "Lungs are clear bilaterally without consolidation, infiltrate, or pleural effusion. No cardiomegaly. No evidence of acute chest syndrome at this time. Bony structures appear unremarkable."
+    },
+    "procedureResults": {},
+    "hiddenHistory": {
+      "fullHistory": "Patient reports being born in Nigeria and immigrated to the United States at age 12. He vaguely recalls being told as a child that he had 'blood problems' but was never formally followed by a hematologist. He confirms experiencing hand and foot swelling as an infant that resolved spontaneously.",
+      "socialHistory": "Non-smoker, occasional alcohol use (1-2 drinks on weekends). College freshman studying engineering. Denies recreational drug use. No recent travel outside the United States.",
+      "familyHistory": "Mother has known sickle cell trait (HbAS). Father also has sickle cell trait per patient's report. Maternal uncle died of complications related to 'sickle cell disease' in his 30s.",
+      "medications": "No current prescription medications. Occasional ibuprofen for headaches. No supplements.",
+      "hiddenSymptoms": "If asked about pain: patient reports intermittent deep bone pain in his lower back and thighs over the past year that he attributed to 'growing pains.' If asked about vision: denies any visual changes.",
+      "allergies": "NKDA"
+    },
+    "imagingCategory": "Hematologic peripheral smear",
+    "ecgFindings": "",
+    "hematologyFindings": "Numerous sickle-shaped (crescent) erythrocytes. Howell-Jolly bodies present. Polychromasia consistent with reticulocytosis. No spherocytes. Findings are pathognomonic for sickle cell disease (HbSS).",
+    "urineFindings": "Elevated urobilinogen (4+) and hemoglobinuria (2+ blood on dipstick with likely absence of RBCs on microscopy) consistent with intravascular hemolysis and pigmenturia.",
+    "skinFindings": "",
+    "fundusFindings": "",
+    "biopsyFindings": ""
+  },
+  "correctDiagnosis": "Sickle Cell Disease (Hemolytic Crisis)",
+  "workingDiagnosis": "Hemolytic anemia — possibly sickle cell disease or G6PD deficiency given West African descent",
+  "clinicalImpression": "This 19-year-old West African male presenting with fatigue, pallor, jaundice, dark urine, and left upper quadrant fullness really points me toward a hemolytic process. The LUQ fullness makes me think splenomegaly, which fits with a chronic hemolytic anemia. Given his ethnic background, I'm thinking sickle cell disease first, but the gradual onset without a clear crisis trigger and no prior episodes makes me second-guess that — G6PD deficiency or hereditary spherocytosis also jump to mind. I'm a bit unsure why he's never had an episode before if it's a congenital condition.",
+  "grading": {
+    "score": 72,
+    "correct": false,
+    "feedback": "You correctly identified this as a hemolytic anemia and appropriately considered hereditary spherocytosis and G6PD deficiency, but the most critical clue — both parents having sickle cell trait and the patient being of West African descent — should have immediately elevated sickle cell disease to the top of your differential. The hemoglobin electrophoresis result (92% HbS, 0% HbA) definitively confirms HbSS disease, and this should have been your leading diagnosis given the family history elicited during the interview. Refining your pattern recognition for when to prioritize sickle cell disease — especially in young patients of African descent with hemolytic anemia and family history — will be key going forward.",
+    "strengths": [
+      "Elicited critical family history revealing that both parents carry sickle cell trait and that a maternal uncle died of sickle cell disease — this is highly yield information that strongly pointed toward HbSS",
+      "Asked about potential precipitating triggers (fava beans, antimalarials, infections) which was appropriate for ruling in G6PD deficiency as a differential",
+      "Appropriately ordered a comprehensive hemolysis panel (LDH, haptoglobin, indirect bilirubin, DAT/Coombs), reticulocyte count, and hemoglobin electrophoresis — a thorough and correct diagnostic workup",
+      "Asked about associated symptoms including pain and urine color patterns, uncovering the bone pain history that is characteristic of vaso-occlusive disease"
+    ],
+    "dimensions": {
+      "historyInterview": {
+        "score": 19,
+        "feedback": "Strong history overall — you elicited the key family history and asked about triggers and associated symptoms; a missed opportunity was not directly asking about prior newborn screening, childhood hospitalizations, or dactylitis (hand/foot swelling as an infant), which would have further supported sickle cell disease."
+      },
+      "testOrdering": {
+        "score": 22,
+        "feedback": "Excellent and comprehensive test ordering — CBC, hemolysis panel, reticulocyte count, peripheral smear, hemoglobin electrophoresis, CMP, urinalysis, and abdominal ultrasound all appropriate and collectively sufficient to confirm the diagnosis and assess complications."
+      },
+      "diagnosisAccuracy": {
+        "score": 19,
+        "feedback": "Hereditary spherocytosis is incorrect — the peripheral smear shows sickle cells and Howell-Jolly bodies with no spherocytes, and hemoglobin electrophoresis confirms HbSS disease; while G6PD deficiency was listed as a secondary consideration, neither diagnosis is correct for this case."
+      },
+      "diagnosisCompleteness": {
+        "score": 12,
+        "feedback": "Partial credit only — hereditary spherocytosis is a recognized hemolytic anemia differential and the student demonstrated structured reasoning, but the core diagnosis was missed, so full completeness credit cannot be awarded."
+      }
+    },
+    "missedQuestions": [
+      "Have you ever been told as a child that you had a blood disorder, or were you ever hospitalized for episodes of pain, hand/foot swelling, or anemia as an infant or young child?",
+      "Have you ever had any prior hemoglobin testing or newborn screening results shared with your family?"
+    ],
+    "teachingPoints": [
+      "Sickle cell disease (HbSS) results from a point mutation in the beta-globin gene, causing polymerization of deoxygenated hemoglobin S, leading to red cell sickling, hemolysis, vaso-occlusion, and end-organ damage. Hemoglobin electrophoresis is the gold-standard confirmatory test demonstrating predominantly HbS with absent HbA.",
+      "Classic laboratory findings of hemolytic anemia in sickle cell disease include low hemoglobin, elevated reticulocyte count (compensatory erythropoiesis), elevated indirect bilirubin (hemolysis byproduct), elevated LDH, and low haptoglobin — all reflecting intravascular and extravascular red cell destruction.",
+      "The peripheral blood smear in sickle cell disease characteristically shows sickle-shaped (crescent) red cells and Howell-Jolly bodies reflecting functional asplenia, which develops due to repeated splenic infarction from vaso-occlusion — a finding that distinguishes SCD from most other hemolytic anemias.",
+      "Hydroxyurea is the cornerstone disease-modifying therapy for SCD; it increases fetal hemoglobin (HbF) levels, which inhibit HbS polymerization and reduce the frequency of vaso-occlusive crises and acute chest syndrome."
+    ],
+    "differentials": [
+      "Hereditary Spherocytosis: presents with chronic hemolytic anemia, splenomegaly, and jaundice, but distinguished by spherocytes on smear (not sickle cells), positive osmotic fragility test, normal hemoglobin electrophoresis, and typically Northern European ancestry.",
+      "G6PD Deficiency: causes episodic hemolytic anemia triggered by oxidative stress (fava beans, infections, certain drugs); distinguished by the presence of a precipitating trigger, Heinz bodies on smear, low G6PD enzyme activity, and absence of sickling on electrophoresis.",
+      "Autoimmune Hemolytic Anemia (AIHA): extravascular hemolysis with positive DAT/Coombs test and spherocytes on smear; this patient's negative DAT effectively rules it out.",
+      "Thalassemia Major: causes severe hemolytic anemia with target cells and nucleated RBCs on smear; hemoglobin electrophoresis would show elevated HbF/HbA2 with absent or reduced HbA but without the high HbS seen here."
+    ]
+  },
+  "score": 72,
+  "correct": false
+}

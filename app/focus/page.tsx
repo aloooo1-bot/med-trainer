@@ -18,6 +18,7 @@ import {
   saveFocusSkip,
 } from '@/app/lib/focusSettings'
 import { useChartTheme } from '@/app/lib/useChartTheme'
+import { useRouter } from 'next/navigation'
 
 function cssScore(score: number): string {
   if (score < 60) return 'var(--red)'
@@ -53,6 +54,7 @@ const MISSED_PATTERNS = [
 const DAY_INDEX: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }
 
 export default function FocusAreasPage() {
+  const router = useRouter()
   const theme = useChartTheme()
   const LEVEL_COLOR: Record<string, string> = {
     Foundations: theme.primary,
@@ -144,13 +146,14 @@ export default function FocusAreasPage() {
             <div className="dx-card-header">
               <div style={{ fontWeight: 700 }}>Your Study Queue</div>
               <div style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)', marginTop: 2 }}>
-                Systems ranked by urgency — score × recency × case count
+                Systems ranked by urgency — gap from 100, boosted if only one case on record
               </div>
             </div>
             <div style={{ padding: '4px 0' }}>
               {prioritized.map((s, i) => {
                 const urgency = s.urgency > 50 ? 'HIGH' : s.urgency > 25 ? 'MED' : 'LOW'
-                const urgencyColor = urgency === 'HIGH' ? theme.critical : urgency === 'MED' ? theme.caution : theme.confirmed
+                const urgencyLabel = urgency === 'LOW' ? 'STRONG' : urgency
+                const urgencyColor = urgency === 'HIGH' ? 'var(--red)' : urgency === 'MED' ? 'var(--amber)' : 'var(--green)'
                 const urgencyBg   = urgency === 'HIGH' ? 'var(--critical-bg)' : urgency === 'MED' ? 'var(--caution-bg)' : 'var(--confirmed-bg)'
                 const recLevel = s.score < 60 ? 'Foundations' : s.score < 80 ? 'Clinical' : 'Advanced'
                 const recCases = Math.min(3, Math.max(1, Math.ceil(s.urgency / 30)))
@@ -171,23 +174,23 @@ export default function FocusAreasPage() {
                         ~{recCases} {recCases === 1 ? 'case' : 'cases'}, ~{recMinutes} min
                       </div>
                     </div>
-                    <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, fontSize: 13, color: cssScore(s.score), flexShrink: 0 }}>
+                    <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, fontSize: 13, color: urgencyColor, flexShrink: 0 }}>
                       {s.score}
                     </span>
                     <span style={{
                       fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4,
                       color: urgencyColor, background: urgencyBg, flexShrink: 0,
                     }}>
-                      {urgency}
+                      {urgencyLabel}
                     </span>
                     <span style={{
                       fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 4,
-                      color: LEVEL_COLOR[recLevel], background: 'var(--surface3)', flexShrink: 0,
+                      color: 'var(--text-secondary)', background: 'var(--surface3)', flexShrink: 0,
                     }}>
                       {recLevel}
                     </span>
                     <button
-                      onClick={() => alert(`Launching ${s.name} case…`)}
+                      onClick={() => router.push('/trainer')}
                       style={{
                         fontSize: 12, fontWeight: 600, color: 'var(--accent)',
                         background: 'rgba(79,156,249,0.1)', border: '1px solid rgba(79,156,249,0.2)',
@@ -312,7 +315,7 @@ export default function FocusAreasPage() {
                       {d.teaching}
                     </p>
                     <button
-                      onClick={() => alert(`Explain the key distinguishing features of ${d.correctDx} vs ${d.yourDx}`)}
+                      onClick={() => router.push('/trainer')}
                       style={{
                         fontSize: 11, fontWeight: 600, color: 'var(--accent)',
                         background: 'rgba(79,156,249,0.1)', border: '1px solid rgba(79,156,249,0.2)',

@@ -57,7 +57,7 @@ export default function ProgressPage() {
     })
   }, [])
 
-  const totalCases = sessions.length
+  const totalCases = sessions.filter(s => s.system).length
   const avgScore = useMemo(() =>
     totalCases ? Math.round(sessions.reduce((a, s) => a + s.score, 0) / totalCases) : 0,
   [sessions, totalCases])
@@ -68,6 +68,13 @@ export default function ProgressPage() {
     if (!totalCases) return '—'
     return fmtSeconds(Math.round(sessions.reduce((a, s) => a + s.elapsed_seconds, 0) / totalCases))
   }, [sessions, totalCases])
+  const medianTimeStr = useMemo(() => {
+    if (!totalCases) return ''
+    const sorted = [...sessions].map(s => s.elapsed_seconds).sort((a, b) => a - b)
+    const mid = Math.floor(sorted.length / 2)
+    const median = sorted.length % 2 ? sorted[mid] : Math.round((sorted[mid - 1] + sorted[mid]) / 2)
+    return `${Math.floor(median / 60)}m`
+  }, [sessions, totalCases])
 
   return (
     <div className="dx-root">
@@ -77,33 +84,39 @@ export default function ProgressPage() {
 
           <div>
             <h1 className="heading-display text-[22px]"><span className="heading-accent">Progress</span> over time</h1>
-            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--muted)' }}>Your learning trajectory over time</p>
+            <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--muted)' }}>
+              {totalCases > 0 ? `${totalCases} case${totalCases !== 1 ? 's' : ''} tracked` : 'Complete your first case to start tracking progress'}
+            </p>
           </div>
 
           {loaded && totalCases === 0 ? (
             <div className="dx-card">
               <div className="dx-card-body dx-progress-locked">
                 <p>Complete your first case to start seeing your progress.</p>
+                <a href="/trainer" style={{ fontSize: 13, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>
+                  Start a case →
+                </a>
               </div>
             </div>
           ) : (
             <>
               <div className="dx-stats-row">
                 {[
-                  { label: 'Total Cases',  value: String(totalCases), color: 'var(--text)' },
-                  { label: 'Avg Score',    value: String(avgScore),   color: cssScore(avgScore) },
-                  { label: 'Correct Rate', value: `${correctRate}%`,  color: 'var(--green)' },
-                  { label: 'Avg Time',     value: avgTimeStr,         color: 'var(--muted)' },
-                ].map(({ label, value, color }) => (
+                  { label: 'Total Cases',  value: String(totalCases), color: 'var(--text)',    tip: 'Total completed cases with a recognized system', note: undefined },
+                  { label: 'Avg Score',    value: `${avgScore}/100`,  color: cssScore(avgScore), tip: 'Mean rubric score across all completed cases (0–100)', note: undefined },
+                  { label: 'Correct Rate', value: `${correctRate}%`,  color: 'var(--green)',  tip: 'Percent of cases where the core diagnosis was marked correct', note: undefined },
+                  { label: 'Avg Time',     value: avgTimeStr,         color: 'var(--muted)',  tip: 'Average time spent per case from first question to diagnosis', note: medianTimeStr ? `· median ${medianTimeStr}` : undefined },
+                ].map(({ label, value, color, tip, note }) => (
                   <div key={label} className="dx-stat-card">
-                    <div className="dx-stat-label">{label}</div>
+                    <div className="dx-stat-label" title={tip}>{label}</div>
                     <div className="dx-stat-value" style={{ color }}>{value}</div>
+                    {note && <div style={{ fontSize: 10, color: 'var(--muted)', marginTop: 2 }}>{note}</div>}
                   </div>
                 ))}
               </div>
               <ScoreOverTime sessions={sessions} />
               <ComponentScoreTrends sessions={sessions} />
-              <PerformanceBreakdown sessions={sessions} />
+              <PerformanceBreakdown sessions={sessions.filter(s => s.system)} />
               <ActivityCalendar sessions={sessions} />
             </>
           )}

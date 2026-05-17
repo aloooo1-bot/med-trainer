@@ -1,0 +1,363 @@
+{
+  "caseNum": 10,
+  "system": "Psychiatric",
+  "difficulty": "Foundations",
+  "transcript": [
+    {
+      "role": "student",
+      "content": "Have you noticed feeling cold more than usual, or has your skin or hair changed at all recently — like dryness or hair falling out?"
+    },
+    {
+      "role": "patient",
+      "content": "Hmm, that's an interesting question... I don't think I've been feeling unusually cold, no. My skin might be a little dry but honestly I figured that was just the winter air or maybe because I haven't been taking great care of myself lately. I haven't really noticed my hair falling out or anything like that."
+    },
+    {
+      "role": "student",
+      "content": "Is there any history of mood episodes in the past where you felt the opposite — like unusually high energy, needing less sleep, or feeling like you could do everything at once?"
+    },
+    {
+      "role": "patient",
+      "content": "No, nothing like that that I can think of. I've always been pretty even-keeled before these last two months — like, I'd have normal good days and bad days but nothing where I felt like I was on top of the world or had this crazy burst of energy. This low feeling I have now is really different from anything I've experienced before."
+    },
+    {
+      "role": "student",
+      "content": "Has anyone in your family been diagnosed with depression, bipolar disorder, or thyroid problems?"
+    },
+    {
+      "role": "patient",
+      "content": "Yeah, actually my mom has depression — she takes sertraline for it and it seems to help her. And my dad's brother, my uncle, apparently had some kind of \"mood swings\" but as far as I know he was never officially diagnosed with anything. I don't know of anyone having thyroid problems in my family though."
+    }
+  ],
+  "testsOrdered": [
+    "Thyroid Function Tests",
+    "CBC",
+    "BMP",
+    "Urine Drug Screen"
+  ],
+  "diagnosis": "Major Depressive Disorder (MDD)",
+  "reasoning": "Dmitri meets DSM-5 criteria for MDD: depressed mood, anhedonia, fatigue, insomnia with early morning awakening, decreased appetite with 12-lb weight loss, worthlessness, and impaired concentration — all persisting for two months without an identifiable precipitant. I ordered thyroid function tests to rule out hypothyroidism, which is a key organic mimic of depression and should always be excluded before diagnosing a primary mood disorder, especially with fatigue and weight changes. CBC and BMP help screen for anemia, metabolic disturbances, or other systemic illness contributing to his presentation. Urine drug screen rules out substance-related mood disorder. If labs come back normal — which I'd expect here given his vitals are completely unremarkable and he denies substance use — this strongly supports a primary psychiatric diagnosis of MDD. I'd also want to clarify the absence of manic or hypomanic episodes before committing to MDD over Bipolar II disorder.",
+  "studentNotes": "A few things I'm still turning over: the weight loss is 12 pounds, which is significant — I keep wondering if I should be thinking about something more systemic, though logically depression itself can cause this level of weight loss. I also want to make sure I'm not missing Bipolar II because starting an SSRI without a mood stabilizer in a bipolar patient can precipitate mania, and that's a real safety issue. I didn't order CT Head because nothing in this presentation — no headache, no focal neuro deficits, vitals normal — suggests a structural cause, and I think imaging would be low yield here. I'd want to ask my attending whether iron studies are worth adding given the fatigue and weight loss, or if that's over-testing at this stage. Also want to confirm: does the 'no precipitating event' part actually support MDD, or does it just mean it's more endogenous — I think it's the latter but I'm not 100% sure how that factors into the diagnostic criteria.",
+  "caseData": {
+    "patientInfo": {
+      "name": "Dmitri Voloshyn",
+      "age": 27,
+      "gender": "Male",
+      "chiefComplaint": "Depressed mood, loss of interest, and fatigue for two months"
+    },
+    "hpi": "Dmitri Voloshyn is a 27-year-old Ukrainian male presenting with a two-month history of persistent low mood, loss of interest in activities he previously enjoyed, and profound fatigue. He reports difficulty falling asleep and early morning awakening, along with a decreased appetite that has led to an unintentional 12-pound weight loss. He describes feelings of worthlessness and difficulty concentrating at work, which has affected his job performance as a software developer. He denies any suicidal ideation, psychotic symptoms, or recent substance use, and reports no precipitating life event that he can identify.",
+    "vitals": {
+      "bp": "118/74",
+      "hr": 72,
+      "rr": 16,
+      "temp": 98.4,
+      "spo2": 99,
+      "weight": "163 lbs"
+    },
+    "diagnosis": "Major Depressive Disorder (MDD), single episode, moderate severity",
+    "differentials": [
+      "Hypothyroidism",
+      "Bipolar I Disorder (depressive episode)",
+      "Persistent Depressive Disorder (Dysthymia)",
+      "Adjustment Disorder with Depressed Mood"
+    ],
+    "keyQuestions": [
+      "Have you ever had a period of unusually elevated mood, decreased need for sleep, or grandiosity lasting several days or more?",
+      "Do you have any current thoughts of suicide, self-harm, or feeling that life is not worth living?",
+      "Has there been any significant stressor, loss, or life change in the past six months?",
+      "Do you have a personal or family history of depression, bipolar disorder, or other psychiatric illness?"
+    ],
+    "teachingPoints": [
+      "Major Depressive Disorder requires at least 5 of 9 DSM-5 criteria present for ≥2 weeks, with at least one being depressed mood or anhedonia; this patient meets 6 criteria (depressed mood, anhedonia, sleep disturbance, weight loss/appetite change, fatigue, and difficulty concentrating).",
+      "Hypothyroidism is a critical medical mimic of MDD and must be excluded with a TSH before attributing symptoms to a primary psychiatric disorder; an elevated TSH with low free T4 would redirect the diagnosis.",
+      "Eliciting a thorough personal and family history of manic or hypomanic episodes is essential before starting an antidepressant, as undiagnosed Bipolar Disorder may be precipitated into mania by antidepressant monotherapy.",
+      "First-line treatment for moderate MDD includes a combination of a selective serotonin reuptake inhibitor (SSRI) and psychotherapy (specifically cognitive behavioral therapy or interpersonal therapy); response is typically assessed at 4-8 weeks."
+    ],
+    "availableLabs": [
+      "CBC",
+      "BMP",
+      "Thyroid Function Tests",
+      "Iron Studies",
+      "Urine Drug Screen"
+    ],
+    "availableImaging": [
+      "CT Head (Non-contrast)"
+    ],
+    "labGroups": [
+      {
+        "name": "CBC",
+        "tests": [
+          "CBC"
+        ]
+      },
+      {
+        "name": "BMP",
+        "tests": [
+          "BMP"
+        ]
+      },
+      {
+        "name": "Thyroid Function Tests",
+        "tests": [
+          "Thyroid Function Tests"
+        ]
+      },
+      {
+        "name": "Iron Studies",
+        "tests": [
+          "Iron Studies"
+        ]
+      },
+      {
+        "name": "Urine Drug Screen",
+        "tests": [
+          "Urine Drug Screen"
+        ]
+      }
+    ],
+    "labResults": {
+      "CBC": {
+        "components": [
+          {
+            "name": "WBC",
+            "value": "6.8",
+            "unit": "x10³/µL",
+            "referenceRange": "4.5-11.0",
+            "status": "normal"
+          },
+          {
+            "name": "Hemoglobin",
+            "value": "14.2",
+            "unit": "g/dL",
+            "referenceRange": "13.5-17.5",
+            "status": "normal"
+          },
+          {
+            "name": "Hematocrit",
+            "value": "42",
+            "unit": "%",
+            "referenceRange": "41-53",
+            "status": "normal"
+          },
+          {
+            "name": "Platelets",
+            "value": "238",
+            "unit": "x10³/µL",
+            "referenceRange": "150-400",
+            "status": "normal"
+          },
+          {
+            "name": "MCV",
+            "value": "88",
+            "unit": "fL",
+            "referenceRange": "80-100",
+            "status": "normal"
+          }
+        ]
+      },
+      "BMP": {
+        "components": [
+          {
+            "name": "Sodium",
+            "value": "139",
+            "unit": "mEq/L",
+            "referenceRange": "136-145",
+            "status": "normal"
+          },
+          {
+            "name": "Potassium",
+            "value": "4.1",
+            "unit": "mEq/L",
+            "referenceRange": "3.5-5.1",
+            "status": "normal"
+          },
+          {
+            "name": "Chloride",
+            "value": "102",
+            "unit": "mEq/L",
+            "referenceRange": "98-107",
+            "status": "normal"
+          },
+          {
+            "name": "Bicarbonate",
+            "value": "24",
+            "unit": "mEq/L",
+            "referenceRange": "22-29",
+            "status": "normal"
+          },
+          {
+            "name": "BUN",
+            "value": "14",
+            "unit": "mg/dL",
+            "referenceRange": "7-20",
+            "status": "normal"
+          },
+          {
+            "name": "Creatinine",
+            "value": "0.9",
+            "unit": "mg/dL",
+            "referenceRange": "0.74-1.35",
+            "status": "normal"
+          },
+          {
+            "name": "Glucose",
+            "value": "88",
+            "unit": "mg/dL",
+            "referenceRange": "70-99",
+            "status": "normal"
+          }
+        ]
+      },
+      "Thyroid Function Tests": {
+        "components": [
+          {
+            "name": "TSH",
+            "value": "1.8",
+            "unit": "mIU/L",
+            "referenceRange": "0.4-4.0",
+            "status": "normal"
+          },
+          {
+            "name": "Free T4",
+            "value": "1.1",
+            "unit": "ng/dL",
+            "referenceRange": "0.8-1.8",
+            "status": "normal"
+          }
+        ]
+      },
+      "Iron Studies": {
+        "components": [
+          {
+            "name": "Serum Iron",
+            "value": "92",
+            "unit": "µg/dL",
+            "referenceRange": "60-170",
+            "status": "normal"
+          },
+          {
+            "name": "TIBC",
+            "value": "310",
+            "unit": "µg/dL",
+            "referenceRange": "240-450",
+            "status": "normal"
+          },
+          {
+            "name": "Ferritin",
+            "value": "68",
+            "unit": "ng/mL",
+            "referenceRange": "30-400",
+            "status": "normal"
+          }
+        ]
+      },
+      "Urine Drug Screen": {
+        "components": [
+          {
+            "name": "Amphetamines",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          },
+          {
+            "name": "Cocaine metabolites",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          },
+          {
+            "name": "Opiates",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          },
+          {
+            "name": "Cannabinoids (THC)",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          },
+          {
+            "name": "Benzodiazepines",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          }
+        ]
+      }
+    },
+    "imagingResults": {
+      "CT Head (Non-contrast)": "Non-contrast CT of the brain demonstrates no acute intracranial hemorrhage, mass lesion, midline shift, or hydrocephalus. Gray-white matter differentiation is preserved throughout. Visualized bony structures are intact with no acute osseous abnormality. Overall, the study is within normal limits."
+    },
+    "procedureResults": {},
+    "hiddenHistory": {
+      "fullHistory": "Patient endorses anhedonia, hypersomnia alternating with early awakening, appetite loss with 12-lb weight loss over two months, fatigue, psychomotor slowing, difficulty concentrating, and feelings of worthlessness. He explicitly denies current suicidal ideation but admits to passive thoughts that 'life feels pointless' which he has not acted upon.",
+      "socialHistory": "Non-smoker. Drinks alcohol socially (2-3 drinks per week). Works remotely as a software developer. No recent international travel. Lives alone in a studio apartment. Reports social isolation over the past several months and has been declining invitations from friends.",
+      "familyHistory": "Mother has a history of depression, treated with sertraline. Paternal uncle had 'mood swings' but no formal diagnosis documented. No known family history of suicide or bipolar disorder.",
+      "medications": "None currently. No recent use of beta-blockers, corticosteroids, or other medications known to cause depressive symptoms.",
+      "hiddenSymptoms": "If asked specifically, patient confirms that he has been crying unexpectedly at times for no clear reason, and that he has noticed a significant decrease in sexual libido over the past 6 weeks.",
+      "allergies": "NKDA"
+    },
+    "imagingCategory": "Normal neuroimaging",
+    "ecgFindings": "",
+    "hematologyFindings": "",
+    "urineFindings": "",
+    "skinFindings": "",
+    "fundusFindings": "",
+    "biopsyFindings": ""
+  },
+  "correctDiagnosis": "Major Depressive Disorder (MDD), single episode, moderate severity",
+  "workingDiagnosis": "Major Depressive Disorder (MDD)",
+  "clinicalImpression": "This 27-year-old male presents with a classic constellation of depressive symptoms — depressed mood, anhedonia, fatigue, insomnia with early morning awakening, decreased appetite with significant weight loss, worthlessness, and poor concentration — lasting two months, which meets the duration criterion for MDD. My initial instinct is MDD, but I want to make sure I'm not missing an organic cause like hypothyroidism, which can mimic depression almost perfectly. The 12-pound weight loss is a little concerning and makes me want to rule out something systemic before anchoring on a psychiatric diagnosis.",
+  "grading": {
+    "score": 93,
+    "correct": true,
+    "feedback": "Excellent diagnostic performance — you correctly identified Major Depressive Disorder and ordered a thorough, appropriate workup that ruled out key medical mimics including hypothyroidism and substance use. Your interview was well-targeted, covering bipolar history and family psychiatric history, though directly asking about suicidal ideation and recent life stressors would have rounded out the safety assessment. Overall, this is a strong foundation-level performance.",
+    "strengths": [
+      "Asked specifically about past manic or hypomanic episodes, which is safety-critical before initiating antidepressant therapy",
+      "Elicited family psychiatric history including the mother's depression and the uncle's mood swings, relevant for risk stratification",
+      "Ordered TSH and Free T4 to exclude hypothyroidism — the most important medical mimic of MDD",
+      "Ordered a urine drug screen and CBC/BMP to rule out substance-related and metabolic causes of depressive symptoms"
+    ],
+    "dimensions": {
+      "historyInterview": {
+        "score": 19,
+        "feedback": "Covered bipolar screening and family history well, but did not directly ask about suicidal ideation or recent psychosocial stressors, both of which are management-critical in a depressive presentation."
+      },
+      "testOrdering": {
+        "score": 23,
+        "feedback": "Ordered a comprehensive and appropriate workup including TFTs, CBC, BMP, and urine drug screen — all core tests for ruling out secondary causes of depression with no unnecessary or harmful additions."
+      },
+      "diagnosisAccuracy": {
+        "score": 35,
+        "feedback": "Major Depressive Disorder is correct; the omission of episode qualifier ('single episode') and severity ('moderate') are minor modifiers that do not change the core diagnosis or management pathway at the Foundations level."
+      },
+      "diagnosisCompleteness": {
+        "score": 16,
+        "feedback": "The core diagnosis is named cleanly and correctly, which is fully complete at the Foundations difficulty level."
+      }
+    },
+    "missedQuestions": [
+      "Do you have any thoughts of suicide, self-harm, or feelings that life is not worth living? (Safety-critical; directly impacts management including level of care and monitoring frequency)",
+      "Has there been any significant stressor, loss, or major life change in the past several months? (Helps distinguish MDD from Adjustment Disorder with Depressed Mood, affecting treatment approach)"
+    ],
+    "teachingPoints": [
+      "Major Depressive Disorder requires at least 5 of 9 DSM-5 criteria present for ≥2 weeks, with at least one being depressed mood or anhedonia; this patient meets 6 criteria (depressed mood, anhedonia, sleep disturbance, weight loss/appetite change, fatigue, and difficulty concentrating).",
+      "Hypothyroidism is a critical medical mimic of MDD and must be excluded with a TSH before attributing symptoms to a primary psychiatric disorder; an elevated TSH with low free T4 would redirect the diagnosis.",
+      "Eliciting a thorough personal and family history of manic or hypomanic episodes is essential before starting an antidepressant, as undiagnosed Bipolar Disorder may be precipitated into mania by antidepressant monotherapy.",
+      "First-line treatment for moderate MDD includes a combination of a selective serotonin reuptake inhibitor (SSRI) and psychotherapy (specifically cognitive behavioral therapy or interpersonal therapy); response is typically assessed at 4-8 weeks."
+    ],
+    "differentials": [
+      "Hypothyroidism: presents with fatigue, weight changes, low mood, and cognitive slowing — excluded here by normal TSH (1.8 mIU/L) and Free T4 (1.1 ng/dL).",
+      "Bipolar I Disorder (depressive episode): must be excluded before diagnosing MDD; the patient denied any past hypomanic or manic episodes and has no documented family history of bipolar disorder, making this less likely.",
+      "Persistent Depressive Disorder (Dysthymia): characterized by low-grade depressed mood lasting ≥2 years; this patient's symptoms are only two months old and appear to represent a more acute, moderate-severity episode consistent with MDD.",
+      "Adjustment Disorder with Depressed Mood: depressive symptoms arising in response to an identifiable stressor and resolving within 6 months; the patient denies a precipitating event, and the symptom severity (weight loss, anhedonia, cognitive impairment) exceeds what is expected for adjustment disorder."
+    ]
+  },
+  "score": 93,
+  "correct": true
+}

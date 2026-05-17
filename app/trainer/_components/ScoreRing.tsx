@@ -78,18 +78,18 @@ export function CategoryRow({
 export function NotesResultPanel({ content }: { content: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="rounded-lg border border-caution-border bg-caution-bg">
+    <div className="rounded-lg border border-surface-3 bg-surface-2">
       <button
         onClick={() => setOpen(v => !v)}
         className="flex w-full items-center justify-between px-5 py-3 text-left"
       >
-        <span className="text-sm font-semibold text-caution">Your Case Notes</span>
+        <span className="text-sm font-semibold text-ink-secondary">Your Case Notes</span>
         <svg className={`w-4 h-4 text-ink-tertiary transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
       {open && (
-        <div className="border-t border-caution-border px-5 py-4">
+        <div className="border-t border-surface-3 px-5 py-4">
           <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-ink-secondary">{content}</pre>
           <p className="mt-3 text-xs text-ink-tertiary italic border-t border-surface-4 pt-3">
             Compare your notes with the teaching points and differential discussion above to identify gaps in your reasoning.
@@ -103,18 +103,18 @@ export function NotesResultPanel({ content }: { content: string }) {
 export function ScorecardNotesPanel({ content }: { content: string }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="rounded-lg border border-caution/30 bg-caution/5">
+    <div className="rounded-lg border border-surface-3 bg-surface-2">
       <button
         onClick={() => setOpen(v => !v)}
         className="flex w-full items-center justify-between px-5 py-3 text-left"
       >
-        <span className="text-sm font-semibold text-caution">Your Case Notes</span>
+        <span className="text-sm font-semibold text-ink-secondary">Your Case Notes</span>
         <svg className={`w-4 h-4 text-ink-3 transition-transform ${open ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
       {open && (
-        <div className="border-t border-caution/30 px-5 py-4">
+        <div className="border-t border-surface-3 px-5 py-4">
           <pre className="whitespace-pre-wrap font-mono text-xs leading-relaxed text-ink-2">{content}</pre>
         </div>
       )}

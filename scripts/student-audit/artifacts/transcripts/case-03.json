@@ -1,0 +1,387 @@
+{
+  "caseNum": 3,
+  "system": "Neurologic",
+  "difficulty": "Foundations",
+  "transcript": [
+    {
+      "role": "student",
+      "content": "Did the headache come on literally all at once — like a thunderclap — or did it build up over a minute or two?"
+    },
+    {
+      "role": "patient",
+      "content": "Yeah, it was like... instant. Like someone literally hit me over the back of the head with a bat — it just exploded out of nowhere while I was in the middle of a lift. There was no warning, no build-up, it was just suddenly the worst pain I've ever felt in my life."
+    },
+    {
+      "role": "student",
+      "content": "Do you have any family history of brain aneurysms, polycystic kidney disease, or anyone in your family who died suddenly of a brain bleed?"
+    },
+    {
+      "role": "patient",
+      "content": "Yeah, actually — my dad was diagnosed with a brain aneurysm a few years back, though thankfully it never ruptured, they just found it by accident during some scan. And my mom's sister has polycystic kidney disease. I'm not sure if those things are related but... is that important?"
+    },
+    {
+      "role": "student",
+      "content": "Have you had any recent illnesses, sick contacts, or a stiff neck before today — like days before the headache started?"
+    },
+    {
+      "role": "patient",
+      "content": "No, nothing like that — no fever, no cold, no one around me has been sick. The neck stiffness only started maybe an hour or so after the headache hit, it wasn't there before today at all."
+    }
+  ],
+  "testsOrdered": [
+    "Non-Contrast CT Head",
+    "Lumbar Puncture (CSF Analysis)",
+    "CT Angiography Head",
+    "CBC",
+    "BMP",
+    "Coagulation Studies"
+  ],
+  "diagnosis": "Subarachnoid Hemorrhage (SAH), likely aneurysmal",
+  "reasoning": "The combination of thunderclap headache reaching maximal intensity within seconds during exertion, 'worst headache of his life,' nausea/vomiting, photophobia, and delayed nuchal rigidity is the classic presentation of aneurysmal SAH — meningeal irritation from blood takes time to develop, which explains the neck stiffness appearing an hour after onset. Non-contrast CT head is the right first step since it detects blood in up to 95% of SAH cases within the first 6 hours. If CT is negative but clinical suspicion remains high, LP is critical — xanthochromia or elevated RBCs that don't clear between tubes 1 and 4 would confirm the diagnosis. CT angiography would then follow to identify a culprit aneurysm. I ordered CBC and coags partly out of habit for any ED patient, but also because knowing his platelet count and coagulation status matters if he's going to need neurosurgical intervention. Bacterial meningitis stays on my differential given the fever and neck stiffness, but the explosive thunderclap onset and exertional trigger point strongly away from it.",
+  "studentNotes": "",
+  "caseData": {
+    "patientInfo": {
+      "name": "Dmitri Voloshyn",
+      "age": 34,
+      "gender": "Male",
+      "chiefComplaint": "Sudden severe headache"
+    },
+    "hpi": "Dmitri Voloshyn is a 34-year-old male who presents to the emergency department with a sudden-onset, severe headache that he describes as 'the worst headache of my life.' The headache began approximately 3 hours ago while he was lifting weights at the gym and reached maximal intensity within seconds. He reports associated nausea and two episodes of vomiting since onset. He notes mild sensitivity to light and stiffness in his neck that developed about an hour after the headache began. He denies any prior history of similar headaches, fever, vision changes, or focal neurological deficits.",
+    "vitals": {
+      "bp": "158/94",
+      "hr": 96,
+      "rr": 18,
+      "temp": 99.1,
+      "spo2": 98,
+      "weight": "192 lbs"
+    },
+    "diagnosis": "Subarachnoid Hemorrhage (SAH)",
+    "differentials": [
+      "Thunderclap migraine",
+      "Bacterial meningitis",
+      "Hypertensive emergency with headache",
+      "Cerebral venous sinus thrombosis"
+    ],
+    "keyQuestions": [
+      "Did this headache reach maximum intensity within seconds (thunderclap onset)?",
+      "Have you ever had a headache like this before?",
+      "Do you have a personal or family history of intracranial aneurysms or polycystic kidney disease?",
+      "Are you experiencing any vision changes, weakness, or difficulty speaking?"
+    ],
+    "teachingPoints": [
+      "A 'thunderclap headache' — maximal intensity within seconds — is the classic presentation of subarachnoid hemorrhage and must be treated as SAH until proven otherwise. Non-contrast head CT is the first-line test and is highly sensitive (>98%) within 6 hours of onset.",
+      "When CT is negative but clinical suspicion for SAH remains high, lumbar puncture is mandatory to look for xanthochromia (yellow discoloration of CSF) or elevated red blood cells that do not clear between tubes 1 and 4 — these findings are pathognomonic for SAH.",
+      "The most common cause of non-traumatic SAH is rupture of a saccular (berry) aneurysm, typically at arterial bifurcations of the Circle of Willis. CT angiography or formal cerebral angiography is used to identify the responsible aneurysm for definitive treatment."
+    ],
+    "availableLabs": [
+      "CBC",
+      "BMP",
+      "Coagulation Studies",
+      "LFTs",
+      "Lumbar Puncture (CSF Analysis)"
+    ],
+    "availableImaging": [
+      "Non-Contrast CT Head",
+      "CT Angiography Head"
+    ],
+    "labGroups": [
+      {
+        "name": "CBC",
+        "tests": [
+          "CBC"
+        ]
+      },
+      {
+        "name": "BMP",
+        "tests": [
+          "BMP"
+        ]
+      },
+      {
+        "name": "Coagulation Studies",
+        "tests": [
+          "Coagulation Studies"
+        ]
+      },
+      {
+        "name": "LFTs",
+        "tests": [
+          "LFTs"
+        ]
+      },
+      {
+        "name": "Lumbar Puncture (CSF Analysis)",
+        "tests": [
+          "Lumbar Puncture (CSF Analysis)"
+        ]
+      }
+    ],
+    "labResults": {
+      "CBC": {
+        "components": [
+          {
+            "name": "WBC",
+            "value": "10.8",
+            "unit": "x10³/µL",
+            "referenceRange": "4.5-11.0",
+            "status": "normal"
+          },
+          {
+            "name": "Hgb",
+            "value": "14.6",
+            "unit": "g/dL",
+            "referenceRange": "13.5-17.5",
+            "status": "normal"
+          },
+          {
+            "name": "Hct",
+            "value": "43.2",
+            "unit": "%",
+            "referenceRange": "41-53",
+            "status": "normal"
+          },
+          {
+            "name": "Platelets",
+            "value": "224",
+            "unit": "x10³/µL",
+            "referenceRange": "150-400",
+            "status": "normal"
+          }
+        ]
+      },
+      "BMP": {
+        "components": [
+          {
+            "name": "Sodium",
+            "value": "138",
+            "unit": "mEq/L",
+            "referenceRange": "136-145",
+            "status": "normal"
+          },
+          {
+            "name": "Potassium",
+            "value": "3.9",
+            "unit": "mEq/L",
+            "referenceRange": "3.5-5.0",
+            "status": "normal"
+          },
+          {
+            "name": "Chloride",
+            "value": "101",
+            "unit": "mEq/L",
+            "referenceRange": "98-106",
+            "status": "normal"
+          },
+          {
+            "name": "Bicarbonate",
+            "value": "23",
+            "unit": "mEq/L",
+            "referenceRange": "22-29",
+            "status": "normal"
+          },
+          {
+            "name": "BUN",
+            "value": "14",
+            "unit": "mg/dL",
+            "referenceRange": "7-20",
+            "status": "normal"
+          },
+          {
+            "name": "Creatinine",
+            "value": "0.9",
+            "unit": "mg/dL",
+            "referenceRange": "0.7-1.3",
+            "status": "normal"
+          },
+          {
+            "name": "Glucose",
+            "value": "104",
+            "unit": "mg/dL",
+            "referenceRange": "70-100",
+            "status": "high"
+          }
+        ]
+      },
+      "Coagulation Studies": {
+        "components": [
+          {
+            "name": "PT",
+            "value": "11.8",
+            "unit": "seconds",
+            "referenceRange": "11.0-13.5",
+            "status": "normal"
+          },
+          {
+            "name": "INR",
+            "value": "1.0",
+            "unit": "",
+            "referenceRange": "0.9-1.1",
+            "status": "normal"
+          },
+          {
+            "name": "aPTT",
+            "value": "29",
+            "unit": "seconds",
+            "referenceRange": "25-35",
+            "status": "normal"
+          }
+        ]
+      },
+      "LFTs": {
+        "components": [
+          {
+            "name": "AST",
+            "value": "28",
+            "unit": "U/L",
+            "referenceRange": "10-40",
+            "status": "normal"
+          },
+          {
+            "name": "ALT",
+            "value": "22",
+            "unit": "U/L",
+            "referenceRange": "7-56",
+            "status": "normal"
+          },
+          {
+            "name": "Total Bilirubin",
+            "value": "0.8",
+            "unit": "mg/dL",
+            "referenceRange": "0.2-1.2",
+            "status": "normal"
+          },
+          {
+            "name": "Alkaline Phosphatase",
+            "value": "67",
+            "unit": "U/L",
+            "referenceRange": "44-147",
+            "status": "normal"
+          }
+        ]
+      },
+      "Lumbar Puncture (CSF Analysis)": {
+        "components": [
+          {
+            "name": "Opening Pressure",
+            "value": "24",
+            "unit": "cm H2O",
+            "referenceRange": "7-18",
+            "status": "high"
+          },
+          {
+            "name": "Appearance",
+            "value": "Xanthochromic (yellow)",
+            "unit": "",
+            "referenceRange": "Clear and colorless",
+            "status": "abnormal"
+          },
+          {
+            "name": "RBC (Tube 1)",
+            "value": "85,000",
+            "unit": "cells/µL",
+            "referenceRange": "0-5",
+            "status": "high"
+          },
+          {
+            "name": "RBC (Tube 4)",
+            "value": "82,000",
+            "unit": "cells/µL",
+            "referenceRange": "0-5",
+            "status": "high"
+          },
+          {
+            "name": "WBC",
+            "value": "12",
+            "unit": "cells/µL",
+            "referenceRange": "0-5",
+            "status": "high"
+          },
+          {
+            "name": "Protein",
+            "value": "98",
+            "unit": "mg/dL",
+            "referenceRange": "15-45",
+            "status": "high"
+          },
+          {
+            "name": "Glucose",
+            "value": "62",
+            "unit": "mg/dL",
+            "referenceRange": "50-80",
+            "status": "normal"
+          }
+        ]
+      }
+    },
+    "imagingResults": {
+      "Non-Contrast CT Head": "Hyperdense blood is identified within the basal cisterns, sylvian fissures bilaterally, and the interhemispheric fissure, consistent with acute subarachnoid hemorrhage. No hydrocephalus or herniation is identified. No intraparenchymal hemorrhage is seen.",
+      "CT Angiography Head": "CT angiography of the circle of Willis demonstrates a 6mm saccular aneurysm arising from the junction of the left internal carotid artery and posterior communicating artery (PComm). No additional aneurysms are identified. Findings are consistent with the source of subarachnoid hemorrhage."
+    },
+    "procedureResults": {
+      "Lumbar Puncture (CSF Analysis)": "Lumbar puncture performed at L3-L4 with patient in lateral decubitus position. Opening pressure elevated at 24 cm H2O. CSF is visibly xanthochromic (yellow-tinged). Red blood cell counts are uniformly elevated in tubes 1 and 4 (85,000 and 82,000 cells/µL respectively), confirming a non-traumatic hemorrhagic source rather than a traumatic tap. Xanthochromia in the setting of non-clearing RBCs is pathognomonic for subarachnoid hemorrhage. Gram stain negative; cultures pending."
+    },
+    "hiddenHistory": {
+      "fullHistory": "No prior history of migraines or recurrent headaches. No prior neurological events.",
+      "socialHistory": "Non-smoker. Occasional alcohol use on weekends (2-3 drinks). Works as an IT engineer. No recent travel. Regular gym-goer.",
+      "familyHistory": "Father had a brain aneurysm detected incidentally at age 58; no rupture. Maternal aunt has polycystic kidney disease.",
+      "medications": "Ibuprofen 400mg PRN (rarely used). No anticoagulants or antiplatelets.",
+      "hiddenSymptoms": "Patient reports a brief episode of 'sentinel headache' — a milder but sudden severe headache — approximately 2 weeks ago that resolved within an hour, which he attributed to dehydration. Patient also admits to a very brief loss of consciousness lasting a few seconds at headache onset.",
+      "allergies": "NKDA"
+    },
+    "imagingCategory": "Hyperdense basal cisterns on non-contrast CT",
+    "ecgFindings": "",
+    "hematologyFindings": "",
+    "urineFindings": "",
+    "skinFindings": "",
+    "fundusFindings": "",
+    "biopsyFindings": ""
+  },
+  "correctDiagnosis": "Subarachnoid Hemorrhage (SAH)",
+  "workingDiagnosis": "Subarachnoid Hemorrhage (SAH)",
+  "clinicalImpression": "This 34-year-old male presenting with a sudden-onset 'worst headache of my life' that reached maximal intensity within seconds — that's textbook thunderclap headache, and SAH is the first thing that jumps to mind. The associated nausea, vomiting, photophobia, and especially the nuchal rigidity developing about an hour later really fits with meningeal irritation from blood in the subarachnoid space. I'm also keeping meningitis in the back of my mind given the neck stiffness and low-grade fever, but the ultra-sudden onset and exertional trigger make SAH feel much more likely here.",
+  "grading": {
+    "score": 93,
+    "correct": true,
+    "feedback": "Excellent diagnostic performance — the student correctly identified subarachnoid hemorrhage with aneurysmal etiology, which is the precise diagnosis supported by all clinical and imaging findings. The interview was efficiently targeted, surfacing the thunderclap onset, family history of aneurysm and PKD, and ruling out infectious prodrome, all of which are high-yield for this presentation. The added qualifier 'likely aneurysmal' demonstrates strong clinical reasoning appropriate for a Foundations student.",
+    "strengths": [
+      "Correctly identified SAH as the diagnosis and added clinically accurate specificity ('likely aneurysmal') supported by family history and imaging findings",
+      "Asked about thunderclap onset quality — directly confirmed the hallmark presentation of SAH",
+      "Elicited family history of intracranial aneurysm and polycystic kidney disease, both of which are established risk factors for aneurysmal SAH",
+      "Appropriately ruled out infectious etiology by asking about prior neck stiffness, fever, and sick contacts"
+    ],
+    "dimensions": {
+      "historyInterview": {
+        "score": 21,
+        "feedback": "The student asked the three most critical questions (thunderclap onset, family history of aneurysm/PKD, and infectious prodrome), covering the core diagnostic and risk-stratification ground; minor missed areas include focal neurological symptoms and any prior similar headaches, but these did not meaningfully change management here."
+      },
+      "testOrdering": {
+        "score": 20,
+        "feedback": "The core diagnostic workup was complete — non-contrast CT head, LP with CSF analysis, CBC, BMP, coagulation studies, and CT angiography were all ordered appropriately and collectively confirmed the diagnosis and identified the aneurysm; no unnecessary or contraindicated tests were ordered."
+      },
+      "diagnosisAccuracy": {
+        "score": 36,
+        "feedback": "The diagnosis of 'Subarachnoid Hemorrhage (SAH), likely aneurysmal' is the correct core entity with an added qualifier that is clinically accurate and well-supported by the history, CSF findings, CT, and CTA — this merits full credit."
+      },
+      "diagnosisCompleteness": {
+        "score": 16,
+        "feedback": "At Foundations level, naming the correct core diagnosis is entirely sufficient, and the student exceeded expectations by correctly specifying the likely etiology."
+      }
+    },
+    "missedQuestions": [
+      "Have you had any focal neurological symptoms such as weakness, vision changes, or difficulty speaking? (relevant to ruling out concurrent intraparenchymal extension or vasospasm affecting management)"
+    ],
+    "teachingPoints": [
+      "A 'thunderclap headache' — maximal intensity within seconds — is the classic presentation of subarachnoid hemorrhage and must be treated as SAH until proven otherwise. Non-contrast head CT is the first-line test and is highly sensitive (>98%) within 6 hours of onset.",
+      "When CT is negative but clinical suspicion for SAH remains high, lumbar puncture is mandatory to look for xanthochromia (yellow discoloration of CSF) or elevated red blood cells that do not clear between tubes 1 and 4 — these findings are pathognomonic for SAH.",
+      "The most common cause of non-traumatic SAH is rupture of a saccular (berry) aneurysm, typically at arterial bifurcations of the Circle of Willis. CT angiography or formal cerebral angiography is used to identify the responsible aneurysm for definitive treatment."
+    ],
+    "differentials": [
+      "Thunderclap migraine: Can present with sudden severe headache but is a diagnosis of exclusion — no prior migraine history, CSF xanthochromia, and CT findings definitively rule this out in this case.",
+      "Bacterial meningitis: Neck stiffness and elevated CSF WBC can overlap, but the absence of fever, xanthochromic CSF with a high RBC count that does not clear, and CT showing blood in the basal cisterns confirm SAH over meningitis.",
+      "Hypertensive emergency with headache: Can cause severe headache and secondary neurological findings, but no severely elevated BP is described, and CT/CSF findings are inconsistent with hypertensive encephalopathy alone.",
+      "Cerebral venous sinus thrombosis (CVST): Can cause sudden headache and elevated intracranial pressure, but the CT pattern of blood in the basal cisterns and the identified aneurysm on CTA make CVST implausible here."
+    ]
+  },
+  "score": 93,
+  "correct": true
+}

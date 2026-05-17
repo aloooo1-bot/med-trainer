@@ -47,7 +47,7 @@ export default function Dashboard({
   const [showOnboarding, setShowOnboarding] = useState(false)
 
   useEffect(() => {
-    if (firstCaseDone) return
+    if (firstCaseDone || sessions.length > 0) return
     try {
       if (!localStorage.getItem(ONBOARDING_DISMISSED_KEY)) setShowOnboarding(true)
     } catch {}

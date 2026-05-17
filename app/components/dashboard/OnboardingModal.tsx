@@ -20,7 +20,7 @@ const STEPS = [
   {
     icon: '📊',
     title: 'Submit your diagnosis & get graded',
-    body: 'Submit your leading diagnosis. You\'re graded across 5 dimensions: History, Testing, Accuracy, Completeness, and Reasoning — out of 90 points.',
+    body: 'Submit your leading diagnosis. You\'re graded across 4–5 dimensions: History, Testing, Accuracy, Completeness, and Reasoning — out of 100 points.',
   },
 ]
 
@@ -56,7 +56,7 @@ export default function OnboardingModal({
     <Modal open={open} onClose={dismiss} ariaLabel="Welcome to MedTrainer" maxWidth={460}>
       <div className="dx-modal-header">
         <span className="dx-modal-title">Welcome to MedTrainer</span>
-        <button className="dx-modal-close" onClick={dismiss} aria-label="Skip onboarding">×</button>
+        <button className="dx-modal-close" onClick={dismiss} aria-label="Close onboarding" title="Close">×</button>
       </div>
 
       <div className="dx-modal-body">

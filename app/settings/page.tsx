@@ -19,7 +19,7 @@ const DIFF_MIX_OPTIONS: { value: FocusSettings['difficultyMix']; label: string }
   { value: 'clinical-heavy',    label: 'Clinical heavy' },
   { value: 'advanced-heavy',    label: 'Advanced heavy' },
 ]
-const SUPPORT_EMAIL = 'jorellana9100@gmail.com'
+const SUPPORT_EMAIL = 'support@medtrainer.app'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
 
@@ -47,6 +47,7 @@ export default function SettingsPage() {
   const [deleteStatus,   setDeleteStatus]    = useState<SaveStatus>('idle')
 
   // Password change
+  const [currentPw, setCurrentPw]   = useState('')
   const [newPw, setNewPw]           = useState('')
   const [confirmPw, setConfirmPw]   = useState('')
   const [deleteConfirm, setDeleteConfirm] = useState('')
@@ -125,15 +126,16 @@ export default function SettingsPage() {
   }
 
   async function changePassword() {
+    if (!currentPw) { setPwStatus('error'); setTimeout(() => setPwStatus('idle'), 3000); return }
     if (newPw.length < 8) { setPwStatus('error'); setTimeout(() => setPwStatus('idle'), 3000); return }
     if (newPw !== confirmPw) { setPwStatus('error'); setTimeout(() => setPwStatus('idle'), 3000); return }
     setPwStatus('saving')
     const res = await fetch('/api/account/password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ password: newPw }),
+      body: JSON.stringify({ currentPassword: currentPw, password: newPw }),
     })
-    if (res.ok) { setPwStatus('saved'); setNewPw(''); setConfirmPw('') }
+    if (res.ok) { setPwStatus('saved'); setCurrentPw(''); setNewPw(''); setConfirmPw('') }
     else setPwStatus('error')
     setTimeout(() => setPwStatus('idle'), 3000)
   }
@@ -200,6 +202,7 @@ export default function SettingsPage() {
                     placeholder="Your name"
                     style={{ maxWidth: 320 }}
                   />
+                  <p className="dx-help-text" style={{ margin: '4px 0 0' }}>{displayName.length}/60 characters</p>
                 </div>
                 <div className="dx-field">
                   <label className="dx-label">Email</label>
@@ -208,7 +211,8 @@ export default function SettingsPage() {
                     type="email"
                     value={email}
                     readOnly
-                    style={{ maxWidth: 320, opacity: 0.6, cursor: 'default' }}
+                    aria-readonly="true"
+                    style={{ maxWidth: 320, cursor: 'default', background: 'var(--surface2)', color: 'var(--text-secondary)' }}
                   />
                   <p className="dx-help-text">Email cannot be changed here. Contact support to update it.</p>
                 </div>
@@ -288,16 +292,29 @@ export default function SettingsPage() {
 
               <div className="dx-form-section">
                 <p className="dx-form-section-title" style={{ fontSize: 13, fontWeight: 600 }}>Weekly case goal</p>
-                <input
-                  className="dx-input"
-                  type="number"
-                  min={1}
-                  max={49}
-                  value={focusSettings.weeklyVolume}
-                  onChange={e => setFocusSettings(prev => ({ ...prev, weeklyVolume: Math.max(1, Math.min(49, parseInt(e.target.value, 10) || 1)) }))}
-                  style={{ maxWidth: 80 }}
-                />
-                <p className="dx-help-text">Number of cases you aim to complete each week.</p>
+                {(() => {
+                  const activeDays = 7 - focusSettings.restDays.length
+                  const effectiveCap = tier === 'free' ? Math.min(14, activeDays * 2) : 49
+                  return (
+                    <>
+                      <input
+                        className="dx-input"
+                        type="number"
+                        min={1}
+                        max={effectiveCap}
+                        value={focusSettings.weeklyVolume}
+                        onChange={e => setFocusSettings(prev => ({ ...prev, weeklyVolume: Math.max(1, Math.min(effectiveCap, parseInt(e.target.value, 10) || 1)) }))}
+                        style={{ maxWidth: 80 }}
+                      />
+                      <p className="dx-help-text">
+                        {tier === 'free'
+                          ? `Free plan: up to 2 cases per active day (max ${effectiveCap}/week with your current rest days). `
+                          : ''}
+                        Number of cases you aim to complete each week.
+                      </p>
+                    </>
+                  )
+                })()}
               </div>
 
               <div className="dx-form-section">
@@ -355,8 +372,8 @@ export default function SettingsPage() {
                 </label>
                 <p className="dx-checkbox-desc">Your scores, streaks, and top weak areas every Monday.</p>
                 <div className="dx-form-actions">
-                  <button className="dx-btn-primary" style={{ fontSize: 13, padding: '7px 18px' }} onClick={saveNotifications} disabled={notifStatus === 'saving'}>
-                    Save notifications
+                  <button className="dx-btn-primary" style={{ fontSize: 13, padding: '7px 18px' }} onClick={saveNotifications} disabled={notifStatus === 'saving'} title="Preferences will take effect once email sending is enabled">
+                    Save preferences (pending email activation)
                   </button>
                   {statusText(notifStatus) && (
                     <span className="dx-save-status" style={{ color: notifStatus === 'error' ? 'var(--red)' : 'var(--muted)' }}>
@@ -411,6 +428,17 @@ export default function SettingsPage() {
               <div className="dx-form-section">
                 <p className="dx-form-section-title" style={{ fontSize: 13, fontWeight: 600 }}>Change password</p>
                 <div className="dx-field">
+                  <label className="dx-label">Current password</label>
+                  <input
+                    className="dx-input"
+                    type="password"
+                    value={currentPw}
+                    onChange={e => setCurrentPw(e.target.value)}
+                    placeholder="Enter current password"
+                    style={{ maxWidth: 320 }}
+                  />
+                </div>
+                <div className="dx-field">
                   <label className="dx-label">New password</label>
                   <input
                     className="dx-input"
@@ -437,13 +465,13 @@ export default function SettingsPage() {
                     className="dx-btn-primary"
                     style={{ fontSize: 13, padding: '7px 18px' }}
                     onClick={changePassword}
-                    disabled={pwStatus === 'saving' || !newPw}
+                    disabled={pwStatus === 'saving' || !currentPw || !newPw}
                   >
                     Update password
                   </button>
                   {statusText(pwStatus) && (
                     <span className="dx-save-status" style={{ color: pwStatus === 'error' ? 'var(--red)' : 'var(--muted)' }}>
-                      {pwStatus === 'error' ? (newPw !== confirmPw ? 'Passwords don\'t match' : 'Minimum 8 characters') : statusText(pwStatus)}
+                      {pwStatus === 'error' ? (!currentPw ? 'Enter your current password' : newPw !== confirmPw ? 'Passwords don\'t match' : 'Minimum 8 characters') : statusText(pwStatus)}
                     </span>
                   )}
                 </div>
@@ -464,7 +492,7 @@ export default function SettingsPage() {
                     type="email"
                     value={deleteConfirm}
                     onChange={e => setDeleteConfirm(e.target.value)}
-                    placeholder={email}
+                    placeholder="Type your email address"
                     style={{ maxWidth: 320 }}
                   />
                 </div>

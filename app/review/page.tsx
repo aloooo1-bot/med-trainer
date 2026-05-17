@@ -35,6 +35,10 @@ function fmtPct(n: number): string {
   return `${Math.round(n * 100)}%`
 }
 
+function fmtPct1(n: number): string {
+  return `${(n * 100).toFixed(1)}%`
+}
+
 // ── Score trend chart (inline SVG, no library) ─────────────────────────────────
 
 function ScoreTrendChart({ sessions }: { sessions: CaseSessionRecord[] }) {
@@ -48,8 +52,12 @@ function ScoreTrendChart({ sessions }: { sessions: CaseSessionRecord[] }) {
     )
   }
 
-  const W = 560, H = 130
-  const PAD = { top: 14, right: 10, bottom: 14, left: 26 }
+  const allSameDay = sessions.length > 1 && sessions.every(s =>
+    new Date(s.completedAt).toDateString() === new Date(sessions[0].completedAt).toDateString()
+  )
+
+  const W = 560, H = 148
+  const PAD = { top: 14, right: 10, bottom: 30, left: 26 }
   const cW = W - PAD.left - PAD.right
   const cH = H - PAD.top - PAD.bottom
 
@@ -59,19 +67,26 @@ function ScoreTrendChart({ sessions }: { sessions: CaseSessionRecord[] }) {
 
   const polyline = sessions.map((s, i) => `${xFor(i)},${yFor(s.score)}`).join(' ')
 
-  // 7-case moving average
+  // 7-case moving average — first valid point is at index 6 (7 data points)
   const maLine: string[] = []
   if (sessions.length >= 7) {
     sessions.forEach((_, i) => {
-      const start = Math.max(0, i - 6)
-      const slice = sessions.slice(start, i + 1)
+      if (i < 6) return
+      const slice = sessions.slice(i - 6, i + 1)
       const ma = slice.reduce((a, s) => a + s.score, 0) / slice.length
       maLine.push(`${xFor(i)},${yFor(ma)}`)
     })
   }
 
+  // X-axis tick interval: show every tick up to 12 sessions, then every 5
+  const xTickStep = sessions.length <= 12 ? 1 : 5
+  const xTicks = sessions
+    .map((s, i) => ({ i, label: allSameDay ? `#${i + 1}` : new Date(s.completedAt).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric' }) }))
+    .filter((_, i) => i === 0 || i === sessions.length - 1 || (i + 1) % xTickStep === 0)
+
   return (
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" style={{ height: H }}>
+      <desc>{sessions.length} cases, scores {Math.min(...sessions.map(s => s.score))}–{Math.max(...sessions.map(s => s.score))}</desc>
       {/* Grid lines */}
       {[0, 25, 50, 75, 100].map(v => {
         const y = yFor(v)
@@ -85,6 +100,12 @@ function ScoreTrendChart({ sessions }: { sessions: CaseSessionRecord[] }) {
           </g>
         )
       })}
+      {/* X-axis ticks */}
+      {xTicks.map(({ i, label }) => (
+        <text key={i} x={xFor(i)} y={H - 4} fontSize="7.5" fill={theme.inkTertiary} textAnchor="middle">
+          {label}
+        </text>
+      ))}
 
       {/* Score line */}
       <polyline points={polyline} fill="none" stroke={theme.primary}
@@ -101,7 +122,9 @@ function ScoreTrendChart({ sessions }: { sessions: CaseSessionRecord[] }) {
         <circle key={i} cx={xFor(i)} cy={yFor(s.score)} r="3.5"
           fill={s.correct ? theme.confirmed : theme.critical}
           stroke="var(--color-surface-0)" strokeWidth="1.5"
-        />
+        >
+          <title>{s.system} · {s.difficulty} — Score {s.score} ({s.correct ? 'correct' : 'incorrect'}) · {new Date(s.completedAt).toLocaleDateString()}</title>
+        </circle>
       ))}
     </svg>
   )
@@ -325,10 +348,16 @@ export default function ReviewPage() {
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-5">
           {[
             { label: 'Cases',          value: stats.total.toString(),             color: 'text-ink-primary' },
-            { label: 'Accuracy',       value: fmtPct(stats.accuracy),             color: pctColor(stats.accuracy) },
+            { label: 'Accuracy (dx correct)', value: fmtPct1(stats.accuracy),   color: pctColor(stats.accuracy) },
             { label: 'Avg score',      value: `${stats.avgScore.toFixed(0)}/100`, color: pctColor(stats.avgScore / 100) },
             { label: 'Correct streak', value: stats.streak.toString(),            color: stats.streak >= 3 ? 'text-green-400' : 'text-ink-primary' },
-            { label: 'Systems tried',  value: `${stats.systemsTried} / 12`,       color: 'text-ink-primary' },
+            {
+              label: 'Systems tried',
+              value: stats.byDiff.length === 1 && stats.byDiff[0].diff === 'Foundations'
+                ? `${stats.systemsTried} / 12 (Foundations only)`
+                : `${stats.systemsTried} / 36`,
+              color: 'text-ink-primary',
+            },
           ].map(({ label, value, color }) => (
             <div key={label} className="rounded-lg border border-surface-3 bg-surface-1 p-4">
               <div className="text-xs text-ink-tertiary mb-1">{label}</div>
@@ -343,10 +372,10 @@ export default function ReviewPage() {
             <div className="text-xs font-semibold uppercase tracking-wider text-ink-secondary">Score Trend</div>
             <div className="flex items-center gap-4 text-[10px] text-ink-tertiary">
               <span className="flex items-center gap-1.5">
-                <span className="inline-block w-2 h-2 rounded-full bg-green-500" />Correct
+                <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#2d7a4a' }} />Correct
               </span>
               <span className="flex items-center gap-1.5">
-                <span className="inline-block w-2 h-2 rounded-full bg-red-500" />Incorrect
+                <span className="inline-block w-2 h-2 rounded-full" style={{ background: '#b43b3b' }} />Incorrect
               </span>
               {stats.trendSessions.length >= 7 && (
                 <span className="flex items-center gap-1.5">
@@ -376,29 +405,42 @@ export default function ReviewPage() {
             </div>
             {stats.withDimsCount === 0
               ? <p className="text-xs text-ink-tertiary">Submit more cases to see dimension breakdowns.</p>
-              : (
-                <div className="space-y-3.5">
-                  {stats.dimAvgs.map(({ key, label, pct }) => (
-                    <div key={key} className="space-y-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-ink-secondary">{label}</span>
-                        <span className={`tabular-nums font-semibold ${pctColor(pct)}`}>
-                          {Math.round(pct * 100)}%
-                        </span>
-                      </div>
-                      <div className="h-2 rounded-full bg-surface-3 overflow-hidden">
-                        <div
-                          className="h-full rounded-full transition-all"
-                          style={{
-                            width: `${pct * 100}%`,
-                            backgroundColor: `hsl(${Math.round(pct * 120)},55%,42%)`,
-                          }}
-                        />
-                      </div>
+              : (() => {
+                  const sorted = [...stats.dimAvgs].sort((a, b) => a.pct - b.pct)
+                  const weakestPct = sorted[0]?.pct ?? 1
+                  const secondPct  = sorted[1]?.pct ?? 1
+                  const gapFlags   = new Set(
+                    secondPct - weakestPct > 0.1 ? [sorted[0].key] : []
+                  )
+                  return (
+                    <div className="space-y-3.5">
+                      {stats.dimAvgs.map(({ key, label, pct }) => {
+                        const isWeak = gapFlags.has(key)
+                        return (
+                          <div key={key} className="space-y-1">
+                            <div className="flex items-center justify-between text-xs">
+                              <span className={isWeak ? 'text-yellow-400 font-semibold' : 'text-ink-secondary'}>
+                                {label}{isWeak ? ' ↓' : ''}
+                              </span>
+                              <span className={`tabular-nums font-semibold ${isWeak ? 'text-yellow-400' : pctColor(pct)}`}>
+                                {Math.round(pct * 100)}%
+                              </span>
+                            </div>
+                            <div className="h-2 rounded-full bg-surface-3 overflow-hidden">
+                              <div
+                                className="h-full rounded-full transition-all"
+                                style={{
+                                  width: `${Math.round(pct * 100)}%`,
+                                  backgroundColor: isWeak ? 'hsl(40,80%,45%)' : `hsl(${Math.round(pct * 120)},55%,42%)`,
+                                }}
+                              />
+                            </div>
+                          </div>
+                        )
+                      })}
                     </div>
-                  ))}
-                </div>
-              )
+                  )
+                })()
             }
           </section>
 
@@ -417,9 +459,9 @@ export default function ReviewPage() {
                         {bucket.count > 0 ? bucket.count : ''}
                       </span>
                       <div
-                        className="w-full rounded-t min-h-[2px]"
+                        className="w-full rounded-t"
                         style={{
-                          height: `${Math.max(2, pct * 100)}%`,
+                          height: bucket.count === 0 ? 0 : `${Math.max(2, pct * 100)}%`,
                           backgroundColor: `hsl(${bucket.hue},55%,38%)`,
                         }}
                       />

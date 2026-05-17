@@ -7,16 +7,16 @@ type Session = {
   completed_at: string; grading_result: GradingResult | null
 }
 
-function biggestLoss(gr: GradingResult | null, difficulty: string): string {
-  if (!gr?.dimensions) return '—'
-  let maxFrac = 0, maxLabel = ''
+function biggestLoss(gr: GradingResult | null, difficulty: string): { label: string; key: string } {
+  if (!gr?.dimensions) return { label: '—', key: '' }
+  let maxFrac = 0, maxLabel = '', maxKey = ''
   for (const { key, label, max } of getRubric(difficulty)) {
     const dim = gr.dimensions[key]
     if (!dim) continue
     const frac = (max - dim.score) / max
-    if (frac > maxFrac) { maxFrac = frac; maxLabel = label }
+    if (frac > maxFrac) { maxFrac = frac; maxLabel = label; maxKey = key }
   }
-  return maxFrac > 0 ? `−${Math.round(maxFrac * 100)}% ${maxLabel}` : '—'
+  return maxFrac > 0 ? { label: `−${Math.round(maxFrac * 100)}% ${maxLabel}`, key: maxKey } : { label: '—', key: '' }
 }
 
 function scoreColor(s: number) {
@@ -55,7 +55,18 @@ export default function RecentActivity({ sessions }: { sessions: Session[] }) {
             <span className="dx-recent-score" style={{ color: scoreColor(s.score) }}>
               {s.score}<span className="dx-score-pct">%</span>
             </span>
-            <span className={`dx-recent-loss${loss !== '—' ? ' has-loss' : ''}`}>{loss}</span>
+            {loss.key ? (
+              <Link
+                href={`/review#dim-${loss.key}`}
+                className={`dx-recent-loss has-loss`}
+                title="Biggest subscore deduction within the weighted total — click to review"
+                onClick={e => e.stopPropagation()}
+              >
+                {loss.label}
+              </Link>
+            ) : (
+              <span className="dx-recent-loss">{loss.label}</span>
+            )}
           </Link>
         )
       })}

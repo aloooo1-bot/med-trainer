@@ -1,0 +1,345 @@
+{
+  "caseNum": 11,
+  "system": "Toxicologic",
+  "difficulty": "Foundations",
+  "transcript": [
+    {
+      "role": "student",
+      "content": "Dmitri, do you know roughly what time you took the pills — like was it all at once or spread out over a few hours?"
+    },
+    {
+      "role": "patient",
+      "content": "Yeah, it was all at once. I just... I took them all at the same time, maybe around 2 in the morning. So it's been like six hours since then, give or take."
+    },
+    {
+      "role": "student",
+      "content": "Did you take anything else tonight, even something like ibuprofen, aspirin, Benadryl, or any alcohol — even a little bit?"
+    },
+    {
+      "role": "patient",
+      "content": "No, nothing else, I swear. Just the Tylenol. I didn't have any alcohol or anything like that — I don't really drink much anyway. It was just the Tylenol."
+    },
+    {
+      "role": "student",
+      "content": "Do you have any history of liver problems, or do you drink alcohol regularly, like on a weekly basis?"
+    },
+    {
+      "role": "patient",
+      "content": "No, nothing like that. My liver's always been fine as far as I know, and like I said I don't really drink — maybe like once in a blue moon at a party or something, but not regularly. No liver problems or anything."
+    }
+  ],
+  "testsOrdered": [
+    "Acetaminophen Level",
+    "Salicylate Level",
+    "LFTs",
+    "BMP",
+    "Coagulation Panel",
+    "Urine Drug Screen"
+  ],
+  "diagnosis": "Acute acetaminophen overdose — toxic ingestion requiring NAC (N-acetylcysteine) therapy, pending Rumack-Matthew nomogram risk stratification",
+  "reasoning": "The history is essentially confirmatory here: known intentional ingestion of ~10,000mg acetaminophen approximately 6 hours ago in a young male with no significant liver history. The acetaminophen level drawn at or after 4 hours post-ingestion will be plotted on the Rumack-Matthew nomogram to determine whether he falls in the treatment zone for NAC. LFTs are critical to establish a baseline — at 6 hours they may still be normal even with significant ingestion, but rising AST/ALT over the next 24-48 hours would indicate hepatocellular injury. Coagulation studies (PT/INR) are important because coagulopathy is a marker of hepatic synthetic dysfunction and would indicate progression toward acute liver failure. I ordered the salicylate level and urine drug screen because co-ingestion can change management significantly and patients sometimes underreport — ruling those out is important even if the history sounds clean.",
+  "studentNotes": "",
+  "caseData": {
+    "patientInfo": {
+      "name": "Dmitri Voloshyn",
+      "age": 19,
+      "gender": "Male",
+      "chiefComplaint": "Nausea, vomiting, and abdominal pain after taking 'a lot of Tylenol'"
+    },
+    "hpi": "Dmitri Voloshyn is a 19-year-old male with no significant past medical history who presents to the emergency department approximately 6 hours after intentionally ingesting approximately 20 tablets of acetaminophen 500mg (total estimated dose ~10,000mg) following a breakup. He reports nausea, vomiting twice, and diffuse dull abdominal pain since shortly after ingestion. He denies co-ingestion of alcohol or other substances. He states he regrets the ingestion and is cooperative with treatment. He has no prior suicide attempts and denies current suicidal ideation.",
+    "vitals": {
+      "bp": "118/74",
+      "hr": 102,
+      "rr": 18,
+      "temp": 98.8,
+      "spo2": 99,
+      "weight": "165 lbs"
+    },
+    "diagnosis": "Acetaminophen (Tylenol) Toxicity — Acute Intentional Overdose",
+    "differentials": [
+      "Acute viral hepatitis",
+      "Intentional salicylate (aspirin) overdose",
+      "Acute alcoholic hepatitis",
+      "Ingestion of another hepatotoxin (e.g., iron, mushroom)"
+    ],
+    "keyQuestions": [
+      "Exactly how many tablets were taken and at what time was the ingestion?",
+      "Were any other substances ingested concurrently (alcohol, opioids, other medications)?",
+      "Does the patient have any underlying liver disease, malnutrition, or chronic alcohol use that increases hepatotoxicity risk?",
+      "What is the patient's current mental health status and is psychiatry consultation needed?"
+    ],
+    "teachingPoints": [
+      "The Rumack-Matthew nomogram is the gold standard for risk stratification in acute acetaminophen overdose — it plots serum acetaminophen level against time post-ingestion (at least 4 hours post-ingestion) to determine need for N-acetylcysteine (NAC) therapy. A level drawn too early (before 4 hours) cannot be plotted and may underestimate true peak.",
+      "N-acetylcysteine (NAC) is most effective when given within 8 hours of ingestion and restores hepatic glutathione, preventing toxic NAPQI accumulation. It should be started empirically while awaiting lab results if ingestion timing is concerning.",
+      "Early acetaminophen toxicity (0-24 hours) may present with only mild nausea and vomiting — LFT elevations (AST/ALT) typically appear in Phase II (24-72 hours), with peak hepatotoxicity in Phase III (72-96 hours). A near-normal initial LFT panel does NOT rule out significant toxicity.",
+      "Risk factors for increased hepatotoxicity include chronic alcohol use, malnutrition, fasting states, and concurrent use of CYP2E1 inducers (e.g., isoniazid, rifampin), which enhance conversion of acetaminophen to toxic NAPQI.",
+      "All patients with intentional overdose require mandatory psychiatric evaluation prior to discharge, regardless of medical stability."
+    ],
+    "availableLabs": [
+      "Acetaminophen Level",
+      "Salicylate Level",
+      "LFTs",
+      "BMP",
+      "Coagulation Panel",
+      "Urine Drug Screen"
+    ],
+    "availableImaging": [
+      "Chest X-Ray",
+      "Abdominal Ultrasound"
+    ],
+    "labGroups": [
+      {
+        "name": "Toxicology",
+        "tests": [
+          "Acetaminophen Level",
+          "Salicylate Level",
+          "Urine Drug Screen"
+        ]
+      },
+      {
+        "name": "Liver & Metabolic",
+        "tests": [
+          "LFTs",
+          "BMP",
+          "Coagulation Panel"
+        ]
+      }
+    ],
+    "labResults": {
+      "Acetaminophen Level": {
+        "components": [
+          {
+            "name": "Serum Acetaminophen",
+            "value": "210",
+            "unit": "mcg/mL",
+            "referenceRange": "Plotted at 6 hours post-ingestion: treatment line threshold is ~150 mcg/mL at 4h, ~75 mcg/mL at 8h (Rumack-Matthew nomogram; reference range is time-dependent — this value at 6h falls in the HIGH RISK treatment zone)",
+            "status": "high"
+          }
+        ]
+      },
+      "Salicylate Level": {
+        "components": [
+          {
+            "name": "Serum Salicylate",
+            "value": "2.1",
+            "unit": "mg/dL",
+            "referenceRange": "<20 (therapeutic); toxic >30",
+            "status": "normal"
+          }
+        ]
+      },
+      "LFTs": {
+        "components": [
+          {
+            "name": "AST",
+            "value": "58",
+            "unit": "U/L",
+            "referenceRange": "10-40",
+            "status": "high"
+          },
+          {
+            "name": "ALT",
+            "value": "72",
+            "unit": "U/L",
+            "referenceRange": "7-56",
+            "status": "high"
+          },
+          {
+            "name": "Total Bilirubin",
+            "value": "1.1",
+            "unit": "mg/dL",
+            "referenceRange": "0.2-1.2",
+            "status": "normal"
+          },
+          {
+            "name": "Alkaline Phosphatase",
+            "value": "78",
+            "unit": "U/L",
+            "referenceRange": "44-147",
+            "status": "normal"
+          },
+          {
+            "name": "Albumin",
+            "value": "4.1",
+            "unit": "g/dL",
+            "referenceRange": "3.5-5.0",
+            "status": "normal"
+          }
+        ]
+      },
+      "BMP": {
+        "components": [
+          {
+            "name": "Sodium",
+            "value": "138",
+            "unit": "mEq/L",
+            "referenceRange": "136-145",
+            "status": "normal"
+          },
+          {
+            "name": "Potassium",
+            "value": "3.8",
+            "unit": "mEq/L",
+            "referenceRange": "3.5-5.0",
+            "status": "normal"
+          },
+          {
+            "name": "Bicarbonate",
+            "value": "22",
+            "unit": "mEq/L",
+            "referenceRange": "22-29",
+            "status": "normal"
+          },
+          {
+            "name": "BUN",
+            "value": "14",
+            "unit": "mg/dL",
+            "referenceRange": "7-20",
+            "status": "normal"
+          },
+          {
+            "name": "Creatinine",
+            "value": "0.9",
+            "unit": "mg/dL",
+            "referenceRange": "0.6-1.2",
+            "status": "normal"
+          },
+          {
+            "name": "Glucose",
+            "value": "94",
+            "unit": "mg/dL",
+            "referenceRange": "70-100",
+            "status": "normal"
+          }
+        ]
+      },
+      "Coagulation Panel": {
+        "components": [
+          {
+            "name": "PT",
+            "value": "13.2",
+            "unit": "seconds",
+            "referenceRange": "11.0-13.5",
+            "status": "normal"
+          },
+          {
+            "name": "INR",
+            "value": "1.1",
+            "unit": "",
+            "referenceRange": "0.9-1.1",
+            "status": "normal"
+          }
+        ]
+      },
+      "Urine Drug Screen": {
+        "components": [
+          {
+            "name": "Acetaminophen (urine screen)",
+            "value": "Positive",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "abnormal"
+          },
+          {
+            "name": "Opioids",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          },
+          {
+            "name": "Benzodiazepines",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          },
+          {
+            "name": "Salicylates",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          },
+          {
+            "name": "Ethanol",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          }
+        ]
+      }
+    },
+    "imagingResults": {
+      "Chest X-Ray": "PA and lateral chest radiograph demonstrates clear lung fields bilaterally with no consolidation, pleural effusion, or pneumothorax. Cardiac silhouette is normal in size. Mediastinal contour is unremarkable. Impression: No acute cardiopulmonary process.",
+      "Abdominal Ultrasound": "Liver is normal in size with homogeneous echogenicity. No focal hepatic lesions identified. No biliary ductal dilatation; common bile duct measures 3mm. Gallbladder without stones or wall thickening. Spleen is normal. No ascites. Impression: No acute sonographic abnormality to suggest alternative hepatic pathology."
+    },
+    "procedureResults": {},
+    "hiddenHistory": {
+      "fullHistory": "No significant past medical history. No prior hospitalizations or surgeries.",
+      "socialHistory": "College freshman. Denies regular alcohol use. No tobacco. No illicit drug use. Broke up with long-term girlfriend yesterday. Lives in university dormitory. No travel history.",
+      "familyHistory": "No family history of liver disease, metabolic disorders, or psychiatric illness.",
+      "medications": "No chronic medications. Took approximately 20 tablets of acetaminophen 500mg (Extra Strength Tylenol) approximately 6 hours ago — total estimated dose 10,000mg in a single acute ingestion.",
+      "hiddenSymptoms": "Patient admits to right upper quadrant tenderness on deep palpation if specifically asked; also reports diaphoresis and pallor noted by nursing staff shortly after arrival.",
+      "allergies": "NKDA"
+    },
+    "imagingCategory": "Normal abdominal ultrasound",
+    "ecgFindings": "",
+    "hematologyFindings": "",
+    "urineFindings": "",
+    "skinFindings": "",
+    "fundusFindings": "",
+    "biopsyFindings": ""
+  },
+  "correctDiagnosis": "Acetaminophen (Tylenol) Toxicity — Acute Intentional Overdose",
+  "workingDiagnosis": "Acute acetaminophen (Tylenol) overdose with potential hepatotoxicity risk",
+  "clinicalImpression": "This is pretty straightforward on the surface — 19-year-old who tells us exactly what he took and how much. Around 10,000mg of acetaminophen is well above the toxic threshold, which I think is roughly 150mg/kg or more depending on the nomogram. He's 6 hours out from ingestion, which is actually a critical window because the Rumack-Matthew nomogram uses the 4-hour level to stratify risk. Right now he's in what I believe is Phase 1 — nausea, vomiting, malaise — which can look deceptively mild before potential liver injury sets in around 24-72 hours. I'm not too worried about an alternative diagnosis here given the clear history, but I want to make sure I'm not missing a co-ingestion.",
+  "grading": {
+    "score": 93,
+    "correct": true,
+    "feedback": "Excellent diagnostic performance — you correctly identified acute acetaminophen toxicity, appropriately referenced the Rumack-Matthew nomogram, and ordered a comprehensive, targeted workup including acetaminophen level, LFTs, coagulation studies, BMP, and a urine drug screen to rule out co-ingestions. Your interview efficiently covered timing, co-ingestion, and hepatic risk factors, which are the three most management-critical domains in this case. The main gap was not explicitly asking about psychiatric safety or requesting a psychiatry consult, which is mandatory in any intentional overdose regardless of medical stability.",
+    "strengths": [
+      "Correctly identified the diagnosis and immediately referenced NAC therapy and the Rumack-Matthew nomogram for risk stratification — demonstrating strong foundational toxicology knowledge",
+      "Ordered a complete core workup: serum acetaminophen level, LFTs, coagulation panel, BMP, and urine drug screen — all appropriate and collectively sufficient to guide management",
+      "Efficiently confirmed single acute ingestion timing (6 hours post-ingestion), which is critical for correct nomogram plotting and NAC initiation window",
+      "Directly asked about co-ingestion of alcohol and other substances, appropriately ruling out factors that would alter hepatotoxicity risk and management"
+    ],
+    "dimensions": {
+      "historyInterview": {
+        "score": 20,
+        "feedback": "You covered the three highest-yield domains (ingestion timing, co-ingestions, and underlying liver disease/alcohol use) efficiently and directly; the notable gap was not asking about the patient's current mental health status, suicidal ideation, or the need for psychiatry consultation — a management-critical step in any intentional overdose."
+      },
+      "testOrdering": {
+        "score": 24,
+        "feedback": "The ordered panel — serum acetaminophen level, LFTs, coagulation studies, BMP, and urine drug screen — constitutes a complete and appropriate workup for acute acetaminophen toxicity with no unnecessary or harmful tests included."
+      },
+      "diagnosisAccuracy": {
+        "score": 36,
+        "feedback": "The submitted diagnosis of 'Acute acetaminophen overdose — toxic ingestion requiring NAC therapy, pending Rumack-Matthew nomogram risk stratification' is clinically accurate, correctly identifies the core pathological entity, and adds clinically supported and relevant specificity; this is fully correct and demonstrates strong clinical reasoning for a Foundations-level student."
+      },
+      "diagnosisCompleteness": {
+        "score": 13,
+        "feedback": "The core diagnosis is correctly and completely named; at Foundations level this is fully sufficient, and the mention of NAC and nomogram stratification adds meaningful clinical context, though the intentional/psychiatric dimension of the overdose was not explicitly addressed in the diagnosis statement."
+      }
+    },
+    "missedQuestions": [
+      "What is the patient's current mental health status — does he have active suicidal ideation, and has psychiatry been consulted? (Mandatory in all intentional overdoses regardless of medical stability and directly changes disposition planning)"
+    ],
+    "teachingPoints": [
+      "The Rumack-Matthew nomogram is the gold standard for risk stratification in acute acetaminophen overdose — it plots serum acetaminophen level against time post-ingestion (at least 4 hours post-ingestion) to determine need for N-acetylcysteine (NAC) therapy. A level drawn too early (before 4 hours) cannot be plotted and may underestimate true peak.",
+      "N-acetylcysteine (NAC) is most effective when given within 8 hours of ingestion and restores hepatic glutathione, preventing toxic NAPQI accumulation. It should be started empirically while awaiting lab results if ingestion timing is concerning.",
+      "Early acetaminophen toxicity (0-24 hours) may present with only mild nausea and vomiting — LFT elevations (AST/ALT) typically appear in Phase II (24-72 hours), with peak hepatotoxicity in Phase III (72-96 hours). A near-normal initial LFT panel does NOT rule out significant toxicity.",
+      "Risk factors for increased hepatotoxicity include chronic alcohol use, malnutrition, fasting states, and concurrent use of CYP2E1 inducers (e.g., isoniazid, rifampin), which enhance conversion of acetaminophen to toxic NAPQI.",
+      "All patients with intentional overdose require mandatory psychiatric evaluation prior to discharge, regardless of medical stability."
+    ],
+    "differentials": [
+      "Acute viral hepatitis: Could cause nausea, vomiting, and RUQ pain with transaminase elevation, but would not explain an acutely elevated serum acetaminophen level and onset would typically be more gradual without a clear ingestion history.",
+      "Intentional salicylate (aspirin) overdose: Important co-ingestion to exclude given overlapping GI symptoms; ruled out here by a normal serum salicylate level and negative urine salicylate screen.",
+      "Acute alcoholic hepatitis: Can cause nausea, vomiting, and transaminase elevation, but requires a history of chronic/heavy alcohol use — excluded here by history and a negative serum/urine ethanol screen.",
+      "Ingestion of another hepatotoxin (e.g., iron, amanita mushroom, carbon tetrachloride): Could cause acute hepatotoxicity, but the clear history of acetaminophen ingestion, confirmed serum level, and lack of supporting exposure history make these diagnoses unlikely."
+    ]
+  },
+  "score": 93,
+  "correct": true
+}

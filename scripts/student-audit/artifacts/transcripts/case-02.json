@@ -1,0 +1,333 @@
+{
+  "caseNum": 2,
+  "system": "Respiratory",
+  "difficulty": "Foundations",
+  "transcript": [
+    {
+      "role": "student",
+      "content": "Have you ever been formally diagnosed with asthma before, or has any doctor ever prescribed you an inhaler?"
+    },
+    {
+      "role": "patient",
+      "content": "No, I've never actually been officially diagnosed with asthma or anything like that. I've had these breathing episodes before but I just kind of assumed it was normal, like maybe I wasn't fit enough or it was just allergies. No doctor has ever given me an inhaler or anything."
+    },
+    {
+      "role": "student",
+      "content": "Do you have any allergies — like to pollen, pets, dust — or any history of eczema or hay fever?"
+    },
+    {
+      "role": "patient",
+      "content": "Yeah, I definitely get really bad hay fever every spring and summer — my nose runs like crazy and my eyes get itchy. I take that loratadine, the antihistamine, on my own just to manage it during pollen season. I don't think I have eczema though, at least nothing that's ever been diagnosed."
+    },
+    {
+      "role": "student",
+      "content": "Does anyone in your family have asthma or allergic conditions?"
+    },
+    {
+      "role": "patient",
+      "content": "Yeah actually, my mom has pretty bad hay fever — allergic rhinitis I think it's called. And my uncle on my mom's side has asthma. Other than that, no major health issues in the family that I know of."
+    }
+  ],
+  "testsOrdered": [
+    "Spirometry (Pre- and Post-Bronchodilator)",
+    "CBC",
+    "Allergy Panel (Serum IgE + Eosinophil Count)",
+    "Chest X-Ray",
+    "ABG (Arterial Blood Gas)"
+  ],
+  "diagnosis": "Acute asthma exacerbation (allergic/exercise-induced)",
+  "reasoning": "The clinical picture strongly supports an acute asthma exacerbation: young patient with episodic wheezing, nocturnal and early morning worsening, classic triggers (exercise, cold air, allergens/pollen), partial relief with positional changes, and an SpO2 of 93% indicating moderate severity. Spirometry with pre- and post-bronchodilator testing would be the key confirmatory test — I'd expect to see an obstructive pattern with FEV1/FVC ratio below 0.7 and significant reversibility (≥12% improvement in FEV1) after a bronchodilator. The elevated eosinophil count and IgE on the allergy panel would support an atopic/allergic component, which fits this seasonal, exercise-triggered presentation. Chest X-Ray is primarily useful to rule out complications like pneumothorax or pneumonia rather than confirming asthma — I'd expect it to be largely normal or show mild hyperinflation. I considered cardiac causes given tachycardia and dyspnea, but the absence of leg swelling, no productive cough or fever, his young age, and the history of similar episodic events all make heart failure or PE much less likely here.",
+  "studentNotes": "",
+  "caseData": {
+    "patientInfo": {
+      "name": "Tomasz Wiśniewski",
+      "age": 22,
+      "gender": "Male",
+      "chiefComplaint": "Wheezing and shortness of breath for 2 days"
+    },
+    "hpi": "Tomasz Wiśniewski is a 22-year-old male who presents with a 2-day history of progressive wheezing and shortness of breath. He reports that symptoms began after he started jogging outdoors during high pollen season. He describes chest tightness and a dry cough that is worse at night and in the early morning. He has experienced similar episodes in the past, typically triggered by exercise, cold air, or allergen exposure. Symptoms are partially relieved when he sits upright and worsen when he lies flat. He denies fever, productive cough, hemoptysis, or leg swelling.",
+    "vitals": {
+      "bp": "122/76",
+      "hr": 98,
+      "rr": 22,
+      "temp": 98.4,
+      "spo2": 93,
+      "weight": "155 lbs"
+    },
+    "diagnosis": "Acute asthma exacerbation (moderate)",
+    "differentials": [
+      "Allergic bronchospasm without asthma",
+      "Viral-induced reactive airway disease",
+      "Vocal cord dysfunction",
+      "Exercise-induced bronchospasm isolated episode"
+    ],
+    "keyQuestions": [
+      "Have you ever been diagnosed with asthma or reactive airway disease before?",
+      "Do you use any rescue inhaler (like albuterol) and how often in the past week?",
+      "Do you have known allergies to pollen, dust, pets, or other triggers?",
+      "Have you ever been hospitalized or needed an emergency room visit for breathing difficulty before?"
+    ],
+    "teachingPoints": [
+      "Asthma is characterized by reversible airflow obstruction, airway hyperresponsiveness, and chronic airway inflammation; classic triggers include allergens, exercise, cold air, and respiratory infections. Spirometry showing an obstructive pattern with significant bronchodilator reversibility (≥12% and ≥200 mL improvement in FEV1) is the key diagnostic criterion.",
+      "Moderate asthma exacerbations present with SpO2 88–95%, RR >20, and notable accessory muscle use; first-line treatment includes inhaled short-acting beta-2 agonists (albuterol), ipratropium, and systemic corticosteroids. Oxygen supplementation should target SpO2 ≥94%.",
+      "A peak expiratory flow (PEF) <70% of predicted after initial bronchodilator therapy indicates a moderate exacerbation and warrants close monitoring; failure to respond to initial therapy or PEF <40% of predicted signals a severe exacerbation requiring hospital admission and possible IV magnesium sulfate."
+    ],
+    "availableLabs": [
+      "CBC",
+      "BMP",
+      "ABG (Arterial Blood Gas)",
+      "Allergy Panel (Serum IgE + Eosinophil Count)"
+    ],
+    "availableImaging": [
+      "Chest X-Ray",
+      "ECG",
+      "Spirometry (Pre- and Post-Bronchodilator)"
+    ],
+    "labGroups": [
+      {
+        "name": "CBC",
+        "tests": [
+          "CBC"
+        ]
+      },
+      {
+        "name": "BMP",
+        "tests": [
+          "BMP"
+        ]
+      },
+      {
+        "name": "ABG (Arterial Blood Gas)",
+        "tests": [
+          "ABG (Arterial Blood Gas)"
+        ]
+      },
+      {
+        "name": "Allergy Panel (Serum IgE + Eosinophil Count)",
+        "tests": [
+          "Allergy Panel (Serum IgE + Eosinophil Count)"
+        ]
+      }
+    ],
+    "labResults": {
+      "CBC": {
+        "components": [
+          {
+            "name": "WBC",
+            "value": "9.4",
+            "unit": "x10³/µL",
+            "referenceRange": "4.5–11.0",
+            "status": "normal"
+          },
+          {
+            "name": "Hemoglobin",
+            "value": "15.2",
+            "unit": "g/dL",
+            "referenceRange": "13.5–17.5",
+            "status": "normal"
+          },
+          {
+            "name": "Hematocrit",
+            "value": "45.1",
+            "unit": "%",
+            "referenceRange": "41–53",
+            "status": "normal"
+          },
+          {
+            "name": "Platelets",
+            "value": "238",
+            "unit": "x10³/µL",
+            "referenceRange": "150–400",
+            "status": "normal"
+          },
+          {
+            "name": "Eosinophils (absolute)",
+            "value": "0.62",
+            "unit": "x10³/µL",
+            "referenceRange": "0.0–0.45",
+            "status": "high"
+          }
+        ]
+      },
+      "BMP": {
+        "components": [
+          {
+            "name": "Sodium",
+            "value": "138",
+            "unit": "mEq/L",
+            "referenceRange": "136–145",
+            "status": "normal"
+          },
+          {
+            "name": "Potassium",
+            "value": "3.8",
+            "unit": "mEq/L",
+            "referenceRange": "3.5–5.0",
+            "status": "normal"
+          },
+          {
+            "name": "Chloride",
+            "value": "101",
+            "unit": "mEq/L",
+            "referenceRange": "98–107",
+            "status": "normal"
+          },
+          {
+            "name": "Bicarbonate",
+            "value": "22",
+            "unit": "mEq/L",
+            "referenceRange": "22–29",
+            "status": "normal"
+          },
+          {
+            "name": "BUN",
+            "value": "11",
+            "unit": "mg/dL",
+            "referenceRange": "7–20",
+            "status": "normal"
+          },
+          {
+            "name": "Creatinine",
+            "value": "0.9",
+            "unit": "mg/dL",
+            "referenceRange": "0.6–1.2",
+            "status": "normal"
+          },
+          {
+            "name": "Glucose",
+            "value": "94",
+            "unit": "mg/dL",
+            "referenceRange": "70–100",
+            "status": "normal"
+          }
+        ]
+      },
+      "ABG (Arterial Blood Gas)": {
+        "components": [
+          {
+            "name": "pH",
+            "value": "7.48",
+            "unit": "",
+            "referenceRange": "7.35–7.45",
+            "status": "high"
+          },
+          {
+            "name": "PaCO2",
+            "value": "32",
+            "unit": "mmHg",
+            "referenceRange": "35–45",
+            "status": "low"
+          },
+          {
+            "name": "PaO2",
+            "value": "64",
+            "unit": "mmHg",
+            "referenceRange": "75–100",
+            "status": "low"
+          },
+          {
+            "name": "HCO3",
+            "value": "23",
+            "unit": "mEq/L",
+            "referenceRange": "22–26",
+            "status": "normal"
+          },
+          {
+            "name": "SaO2",
+            "value": "93",
+            "unit": "%",
+            "referenceRange": "95–100",
+            "status": "low"
+          }
+        ]
+      },
+      "Allergy Panel (Serum IgE + Eosinophil Count)": {
+        "components": [
+          {
+            "name": "Total Serum IgE",
+            "value": "320",
+            "unit": "IU/mL",
+            "referenceRange": "0–100",
+            "status": "high"
+          },
+          {
+            "name": "Peripheral Eosinophil %",
+            "value": "8.2",
+            "unit": "%",
+            "referenceRange": "1–4",
+            "status": "high"
+          }
+        ]
+      }
+    },
+    "imagingResults": {
+      "Chest X-Ray": "Chest X-ray demonstrates bilateral hyperinflation with flattening of the diaphragms and increased AP diameter, consistent with air trapping. No focal consolidation, pleural effusion, or pneumothorax is identified. Perihilar bronchovascular markings appear mildly increased.",
+      "ECG": "Sinus tachycardia at 98 bpm. Normal axis. No ST-segment changes, no T-wave inversions, no right heart strain pattern. QTc interval normal at 408 ms. Findings consistent with physiological tachycardia in the setting of respiratory distress.",
+      "Spirometry (Pre- and Post-Bronchodilator)": "Pre-bronchodilator: FEV1 58% of predicted, FVC 78% of predicted, FEV1/FVC ratio 0.62 (reduced). Post-bronchodilator (albuterol 400 mcg): FEV1 improves to 76% of predicted, an absolute increase of 310 mL and 31% relative improvement — meeting criteria for significant bronchodilator reversibility (≥12% and ≥200 mL increase in FEV1). Findings confirm obstructive airflow pattern with reversibility, diagnostic of asthma."
+    },
+    "procedureResults": {},
+    "hiddenHistory": {
+      "fullHistory": "Patient reports similar wheezing episodes since childhood, approximately 3–4 times per year, usually in spring and fall. Has not seen a doctor for these episodes previously and self-managed with over-the-counter antihistamines with partial relief.",
+      "socialHistory": "Non-smoker. Occasional alcohol use (1–2 drinks per week). University student studying engineering. No recent travel. Lives in a dormitory; no pets but roommate has a cat. Exercises regularly — jogging 4 times per week.",
+      "familyHistory": "Mother has allergic rhinitis. Maternal uncle has asthma. No family history of cardiac disease or malignancy.",
+      "medications": "Loratadine 10mg daily (seasonal, self-prescribed). No inhaled corticosteroids or bronchodilators. No NSAIDs. NKDA.",
+      "hiddenSymptoms": "Patient confirms nocturnal cough waking him from sleep at least 2–3 nights per week over the past month. He also admits to having to slow down or stop exercise due to chest tightness approximately once per week.",
+      "allergies": "NKDA"
+    },
+    "imagingCategory": "Hyperinflation pattern with obstructive physiology",
+    "ecgFindings": "Sinus tachycardia at 98 bpm with no ST-segment changes or right heart strain pattern",
+    "hematologyFindings": "",
+    "urineFindings": "",
+    "skinFindings": "",
+    "fundusFindings": "",
+    "biopsyFindings": ""
+  },
+  "correctDiagnosis": "Acute asthma exacerbation (moderate)",
+  "workingDiagnosis": "Acute asthma exacerbation",
+  "clinicalImpression": "This 22-year-old male presents with classic features that really scream asthma to me — wheezing, shortness of breath, chest tightness, dry cough that's worse at night and early morning, and clear triggers like exercise and pollen exposure. His SpO2 of 93% tells me this isn't trivial. I'm also keeping COPD in the back of my head but at 22 with no smoking history mentioned, that's way less likely — asthma is my strong working diagnosis here.",
+  "grading": {
+    "score": 90,
+    "correct": true,
+    "feedback": "Excellent work — you correctly identified an acute asthma exacerbation with accurate qualifiers (allergic/exercise-induced) that are well-supported by the clinical data. Your history-taking was targeted and efficient, covering the key elements of prior episodes, allergic triggers, and family history. To strengthen future assessments, consider asking about prior hospitalizations or ER visits for breathing difficulty, as this directly impacts triage and management decisions.",
+    "strengths": [
+      "Correctly diagnosed acute asthma exacerbation with clinically accurate and supported qualifiers (allergic/exercise-induced)",
+      "Efficiently elicited family history of asthma and allergic rhinitis, supporting atopic predisposition",
+      "Asked directly about prior formal diagnosis and inhaler use, identifying an undiagnosed patient who had been self-managing",
+      "Covered known allergies and environmental triggers (pollen, hay fever), which are directly relevant to management"
+    ],
+    "dimensions": {
+      "historyInterview": {
+        "score": 19,
+        "feedback": "Strong targeted questioning covering prior diagnosis, inhaler use, allergies, and family history; missed asking about prior hospitalizations or ER visits for breathing difficulty, which would directly inform severity assessment and triage."
+      },
+      "testOrdering": {
+        "score": 24,
+        "feedback": "Excellent and comprehensive test ordering — CBC with eosinophils, serum IgE, ABG, spirometry with pre/post-bronchodilator, and chest X-ray all directly confirmed the diagnosis and severity of the exacerbation."
+      },
+      "diagnosisAccuracy": {
+        "score": 36,
+        "feedback": "The core diagnosis of acute asthma exacerbation is correct, and the added qualifiers (allergic/exercise-induced) are clinically accurate and well-supported by the history, lab findings, and spirometry results — this represents added specificity that is a strength."
+      },
+      "diagnosisCompleteness": {
+        "score": 11,
+        "feedback": "The core diagnosis is named correctly with supporting qualifiers; at Foundations level this is fully complete, though noting the severity (moderate) would have added useful clinical context for management planning — score reflects this minor gap."
+      }
+    },
+    "missedQuestions": [
+      "Have you ever been hospitalized or needed an emergency room visit for breathing difficulty? — this directly informs severity stratification and management intensity for an asthma exacerbation."
+    ],
+    "teachingPoints": [
+      "Asthma is characterized by reversible airflow obstruction, airway hyperresponsiveness, and chronic airway inflammation; classic triggers include allergens, exercise, cold air, and respiratory infections. Spirometry showing an obstructive pattern with significant bronchodilator reversibility (≥12% and ≥200 mL improvement in FEV1) is the key diagnostic criterion.",
+      "Moderate asthma exacerbations present with SpO2 88–95%, RR >20, and notable accessory muscle use; first-line treatment includes inhaled short-acting beta-2 agonists (albuterol), ipratropium, and systemic corticosteroids. Oxygen supplementation should target SpO2 ≥94%.",
+      "A peak expiratory flow (PEF) <70% of predicted after initial bronchodilator therapy indicates a moderate exacerbation and warrants close monitoring; failure to respond to initial therapy or PEF <40% of predicted signals a severe exacerbation requiring hospital admission and possible IV magnesium sulfate."
+    ],
+    "differentials": [
+      "Allergic bronchospasm without asthma: presents similarly with wheeze after allergen exposure but lacks the chronicity, nocturnal symptoms, and spirometric reversibility pattern seen here; distinguished by spirometry and symptom pattern over time.",
+      "Vocal cord dysfunction: can mimic asthma with inspiratory stridor and chest tightness, but spirometry typically shows a flattened inspiratory loop and symptoms do not respond to bronchodilators as seen in this case.",
+      "Exercise-induced bronchospasm (isolated): a subset of asthma triggered exclusively by exercise without other triggers; this patient's multi-trigger pattern, elevated IgE, eosinophilia, and nocturnal symptoms support broader atopic asthma rather than isolated EIB.",
+      "Viral-induced reactive airway disease: wheezing triggered by respiratory infections in non-atopic individuals; the absence of fever, productive cough, and the presence of elevated IgE and eosinophils make allergic asthma more consistent with this presentation."
+    ]
+  },
+  "score": 90,
+  "correct": true
+}

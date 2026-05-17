@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useState, useEffect, useMemo, useCallback, Fragment } from 'react'
+import { useState, useEffect, useMemo, useCallback, useRef, Fragment } from 'react'
 import '@/app/dashboard.css'
 import { type CaseSessionRecord, type APICallRecord, loadSessionRecords } from '../lib/analytics'
 import type { GradingResult } from '../grading/types'
@@ -38,6 +38,14 @@ function scoreBucketFor(score: number): string {
   return '90+'
 }
 
+function diagnosisIsPartial(userDx: string, correctDx: string): boolean {
+  const normalize = (s: string) =>
+    s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim()
+  const userNorm = normalize(userDx)
+  const tokens = normalize(correctDx).split(' ').filter(t => t.length > 3)
+  return tokens.length > 0 && !tokens.every(t => userNorm.includes(t))
+}
+
 const DIFFICULTY_COLOR: Record<string, string> = {
   Foundations: 'var(--green)',
   Clinical: 'var(--amber)',
@@ -45,14 +53,30 @@ const DIFFICULTY_COLOR: Record<string, string> = {
 }
 
 
+// ── Notes save chip ───────────────────────────────────────────────────────────
+
+function NotesSaveChip({ status, dirty, onRetry }: {
+  status?: 'saving' | 'saved' | 'error'
+  dirty: boolean
+  onRetry?: () => void
+}) {
+  if (status === 'saving') return <span className="dx-notes-save-chip saving">Saving…</span>
+  if (status === 'saved')  return <span className="dx-notes-save-chip saved">Saved ✓</span>
+  if (status === 'error')  return <button className="dx-notes-save-chip error" onClick={onRetry}>Save failed — retry</button>
+  if (dirty)               return <span className="dx-notes-save-chip dirty">Unsaved</span>
+  return null
+}
+
 // ── Scorecard detail ──────────────────────────────────────────────────────────
 
 function ScoreDetail({
-  session, isPro, onNotesChange,
+  session, isPro, onNotesChange, saveStatus, onRetrySave,
 }: {
   session: CaseSessionRecord
   isPro: boolean
   onNotesChange: (id: string, notes: string) => void
+  saveStatus?: 'saving' | 'saved' | 'error'
+  onRetrySave?: () => void
 }) {
   const gr = session.gradingResult
   const [localNotes, setLocalNotes] = useState(session.notes ?? '')
@@ -71,7 +95,10 @@ function ScoreDetail({
           Detailed scorecard not available for this session.
         </p>
         <div className="dx-notes-section" style={{ marginTop: 12 }}>
-          <div className="dx-notes-label">Your notes</div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <div className="dx-notes-label">Your notes</div>
+            <NotesSaveChip status={saveStatus} dirty={localNotes !== (session.notes ?? '')} onRetry={onRetrySave} />
+          </div>
           <textarea
             className="dx-notes-textarea"
             placeholder="Add notes about this case…"
@@ -190,14 +217,17 @@ function ScoreDetail({
 
           <div style={{ display: 'flex', gap: 16, fontSize: 11, color: 'var(--muted)', paddingTop: 8, borderTop: '1px solid var(--border)' }}>
             <span>Time: {fmtElapsed(session.elapsedSeconds)}</span>
-            <span>Questions: {session.questionCount}</span>
+            <span title="Number of history questions asked">Interview Qs: {session.questionCount}</span>
           </div>
         </div>
       </div>
 
       {/* Notes */}
       <div className="dx-notes-section">
-        <div className="dx-notes-label">Your notes</div>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          <div className="dx-notes-label">Your notes</div>
+          <NotesSaveChip status={saveStatus} dirty={localNotes !== (session.notes ?? '')} onRetry={onRetrySave} />
+        </div>
         <textarea
           className="dx-notes-textarea"
           placeholder="Add notes about this case…"
@@ -268,6 +298,8 @@ export default function HistoryPage() {
   const [isPro, setIsPro]               = useState(false)
   const [diffFilter, setDiffFilter]     = useState<DiffFilter>('All')
   const [displayName, setDisplayName]   = useState('User')
+  const [noteSaveState, setNoteSaveState] = useState<Record<string, 'saving' | 'saved' | 'error'>>({})
+  const noteSaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
   const [tier, setTier]                 = useState('free')
 
   // Phase 4b: additional filter state
@@ -421,13 +453,20 @@ export default function HistoryPage() {
   // Phase 7e: notes auto-save
   const handleNotesChange = useCallback((id: string, notes: string) => {
     setSessions(prev => prev.map(s => s.id === id ? { ...s, notes } : s))
+    setNoteSaveState(prev => ({ ...prev, [id]: 'saving' }))
+    clearTimeout(noteSaveTimers.current[id])
     fetch('/api/sessions/notes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, notes }),
     }).then(r => {
-      if (!r.ok) setSessions(prev => prev.map(s => s.id === id ? { ...s, notes: s.notes } : s))
-    }).catch(() => {})
+      if (!r.ok) throw new Error()
+      setNoteSaveState(prev => ({ ...prev, [id]: 'saved' }))
+      noteSaveTimers.current[id] = setTimeout(
+        () => setNoteSaveState(prev => { const { [id]: _, ...rest } = prev; return rest }),
+        2000
+      )
+    }).catch(() => setNoteSaveState(prev => ({ ...prev, [id]: 'error' })))
   }, [])
 
   // Phase 4d: scroll to parent session
@@ -480,7 +519,7 @@ export default function HistoryPage() {
           <div style={{ marginBottom: 24 }}>
             <h1 className="heading-display text-[22px]">Case <span className="heading-accent">history</span></h1>
             <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--muted)' }}>
-              {sessions.length === 50 ? 'Last 50 completed cases' : `${sessions.length} completed case${sessions.length !== 1 ? 's' : ''}`}
+              {`Showing ${sessions.length}${sessions.length === 50 ? ' (cap)' : ''} completed case${sessions.length !== 1 ? 's' : ''}`}
             </p>
           </div>
 
@@ -503,7 +542,7 @@ export default function HistoryPage() {
                   </div>
                 ) : (
                   <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace', color: recentTrend > 0 ? 'var(--green)' : recentTrend < 0 ? 'var(--red)' : 'var(--muted)' }}>
-                    {recentTrend > 0 ? `+${recentTrend}` : recentTrend} pts
+                    {recentTrend > 0 ? `+${recentTrend}` : recentTrend}%
                   </div>
                 )}
               </div>
@@ -512,7 +551,7 @@ export default function HistoryPage() {
 
           {/* Filter bar */}
           <div className="dx-history-filters">
-            {/* Search + bookmarked + clear */}
+            {/* Search + clear */}
             <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
               <input
                 className="dx-search"
@@ -522,17 +561,21 @@ export default function HistoryPage() {
                 onChange={e => setSearchRaw(e.target.value)}
                 style={{ flex: '1 1 200px', minWidth: 0 }}
               />
+              {isFiltered && (
+                <button className="dx-chip" onClick={clearAllFilters} style={{ color: 'var(--muted)' }}>
+                  Clear filters
+                </button>
+              )}
+            </div>
+
+            {/* Bookmarked chip (separate row for consistent grouping) */}
+            <div className="dx-filter-chips">
               <button
                 className={`dx-chip${onlyBookmarked ? ' active' : ''}`}
                 onClick={() => { setOnlyBookmarked(v => !v); setExpandedId(null) }}
               >
                 {onlyBookmarked ? '★' : '☆'} Bookmarked
               </button>
-              {isFiltered && (
-                <button className="dx-chip" onClick={clearAllFilters} style={{ color: 'var(--muted)' }}>
-                  Clear filters
-                </button>
-              )}
             </div>
 
             {/* Difficulty chips */}
@@ -545,7 +588,7 @@ export default function HistoryPage() {
                     className={`dx-chip${diffFilter === d ? ' active' : ''}`}
                     onClick={() => { setDiffFilter(d); setExpandedId(null) }}
                   >
-                    {d}{count > 0 && ` (${count})`}
+                    {d} ({count})
                   </button>
                 )
               })}
@@ -646,7 +689,7 @@ export default function HistoryPage() {
                       </button>
 
                       <span style={{ color: 'var(--muted)', fontSize: 12, whiteSpace: 'nowrap' }}>
-                        {fmtDate(session.startedAt)}
+                        {fmtDate(session.completedAt)}
                       </span>
 
                       {/* System + redo badge */}
@@ -665,22 +708,29 @@ export default function HistoryPage() {
                         )}
                       </span>
 
-                      <span>
+                      <span style={{ overflow: 'visible' }}>
                         <span style={{
                           fontSize: 11, fontWeight: 600, padding: '2px 8px', borderRadius: 4,
                           color: DIFFICULTY_COLOR[session.difficulty] ?? 'var(--text-secondary)',
                           background: 'var(--border)',
-                        }}>
-                          {session.difficulty.slice(0, 4)}
+                          whiteSpace: 'nowrap',
+                          display: 'inline-block',
+                        }} title={session.difficulty}>
+                          {session.difficulty}
                         </span>
                       </span>
                       <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 17, letterSpacing: '-0.01em', color: scoreColorVar(session.score) }}>
                         {session.score}<span style={{ fontSize: 10, fontWeight: 500, opacity: 0.6, marginLeft: 1, verticalAlign: 'top', lineHeight: '2' }}>%</span>
                       </span>
                       <span>
-                        <span className={`dx-result-badge ${session.correct ? 'correct' : 'incorrect'}`}>
-                          {session.correct ? 'Correct' : 'Incorrect'}
-                        </span>
+                        {(() => {
+                          const partial = session.correct && diagnosisIsPartial(session.userDiagnosis, session.diagnosis)
+                          return (
+                            <span className={`dx-result-badge ${partial ? 'partial' : session.correct ? 'correct' : 'incorrect'}`}>
+                              {partial ? 'Partial' : session.correct ? 'Correct' : 'Incorrect'}
+                            </span>
+                          )
+                        })()}
                       </span>
                       <span className="dx-diagnosis-cell">{session.userDiagnosis}</span>
                       <span className="dx-diagnosis-cell">{session.diagnosis}</span>
@@ -694,7 +744,13 @@ export default function HistoryPage() {
 
                     {isExpanded && (
                       <div style={{ padding: '20px 24px', borderBottom: '1px solid var(--border)', background: 'rgba(255,255,255,0.02)' }}>
-                        <ScoreDetail session={session} isPro={isPro} onNotesChange={handleNotesChange} />
+                        <ScoreDetail
+                          session={session}
+                          isPro={isPro}
+                          onNotesChange={handleNotesChange}
+                          saveStatus={noteSaveState[session.id]}
+                          onRetrySave={() => handleNotesChange(session.id, session.notes ?? '')}
+                        />
                       </div>
                     )}
                   </Fragment>

@@ -16,7 +16,7 @@ const CLINICAL_ADVANCED_DIMS = [
   { name: 'History & Interview',    pts: 20, desc: 'Did you ask the right questions? Covers chief complaint, HPI, relevant past history, medications, social history, and pertinent negatives.' },
   { name: 'Test Ordering',          pts: 20, desc: 'Did you order the core diagnostic workup? Scored against a curated "must-order" list for the diagnosis. Supplementary / subspecialty tests are not required for full marks.' },
   { name: 'Diagnosis Accuracy',     pts: 30, desc: 'Is your submitted diagnosis correct? Clinically equivalent terms are accepted. Partial credit for the right organ system or syndrome with a meaningfully wrong pathological process.' },
-  { name: 'Diagnosis Completeness', pts: 15, desc: 'How complete and specific is your diagnosis? At Clinical, a correct core diagnosis earns 10–15. At Advanced, etiology, staging, or complication details are expected.' },
+  { name: 'Diagnosis Completeness', pts: 15, desc: 'How complete and specific is your diagnosis? At Clinical, a correct core diagnosis earns 10–15 pts. At Advanced, etiology, staging, or complication details are required for full marks (13–15 pts); a core diagnosis alone earns 10–12 pts.' },
   { name: 'Clinical Reasoning',     pts: 15, desc: 'Do your interview choices and written reasoning link specific findings to the diagnosis? Penalised for fabricated findings or wrong conclusions, not for brevity.' },
 ]
 
@@ -24,7 +24,7 @@ const CLINICAL_ADVANCED_DIMS = [
 const FAQS = [
   {
     q: 'Why did I get partial credit for the right diagnosis?',
-    a: 'If you named the correct pathological entity but omitted a qualifying modifier (e.g. "pneumothorax" instead of "spontaneous pneumothorax"), that\'s still marked correct. Partial credit is reserved for cases where you identified the right organ system but the wrong pathological process.',
+    a: 'If you named the correct pathological entity but omitted a qualifying modifier, that\'s accepted only when the qualifier does not change management (e.g. "pharyngitis" instead of "viral pharyngitis"). When the qualifier carries management weight — such as a STEMI territory or injury laterality — omitting it costs points. Partial credit is reserved for cases where you identified the right organ system but the wrong pathological process.',
   },
   {
     q: 'Why does my score vary even on similar cases?',
@@ -36,7 +36,7 @@ const FAQS = [
   },
   {
     q: 'How does the recommendation algorithm choose what to study?',
-    a: 'Systems are ranked by urgency = (100 − avg score) × recency weight. Single-case systems get a 1.2× multiplier because one data point is less reliable. Your weekly plan then fills active days with the top-urgency systems in order.',
+    a: 'Systems are ranked by urgency = (100 − avg_score) × (1.2 if only 1 case, else 1.0). Single-case systems get the 1.2× multiplier because one data point is less reliable; multi-case systems carry a factor of 1.0 (no multiplier). Your weekly plan then fills active days with the top-urgency systems in order.',
   },
   {
     q: 'How do I redo a case?',
@@ -44,7 +44,7 @@ const FAQS = [
   },
   {
     q: 'What does STEMI vs NSTEMI mean for my score?',
-    a: 'STEMI and NSTEMI are not clinically equivalent — they differ in ECG findings, cath-lab activation, and management. Submitting one when the other is correct caps Diagnosis Accuracy at 12/27 and marks the case incorrect, regardless of other correct elements.',
+    a: 'STEMI and NSTEMI are not clinically equivalent — they differ in ECG findings and urgency of invasive management: STEMI mandates immediate cath-lab activation, while NSTEMI management is risk-stratified and may also require early catheterization in high-risk presentations. Submitting one when the other is correct caps Diagnosis Accuracy at approximately 43–44% of its dimension (16/36 at Foundations; 13/30 at Clinical/Advanced) and marks the case incorrect, regardless of other correct elements.',
   },
 ]
 
@@ -88,6 +88,18 @@ export default function HelpPage() {
             </div>
             <div className="dx-card-body">
               <div className="dx-help-section">
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
+                  {[
+                    { tier: 'Foundations', desc: 'Classic presentations, common diagnoses. All requested tests are returned immediately. No timer. Output: diagnosis + brief rationale.' },
+                    { tier: 'Clinical', desc: 'Moderate difficulty, 1–2 atypical features. Broad workup available. 22-minute timer. Output: diagnosis + clinical reasoning.' },
+                    { tier: 'Advanced', desc: 'Rare/complex diagnoses, red herrings. Some tests withheld. 15-minute timer simulating rounds time-pressure. Output: diagnosis + full reasoning.' },
+                  ].map(d => (
+                    <div key={d.tier} style={{ background: 'var(--surface2)', borderRadius: 8, padding: '10px 14px', border: '1px solid var(--border)' }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>{d.tier}</div>
+                      <div style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1.5 }}>{d.desc}</div>
+                    </div>
+                  ))}
+                </div>
                 <div style={{ fontWeight: 600, fontSize: 12, color: 'var(--text-secondary)', marginBottom: 6 }}>
                   Foundations — 4 categories, 100 pts total
                 </div>
@@ -120,6 +132,9 @@ export default function HelpPage() {
                     </div>
                   ))}
                 </div>
+                <div style={{ marginTop: 8, fontSize: 11, color: 'var(--muted)', fontStyle: 'italic' }}>
+                  These thresholds reflect platform calibration — they are not mapped to USMLE/NBME passing standards.
+                </div>
               </div>
             </div>
           </div>
@@ -132,7 +147,7 @@ export default function HelpPage() {
                 {[
                   {
                     name: 'Free', badge: '',
-                    features: ['2 cases per day', 'Core scorecard (5 dimensions + score)', 'Case history (last 50 cases)', 'Bookmarks and search', 'Focus areas & study queue'],
+                    features: ['2 cases per day', 'Core scorecard (4 dimensions at Foundations, 5 at Clinical/Advanced)', 'Case history (last 50 cases)', 'Bookmarks and search', 'Focus areas & study queue'],
                   },
                   {
                     name: 'Pro', badge: 'pro',
@@ -167,7 +182,7 @@ export default function HelpPage() {
                   urgency = (100 − avg_score) × (1.2 if only 1 case, else 1.0)
                 </div>
                 <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>
-                  A higher urgency means you need more practice. The 1.2× multiplier for single-case systems reflects
+                  A higher urgency means you need more practice. The 1.2× case-count factor for single-case systems reflects
                   that one data point is less reliable than multiple attempts. Systems are sorted by urgency
                   descending; your weekly training plan fills active days in that order.
                 </p>
@@ -202,7 +217,7 @@ export default function HelpPage() {
               Found a bug or have a suggestion?
             </p>
             <a
-              href="mailto:jorellana9100@gmail.com?subject=MedTrainer feedback"
+              href="mailto:support@medtrainer.app?subject=MedTrainer feedback"
               style={{ fontSize: 13, fontWeight: 600, color: 'var(--accent)', textDecoration: 'none' }}
             >
               Send feedback →

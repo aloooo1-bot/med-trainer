@@ -1,0 +1,21 @@
+{
+  "url": "http://localhost:3000/history",
+  "capturedAt": "2026-05-16T22:44:21.897Z",
+  "consoleErrors": [],
+  "networkErrors": [],
+  "interactionLog": [
+    {
+      "action": "expand-first-row",
+      "status": "ok"
+    },
+    {
+      "action": "toggle-bookmark",
+      "status": "ok"
+    },
+    {
+      "action": "check-filter-chips",
+      "status": "3 found"
+    }
+  ],
+  "elapsedMs": 4400
+}

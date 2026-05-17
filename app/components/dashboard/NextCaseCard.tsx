@@ -30,6 +30,10 @@ export default function NextCaseCard({
         </svg>
         Recommended next case
       </div>
+      <p style={{ fontSize: 11, color: 'var(--muted)', margin: '0 0 4px', lineHeight: 1.4 }}
+         title="Foundations — classic cases, no timer. Clinical — atypical features, 22-min timer. Advanced — rare/complex, 15-min timer.">
+        Foundations → Clinical → Advanced as your score improves.
+      </p>
       <h2 className="dx-next-headline">
         {system} <span className={`dx-next-tier ${tierClass}`}>{tier}</span>
       </h2>

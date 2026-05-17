@@ -476,6 +476,7 @@
 }
 
 .dx-result-badge.correct   { background: rgba(107,184,122,0.1); color: var(--green); }
+.dx-result-badge.partial   { background: rgba(184,134,46,0.12); color: var(--amber); }
 .dx-result-badge.incorrect { background: rgba(232,93,93,0.1);  color: var(--red);   }
 
 /* ── Case detail panel ───────────────────────────────────────────── */
@@ -1463,6 +1464,21 @@
   letter-spacing: 0.08em;
   color: var(--muted);
 }
+
+.dx-notes-save-chip {
+  font-size: 10px;
+  font-weight: 500;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: none;
+  cursor: default;
+  background: transparent;
+  transition: color 0.15s;
+}
+.dx-notes-save-chip.dirty   { color: var(--amber); }
+.dx-notes-save-chip.saving  { color: var(--muted); }
+.dx-notes-save-chip.saved   { color: var(--green); }
+.dx-notes-save-chip.error   { color: var(--red); cursor: pointer; text-decoration: underline; }
 
 .dx-notes-textarea {
   background: var(--surface2);

@@ -1,0 +1,342 @@
+{
+  "caseNum": 1,
+  "system": "Cardiovascular",
+  "difficulty": "Foundations",
+  "transcript": [
+    {
+      "role": "student",
+      "content": "Mr. Voloshyn, do you have any history of high blood pressure, diabetes, or high cholesterol — has any doctor ever told you that you have those?"
+    },
+    {
+      "role": "patient",
+      "content": "*grimaces and shifts uncomfortably on the stretcher*\n\nYou know, I haven't been to a doctor in... maybe four or five years, so nobody's really told me anything official. But my wife, she's been nagging me that I probably have high blood pressure — she says I'm always stressed and red in the face. I honestly don't know about the cholesterol or diabetes, I just never got it checked."
+    },
+    {
+      "role": "student",
+      "content": "Has the pain been constant since it started, or does it come and go at all? And does anything make it better or worse?"
+    },
+    {
+      "role": "patient",
+      "content": "*takes a slow breath and clutches his chest*\n\nNo, it's been constant since it hit me out there with the shovel — it hasn't let up at all, not even a little bit. I tried those antacid tablets thinking maybe it was just indigestion, but they did absolutely nothing. Sitting still doesn't seem to help either, it just keeps pressing down on my chest like a heavy weight."
+    },
+    {
+      "role": "student",
+      "content": "Do you smoke or have you smoked in the past, and is there any family history of heart attacks or heart disease?"
+    },
+    {
+      "role": "patient",
+      "content": "*nods slowly with a worried expression*\n\nYeah, I've been smoking most of my adult life — about a pack a day, been doing it for maybe 35 years or so, never really managed to quit. And yeah, the family history... it's not good — my father, he died from a heart attack at 62, and my older brother had to have bypass surgery on his heart when he was just 55. *pauses and swallows hard* That's actually what's scaring me right now, because I'm 58 and this feels... it feels bad."
+    }
+  ],
+  "testsOrdered": [
+    "ECG",
+    "Troponin I (Serial)",
+    "CBC",
+    "BMP",
+    "Chest X-Ray",
+    "Coagulation Studies (PT/INR, aPTT)",
+    "Echocardiogram (Bedside)"
+  ],
+  "diagnosis": "STEMI (ST-Elevation Myocardial Infarction)",
+  "reasoning": "The clinical picture strongly supports STEMI: classic ischemic chest pain with exertional onset, typical radiation to the left arm and jaw, associated autonomic symptoms (diaphoresis, nausea), and lack of response to antacids ruling out a GI etiology. The ECG is the most critical test here — ST elevations in the appropriate territory would confirm STEMI and trigger cath lab activation. Serial troponins will confirm myocardial injury, though we shouldn't wait for those to act. The two-week prodrome of exertional fatigue and dyspnea suggests possible prior unstable angina or even a subacute process. I ordered coagulation studies thinking ahead to anticoagulation and potential PCI, and the bedside echo could show regional wall motion abnormalities supporting ischemia. Aortic dissection remains a thought given the hypertension and sudden onset, but the radiation pattern and exertional trigger make it lower on my list.",
+  "studentNotes": "",
+  "caseData": {
+    "patientInfo": {
+      "name": "Dmitri Voloshyn",
+      "age": 58,
+      "gender": "Male",
+      "chiefComplaint": "Crushing chest pain radiating to left arm for 90 minutes"
+    },
+    "hpi": "Dmitri Voloshyn is a 58-year-old Ukrainian male who presents to the emergency department with sudden onset crushing substernal chest pain that began 90 minutes ago while shoveling snow. The pain is 9/10 in severity, described as pressure-like, and radiates to the left arm and jaw. He reports associated diaphoresis, nausea, and shortness of breath. He took two antacid tablets at home without any relief. He has no prior cardiac history but mentions he has felt intermittently fatigued and short of breath with exertion over the past two weeks.",
+    "vitals": {
+      "bp": "158/96",
+      "hr": 102,
+      "rr": 22,
+      "temp": 98.4,
+      "spo2": 94,
+      "weight": "212 lbs"
+    },
+    "diagnosis": "ST-Elevation Myocardial Infarction (Inferior STEMI)",
+    "differentials": [
+      "Unstable Angina / NSTEMI",
+      "Aortic Dissection",
+      "Acute Pericarditis",
+      "Pulmonary Embolism"
+    ],
+    "keyQuestions": [
+      "Did the pain start suddenly at rest or during exertion, and has it changed since onset?",
+      "Do you have a history of hypertension, hyperlipidemia, or diabetes?",
+      "Do you smoke or have a family history of premature heart disease?",
+      "Have you ever had a cardiac catheterization, stent, or bypass surgery?"
+    ],
+    "teachingPoints": [
+      "Inferior STEMI (ST elevation in leads II, III, and aVF with reciprocal depression in I and aVL) is most commonly caused by occlusion of the right coronary artery (RCA); always obtain a right-sided ECG to evaluate for right ventricular infarction, which occurs in up to 40% of inferior STEMIs.",
+      "STEMI protocol activation (emergent PCI within 90 minutes of first medical contact) is the immediate required action when ST elevation meeting STEMI criteria is identified — this supersedes further diagnostic workup; the goal door-to-balloon time is less than 90 minutes.",
+      "Classic risk factors for acute MI include age >45 in males, hypertension, hyperlipidemia, diabetes mellitus, smoking, family history of premature coronary artery disease, and obesity; physical exertion can precipitate plaque rupture in patients with underlying atherosclerotic disease.",
+      "Troponin I or T are the preferred biomarkers for myocardial injury; in STEMI, troponin typically begins rising within 3-6 hours, peaks at 12-24 hours, and may remain elevated for 7-14 days, so a single value must always be interpreted in the context of symptom onset time."
+    ],
+    "availableLabs": [
+      "Troponin I (Serial)",
+      "CBC",
+      "BMP",
+      "Lipid Panel",
+      "Coagulation Studies (PT/INR, aPTT)"
+    ],
+    "availableImaging": [
+      "ECG",
+      "Chest X-Ray",
+      "Echocardiogram (Bedside)"
+    ],
+    "labGroups": [
+      {
+        "name": "Cardiac Biomarkers",
+        "tests": [
+          "Troponin I (Serial)"
+        ]
+      },
+      {
+        "name": "CBC",
+        "tests": [
+          "CBC"
+        ]
+      },
+      {
+        "name": "BMP",
+        "tests": [
+          "BMP"
+        ]
+      },
+      {
+        "name": "Lipid Panel",
+        "tests": [
+          "Lipid Panel"
+        ]
+      },
+      {
+        "name": "Coagulation Studies",
+        "tests": [
+          "Coagulation Studies (PT/INR, aPTT)"
+        ]
+      }
+    ],
+    "labResults": {
+      "Troponin I (Serial)": {
+        "components": [
+          {
+            "name": "Troponin I (Hour 0)",
+            "value": "4.82",
+            "unit": "ng/mL",
+            "referenceRange": "< 0.04 ng/mL (elevated at 90 min from symptom onset; rising pattern expected at 3-6h post-onset)",
+            "status": "critical"
+          },
+          {
+            "name": "Troponin I (Hour 3)",
+            "value": "18.6",
+            "unit": "ng/mL",
+            "referenceRange": "< 0.04 ng/mL (rising pattern confirms acute myocardial injury; interpret relative to 90-min symptom onset)",
+            "status": "critical"
+          }
+        ]
+      },
+      "CBC": {
+        "components": [
+          {
+            "name": "WBC",
+            "value": "12.4",
+            "unit": "x10³/µL",
+            "referenceRange": "4.5-11.0",
+            "status": "high"
+          },
+          {
+            "name": "Hemoglobin",
+            "value": "14.8",
+            "unit": "g/dL",
+            "referenceRange": "13.5-17.5",
+            "status": "normal"
+          },
+          {
+            "name": "Hematocrit",
+            "value": "44.2",
+            "unit": "%",
+            "referenceRange": "41-53",
+            "status": "normal"
+          },
+          {
+            "name": "Platelets",
+            "value": "228",
+            "unit": "x10³/µL",
+            "referenceRange": "150-400",
+            "status": "normal"
+          }
+        ]
+      },
+      "BMP": {
+        "components": [
+          {
+            "name": "Sodium",
+            "value": "138",
+            "unit": "mEq/L",
+            "referenceRange": "136-145",
+            "status": "normal"
+          },
+          {
+            "name": "Potassium",
+            "value": "4.1",
+            "unit": "mEq/L",
+            "referenceRange": "3.5-5.0",
+            "status": "normal"
+          },
+          {
+            "name": "Creatinine",
+            "value": "1.1",
+            "unit": "mg/dL",
+            "referenceRange": "0.7-1.3",
+            "status": "normal"
+          },
+          {
+            "name": "Glucose",
+            "value": "148",
+            "unit": "mg/dL",
+            "referenceRange": "70-100",
+            "status": "high"
+          },
+          {
+            "name": "BUN",
+            "value": "18",
+            "unit": "mg/dL",
+            "referenceRange": "7-20",
+            "status": "normal"
+          }
+        ]
+      },
+      "Lipid Panel": {
+        "components": [
+          {
+            "name": "Total Cholesterol",
+            "value": "242",
+            "unit": "mg/dL",
+            "referenceRange": "< 200",
+            "status": "high"
+          },
+          {
+            "name": "LDL Cholesterol",
+            "value": "168",
+            "unit": "mg/dL",
+            "referenceRange": "< 100",
+            "status": "high"
+          },
+          {
+            "name": "HDL Cholesterol",
+            "value": "32",
+            "unit": "mg/dL",
+            "referenceRange": "> 40",
+            "status": "low"
+          },
+          {
+            "name": "Triglycerides",
+            "value": "210",
+            "unit": "mg/dL",
+            "referenceRange": "< 150",
+            "status": "high"
+          }
+        ]
+      },
+      "Coagulation Studies (PT/INR, aPTT)": {
+        "components": [
+          {
+            "name": "PT",
+            "value": "12.4",
+            "unit": "seconds",
+            "referenceRange": "11-13.5",
+            "status": "normal"
+          },
+          {
+            "name": "INR",
+            "value": "1.0",
+            "unit": "",
+            "referenceRange": "0.8-1.2",
+            "status": "normal"
+          },
+          {
+            "name": "aPTT",
+            "value": "29",
+            "unit": "seconds",
+            "referenceRange": "25-35",
+            "status": "normal"
+          }
+        ]
+      }
+    },
+    "imagingResults": {
+      "ECG": "12-lead ECG demonstrates normal sinus rhythm at 102 bpm. There is 3mm ST elevation in leads II, III, and aVF with reciprocal ST depression of 2mm in leads I and aVL. No ST elevation in precordial leads. Q waves are beginning to form in lead III. Findings are diagnostic of an acute inferior ST-elevation myocardial infarction. Right-sided leads (V3R-V4R) show 1mm ST elevation, consistent with right ventricular involvement.",
+      "Chest X-Ray": "Portable AP chest radiograph demonstrates mild cardiomegaly with a cardiothoracic ratio of 0.55. There is early pulmonary vascular congestion with perihilar haziness bilaterally consistent with early pulmonary edema. No pneumothorax, pleural effusion, or widened mediastinum. No evidence of aortic knob enlargement or tracheal deviation to suggest dissection.",
+      "Echocardiogram (Bedside)": "Bedside point-of-care echocardiogram demonstrates normal left ventricular size with regional wall motion abnormality involving the inferior and inferolateral walls (hypokinesis to akinesis). Estimated ejection fraction 40-45%. Right ventricular free wall motion is mildly reduced. No pericardial effusion. No aortic root dilation. Findings are consistent with acute inferior wall myocardial infarction with right ventricular involvement."
+    },
+    "procedureResults": {},
+    "hiddenHistory": {
+      "fullHistory": "Patient reports he has been told his blood pressure and cholesterol are 'borderline high' for several years but has not seen a physician regularly and is not on any medications. He admits to feeling more fatigued during his usual walks over the past month but attributed it to the cold weather.",
+      "socialHistory": "35-pack-year smoking history, currently smokes 1 PPD. Drinks 2-3 beers on weekends. Works as a construction foreman. No recent travel. Sedentary lifestyle outside of work.",
+      "familyHistory": "Father died of a myocardial infarction at age 62. Older brother had coronary artery bypass graft surgery at age 55.",
+      "medications": "No prescription medications. Takes occasional ibuprofen 400mg PRN for back pain. No antiplatelet or statin therapy.",
+      "hiddenSymptoms": "Patient will admit to 2-3 episodes of exertional chest tightness over the past month that resolved with rest, each lasting 5-10 minutes; he also reports waking once with mild chest discomfort that resolved spontaneously.",
+      "allergies": "NKDA"
+    },
+    "imagingCategory": "ECG ST-segment changes with wall motion abnormality on echo",
+    "ecgFindings": "3mm ST elevation in leads II, III, and aVF with 2mm reciprocal ST depression in leads I and aVL; early Q wave formation in lead III; right-sided leads show 1mm ST elevation in V3R-V4R indicating right ventricular infarction; rate 102 bpm sinus tachycardia",
+    "hematologyFindings": "",
+    "urineFindings": "",
+    "skinFindings": "",
+    "fundusFindings": "",
+    "biopsyFindings": ""
+  },
+  "correctDiagnosis": "ST-Elevation Myocardial Infarction (Inferior STEMI)",
+  "workingDiagnosis": "STEMI (ST-Elevation Myocardial Infarction)",
+  "clinicalImpression": "This really feels like a classic ACS presentation — 58-year-old male, crushing substernal chest pain radiating to the left arm and jaw, onset with exertion (shoveling snow), diaphoresis, nausea, shortness of breath, and no relief with antacids. My first instinct is STEMI until proven otherwise. I want to keep aortic dissection in the back of my mind given the severe sudden onset and hypertension, but the radiation pattern and exertional trigger feel more ischemic to me. The two-week history of exertional fatigue and dyspnea is interesting — could suggest he's had unstable angina building up to this.",
+  "grading": {
+    "score": 93,
+    "correct": true,
+    "feedback": "Excellent work identifying STEMI as the correct diagnosis based on classic presentation and high-yield history. Your three interview questions were well-targeted, covering pain character, cardiac risk factors, and family/smoking history efficiently. To strengthen future performance, consider also asking about prior cardiac procedures and eliciting the prodromal exertional chest tightness episodes that preceded this event, which have important management implications.",
+    "strengths": [
+      "Correctly identified STEMI from a classic presentation of crushing substernal chest pain with radiation, diaphoresis, and nausea in a high-risk patient",
+      "Efficiently elicited key cardiac risk factors including smoking history and strong family history of premature coronary artery disease in just three targeted questions",
+      "Appropriately asked about pain character and relieving/aggravating factors, distinguishing this from GERD and other benign causes",
+      "Ordered a comprehensive and appropriate diagnostic workup including serial troponins, ECG, chest X-ray, echocardiogram, BMP, CBC, and coagulation studies"
+    ],
+    "dimensions": {
+      "historyInterview": {
+        "score": 20,
+        "feedback": "Strong targeted questioning that captured smoking history, family history, pain character, and baseline risk factors; missed elicitation of prior cardiac procedures and the prodromal exertional chest tightness episodes over the past month, which would have refined risk stratification."
+      },
+      "testOrdering": {
+        "score": 24,
+        "feedback": "Comprehensive and appropriate test panel ordered including serial troponins, 12-lead ECG, chest X-ray, bedside echo, BMP, CBC, and coagulation studies — all core expected tests for an acute coronary syndrome presentation are present."
+      },
+      "diagnosisAccuracy": {
+        "score": 33,
+        "feedback": "STEMI is correctly identified and is the core diagnosis; omitting the anatomic qualifier 'inferior' is a minor incompleteness at this difficulty level, though the ECG findings clearly localize to the inferior wall and specifying this would be important for anticipating RV involvement and management nuances."
+      },
+      "diagnosisCompleteness": {
+        "score": 16,
+        "feedback": "At Foundations difficulty, naming STEMI as the core diagnosis is complete and fully satisfies the task requirements."
+      }
+    },
+    "missedQuestions": [
+      "Have you had any episodes of chest tightness or discomfort with exertion in the weeks before today that resolved with rest? (Would have identified unstable angina prodrome and informed urgency of revascularization)",
+      "Have you ever had a cardiac catheterization, coronary stent, or bypass surgery? (Directly changes procedural approach and anticoagulation management)"
+    ],
+    "teachingPoints": [
+      "Inferior STEMI (ST elevation in leads II, III, and aVF with reciprocal depression in I and aVL) is most commonly caused by occlusion of the right coronary artery (RCA); always obtain a right-sided ECG to evaluate for right ventricular infarction, which occurs in up to 40% of inferior STEMIs.",
+      "STEMI protocol activation (emergent PCI within 90 minutes of first medical contact) is the immediate required action when ST elevation meeting STEMI criteria is identified — this supersedes further diagnostic workup; the goal door-to-balloon time is less than 90 minutes.",
+      "Classic risk factors for acute MI include age >45 in males, hypertension, hyperlipidemia, diabetes mellitus, smoking, family history of premature coronary artery disease, and obesity; physical exertion can precipitate plaque rupture in patients with underlying atherosclerotic disease.",
+      "Troponin I or T are the preferred biomarkers for myocardial injury; in STEMI, troponin typically begins rising within 3-6 hours, peaks at 12-24 hours, and may remain elevated for 7-14 days, so a single value must always be interpreted in the context of symptom onset time."
+    ],
+    "differentials": [
+      "Unstable Angina / NSTEMI: Would present with similar chest pain and risk factors but without ST elevation on ECG; distinguished by ECG findings (ST depression or T-wave changes rather than elevation) and the pattern of troponin rise — STEMI requires emergent cath lab activation while NSTEMI allows a more deliberate approach.",
+      "Aortic Dissection: Can present with severe chest pain but is classically described as tearing or ripping and often radiates to the back; chest X-ray would show widened mediastinum and blood pressure differential between arms may be present — excluded here by normal mediastinum on CXR and ECG findings diagnostic of STEMI.",
+      "Acute Pericarditis: Can cause chest pain and diffuse ST elevation, but elevation is typically saddle-shaped across multiple leads without reciprocal depression, and pain classically improves with leaning forward; distinguished here by the focal inferior ST elevation with reciprocal changes and elevated troponin consistent with myocardial necrosis.",
+      "Pulmonary Embolism: Can cause acute chest pain, dyspnea, and diaphoresis; ECG may show sinus tachycardia or S1Q3T3 pattern rather than inferior ST elevation; the crushing pressure-type pain, clear ECG localization, and critically elevated troponins in this case are far more consistent with STEMI than PE."
+    ]
+  },
+  "score": 93,
+  "correct": true
+}

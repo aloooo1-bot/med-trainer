@@ -1,0 +1,392 @@
+{
+  "caseNum": 4,
+  "system": "Gastrointestinal",
+  "difficulty": "Foundations",
+  "transcript": [
+    {
+      "role": "student",
+      "content": "Have you ever had episodes like this before, or has anyone in your family had pancreatitis or gallstone problems?"
+    },
+    {
+      "role": "patient",
+      "content": "No, nothing like *this* bad before — this is way worse than anything I've experienced. Though, now that you mention it, maybe about three months ago I had some stomach discomfort after a heavy night of drinking, but it went away on its own so I didn't bother going to the doctor. As for family, my dad has diabetes, but I don't know of anyone having pancreatitis or gallstone issues."
+    },
+    {
+      "role": "student",
+      "content": "How much alcohol did you actually drink tonight, and is heavy drinking something you do regularly or was this unusual for you?"
+    },
+    {
+      "role": "patient",
+      "content": "Honestly, at the party tonight I probably had around 10-12 drinks over a few hours — mostly beer and some shots. And I won't lie to you, that's pretty normal for me on weekends — I'd say I drink like that maybe two or three times a month, been doing it for a few years now. I know it's not great, but it's usually just a weekend thing with friends."
+    },
+    {
+      "role": "student",
+      "content": "Do you have any history of gallstones, or have you ever had an ultrasound of your abdomen done before?"
+    },
+    {
+      "role": "patient",
+      "content": "No, I've never been told I have gallstones or anything like that. And honestly I've never had an ultrasound done — I pretty much never go to the doctor unless something is really wrong, like today. I'm generally pretty healthy otherwise, or at least I thought I was."
+    }
+  ],
+  "testsOrdered": [
+    "Lipase",
+    "CBC",
+    "BMP",
+    "LFTs",
+    "Triglycerides",
+    "Right Upper Quadrant Ultrasound"
+  ],
+  "diagnosis": "Acute Alcoholic Pancreatitis",
+  "reasoning": "The constellation of severe epigastric pain radiating to the back, onset after heavy alcohol consumption, nausea and vomiting, low-grade fever, and tachycardia is highly consistent with acute pancreatitis. Lipase would be the confirmatory test here — elevation greater than 3x upper limit of normal essentially clinches the diagnosis per Atlanta criteria. I ordered LFTs and RUQ ultrasound to evaluate for a biliary etiology (gallstone pancreatitis), which I want to rule out since management differs. Triglycerides were ordered because hypertriglyceridemia is a less common but important cause, especially in a young person. The BMP helps assess for electrolyte disturbances and renal function given his vomiting and third-spacing risk. The CBC will help me trend his WBC given the low-grade fever. I'm less worried about perforation or dissection given the clinical story and the positional relief pattern.",
+  "studentNotes": "What's tripping me up slightly is the mild fever — I want to make sure this is just the inflammatory response from pancreatitis and not early cholangitis or an infected necrosis situation, though that would be early for necrosis at 8 hours. I also wasn't sure if I should order a CT right away — I've heard attendings say CT isn't always needed upfront if the diagnosis is clinically clear and lipase is elevated, but I'd want to know the threshold for getting imaging. I debated whether to order a urinalysis too but held off since his presentation doesn't suggest anything urologic — though I wonder if I should have included it just to be safe. Would definitely want to ask the attending whether RUQ ultrasound should be done on every pancreatitis patient upfront, and when to escalate to CT.",
+  "caseData": {
+    "patientInfo": {
+      "name": "Bogdan Melnyk",
+      "age": 34,
+      "gender": "Male",
+      "chiefComplaint": "Severe epigastric pain radiating to the back"
+    },
+    "hpi": "Bogdan Melnyk is a 34-year-old male who presents to the emergency department with sudden onset of severe, constant epigastric pain that began approximately 8 hours ago after attending a friend's birthday party where he consumed large amounts of alcohol. The pain is rated 9/10, sharp in character, and radiates straight through to his mid-back. He reports nausea and has vomited three times since symptom onset. He notes that leaning forward slightly provides mild relief, while lying flat worsens the pain. He denies any prior similar episodes, fever, or change in bowel habits.",
+    "vitals": {
+      "bp": "118/72",
+      "hr": 108,
+      "rr": 20,
+      "temp": 100.1,
+      "spo2": 97,
+      "weight": "192 lbs"
+    },
+    "diagnosis": "Acute Pancreatitis (alcohol-induced)",
+    "differentials": [
+      "Peptic Ulcer Disease with perforation",
+      "Acute Cholecystitis",
+      "Mesenteric Ischemia",
+      "Aortic Dissection"
+    ],
+    "keyQuestions": [
+      "How much alcohol did you consume last night, and how often do you drink heavily?",
+      "Have you ever had gallstones or been told your gallbladder was abnormal?",
+      "Do you take any medications, including NSAIDs, steroids, or diuretics?",
+      "Have you had any recent blood tests showing elevated triglycerides or cholesterol?"
+    ],
+    "teachingPoints": [
+      "Acute pancreatitis is most commonly caused by gallstones and alcohol; the classic presentation is sudden-onset epigastric pain radiating to the back, worsened by eating or lying flat and relieved by leaning forward.",
+      "Serum lipase is more sensitive and specific than amylase for acute pancreatitis and remains elevated longer; a lipase level greater than 3 times the upper limit of normal (>180 U/L) is diagnostic in the right clinical context.",
+      "The Ranson criteria and BISAP score are used to stratify severity; initial management includes aggressive IV fluid resuscitation (lactated Ringer's is preferred over normal saline), NPO status, and analgesia — antibiotics are NOT indicated unless infected necrosis is confirmed."
+    ],
+    "availableLabs": [
+      "CBC",
+      "BMP",
+      "Lipase",
+      "LFTs",
+      "Triglycerides",
+      "Urinalysis"
+    ],
+    "availableImaging": [
+      "Abdominal X-Ray",
+      "CT Abdomen/Pelvis with Contrast",
+      "Right Upper Quadrant Ultrasound"
+    ],
+    "labGroups": [
+      {
+        "name": "CBC",
+        "tests": [
+          "CBC"
+        ]
+      },
+      {
+        "name": "BMP",
+        "tests": [
+          "BMP"
+        ]
+      },
+      {
+        "name": "Lipase",
+        "tests": [
+          "Lipase"
+        ]
+      },
+      {
+        "name": "LFTs",
+        "tests": [
+          "LFTs"
+        ]
+      },
+      {
+        "name": "Triglycerides",
+        "tests": [
+          "Triglycerides"
+        ]
+      },
+      {
+        "name": "Urinalysis",
+        "tests": [
+          "Urinalysis"
+        ]
+      }
+    ],
+    "labResults": {
+      "CBC": {
+        "components": [
+          {
+            "name": "WBC",
+            "value": "14.2",
+            "unit": "x10³/µL",
+            "referenceRange": "4.5-11.0",
+            "status": "high"
+          },
+          {
+            "name": "Hgb",
+            "value": "15.8",
+            "unit": "g/dL",
+            "referenceRange": "13.5-17.5",
+            "status": "normal"
+          },
+          {
+            "name": "Hct",
+            "value": "48.1",
+            "unit": "%",
+            "referenceRange": "41-53",
+            "status": "normal"
+          },
+          {
+            "name": "Platelets",
+            "value": "238",
+            "unit": "x10³/µL",
+            "referenceRange": "150-400",
+            "status": "normal"
+          }
+        ]
+      },
+      "BMP": {
+        "components": [
+          {
+            "name": "Sodium",
+            "value": "138",
+            "unit": "mEq/L",
+            "referenceRange": "136-145",
+            "status": "normal"
+          },
+          {
+            "name": "Potassium",
+            "value": "3.4",
+            "unit": "mEq/L",
+            "referenceRange": "3.5-5.1",
+            "status": "low"
+          },
+          {
+            "name": "Chloride",
+            "value": "101",
+            "unit": "mEq/L",
+            "referenceRange": "98-107",
+            "status": "normal"
+          },
+          {
+            "name": "Bicarbonate",
+            "value": "21",
+            "unit": "mEq/L",
+            "referenceRange": "22-29",
+            "status": "low"
+          },
+          {
+            "name": "BUN",
+            "value": "22",
+            "unit": "mg/dL",
+            "referenceRange": "7-20",
+            "status": "high"
+          },
+          {
+            "name": "Creatinine",
+            "value": "1.1",
+            "unit": "mg/dL",
+            "referenceRange": "0.6-1.2",
+            "status": "normal"
+          },
+          {
+            "name": "Glucose",
+            "value": "148",
+            "unit": "mg/dL",
+            "referenceRange": "70-99",
+            "status": "high"
+          },
+          {
+            "name": "Calcium",
+            "value": "8.2",
+            "unit": "mg/dL",
+            "referenceRange": "8.5-10.5",
+            "status": "low"
+          }
+        ]
+      },
+      "Lipase": {
+        "components": [
+          {
+            "name": "Lipase",
+            "value": "1,840",
+            "unit": "U/L",
+            "referenceRange": "13-60",
+            "status": "high"
+          }
+        ]
+      },
+      "LFTs": {
+        "components": [
+          {
+            "name": "AST",
+            "value": "68",
+            "unit": "U/L",
+            "referenceRange": "10-40",
+            "status": "high"
+          },
+          {
+            "name": "ALT",
+            "value": "44",
+            "unit": "U/L",
+            "referenceRange": "7-56",
+            "status": "normal"
+          },
+          {
+            "name": "Alkaline Phosphatase",
+            "value": "92",
+            "unit": "U/L",
+            "referenceRange": "44-147",
+            "status": "normal"
+          },
+          {
+            "name": "Total Bilirubin",
+            "value": "1.3",
+            "unit": "mg/dL",
+            "referenceRange": "0.1-1.2",
+            "status": "high"
+          },
+          {
+            "name": "Albumin",
+            "value": "3.9",
+            "unit": "g/dL",
+            "referenceRange": "3.5-5.0",
+            "status": "normal"
+          }
+        ]
+      },
+      "Triglycerides": {
+        "components": [
+          {
+            "name": "Triglycerides",
+            "value": "218",
+            "unit": "mg/dL",
+            "referenceRange": "<150",
+            "status": "high"
+          }
+        ]
+      },
+      "Urinalysis": {
+        "components": [
+          {
+            "name": "Color",
+            "value": "Yellow",
+            "unit": "",
+            "referenceRange": "Yellow",
+            "status": "normal"
+          },
+          {
+            "name": "Specific Gravity",
+            "value": "1.025",
+            "unit": "",
+            "referenceRange": "1.005-1.030",
+            "status": "normal"
+          },
+          {
+            "name": "Glucose",
+            "value": "Trace",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "abnormal"
+          },
+          {
+            "name": "Ketones",
+            "value": "Positive",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "abnormal"
+          },
+          {
+            "name": "WBC",
+            "value": "2",
+            "unit": "/hpf",
+            "referenceRange": "0-5",
+            "status": "normal"
+          }
+        ]
+      }
+    },
+    "imagingResults": {
+      "Abdominal X-Ray": "Upright and supine abdominal radiographs show a sentinel loop sign with a dilated loop of jejunum in the left upper quadrant. No pneumoperitoneum is identified. No calcified gallstones or pancreatic calcifications are visible.",
+      "CT Abdomen/Pelvis with Contrast": "CT with IV contrast demonstrates diffuse pancreatic edema with peripancreatic fat stranding and a small amount of peripancreatic fluid in the lesser sac, consistent with acute interstitial edematous pancreatitis (CT Severity Index Grade D). No pancreatic necrosis, abscess, or pseudocyst is identified. The gallbladder appears normal without wall thickening or pericholecystic fluid, and no biliary ductal dilatation is seen.",
+      "Right Upper Quadrant Ultrasound": "The gallbladder is normal in size and wall thickness with no gallstones, sludge, or pericholecystic fluid identified. The common bile duct measures 3mm, within normal limits. The pancreatic head appears mildly edematous, though visualization of the body and tail is limited by overlying bowel gas. No intra-hepatic biliary ductal dilatation is seen."
+    },
+    "procedureResults": {},
+    "hiddenHistory": {
+      "fullHistory": "No prior hospitalizations or surgeries. No history of gallbladder disease or peptic ulcer disease.",
+      "socialHistory": "Drinks alcohol heavily on weekends, approximately 8-12 drinks per occasion, 2-3 times per month for the past 5 years. Smokes half a pack of cigarettes daily. Works as a construction site foreman. No recent travel.",
+      "familyHistory": "Father has type 2 diabetes. No family history of pancreatitis or pancreatic cancer.",
+      "medications": "Ibuprofen 400mg PRN for musculoskeletal pain (occasional use). No prescription medications. No supplements.",
+      "hiddenSymptoms": "Patient admits to noticing pale, greasy-appearing stools on one occasion in the past month if asked about stool changes. Also admits to a prior episode of milder epigastric discomfort after heavy drinking about 3 months ago that resolved on its own without seeking care.",
+      "allergies": "NKDA"
+    },
+    "imagingCategory": "Peripancreatic fat stranding with pancreatic edema",
+    "ecgFindings": "",
+    "hematologyFindings": "",
+    "urineFindings": "",
+    "skinFindings": "",
+    "fundusFindings": "",
+    "biopsyFindings": ""
+  },
+  "correctDiagnosis": "Acute Pancreatitis (alcohol-induced)",
+  "workingDiagnosis": "Acute Pancreatitis",
+  "clinicalImpression": "This 34-year-old male with heavy alcohol use presenting with severe epigastric pain radiating to the back, nausea, and vomiting is classic for acute pancreatitis. The positional relief with leaning forward is a textbook finding that really points me in this direction. That said, I want to make sure I'm not missing something like a peptic ulcer perforation or even — though less likely at his age — an aortic issue, so I shouldn't anchor too hard yet.",
+  "grading": {
+    "score": 93,
+    "correct": true,
+    "feedback": "Excellent work — you correctly identified acute alcoholic pancreatitis based on a targeted, high-yield history that efficiently established the patient's drinking pattern, prior symptoms, and absence of gallstone history. Your interview was focused and productive, and your diagnosis is clinically accurate and appropriately specific. To round out your workup, consider asking about medications (especially NSAIDs) and stool changes, as these can influence both diagnosis and management.",
+    "strengths": [
+      "Accurately identified alcohol as the causative etiology, supported by a thorough drinking history including frequency, quantity, and duration.",
+      "Efficiently elicited a prior milder episode of epigastric pain after alcohol use, which strengthens the clinical picture.",
+      "Correctly ruled out gallstone etiology by asking about prior gallbladder history and ultrasound — consistent with the negative RUQ ultrasound findings.",
+      "Submitted a precise and clinically supported diagnosis ('Acute Alcoholic Pancreatitis') with accurate added specificity."
+    ],
+    "dimensions": {
+      "historyInterview": {
+        "score": 20,
+        "feedback": "You asked the three most impactful questions (alcohol quantity/pattern, prior episodes, gallstone history) efficiently; the main gap was not asking about medications (e.g., NSAIDs) or stool changes, which could have surfaced additional etiologic clues."
+      },
+      "testOrdering": {
+        "score": 24,
+        "feedback": "The ordered tests — lipase, CBC, BMP, LFTs, triglycerides, and RUQ ultrasound — represent a complete and appropriate core workup for acute pancreatitis, covering diagnosis, etiology, and initial severity assessment."
+      },
+      "diagnosisAccuracy": {
+        "score": 36,
+        "feedback": "The diagnosis of 'Acute Alcoholic Pancreatitis' is correct and clinically supported with accurate temporal and etiologic qualifiers that match the case presentation and lab findings."
+      },
+      "diagnosisCompleteness": {
+        "score": 13,
+        "feedback": "The core diagnosis is clearly named with appropriate etiology; at Foundations level this is complete, though no severity assessment or complication detail was offered."
+      }
+    },
+    "missedQuestions": [
+      "Are you taking any medications regularly, including NSAIDs, steroids, or diuretics? (Ibuprofen use and NSAIDs can contribute to pancreatitis and affect management)",
+      "Have you noticed any changes in your stools — particularly pale, greasy, or foul-smelling stools? (Steatorrhea would suggest exocrine pancreatic insufficiency and possible chronic underlying disease)"
+    ],
+    "teachingPoints": [
+      "Acute pancreatitis is most commonly caused by gallstones and alcohol; the classic presentation is sudden-onset epigastric pain radiating to the back, worsened by eating or lying flat and relieved by leaning forward.",
+      "Serum lipase is more sensitive and specific than amylase for acute pancreatitis and remains elevated longer; a lipase level greater than 3 times the upper limit of normal (>180 U/L) is diagnostic in the right clinical context.",
+      "The Ranson criteria and BISAP score are used to stratify severity; initial management includes aggressive IV fluid resuscitation (lactated Ringer's is preferred over normal saline), NPO status, and analgesia — antibiotics are NOT indicated unless infected necrosis is confirmed."
+    ],
+    "differentials": [
+      "Peptic Ulcer Disease with perforation: can present with sudden severe epigastric pain radiating to the back, but typically shows free air on imaging and lacks markedly elevated lipase; pain often improves with antacids.",
+      "Acute Cholecystitis: causes RUQ/epigastric pain but is usually associated with gallstones, positive Murphy's sign, and fever; RUQ ultrasound here was negative for stones or wall thickening.",
+      "Mesenteric Ischemia: severe abdominal pain often 'out of proportion' to exam findings, typically in older patients with vascular risk factors; lipase would not be markedly elevated and CT angiography would be diagnostic.",
+      "Aortic Dissection: can cause severe back pain radiating to the abdomen, but classically presents with tearing/ripping quality, blood pressure differentials between arms, and no elevation in pancreatic enzymes."
+    ]
+  },
+  "score": 93,
+  "correct": true
+}

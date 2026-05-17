@@ -114,7 +114,18 @@
       "Bash(echo \"generateCase: $\\(awk 'NR==528' app/trainer/page.tsx\\) to $\\(awk 'NR==909' app/trainer/page.tsx\\) = $\\(\\(909-528+1\\)\\) lines\")",
       "Bash(awk 'NR >= 100')",
       "Bash(Get-ChildItem app/lib/generators/)",
-      "Bash(Select-Object Name)"
+      "Bash(Select-Object Name)",
+      "Bash(New-Item -ItemType Directory -Force \"C:\\\\Users\\\\jorel\\\\med-trainer\\\\scripts\\\\student-audit\\\\lib\")",
+      "Bash(npx playwright *)",
+      "Bash(echo \"PID $!\")",
+      "Bash(nohup npm run dev)",
+      "Bash(echo \"started PID $!\")",
+      "Bash(python3 -c \"import sys,json; d=json.load\\(sys.stdin\\); [print\\(a\\) for a in d['interactionLog']]\")",
+      "Bash(echo \"PID: $!\")",
+      "PowerShell(git *)",
+      "Bash(npx eslint *)",
+      "Bash(ls \"C:\\\\Users\\\\jorel\\\\.claude\\\\plans\")",
+      "Bash(ls \"C:\\\\Users\\\\jorel\\\\.claude\")"
     ]
   }
 }

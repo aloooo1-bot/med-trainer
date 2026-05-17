@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useMemo } from 'react'
+import { useRouter } from 'next/navigation'
 
 type Session = { system: string; difficulty: string; score: number }
 
@@ -45,6 +46,7 @@ function cssScore(s: number | null) {
 }
 
 export default function PerformanceBreakdown({ sessions }: { sessions: Session[] }) {
+  const router = useRouter()
   const [sortKey, setSortKey] = useState<SortKey>('count')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
 
@@ -85,25 +87,38 @@ export default function PerformanceBreakdown({ sessions }: { sessions: Session[]
 
   return (
     <div className="dx-card">
-      <div className="dx-card-header">Performance Breakdown</div>
+      <div className="dx-card-header" style={{ display: 'flex', alignItems: 'baseline', gap: 8 }}>
+        <span>Performance Breakdown</span>
+        <span style={{ fontSize: 11, color: 'var(--muted)', fontWeight: 400 }}>— indicates no attempts at this difficulty</span>
+      </div>
       <div className="dx-perf-table">
         <div className="dx-perf-header">
           <span className="dx-perf-th sortable" onClick={() => clickHeader('system')}>System{arrow('system')}</span>
           <span className="dx-perf-th sortable" onClick={() => clickHeader('count')}>Cases{arrow('count')}</span>
-          <span className="dx-perf-th sortable" onClick={() => clickHeader('avgScore')}>Avg{arrow('avgScore')}</span>
+          <span
+            className="dx-perf-th sortable"
+            onClick={() => clickHeader('avgScore')}
+            title="Mean rubric score across all difficulty levels. Equals Foundations avg when only Foundations cases have been attempted."
+          >Avg{arrow('avgScore')}</span>
           <span className="dx-perf-th sortable" onClick={() => clickHeader('fAvg')}>Foundations{arrow('fAvg')}</span>
-          <span className="dx-perf-th sortable" onClick={() => clickHeader('cAvg')}>Clinical{arrow('cAvg')}</span>
-          <span className="dx-perf-th sortable" onClick={() => clickHeader('aAvg')}>Advanced{arrow('aAvg')}</span>
+          <span className="dx-perf-th sortable" onClick={() => clickHeader('cAvg')} title="— indicates no Clinical-level attempts yet">Clinical{arrow('cAvg')}</span>
+          <span className="dx-perf-th sortable" onClick={() => clickHeader('aAvg')} title="— indicates no Advanced-level attempts yet">Advanced{arrow('aAvg')}</span>
         </div>
         {rows.map(r => (
-          <div key={r.system} className="dx-perf-row">
+          <button
+            key={r.system}
+            className="dx-perf-row"
+            style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+            onClick={() => router.push(`/history?system=${encodeURIComponent(r.system)}`)}
+            title={`View ${r.system} case history`}
+          >
             <span className="dx-perf-system">{r.system}</span>
             <span className="dx-perf-count">{r.count}</span>
             <span className="dx-perf-score" style={{ color: cssScore(r.avgScore) }}>{r.avgScore}</span>
             <span className="dx-perf-score" style={{ color: cssScore(r.fAvg) }}>{r.fAvg ?? '—'}</span>
             <span className="dx-perf-score" style={{ color: cssScore(r.cAvg) }}>{r.cAvg ?? '—'}</span>
             <span className="dx-perf-score" style={{ color: cssScore(r.aAvg) }}>{r.aAvg ?? '—'}</span>
-          </div>
+          </button>
         ))}
       </div>
     </div>

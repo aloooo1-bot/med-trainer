@@ -9,6 +9,7 @@ function scorePill(s: number): { color: string; background: string } {
 
 export default function WeakestSystems({ systems }: { systems: SystemEntry[] }) {
   const top3 = systems.slice(0, 3)
+  const allStrong = top3.length > 0 && top3.every(s => s.score >= 75)
   return (
     <div className="dx-card">
       <div className="dx-card-header">
@@ -18,7 +19,7 @@ export default function WeakestSystems({ systems }: { systems: SystemEntry[] }) 
             <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
           </svg>
         </span>
-        Focus areas
+        {allStrong ? 'Recent systems' : 'Focus areas'}
       </div>
       <div className="dx-card-body dx-weak-list">
         {top3.length === 0 ? (

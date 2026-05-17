@@ -1,0 +1,327 @@
+{
+  "caseNum": 6,
+  "system": "Endocrine / Metabolic",
+  "difficulty": "Foundations",
+  "transcript": [
+    {
+      "role": "student",
+      "content": "Has anyone in your family been diagnosed with thyroid disease or any autoimmune conditions like lupus or rheumatoid arthritis?"
+    },
+    {
+      "role": "patient",
+      "content": "Yes, actually my mom has Hashimoto's — that's a thyroid thing, right? And my aunt on my mom's side has rheumatoid arthritis. Oh, and my sister has type 1 diabetes, which I know is also some kind of immune system condition."
+    },
+    {
+      "role": "student",
+      "content": "Have you noticed any swelling or fullness in the front of your neck, or does it feel uncomfortable when you swallow?"
+    },
+    {
+      "role": "patient",
+      "content": "No, I haven't really noticed any swelling in my neck, and swallowing feels completely normal. I haven't felt any lumps or anything like that when I touch my neck either."
+    },
+    {
+      "role": "student",
+      "content": "Have you been feeling depressed or more down than usual lately, and have you made any changes to your diet recently that might explain the weight gain?"
+    },
+    {
+      "role": "patient",
+      "content": "I wouldn't say I'm really depressed, but I do feel kind of blah and sluggish, you know? As for my diet, I haven't really changed anything — if anything, I feel like I've been eating less than usual because I just don't have much appetite, so the weight gain is really confusing and frustrating to me."
+    }
+  ],
+  "testsOrdered": [
+    "Thyroid Function Panel",
+    "Thyroid Antibodies",
+    "CBC",
+    "BMP",
+    "Lipid Panel"
+  ],
+  "diagnosis": "Primary Hypothyroidism, likely Hashimoto's Thyroiditis",
+  "reasoning": "The clinical picture strongly supports primary hypothyroidism: fatigue, weight gain, cold intolerance, dry skin, hair loss, menorrhagia, bradycardia (HR 58), and low-normal temperature (97.2°F) are all classic features of a hypometabolic state. Thyroid function panel would be expected to show elevated TSH with low free T4, confirming primary hypothyroidism. Given her age, sex, and the insidious 4-month onset, Hashimoto's thyroiditis is the most likely etiology, and positive thyroid antibodies (anti-TPO and/or anti-thyroglobulin) would support this. I ordered CBC to check for the normocytic or macrocytic anemia that can accompany hypothyroidism, and a lipid panel because hypothyroidism commonly causes dyslipidemia. The BMP helps rule out metabolic contributors to fatigue. I don't think this is depression alone or simple anemia — the cold intolerance, bradycardia, and hair loss pattern together point too clearly at the thyroid.",
+  "studentNotes": "What confused me slightly: depression can mimic a lot of these symptoms (fatigue, weight gain, concentration problems, menstrual changes), so I want to make sure we're not anchoring too hard and missing a psychiatric component — though the cold intolerance, bradycardia, and objective findings like dry skin/hair loss feel more organic to me. I also wondered whether to order a thyroid ultrasound — I held off initially because labs feel more diagnostic here, but I'd ask my attending whether imaging adds value upfront or if we wait to see antibody results first. Also curious about whether she needs a morning cortisol if her TSH comes back borderline — I've heard about secondary hypothyroidism and central causes and want to make sure I'd recognize if TSH were inappropriately normal with a low T4.",
+  "caseData": {
+    "patientInfo": {
+      "name": "Ekaterina Voloshyn",
+      "age": 34,
+      "gender": "Female",
+      "chiefComplaint": "Fatigue, weight gain, and feeling cold all the time for 4 months"
+    },
+    "hpi": "Ekaterina Voloshyn is a 34-year-old woman who presents with a 4-month history of progressive fatigue, unexplained weight gain of approximately 12 pounds, and persistent cold intolerance. She reports that she has difficulty concentrating at work, her skin has become increasingly dry, and her hair has been falling out more than usual. She also notes that her menstrual cycles have become irregular and heavier than before. She denies any chest pain, palpitations, or shortness of breath, and has no history of neck surgery or radiation.",
+    "vitals": {
+      "bp": "118/76",
+      "hr": 58,
+      "rr": 14,
+      "temp": 97.2,
+      "spo2": 98,
+      "weight": "162 lbs"
+    },
+    "diagnosis": "Primary Hypothyroidism (Hashimoto's Thyroiditis)",
+    "differentials": [
+      "Depression",
+      "Anemia",
+      "Chronic Fatigue Syndrome",
+      "Secondary Hypothyroidism (pituitary dysfunction)"
+    ],
+    "keyQuestions": [
+      "Do you have a family history of thyroid disease or autoimmune conditions?",
+      "Have you noticed any neck swelling or difficulty swallowing?",
+      "Are you currently taking any medications, including lithium, amiodarone, or iodine-containing supplements?",
+      "Have you experienced constipation, puffiness around your eyes, or changes in your voice?"
+    ],
+    "teachingPoints": [
+      "Primary hypothyroidism is characterized by an elevated TSH and low free T4, reflecting failure at the thyroid gland level; Hashimoto's thyroiditis is the most common cause in iodine-sufficient countries and is confirmed by elevated anti-TPO antibodies.",
+      "Classic symptoms of hypothyroidism include fatigue, cold intolerance, weight gain, dry skin, hair loss, constipation, bradycardia, and menstrual irregularities — this patient's presentation is a textbook example.",
+      "Treatment is levothyroxine monotherapy titrated to normalize TSH; TSH should be rechecked 6-8 weeks after initiation or dose change as TSH has a long half-life and does not reflect immediate hormone status."
+    ],
+    "availableLabs": [
+      "Thyroid Function Panel",
+      "Thyroid Antibodies",
+      "CBC",
+      "BMP",
+      "Lipid Panel"
+    ],
+    "availableImaging": [
+      "Thyroid Ultrasound"
+    ],
+    "labGroups": [
+      {
+        "name": "Thyroid Function Panel",
+        "tests": [
+          "Thyroid Function Panel"
+        ]
+      },
+      {
+        "name": "Thyroid Antibodies",
+        "tests": [
+          "Thyroid Antibodies"
+        ]
+      },
+      {
+        "name": "CBC",
+        "tests": [
+          "CBC"
+        ]
+      },
+      {
+        "name": "BMP",
+        "tests": [
+          "BMP"
+        ]
+      },
+      {
+        "name": "Lipid Panel",
+        "tests": [
+          "Lipid Panel"
+        ]
+      }
+    ],
+    "labResults": {
+      "Thyroid Function Panel": {
+        "components": [
+          {
+            "name": "TSH",
+            "value": "18.4",
+            "unit": "mIU/L",
+            "referenceRange": "0.4–4.0",
+            "status": "high"
+          },
+          {
+            "name": "Free T4",
+            "value": "0.5",
+            "unit": "ng/dL",
+            "referenceRange": "0.8–1.8",
+            "status": "low"
+          },
+          {
+            "name": "Free T3",
+            "value": "1.8",
+            "unit": "pg/mL",
+            "referenceRange": "2.3–4.2",
+            "status": "low"
+          }
+        ]
+      },
+      "Thyroid Antibodies": {
+        "components": [
+          {
+            "name": "Anti-TPO Antibody",
+            "value": "842",
+            "unit": "IU/mL",
+            "referenceRange": "<35",
+            "status": "high"
+          },
+          {
+            "name": "Anti-Thyroglobulin Antibody",
+            "value": "310",
+            "unit": "IU/mL",
+            "referenceRange": "<20",
+            "status": "high"
+          }
+        ]
+      },
+      "CBC": {
+        "components": [
+          {
+            "name": "WBC",
+            "value": "6.8",
+            "unit": "x10³/µL",
+            "referenceRange": "4.5–11.0",
+            "status": "normal"
+          },
+          {
+            "name": "Hgb",
+            "value": "11.2",
+            "unit": "g/dL",
+            "referenceRange": "12.0–16.0",
+            "status": "low"
+          },
+          {
+            "name": "MCV",
+            "value": "88",
+            "unit": "fL",
+            "referenceRange": "80–100",
+            "status": "normal"
+          },
+          {
+            "name": "Platelets",
+            "value": "224",
+            "unit": "x10³/µL",
+            "referenceRange": "150–400",
+            "status": "normal"
+          }
+        ]
+      },
+      "BMP": {
+        "components": [
+          {
+            "name": "Sodium",
+            "value": "138",
+            "unit": "mEq/L",
+            "referenceRange": "136–145",
+            "status": "normal"
+          },
+          {
+            "name": "Potassium",
+            "value": "4.1",
+            "unit": "mEq/L",
+            "referenceRange": "3.5–5.0",
+            "status": "normal"
+          },
+          {
+            "name": "Creatinine",
+            "value": "0.8",
+            "unit": "mg/dL",
+            "referenceRange": "0.6–1.1",
+            "status": "normal"
+          },
+          {
+            "name": "Glucose",
+            "value": "88",
+            "unit": "mg/dL",
+            "referenceRange": "70–99",
+            "status": "normal"
+          }
+        ]
+      },
+      "Lipid Panel": {
+        "components": [
+          {
+            "name": "Total Cholesterol",
+            "value": "248",
+            "unit": "mg/dL",
+            "referenceRange": "<200",
+            "status": "high"
+          },
+          {
+            "name": "LDL",
+            "value": "168",
+            "unit": "mg/dL",
+            "referenceRange": "<100",
+            "status": "high"
+          },
+          {
+            "name": "HDL",
+            "value": "48",
+            "unit": "mg/dL",
+            "referenceRange": ">50",
+            "status": "low"
+          },
+          {
+            "name": "Triglycerides",
+            "value": "182",
+            "unit": "mg/dL",
+            "referenceRange": "<150",
+            "status": "high"
+          }
+        ]
+      }
+    },
+    "imagingResults": {
+      "Thyroid Ultrasound": "The thyroid gland is normal in size with a heterogeneous, hypoechoic echotexture throughout both lobes, consistent with autoimmune thyroiditis. Increased fibrous stranding and a coarsened echotexture are noted bilaterally. No discrete nodules, cysts, or calcifications are identified. Findings are characteristic of Hashimoto's thyroiditis."
+    },
+    "procedureResults": {},
+    "hiddenHistory": {
+      "fullHistory": "Patient has no prior thyroid disease diagnosis. She delayed seeking care, attributing symptoms to stress and aging.",
+      "socialHistory": "Non-smoker, occasional alcohol (1-2 drinks per week), works as an accountant, no recent travel. Sedentary lifestyle over the past year.",
+      "familyHistory": "Mother has Hashimoto's thyroiditis; maternal aunt has rheumatoid arthritis. Sister has type 1 diabetes mellitus.",
+      "medications": "Oral contraceptive pill (ethinyl estradiol/levonorgestrel) — ongoing for 3 years. Occasional ibuprofen for headaches.",
+      "hiddenSymptoms": "Patient reports constipation (bowel movements every 3-4 days) if asked about GI symptoms; also reports mild puffiness around her eyes in the mornings if asked about facial changes.",
+      "allergies": "NKDA"
+    },
+    "imagingCategory": "Heterogeneous hypoechoic thyroid parenchyma",
+    "ecgFindings": "",
+    "hematologyFindings": "",
+    "urineFindings": "",
+    "skinFindings": "",
+    "fundusFindings": "",
+    "biopsyFindings": ""
+  },
+  "correctDiagnosis": "Primary Hypothyroidism (Hashimoto's Thyroiditis)",
+  "workingDiagnosis": "Hypothyroidism",
+  "clinicalImpression": "This 34-year-old woman has a classic constellation of symptoms that immediately makes me think hypothyroidism — fatigue, weight gain, cold intolerance, dry skin, hair loss, irregular/heavy periods, and difficulty concentrating. Her HR is 58 which supports a hypometabolic state. I want to make sure I'm not missing something like depression or anemia that could overlap, but the combination here is pretty compelling for a thyroid etiology.",
+  "grading": {
+    "score": 92,
+    "correct": true,
+    "feedback": "Excellent diagnostic performance — you correctly identified Primary Hypothyroidism due to Hashimoto's Thyroiditis, which is the textbook presentation for this case. Your history-taking was efficient and targeted, covering family history of autoimmune disease and neck symptoms, which are high-yield for this diagnosis. The main area to strengthen is asking about medications that can cause hypothyroidism (e.g., lithium, amiodarone) and eliciting hidden symptoms like constipation and periorbital puffiness, which would have rounded out the clinical picture.",
+    "strengths": [
+      "Correctly identified the primary diagnosis and its autoimmune etiology (Hashimoto's Thyroiditis) with appropriate specificity",
+      "Efficiently elicited the family history of Hashimoto's, rheumatoid arthritis, and type 1 diabetes — directly supporting an autoimmune diathesis",
+      "Appropriately asked about neck swelling and dysphagia, ruling out goiter or structural causes",
+      "Ordered a comprehensive and targeted diagnostic panel including thyroid function tests, thyroid antibodies, CBC, BMP, and lipid panel — all clinically relevant and appropriate"
+    ],
+    "dimensions": {
+      "historyInterview": {
+        "score": 19,
+        "feedback": "Asked excellent high-yield questions about family/autoimmune history and neck symptoms, but missed inquiring about medications that can cause hypothyroidism and did not elicit hidden symptoms like constipation or periorbital puffiness."
+      },
+      "testOrdering": {
+        "score": 24,
+        "feedback": "Ordered all core confirmatory tests (TSH, free T4, free T3, anti-TPO, anti-thyroglobulin antibodies) as well as clinically relevant additional panels (CBC, BMP, lipid panel) — a thorough and appropriate workup with no unnecessary tests."
+      },
+      "diagnosisAccuracy": {
+        "score": 36,
+        "feedback": "The submitted diagnosis of 'Primary Hypothyroidism, likely Hashimoto's Thyroiditis' is clinically equivalent to the correct diagnosis and includes accurate added specificity supported by the elevated anti-TPO antibodies and family history."
+      },
+      "diagnosisCompleteness": {
+        "score": 13,
+        "feedback": "The core diagnosis is named correctly and completely for a Foundations-level case; the qualifier 'likely' slightly hedges the Hashimoto's diagnosis when the laboratory data strongly confirm it."
+      }
+    },
+    "missedQuestions": [
+      "Are you currently taking any medications that could affect thyroid function, such as lithium, amiodarone, or iodine-containing supplements?",
+      "Have you noticed any constipation or changes in your bowel habits, or any puffiness around your eyes in the morning?"
+    ],
+    "teachingPoints": [
+      "Primary hypothyroidism is characterized by an elevated TSH and low free T4, reflecting failure at the thyroid gland level; Hashimoto's thyroiditis is the most common cause in iodine-sufficient countries and is confirmed by elevated anti-TPO antibodies.",
+      "Classic symptoms of hypothyroidism include fatigue, cold intolerance, weight gain, dry skin, hair loss, constipation, bradycardia, and menstrual irregularities — this patient's presentation is a textbook example.",
+      "Treatment is levothyroxine monotherapy titrated to normalize TSH; TSH should be rechecked 6-8 weeks after initiation or dose change as TSH has a long half-life and does not reflect immediate hormone status."
+    ],
+    "differentials": [
+      "Depression: Can present with fatigue, cognitive slowing, and weight changes, but would not explain cold intolerance, dry skin, hair loss, elevated TSH, or positive thyroid antibodies; thyroid function testing distinguishes these.",
+      "Anemia: This patient does have mild normocytic anemia (Hgb 11.2), likely secondary to hypothyroidism, but anemia alone does not explain the full constellation of symptoms including cold intolerance and weight gain without dietary change.",
+      "Chronic Fatigue Syndrome: A diagnosis of exclusion characterized by persistent fatigue not explained by other conditions; thyroid lab abnormalities here definitively point to a primary thyroid etiology instead.",
+      "Secondary Hypothyroidism (pituitary dysfunction): Would also present with low free T4 but would show a low or inappropriately normal TSH rather than the markedly elevated TSH seen here; elevated anti-TPO antibodies further confirm primary thyroid disease."
+    ]
+  },
+  "score": 92,
+  "correct": true
+}

@@ -1,0 +1,296 @@
+{
+  "caseNum": 9,
+  "system": "Musculoskeletal",
+  "difficulty": "Foundations",
+  "transcript": [
+    {
+      "role": "student",
+      "content": "When you say the knee feels like it 'gives way,' does that happen even when you're just standing still, or mainly when you try to pivot or change direction?"
+    },
+    {
+      "role": "patient",
+      "content": "It's mostly when I'm trying to walk or put weight on it — like when I took a few steps toward the locker room right after it happened, it just kind of buckled under me. It doesn't really happen when I'm sitting still or just standing there not moving. But any time I try to shift my weight or take a step, it feels really unreliable, like it might just give out on me."
+    },
+    {
+      "role": "student",
+      "content": "Did the swelling come on pretty fast — like within an hour or two of the injury — or did it take longer, like overnight?"
+    },
+    {
+      "role": "patient",
+      "content": "Yeah, it came on really fast — I'd say within maybe an hour or two it was already pretty noticeably swollen. By the time I got home and took my shoe off, it was visibly puffy and felt tight. It definitely wasn't something that crept up overnight."
+    },
+    {
+      "role": "student",
+      "content": "Have you had any numbness or tingling below the knee, or any issues with the foot feeling weak since the injury?"
+    },
+    {
+      "role": "patient",
+      "content": "No, nothing like that — my foot and lower leg feel totally normal in terms of sensation. No tingling or numbness or anything weird like that. The problem is really just in the knee itself."
+    }
+  ],
+  "testsOrdered": [
+    "Left Knee X-Ray (AP and Lateral)",
+    "Left Knee MRI",
+    "CRP/ESR"
+  ],
+  "diagnosis": "ACL tear (anterior cruciate ligament rupture), likely with concurrent medial meniscus injury",
+  "reasoning": "The combination of a non-contact deceleration/landing mechanism, an audible 'pop,' rapid hemarthrosis (swelling within hours strongly suggests intra-articular bleeding, which is classic for ACL), and subjective instability is highly characteristic of ACL rupture. The MRI would be the key test here to confirm the ACL tear and assess for associated injuries like meniscal tears or collateral ligament damage, which commonly occur together — this is sometimes called the 'unhappy triad.' X-ray is important first to rule out a tibial plateau fracture or avulsion fracture, which can mimic this presentation. I ordered CRP/ESR mainly to make sure I'm not missing a septic joint, though the mechanism and lack of fever make that much less likely. The inability to fully extend or flex the knee makes me wonder if there's a locked bucket-handle meniscal tear involved as well.",
+  "studentNotes": "I'm honestly a bit unsure whether I needed CRP/ESR here — the story is so clearly traumatic that infection seems very unlikely, but I always get nervous about missing septic arthritis since it's a surgical emergency. I should probably ask my attending if that's worth ordering in a clear trauma case or if it's just unnecessary. I also wasn't 100% sure whether to order the MRI right away or wait for the X-ray first — I think in practice you'd do X-ray first to rule out fracture before MRI, but I ordered both simultaneously since they were listed as available. I'd want to discuss with the attending what the physical exam findings (Lachman test, anterior drawer sign, McMurray's) would add before imaging, since I know those are really important for this diagnosis and I haven't been shown any physical exam data yet.",
+  "caseData": {
+    "patientInfo": {
+      "name": "Tomasz Wierzbicki",
+      "age": 28,
+      "gender": "Male",
+      "chiefComplaint": "Left knee pain and swelling after sports injury"
+    },
+    "hpi": "Tomasz Wierzbicki is a 28-year-old male who presents with acute left knee pain and swelling that began 3 days ago after landing awkwardly from a jump during a recreational basketball game. He reports hearing a 'pop' at the time of injury followed by immediate pain and rapid swelling of the knee within a few hours. He describes the pain as sharp and constant, rated 7/10, worsened with weight-bearing and twisting movements. He has been unable to fully extend or flex the knee and reports a sensation of instability, as if the knee 'gives way' when attempting to walk. Ice and ibuprofen have provided mild relief. He denies any prior knee injuries or surgeries.",
+    "vitals": {
+      "bp": "122/76",
+      "hr": 82,
+      "rr": 16,
+      "temp": 98.4,
+      "spo2": 99,
+      "weight": "178 lbs"
+    },
+    "diagnosis": "Anterior Cruciate Ligament (ACL) Tear",
+    "differentials": [
+      "Medial Collateral Ligament (MCL) Sprain",
+      "Meniscal Tear",
+      "Posterior Cruciate Ligament (PCL) Tear",
+      "Tibial Plateau Fracture"
+    ],
+    "keyQuestions": [
+      "Did you hear or feel a 'pop' at the moment of injury?",
+      "Does the knee feel unstable or like it gives way when you try to walk?",
+      "Did significant swelling develop within the first few hours after the injury (hemarthrosis)?",
+      "What was the exact mechanism — was it a sudden deceleration, pivot, or landing from a jump?"
+    ],
+    "teachingPoints": [
+      "The classic ACL injury triad is: (1) a non-contact deceleration or pivot mechanism, (2) an audible 'pop' at the time of injury, and (3) rapid hemarthrosis within 2-4 hours — this presentation should prompt MRI as the gold-standard imaging study.",
+      "The Lachman test (anterior tibial translation at 20-30° flexion) is the most sensitive physical exam maneuver for ACL tear (~85% sensitivity), more sensitive than the anterior drawer test or pivot shift test in the acute setting.",
+      "MRI of the knee is the gold-standard diagnostic tool for ACL tears, with approximately 95% sensitivity and specificity; it also identifies concomitant meniscal, cartilage, and collateral ligament injuries that occur in up to 50% of ACL tears.",
+      "Acute hemarthrosis on aspiration (blood in the joint) in the setting of a traumatic knee injury is highly suggestive of ACL tear, tibial plateau fracture, or patellar dislocation, and should always prompt advanced imaging."
+    ],
+    "availableLabs": [
+      "CBC",
+      "BMP",
+      "CRP/ESR",
+      "Coagulation Panel"
+    ],
+    "availableImaging": [
+      "Left Knee X-Ray (AP and Lateral)",
+      "Left Knee MRI"
+    ],
+    "labGroups": [
+      {
+        "name": "CBC",
+        "tests": [
+          "CBC"
+        ]
+      },
+      {
+        "name": "BMP",
+        "tests": [
+          "BMP"
+        ]
+      },
+      {
+        "name": "Inflammatory Markers",
+        "tests": [
+          "CRP/ESR"
+        ]
+      },
+      {
+        "name": "Coagulation Panel",
+        "tests": [
+          "Coagulation Panel"
+        ]
+      }
+    ],
+    "labResults": {
+      "CBC": {
+        "components": [
+          {
+            "name": "WBC",
+            "value": "9.1",
+            "unit": "x10³/µL",
+            "referenceRange": "4.5-11.0",
+            "status": "normal"
+          },
+          {
+            "name": "Hgb",
+            "value": "14.8",
+            "unit": "g/dL",
+            "referenceRange": "13.5-17.5",
+            "status": "normal"
+          },
+          {
+            "name": "Hct",
+            "value": "44.2",
+            "unit": "%",
+            "referenceRange": "41-53",
+            "status": "normal"
+          },
+          {
+            "name": "Platelets",
+            "value": "238",
+            "unit": "x10³/µL",
+            "referenceRange": "150-400",
+            "status": "normal"
+          }
+        ]
+      },
+      "BMP": {
+        "components": [
+          {
+            "name": "Sodium",
+            "value": "139",
+            "unit": "mEq/L",
+            "referenceRange": "136-145",
+            "status": "normal"
+          },
+          {
+            "name": "Potassium",
+            "value": "4.1",
+            "unit": "mEq/L",
+            "referenceRange": "3.5-5.0",
+            "status": "normal"
+          },
+          {
+            "name": "Creatinine",
+            "value": "0.9",
+            "unit": "mg/dL",
+            "referenceRange": "0.7-1.3",
+            "status": "normal"
+          },
+          {
+            "name": "Glucose",
+            "value": "88",
+            "unit": "mg/dL",
+            "referenceRange": "70-99",
+            "status": "normal"
+          },
+          {
+            "name": "BUN",
+            "value": "14",
+            "unit": "mg/dL",
+            "referenceRange": "7-20",
+            "status": "normal"
+          }
+        ]
+      },
+      "CRP/ESR": {
+        "components": [
+          {
+            "name": "C-Reactive Protein (CRP)",
+            "value": "1.2",
+            "unit": "mg/L",
+            "referenceRange": "<3.0",
+            "status": "normal"
+          },
+          {
+            "name": "Erythrocyte Sedimentation Rate (ESR)",
+            "value": "18",
+            "unit": "mm/hr",
+            "referenceRange": "0-20",
+            "status": "normal"
+          }
+        ]
+      },
+      "Coagulation Panel": {
+        "components": [
+          {
+            "name": "PT",
+            "value": "12.4",
+            "unit": "seconds",
+            "referenceRange": "11.0-13.5",
+            "status": "normal"
+          },
+          {
+            "name": "INR",
+            "value": "1.0",
+            "unit": "",
+            "referenceRange": "0.9-1.1",
+            "status": "normal"
+          },
+          {
+            "name": "aPTT",
+            "value": "30.2",
+            "unit": "seconds",
+            "referenceRange": "25-35",
+            "status": "normal"
+          }
+        ]
+      }
+    },
+    "imagingResults": {
+      "Left Knee X-Ray (AP and Lateral)": "AP and lateral views of the left knee demonstrate no acute fracture or osseous malalignment. There is moderate soft tissue swelling about the joint and effusion evidenced by suprapatellar fat pad displacement. A small lateral capsular avulsion (Segond fracture) is identified at the proximal lateral tibial rim, a finding pathognomonic for ACL disruption. No tibial plateau fracture or loose bodies identified.",
+      "Left Knee MRI": "MRI of the left knee without contrast reveals complete disruption of the anterior cruciate ligament with loss of normal fiber continuity, edema at the proximal ACL footprint, and a bone bruise pattern at the lateral femoral condyle and posterolateral tibial plateau consistent with a pivot-shift mechanism. There is a large joint effusion (hemarthrosis). The posterior cruciate ligament, medial and lateral collateral ligaments are intact. The medial and lateral menisci demonstrate no significant tear. Findings are diagnostic of a complete ACL tear."
+    },
+    "procedureResults": {},
+    "hiddenHistory": {
+      "fullHistory": "No prior knee injuries or surgeries. No history of joint hypermobility or connective tissue disorders.",
+      "socialHistory": "Non-smoker, occasional alcohol (2-3 drinks per week), works as a software engineer, plays recreational basketball 2-3 times per week, no recent travel.",
+      "familyHistory": "No family history of bleeding disorders or connective tissue disease. Father has osteoarthritis.",
+      "medications": "Ibuprofen 400mg PRN for the past 3 days. No regular medications.",
+      "hiddenSymptoms": "Patient will confirm, if asked, that the knee locked briefly immediately after the injury and that he was unable to straighten it fully for the first hour; he also reports a feeling of the knee 'buckling' when he attempted to walk to the locker room.",
+      "allergies": "NKDA"
+    },
+    "imagingCategory": "Ligamentous disruption with hemarthrosis",
+    "ecgFindings": "",
+    "hematologyFindings": "",
+    "urineFindings": "",
+    "skinFindings": "",
+    "fundusFindings": "",
+    "biopsyFindings": ""
+  },
+  "correctDiagnosis": "Anterior Cruciate Ligament (ACL) Tear",
+  "workingDiagnosis": "ACL tear",
+  "clinicalImpression": "This 28-year-old male has a classic presentation that immediately makes me think ACL injury — the mechanism (landing awkwardly from a jump), the audible 'pop,' rapid hemarthrosis within hours, and that feeling of instability or 'giving way' are all really textbook. I'm fairly confident this is an ACL tear but I want to keep meniscal injury on my differential too, since those can co-occur and cause similar symptoms. I'm a little less sure about whether there's a bony injury involved, which is why I want imaging.",
+  "grading": {
+    "score": 90,
+    "correct": true,
+    "feedback": "Excellent diagnostic performance — you correctly identified the ACL tear and ordered the key confirmatory tests (X-ray and MRI). Your interview was targeted and high-yield, covering instability, swelling onset, and neurovascular status efficiently. The addition of 'likely concurrent medial meniscus injury' was a reasonable clinical thought but was not supported by the MRI findings in this case, so be cautious about adding unconfirmed co-diagnoses.",
+    "strengths": [
+      "Correctly identified the primary diagnosis of ACL tear based on mechanism, pop, rapid hemarthrosis, and instability",
+      "Asked targeted, high-yield questions about swelling onset (hemarthrosis timing) and instability characteristics",
+      "Appropriately screened for neurovascular compromise with the numbness/tingling question",
+      "Ordered both X-ray and MRI, which constitute the complete and appropriate diagnostic workup for this presentation"
+    ],
+    "dimensions": {
+      "historyInterview": {
+        "score": 20,
+        "feedback": "You efficiently covered the most important clinical features — instability pattern, swelling onset, and neurovascular status — though you could have asked about the exact mechanism (pivot vs. direct contact) and whether the knee locked, which are high-yield for distinguishing ACL from meniscal pathology."
+      },
+      "testOrdering": {
+        "score": 24,
+        "feedback": "Ordering both left knee X-ray and MRI is exactly the correct and complete workup for suspected ACL tear; CRP/ESR were appropriately ordered to rule out inflammatory/infectious causes of joint swelling."
+      },
+      "diagnosisAccuracy": {
+        "score": 30,
+        "feedback": "The core diagnosis of ACL tear is correct and well-supported; the added qualifier of 'likely concurrent medial meniscus injury' is clinically plausible but not supported by the MRI findings in this case, which prevents full credit for accuracy."
+      },
+      "diagnosisCompleteness": {
+        "score": 16,
+        "feedback": "The core diagnosis was named clearly and completely, which is the full expectation at Foundations level."
+      }
+    },
+    "missedQuestions": [
+      "Did the knee lock or get stuck in a position where you couldn't straighten it right after the injury? (Locking is a key feature distinguishing meniscal tear from isolated ACL injury and changes management)"
+    ],
+    "teachingPoints": [
+      "The classic ACL injury triad is: (1) a non-contact deceleration or pivot mechanism, (2) an audible 'pop' at the time of injury, and (3) rapid hemarthrosis within 2-4 hours — this presentation should prompt MRI as the gold-standard imaging study.",
+      "The Lachman test (anterior tibial translation at 20-30° flexion) is the most sensitive physical exam maneuver for ACL tear (~85% sensitivity), more sensitive than the anterior drawer test or pivot shift test in the acute setting.",
+      "MRI of the knee is the gold-standard diagnostic tool for ACL tears, with approximately 95% sensitivity and specificity; it also identifies concomitant meniscal, cartilage, and collateral ligament injuries that occur in up to 50% of ACL tears.",
+      "Acute hemarthrosis on aspiration (blood in the joint) in the setting of a traumatic knee injury is highly suggestive of ACL tear, tibial plateau fracture, or patellar dislocation, and should always prompt advanced imaging."
+    ],
+    "differentials": [
+      "Medial Collateral Ligament (MCL) Sprain: MCL injuries typically result from valgus stress and present with medial-sided tenderness and pain with valgus loading, without the audible pop or significant hemarthrosis seen here; MRI confirmed intact MCL.",
+      "Meniscal Tear: Meniscal tears can co-occur with ACL injury and present with joint-line tenderness, locking, or delayed swelling; distinguished by MRI which showed no significant meniscal tear in this case.",
+      "Posterior Cruciate Ligament (PCL) Tear: PCL tears typically result from a direct posterior blow to the tibia (dashboard injury) and present with posterior sag; mechanism and MRI findings here confirm ACL, not PCL.",
+      "Tibial Plateau Fracture: Can present with hemarthrosis and inability to bear weight after trauma; ruled out by X-ray and MRI showing no fracture, though the Segond fracture identified was pathognomonic for ACL disruption."
+    ]
+  },
+  "score": 90,
+  "correct": true
+}

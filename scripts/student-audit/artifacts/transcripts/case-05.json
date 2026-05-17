@@ -1,0 +1,316 @@
+{
+  "caseNum": 5,
+  "system": "Renal",
+  "difficulty": "Foundations",
+  "transcript": [
+    {
+      "role": "student",
+      "content": "Have you ever had kidney stones before, or does anyone in your family have a history of them?"
+    },
+    {
+      "role": "patient",
+      "content": "No, I've never had anything like this before — this is the first time, and honestly I hope it's the last because this pain is absolutely brutal. But now that you mention it, my dad actually had kidney stones when he was in his 40s, so I guess it runs in the family."
+    },
+    {
+      "role": "student",
+      "content": "How much water do you typically drink in a day — are you someone who drinks a lot of fluids, or would you say you're usually dehydrated?"
+    },
+    {
+      "role": "patient",
+      "content": "Honestly, I'm probably not great about that — I maybe drink one or two glasses of water a day, which I know isn't a lot. I'm usually so busy on the job site that I just forget to drink, and I'm more of a coffee guy in the morning than anything else."
+    },
+    {
+      "role": "student",
+      "content": "Have you noticed any difficulty or burning when you urinate, or any changes in how often you're going to the bathroom?"
+    },
+    {
+      "role": "patient",
+      "content": "No burning or anything like that, no. But I did notice earlier today that my urine looked kind of pinkish, which freaked me out a little — I've never seen that before."
+    }
+  ],
+  "testsOrdered": [
+    "Urinalysis",
+    "BMP",
+    "CBC",
+    "CT Urogram (Non-contrast CT KUB)"
+  ],
+  "diagnosis": "Nephrolithiasis — obstructing left ureteral stone",
+  "reasoning": "The clinical picture here is highly consistent with nephrolithiasis: sudden-onset severe colicky left flank pain radiating to the groin and inner thigh in a young male, associated with gross hematuria (pink urine), nausea and vomiting, and the classic restlessness/inability to find a comfortable position. Urinalysis I'd expect to show hematuria and possibly some crystalluria. The BMP would help me assess for any renal function impairment from obstruction, and I'd want to check creatinine specifically. The non-contrast CT KUB (CT Urogram) is the gold standard here and should identify the stone location, size, and degree of obstruction. I ordered CBC mainly to check for leukocytosis — he denies fever but his HR is 104, which could be pain-related or could hint at early infection, so I want to make sure I'm not missing an infected obstructed kidney, which would be a urological emergency. Aortic dissection crossed my mind briefly, but his age and the colicky, radiating quality of pain plus the hematuria make that far less likely.",
+  "studentNotes": "",
+  "caseData": {
+    "patientInfo": {
+      "name": "Dmytro Kovalenko",
+      "age": 34,
+      "gender": "Male",
+      "chiefComplaint": "Severe left flank pain radiating to the groin for 6 hours"
+    },
+    "hpi": "Dmytro Kovalenko is a 34-year-old male who presents to the emergency department with sudden onset severe left flank pain that began approximately 6 hours ago while he was at work. The pain is colicky in nature, rated 9/10, and radiates from the left flank down to the left groin and inner thigh. He reports associated nausea and one episode of vomiting. He has not been able to find a comfortable position and has been pacing the room. He denies fever, chills, or dysuria, though he notes his urine appeared pink-tinged earlier today. He has had no prior episodes like this.",
+    "vitals": {
+      "bp": "148/92",
+      "hr": 104,
+      "rr": 18,
+      "temp": 98.8,
+      "spo2": 99,
+      "weight": "178 lbs"
+    },
+    "diagnosis": "Ureterolithiasis (Ureteral Kidney Stone)",
+    "differentials": [
+      "Renal colic from ureteral stone",
+      "Pyelonephritis",
+      "Musculoskeletal strain",
+      "Ruptured abdominal aortic aneurysm"
+    ],
+    "keyQuestions": [
+      "Have you had kidney stones before?",
+      "Do you have a family history of kidney stones?",
+      "How much water do you drink daily?",
+      "Have you noticed blood in your urine?"
+    ],
+    "teachingPoints": [
+      "Ureteral stones classically present with sudden-onset, severe, colicky flank pain radiating to the groin — the patient cannot find a comfortable position (distinguishing it from peritonitis where patients lie still). Gross or microscopic hematuria is present in ~85% of cases.",
+      "Stone passage rates depend heavily on size: stones ≤4mm pass spontaneously in ~80-90% of cases; stones 4-6mm pass in ~50-60%; stones >6mm rarely pass without intervention. CT urogram is the gold standard imaging modality with near 100% sensitivity and specificity.",
+      "Initial management includes IV fluids, analgesics (NSAIDs are first-line for pain control), and antiemetics. Alpha-blockers (tamsulosin) are used as medical expulsive therapy for distal ureteral stones ≤10mm. Urgent urology referral is indicated for signs of infection (sepsis), solitary kidney, complete obstruction, or refractory pain."
+    ],
+    "availableLabs": [
+      "Urinalysis",
+      "BMP",
+      "CBC",
+      "Urine Culture"
+    ],
+    "availableImaging": [
+      "CT Urogram (Non-contrast CT KUB)",
+      "Renal Ultrasound"
+    ],
+    "labGroups": [
+      {
+        "name": "Urinalysis",
+        "tests": [
+          "Urinalysis"
+        ]
+      },
+      {
+        "name": "BMP",
+        "tests": [
+          "BMP"
+        ]
+      },
+      {
+        "name": "CBC",
+        "tests": [
+          "CBC"
+        ]
+      },
+      {
+        "name": "Urine Culture",
+        "tests": [
+          "Urine Culture"
+        ]
+      }
+    ],
+    "labResults": {
+      "Urinalysis": {
+        "components": [
+          {
+            "name": "Color",
+            "value": "Pink/Red",
+            "unit": "",
+            "referenceRange": "Yellow",
+            "status": "abnormal"
+          },
+          {
+            "name": "Blood",
+            "value": "3+",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "high"
+          },
+          {
+            "name": "RBCs",
+            "value": "45-60",
+            "unit": "/hpf",
+            "referenceRange": "0-2",
+            "status": "high"
+          },
+          {
+            "name": "WBCs",
+            "value": "2-3",
+            "unit": "/hpf",
+            "referenceRange": "0-5",
+            "status": "normal"
+          },
+          {
+            "name": "Nitrites",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          },
+          {
+            "name": "Leukocyte Esterase",
+            "value": "Negative",
+            "unit": "",
+            "referenceRange": "Negative",
+            "status": "normal"
+          }
+        ]
+      },
+      "BMP": {
+        "components": [
+          {
+            "name": "Sodium",
+            "value": "140",
+            "unit": "mEq/L",
+            "referenceRange": "136-145",
+            "status": "normal"
+          },
+          {
+            "name": "Potassium",
+            "value": "4.1",
+            "unit": "mEq/L",
+            "referenceRange": "3.5-5.0",
+            "status": "normal"
+          },
+          {
+            "name": "Creatinine",
+            "value": "1.1",
+            "unit": "mg/dL",
+            "referenceRange": "0.7-1.3",
+            "status": "normal"
+          },
+          {
+            "name": "BUN",
+            "value": "18",
+            "unit": "mg/dL",
+            "referenceRange": "7-20",
+            "status": "normal"
+          },
+          {
+            "name": "Glucose",
+            "value": "96",
+            "unit": "mg/dL",
+            "referenceRange": "70-100",
+            "status": "normal"
+          }
+        ]
+      },
+      "CBC": {
+        "components": [
+          {
+            "name": "WBC",
+            "value": "10.8",
+            "unit": "x10³/µL",
+            "referenceRange": "4.5-11.0",
+            "status": "normal"
+          },
+          {
+            "name": "Hgb",
+            "value": "15.2",
+            "unit": "g/dL",
+            "referenceRange": "13.5-17.5",
+            "status": "normal"
+          },
+          {
+            "name": "Hematocrit",
+            "value": "44.6",
+            "unit": "%",
+            "referenceRange": "41-53",
+            "status": "normal"
+          },
+          {
+            "name": "Platelets",
+            "value": "224",
+            "unit": "x10³/µL",
+            "referenceRange": "150-400",
+            "status": "normal"
+          }
+        ]
+      },
+      "Urine Culture": {
+        "components": [
+          {
+            "name": "Growth",
+            "value": "No growth",
+            "unit": "",
+            "referenceRange": "No growth",
+            "status": "normal"
+          },
+          {
+            "name": "Colony Count",
+            "value": "<10,000",
+            "unit": "CFU/mL",
+            "referenceRange": "<10,000",
+            "status": "normal"
+          }
+        ]
+      }
+    },
+    "imagingResults": {
+      "CT Urogram (Non-contrast CT KUB)": "Non-contrast CT of the abdomen and pelvis demonstrates a 4mm hyperdense calculus at the left ureterovesical junction (UVJ) causing mild proximal hydroureteronephrosis. Perinephric and periureteral fat stranding is present consistent with obstructive uropathy. The right kidney, ureter, and bladder appear normal. No free air or free fluid is identified. Findings are diagnostic of an obstructing left ureteral calculus.",
+      "Renal Ultrasound": "Ultrasound of the bilateral kidneys demonstrates mild left hydronephrosis with a dilated left renal pelvis measuring 14mm in the AP dimension. A small echogenic focus with posterior acoustic shadowing is identified at the left UVJ consistent with a ureteral calculus. The right kidney is normal in size and echogenicity without hydronephrosis. The urinary bladder is unremarkable."
+    },
+    "procedureResults": {},
+    "hiddenHistory": {
+      "fullHistory": "No prior kidney stones. No history of chronic illness or urologic conditions.",
+      "socialHistory": "Non-smoker. Occasional alcohol use (1-2 drinks per week). Works as a construction supervisor. Denies illicit drug use. Drinks approximately 1-2 glasses of water per day — reports chronically low fluid intake.",
+      "familyHistory": "Father had kidney stones in his 40s. No other significant family history.",
+      "medications": "Ibuprofen 400mg PRN occasionally for headaches. No daily medications.",
+      "hiddenSymptoms": "Patient will confirm pink-tinged urine when directly asked about urine color changes. Patient will also confirm a preference for high-protein, low-vegetable diet rich in red meat when asked about dietary habits.",
+      "allergies": "NKDA"
+    },
+    "imagingCategory": "Obstructive uropathy with ureteral calculus",
+    "ecgFindings": "",
+    "hematologyFindings": "",
+    "urineFindings": "Urine microscopy demonstrates 45-60 RBCs per high-power field, predominantly dysmorphic, with no RBC casts, WBC casts, or bacteria identified. Findings are consistent with hematuria from urinary tract trauma/obstruction rather than glomerulonephritis.",
+    "skinFindings": "",
+    "fundusFindings": "",
+    "biopsyFindings": ""
+  },
+  "correctDiagnosis": "Ureterolithiasis (Ureteral Kidney Stone)",
+  "workingDiagnosis": "Nephrolithiasis (ureteral stone, left side)",
+  "clinicalImpression": "This really screams kidney stone to me — the classic triad of colicky flank pain radiating to the groin, hematuria (pink urine), and the inability to find a comfortable position (he's pacing, which is really characteristic). He's a young guy with no fever so I'm not super worried about infection right now, but I want to confirm with labs and imaging. I should keep pyelonephritis and even aortic pathology in the back of my mind, though his age and presentation make dissection unlikely.",
+  "grading": {
+    "score": 93,
+    "correct": true,
+    "feedback": "Excellent work — you correctly identified the diagnosis of nephrolithiasis with an obstructing left ureteral stone, which is fully supported by the clinical presentation, urinalysis, and CT findings. Your targeted history questions efficiently captured the key high-yield elements: prior episodes, family history, fluid intake, and hematuria. To push toward a higher score, consider also asking about dietary habits (high-protein/low-vegetable diet) and fever/chills to help differentiate from infected obstructive uropathy, which would change management urgently.",
+    "strengths": [
+      "Correctly identified the diagnosis of obstructing left ureteral nephrolithiasis with added anatomic specificity supported by imaging",
+      "Efficiently elicited all four key high-yield history items: prior stone history, family history, fluid intake, and hematuria",
+      "Ordered the core diagnostic workup (UA, BMP, CBC, CT KUB) in a logical and complete fashion",
+      "Recognized hematuria as a clinically significant finding and directly asked about urine color changes"
+    ],
+    "dimensions": {
+      "historyInterview": {
+        "score": 20,
+        "feedback": "The student asked all four key high-yield questions outlined in the case and surfaced critical information efficiently; minor deduction for not asking about fever/chills or dietary habits, which could differentiate infected obstruction (a management-changing finding) and identify stone risk factors."
+      },
+      "testOrdering": {
+        "score": 24,
+        "feedback": "All ordered tests — UA, BMP, CBC, and non-contrast CT KUB — are appropriate, guideline-concordant, and constitute a complete core diagnostic workup for suspected ureterolithiasis with no unnecessary or contraindicated tests ordered."
+      },
+      "diagnosisAccuracy": {
+        "score": 36,
+        "feedback": "The student named the correct pathological entity (nephrolithiasis/ureteral stone) with clinically accurate and imaging-supported anatomic qualifiers (obstructing, left ureteral), which constitutes added specificity that is fully correct and deserves full credit."
+      },
+      "diagnosisCompleteness": {
+        "score": 13,
+        "feedback": "At Foundations difficulty, naming the correct core diagnosis is complete and earns full credit; the diagnosis was stated clearly and correctly, meriting a strong score."
+      }
+    },
+    "missedQuestions": [
+      "Do you have any fever or chills? (Fever with obstructive uropathy suggests infected stone/urosepsis — a surgical emergency requiring urgent urology consultation)",
+      "What does your typical diet look like — do you eat a lot of red meat or animal protein? (High-protein diet is a modifiable risk factor for calcium oxalate stones and informs secondary prevention)"
+    ],
+    "teachingPoints": [
+      "Ureteral stones classically present with sudden-onset, severe, colicky flank pain radiating to the groin — the patient cannot find a comfortable position (distinguishing it from peritonitis where patients lie still). Gross or microscopic hematuria is present in ~85% of cases.",
+      "Stone passage rates depend heavily on size: stones ≤4mm pass spontaneously in ~80-90% of cases; stones 4-6mm pass in ~50-60%; stones >6mm rarely pass without intervention. CT urogram is the gold standard imaging modality with near 100% sensitivity and specificity.",
+      "Initial management includes IV fluids, analgesics (NSAIDs are first-line for pain control), and antiemetics. Alpha-blockers (tamsulosin) are used as medical expulsive therapy for distal ureteral stones ≤10mm. Urgent urology referral is indicated for signs of infection (sepsis), solitary kidney, complete obstruction, or refractory pain."
+    ],
+    "differentials": [
+      "Pyelonephritis: Upper urinary tract infection can cause flank pain and hematuria, but typically presents with fever, chills, dysuria, and costovertebral angle tenderness with pyuria/bacteriuria on UA — this patient has no fever, no WBCs on UA, and negative nitrites/leukocyte esterase, making this unlikely.",
+      "Ruptured abdominal aortic aneurysm (AAA): Must always be considered in a patient with severe flank/abdominal pain, as it is life-threatening; however, AAA typically occurs in older patients (>60s), often with hypotension and a pulsatile mass, and CT here clearly showed a ureteral calculus without aortic pathology.",
+      "Musculoskeletal strain: Lumbar or flank muscle strain can mimic renal colic but would not produce hematuria, nausea/vomiting, colicky pain radiating to the groin, or imaging evidence of a calculus — the constellation of findings here rules this out."
+    ]
+  },
+  "score": 93,
+  "correct": true
+}

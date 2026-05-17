@@ -1,0 +1,17 @@
+{
+  "url": "http://localhost:3000/settings",
+  "capturedAt": "2026-05-16T22:44:39.361Z",
+  "consoleErrors": [],
+  "networkErrors": [],
+  "interactionLog": [
+    {
+      "action": "toggle-dark-mode",
+      "status": "button not found"
+    },
+    {
+      "action": "account-settings",
+      "status": "skipped (destructive)"
+    }
+  ],
+  "elapsedMs": 3349
+}

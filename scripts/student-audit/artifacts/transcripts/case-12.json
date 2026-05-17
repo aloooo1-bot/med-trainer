@@ -1,0 +1,327 @@
+{
+  "caseNum": 12,
+  "system": "Trauma",
+  "difficulty": "Foundations",
+  "transcript": [
+    {
+      "role": "student",
+      "content": "Can you point to exactly where the pain is worst — is it right at the wrist, or more toward the thumb side?"
+    },
+    {
+      "role": "patient",
+      "content": "*winces and carefully gestures toward the wrist without moving it much*\n\nYeah, it's definitely more on the thumb side — right here, kind of in that little hollow area below the thumb. That spot is absolutely killing me, way worse than the rest of the wrist."
+    },
+    {
+      "role": "student",
+      "content": "Did you land with your hand open and fingers extended, or were you kind of catching yourself with a closed fist?"
+    },
+    {
+      "role": "patient",
+      "content": "Yeah, it was totally open hand — I was just trying to catch myself from falling, you know how it is, pure instinct. My hand was spread out flat and fingers extended when I hit the ice, and all my weight just came down right through it."
+    },
+    {
+      "role": "student",
+      "content": "Do you have any history of bone problems, like osteoporosis or a prior fracture in the same wrist — or are you on any medications like steroids?"
+    },
+    {
+      "role": "patient",
+      "content": "No, nothing like that — I'm pretty healthy, no bone problems that I know of, and no steroids or anything like that. The only thing I take is ibuprofen occasionally for headaches, that's it."
+    }
+  ],
+  "testsOrdered": [
+    "X-Ray Right Wrist (PA and Lateral)"
+  ],
+  "diagnosis": "Distal radius fracture (Colles' fracture)",
+  "reasoning": "The combination of a FOOSH mechanism, visible wrist deformity, severe pain, and inability to bear weight through the wrist is classic for a distal radius fracture — specifically a Colles' fracture, which involves dorsal displacement of the distal fragment giving the characteristic 'dinner fork' deformity. X-ray of the wrist in PA and lateral views is the key diagnostic test here and should confirm displacement, angulation, and whether there's any intra-articular extension. I also want to check for an associated ulnar styloid fracture, which is common with Colles'. Scaphoid fracture stays on the differential but typically lacks this degree of visible deformity and would be more tender in the anatomical snuffbox. The absence of numbness or tingling is reassuring that there's no acute median nerve compromise (carpal tunnel involvement), but I'd want to recheck neurovascular status carefully. Labs feel largely unnecessary here unless there's a plan for conscious sedation for reduction.",
+  "studentNotes": "I ordered X-Ray Right Wrist (PA and Lateral) and skipped the hand X-ray because the pain is localized to the wrist — I wasn't sure if I should add the hand film just in case. I also almost reflexively ordered a CBC but stopped myself since there's no indication for it here — good reminder not to over-order. The HR of 102 caught my eye briefly; I'd attribute it to pain but would want to confirm it normalizes after analgesia. I'd want to ask my attending about: (1) how to clinically distinguish Colles' from Smith's fracture before imaging, (2) when to get a CT for surgical planning, and (3) what the threshold is for checking median nerve function more formally. Also unsure if I should have asked about tetanus status or skin integrity — I should probably check if there's any open wound.",
+  "caseData": {
+    "patientInfo": {
+      "name": "Dmitri Voloshyn",
+      "age": 28,
+      "gender": "Male",
+      "chiefComplaint": "Severe right wrist pain and deformity after falling on outstretched hand"
+    },
+    "hpi": "Dmitri Voloshyn is a 28-year-old male who presents to the emergency department after slipping on ice approximately 2 hours ago and falling onto his outstretched right hand. He reports immediate onset of severe pain, swelling, and visible deformity of the right wrist. He denies loss of consciousness or head strike. He is right-hand dominant and notes he is unable to move or bear any weight through the wrist. He has applied ice at home with minimal relief. He denies numbness or tingling in the fingers, though he notes the pain is worsening.",
+    "vitals": {
+      "bp": "128/78",
+      "hr": 102,
+      "rr": 18,
+      "temp": 98.4,
+      "spo2": 99,
+      "weight": "175 lbs"
+    },
+    "diagnosis": "Distal radius fracture (Colles' fracture)",
+    "differentials": [
+      "Scaphoid fracture",
+      "Wrist dislocation",
+      "Distal ulna fracture",
+      "Wrist sprain"
+    ],
+    "keyQuestions": [
+      "Which hand is dominant and what is your occupation?",
+      "Did you land directly on your palm with the wrist extended?",
+      "Do you have any numbness or tingling in the thumb, index, or middle fingers (suggesting median nerve involvement)?",
+      "Have you ever broken a bone before or been told you have low bone density?"
+    ],
+    "teachingPoints": [
+      "Colles' fracture is a distal radius fracture with dorsal angulation and displacement, classically caused by a fall on an outstretched hand (FOOSH) and produces the characteristic 'dinner fork' deformity on lateral X-ray.",
+      "Neurovascular assessment is critical before and after any reduction: the median nerve (sensation to thumb/index/middle finger) and radial artery should be evaluated; acute carpal tunnel syndrome can complicate distal radius fractures.",
+      "Scaphoid fracture is the most important differential to rule out — anatomic snuffbox tenderness, a subtle or negative X-ray, and high clinical suspicion warrant MRI or CT if initial X-ray is unremarkable, as missed scaphoid fractures risk avascular necrosis."
+    ],
+    "availableLabs": [
+      "CBC",
+      "BMP",
+      "Coagulation Panel",
+      "Comprehensive Metabolic Panel"
+    ],
+    "availableImaging": [
+      "X-Ray Right Wrist (PA and Lateral)",
+      "X-Ray Right Hand"
+    ],
+    "labGroups": [
+      {
+        "name": "CBC",
+        "tests": [
+          "CBC"
+        ]
+      },
+      {
+        "name": "BMP",
+        "tests": [
+          "BMP"
+        ]
+      },
+      {
+        "name": "Coagulation Panel",
+        "tests": [
+          "Coagulation Panel"
+        ]
+      },
+      {
+        "name": "Comprehensive Metabolic Panel",
+        "tests": [
+          "Comprehensive Metabolic Panel"
+        ]
+      }
+    ],
+    "labResults": {
+      "CBC": {
+        "components": [
+          {
+            "name": "WBC",
+            "value": "9.4",
+            "unit": "x10³/µL",
+            "referenceRange": "4.5-11.0",
+            "status": "normal"
+          },
+          {
+            "name": "Hgb",
+            "value": "14.8",
+            "unit": "g/dL",
+            "referenceRange": "13.5-17.5",
+            "status": "normal"
+          },
+          {
+            "name": "Hct",
+            "value": "44.2",
+            "unit": "%",
+            "referenceRange": "41-53",
+            "status": "normal"
+          },
+          {
+            "name": "Platelets",
+            "value": "228",
+            "unit": "x10³/µL",
+            "referenceRange": "150-400",
+            "status": "normal"
+          }
+        ]
+      },
+      "BMP": {
+        "components": [
+          {
+            "name": "Sodium",
+            "value": "139",
+            "unit": "mEq/L",
+            "referenceRange": "136-145",
+            "status": "normal"
+          },
+          {
+            "name": "Potassium",
+            "value": "4.0",
+            "unit": "mEq/L",
+            "referenceRange": "3.5-5.0",
+            "status": "normal"
+          },
+          {
+            "name": "Chloride",
+            "value": "102",
+            "unit": "mEq/L",
+            "referenceRange": "98-107",
+            "status": "normal"
+          },
+          {
+            "name": "Bicarbonate",
+            "value": "24",
+            "unit": "mEq/L",
+            "referenceRange": "22-29",
+            "status": "normal"
+          },
+          {
+            "name": "BUN",
+            "value": "14",
+            "unit": "mg/dL",
+            "referenceRange": "7-20",
+            "status": "normal"
+          },
+          {
+            "name": "Creatinine",
+            "value": "0.9",
+            "unit": "mg/dL",
+            "referenceRange": "0.7-1.3",
+            "status": "normal"
+          }
+        ]
+      },
+      "Coagulation Panel": {
+        "components": [
+          {
+            "name": "PT",
+            "value": "12.4",
+            "unit": "seconds",
+            "referenceRange": "11-13.5",
+            "status": "normal"
+          },
+          {
+            "name": "INR",
+            "value": "1.0",
+            "unit": "",
+            "referenceRange": "0.9-1.1",
+            "status": "normal"
+          },
+          {
+            "name": "aPTT",
+            "value": "29",
+            "unit": "seconds",
+            "referenceRange": "25-35",
+            "status": "normal"
+          }
+        ]
+      },
+      "Comprehensive Metabolic Panel": {
+        "components": [
+          {
+            "name": "Glucose",
+            "value": "96",
+            "unit": "mg/dL",
+            "referenceRange": "70-100",
+            "status": "normal"
+          },
+          {
+            "name": "Calcium",
+            "value": "9.3",
+            "unit": "mg/dL",
+            "referenceRange": "8.5-10.5",
+            "status": "normal"
+          },
+          {
+            "name": "Total Protein",
+            "value": "7.2",
+            "unit": "g/dL",
+            "referenceRange": "6.3-8.2",
+            "status": "normal"
+          },
+          {
+            "name": "Albumin",
+            "value": "4.1",
+            "unit": "g/dL",
+            "referenceRange": "3.5-5.0",
+            "status": "normal"
+          },
+          {
+            "name": "ALT",
+            "value": "22",
+            "unit": "U/L",
+            "referenceRange": "7-56",
+            "status": "normal"
+          },
+          {
+            "name": "AST",
+            "value": "18",
+            "unit": "U/L",
+            "referenceRange": "10-40",
+            "status": "normal"
+          }
+        ]
+      }
+    },
+    "imagingResults": {
+      "X-Ray Right Wrist (PA and Lateral)": "PA view demonstrates a transverse fracture of the distal radius approximately 2 cm proximal to the articular surface with dorsal displacement of the distal fragment and approximately 15 degrees of dorsal angulation. The ulnar styloid is intact. Lateral view confirms the classic 'dinner fork' deformity with dorsal tilt of the distal radial fragment, consistent with a Colles' fracture. No intra-articular extension is identified.",
+      "X-Ray Right Hand": "Osseous structures of the carpals, metacarpals, and phalanges are intact. No evidence of scaphoid fracture, dislocation, or additional fracture. Joint spaces are preserved. Soft tissue swelling noted at the wrist."
+    },
+    "procedureResults": {},
+    "hiddenHistory": {
+      "fullHistory": "No prior fractures or musculoskeletal injuries. Occasional recreational sports including ice hockey.",
+      "socialHistory": "Social alcohol use on weekends. Non-smoker. Works as a software engineer. No recent travel. Plays recreational ice hockey in a local league.",
+      "familyHistory": "No family history of osteoporosis or bleeding disorders. Parents are healthy.",
+      "medications": "Ibuprofen 400mg PRN for occasional headaches. No anticoagulants or steroids.",
+      "hiddenSymptoms": "If asked specifically, patient will confirm mild paresthesias in the thumb and index finger that began shortly after the fall, suggesting possible median nerve stretch injury. Also reports pain with passive finger extension.",
+      "allergies": "NKDA"
+    },
+    "imagingCategory": "Orthopedic fracture with dorsal displacement",
+    "ecgFindings": "",
+    "hematologyFindings": "",
+    "urineFindings": "",
+    "skinFindings": "",
+    "fundusFindings": "",
+    "biopsyFindings": ""
+  },
+  "correctDiagnosis": "Distal radius fracture (Colles' fracture)",
+  "workingDiagnosis": "Distal radius fracture (likely Colles' fracture)",
+  "clinicalImpression": "This is a 28-year-old male who fell on an outstretched hand — classic FOOSH mechanism — and now has visible wrist deformity, severe pain, and inability to move the wrist. My top concern immediately is a distal radius fracture, specifically a Colles' fracture given the mechanism. I also want to keep scaphoid fracture on the differential since those can be sneaky, though the visible deformity makes me think this is something more displaced. I'm a little surprised by the HR of 102 — probably pain-related, but I'll keep it in mind.",
+  "grading": {
+    "score": 91,
+    "correct": true,
+    "feedback": "Excellent diagnostic performance — you correctly identified a Colles' fracture and asked targeted, clinically relevant questions about mechanism, bone history, and medications. Your identification of the anatomic snuffbox as the point of maximal tenderness shows strong clinical awareness of the scaphoid differential. The one key area to strengthen is active neurovascular assessment, particularly asking about thumb/index/middle finger paresthesias to screen for median nerve injury, which can complicate distal radius fractures.",
+    "strengths": [
+      "Correctly identified the 'dinner fork' deformity and named the diagnosis precisely as a Colles' fracture",
+      "Strategically asked about mechanism of fall (open hand vs. closed fist) to confirm FOOSH pattern",
+      "Appropriately screened for bone fragility risk factors including osteoporosis and steroid use",
+      "Demonstrated awareness of the scaphoid differential by asking about anatomic snuffbox tenderness"
+    ],
+    "dimensions": {
+      "historyInterview": {
+        "score": 18,
+        "feedback": "Good targeted questioning covering mechanism, bone history, and medications; however, the student did not explicitly ask about numbness or tingling in the thumb/index/middle fingers, which would have uncovered the hidden median nerve stretch injury — a management-relevant finding."
+      },
+      "testOrdering": {
+        "score": 21,
+        "feedback": "Appropriate core imaging was ordered (PA and lateral wrist X-rays plus hand X-rays to rule out scaphoid fracture); the CBC, BMP, and coagulation panel are low-yield in an isolated orthopedic trauma without bleeding concern or operative planning context, but they are not harmful and do not significantly detract from an otherwise complete workup."
+      },
+      "diagnosisAccuracy": {
+        "score": 36,
+        "feedback": "The diagnosis of 'Distal radius fracture (Colles' fracture)' is exactly correct and fully supported by the clinical presentation and imaging findings."
+      },
+      "diagnosisCompleteness": {
+        "score": 16,
+        "feedback": "The core diagnosis is named clearly and completely at the Foundations level — no further detail was required."
+      }
+    },
+    "missedQuestions": [
+      "Do you have any numbness or tingling in your thumb, index, or middle fingers? (screens for median nerve injury, which changes acute management and monitoring)"
+    ],
+    "teachingPoints": [
+      "Colles' fracture is a distal radius fracture with dorsal angulation and displacement, classically caused by a fall on an outstretched hand (FOOSH) and produces the characteristic 'dinner fork' deformity on lateral X-ray.",
+      "Neurovascular assessment is critical before and after any reduction: the median nerve (sensation to thumb/index/middle finger) and radial artery should be evaluated; acute carpal tunnel syndrome can complicate distal radius fractures.",
+      "Scaphoid fracture is the most important differential to rule out — anatomic snuffbox tenderness, a subtle or negative X-ray, and high clinical suspicion warrant MRI or CT if initial X-ray is unremarkable, as missed scaphoid fractures risk avascular necrosis."
+    ],
+    "differentials": [
+      "Scaphoid fracture: also caused by FOOSH with anatomic snuffbox tenderness; distinguished by point tenderness in the snuffbox and possible normal initial X-ray requiring MRI/CT — this patient's snuffbox pain initially raised concern but X-ray confirmed an intact scaphoid",
+      "Wrist dislocation (perilunate or lunate): severe FOOSH mechanism can disrupt carpal ligaments; distinguished by carpal malalignment on lateral X-ray rather than a discrete radial fracture",
+      "Distal ulna fracture: can accompany distal radius fracture (Galeazzi pattern); distinguished by tenderness over the ulnar styloid and specific radiographic findings — ulnar styloid was intact in this case",
+      "Wrist sprain: ligamentous injury without fracture following FOOSH; distinguished by absence of bony deformity, normal X-ray, and typically less severe pain and swelling"
+    ]
+  },
+  "score": 91,
+  "correct": true
+}

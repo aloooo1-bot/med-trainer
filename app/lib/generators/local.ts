@@ -2,6 +2,7 @@ import Anthropic from '@anthropic-ai/sdk'
 import {
   CASE_SYSTEM_PROMPT, DIFFICULTY_RULES, CRITICAL_RULES, JSON_SCHEMA_TEMPLATE,
   repairJson, reconcileHistoryConsistency, sanitizePmhLeak,
+  buildExcludedNamesBlock, nameCollides,
 } from './shared'
 
 export interface LocalCombo {
@@ -126,8 +127,9 @@ export const COMBOS: LocalCombo[] = [
   },
 ]
 
-export async function generateLocal(combo: LocalCombo): Promise<Record<string, unknown>> {
+export async function generateLocal(combo: LocalCombo, opts?: { usedNames?: string[] }): Promise<Record<string, unknown>> {
   const { diagnosis, system, difficulty, expectedImagingName, imagingCategory, findingsField, findingsKeyword } = combo
+  const usedNames = opts?.usedNames ?? []
   const diffCount = difficulty === 'Foundations' ? '2-3' : difficulty === 'Clinical' ? '3-4' : '4-5'
 
   const schema = JSON_SCHEMA_TEMPLATE
@@ -136,44 +138,45 @@ export async function generateLocal(combo: LocalCombo): Promise<Record<string, u
     .replace('IMAGE_CATEGORY', imagingCategory)
     .replace('DIFF_COUNT', diffCount)
 
-  const prompt = `Generate a ${system} clinical training case. The diagnosis MUST be "${diagnosis}".
-
-SPECIAL MODALITY REQUIREMENT:
-- "${expectedImagingName}" MUST appear in both availableImaging and procedureResults (it is a procedure/special test, not radiology).
-- The "${findingsField}" field MUST contain the phrase "${findingsKeyword}" — this is required for the trainer's image-lookup system to display the correct image category. Weave it naturally into a clinically accurate description.
-
-${DIFFICULTY_RULES[difficulty] ?? DIFFICULTY_RULES.Foundations}
-
-${CRITICAL_RULES}
-
-${schema}`
+  const buildPrompt = (excluded: string[]) =>
+    `Generate a ${system} clinical training case. The diagnosis MUST be "${diagnosis}".\n\nSPECIAL MODALITY REQUIREMENT:\n- "${expectedImagingName}" MUST appear in both availableImaging and procedureResults (it is a procedure/special test, not radiology).\n- The "${findingsField}" field MUST contain the phrase "${findingsKeyword}" — this is required for the trainer's image-lookup system to display the correct image category. Weave it naturally into a clinically accurate description.\n\n${DIFFICULTY_RULES[difficulty] ?? DIFFICULTY_RULES.Foundations}\n${buildExcludedNamesBlock(excluded)}\n${CRITICAL_RULES}\n\n${schema}`
 
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
-  const response = await anthropic.messages.create({
-    model: 'claude-sonnet-4-6',
-    max_tokens: 16000,
-    system: CASE_SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: prompt }],
-  })
 
-  const text = (response.content.find(c => c.type === 'text') as { text: string } | undefined)?.text ?? ''
-  let parsed: Record<string, unknown>
-  try {
-    const match = text.match(/\{[\s\S]*\}/)
-    if (!match) throw new Error('No JSON in response')
-    parsed = JSON.parse(match[0])
-  } catch {
-    parsed = JSON.parse(repairJson(text))
+  const callAndParse = async (excluded: string[]): Promise<Record<string, unknown>> => {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 16000,
+      system: CASE_SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: buildPrompt(excluded) }],
+    })
+    const text = (response.content.find(c => c.type === 'text') as { text: string } | undefined)?.text ?? ''
+    let parsed: Record<string, unknown>
+    try {
+      const match = text.match(/\{[\s\S]*\}/)
+      if (!match) throw new Error('No JSON in response')
+      parsed = JSON.parse(match[0])
+    } catch {
+      parsed = JSON.parse(repairJson(text))
+    }
+    // Validate the keyword is present
+    const findings = ((parsed[findingsField] as string) ?? '').toLowerCase()
+    if (!findings.includes(findingsKeyword.toLowerCase())) {
+      throw new Error(`"${findingsField}" missing keyword "${findingsKeyword}" (got: "${String(parsed[findingsField]).slice(0, 80)}")`)
+    }
+    parsed.nativeDifficulty = difficulty
+    return sanitizePmhLeak(reconcileHistoryConsistency(parsed))
   }
 
-  // Validate the keyword is present
-  const findings = ((parsed[findingsField] as string) ?? '').toLowerCase()
-  if (!findings.includes(findingsKeyword.toLowerCase())) {
-    throw new Error(`"${findingsField}" missing keyword "${findingsKeyword}" (got: "${String(parsed[findingsField]).slice(0, 80)}")`)
+  const result = await callAndParse(usedNames)
+  const generatedName = ((result.patientInfo as Record<string, unknown> | undefined)?.name as string | undefined) ?? ''
+
+  if (generatedName && nameCollides(generatedName, usedNames)) {
+    console.warn(`[generateLocal] Name collision: "${generatedName}" — retrying with exclusion`)
+    return callAndParse([...usedNames, generatedName])
   }
 
-  parsed.nativeDifficulty = difficulty
-  return sanitizePmhLeak(reconcileHistoryConsistency(parsed))
+  return result
 }
 
 export function findCombo(modality: string, category: string): LocalCombo | undefined {
