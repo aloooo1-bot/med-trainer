@@ -17,7 +17,7 @@ export default function NextCaseCard({
     const w = systems[0]
     system = w.name
     tier = w.score < 70 ? 'Foundations' : 'Clinical'
-    reason = `Your ${w.name} avg is ${w.score}.`
+    reason = `Your ${w.name} avg is ${w.score}${w.count ? ` across ${w.count} case${w.count === 1 ? '' : 's'}` : ''}.`
   }
 
   const tierClass = tier.toLowerCase()

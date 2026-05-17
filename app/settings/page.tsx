@@ -348,8 +348,9 @@ export default function SettingsPage() {
               </div>
 
               <div className="dx-form-actions">
+                <p className="dx-help-text" style={{ margin: '0 0 8px' }}>Saves rest days, weekly goal, and difficulty mix together.</p>
                 <button className="dx-btn-primary" style={{ fontSize: 13, padding: '7px 18px' }} onClick={savePrefs} disabled={prefStatus === 'saving'}>
-                  Save preferences
+                  Save training preferences
                 </button>
                 {statusText(prefStatus) && (
                   <span className="dx-save-status" style={{ color: prefStatus === 'error' ? 'var(--red)' : 'var(--muted)' }}>

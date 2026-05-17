@@ -541,9 +541,13 @@ export default function ReviewPage() {
                         if (!cell || cell.count === 0) {
                           return (
                             <td key={diff} className="py-1.5 px-3 text-center">
-                              <div className="mx-auto w-16 rounded py-1 text-[10px] text-ink-muted bg-surface-2/40">
-                                —
-                              </div>
+                              <a
+                                href={`/trainer?system=${encodeURIComponent(sys)}&difficulty=${diff}`}
+                                className="mx-auto w-16 rounded py-1 text-[10px] text-ink-muted bg-surface-2/40 block hover:text-blue-400 transition-colors"
+                                style={{ textDecoration: 'none' }}
+                              >
+                                Try →
+                              </a>
                             </td>
                           )
                         }
@@ -596,10 +600,10 @@ export default function ReviewPage() {
                     Avg score {Math.round(avgScore)} / 100
                   </div>
                   <a
-                    href="/"
+                    href={`/trainer?system=${encodeURIComponent(sys)}&difficulty=${diff}`}
                     className="mt-auto block w-full text-center rounded bg-surface-3 hover:bg-surface-3 transition-colors text-xs text-ink-secondary py-1.5"
                   >
-                    Practice →
+                    Practice this →
                   </a>
                 </div>
               ))}

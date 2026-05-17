@@ -45,7 +45,7 @@ function cssScore(s: number | null) {
   return s < 60 ? 'var(--red)' : s < 75 ? 'var(--amber)' : 'var(--green)'
 }
 
-export default function PerformanceBreakdown({ sessions }: { sessions: Session[] }) {
+export default function PerformanceBreakdown({ sessions, tier }: { sessions: Session[]; tier?: string }) {
   const router = useRouter()
   const [sortKey, setSortKey] = useState<SortKey>('count')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
@@ -116,8 +116,16 @@ export default function PerformanceBreakdown({ sessions }: { sessions: Session[]
             <span className="dx-perf-count">{r.count}</span>
             <span className="dx-perf-score" style={{ color: cssScore(r.avgScore) }}>{r.avgScore}</span>
             <span className="dx-perf-score" style={{ color: cssScore(r.fAvg) }}>{r.fAvg ?? '—'}</span>
-            <span className="dx-perf-score" style={{ color: cssScore(r.cAvg) }}>{r.cAvg ?? '—'}</span>
-            <span className="dx-perf-score" style={{ color: cssScore(r.aAvg) }}>{r.aAvg ?? '—'}</span>
+            <span className="dx-perf-score" style={{ color: cssScore(r.cAvg) }}>
+              {r.cAvg !== null ? r.cAvg : tier === 'pro' ? (
+                <a href={`/trainer?system=${encodeURIComponent(r.system)}&difficulty=Clinical`} style={{ fontSize: 10, color: 'var(--accent)', textDecoration: 'none' }} onClick={e => e.stopPropagation()}>Try →</a>
+              ) : '—'}
+            </span>
+            <span className="dx-perf-score" style={{ color: cssScore(r.aAvg) }}>
+              {r.aAvg !== null ? r.aAvg : tier === 'pro' ? (
+                <a href={`/trainer?system=${encodeURIComponent(r.system)}&difficulty=Advanced`} style={{ fontSize: 10, color: 'var(--accent)', textDecoration: 'none' }} onClick={e => e.stopPropagation()}>Try →</a>
+              ) : '—'}
+            </span>
           </button>
         ))}
       </div>

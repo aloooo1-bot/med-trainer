@@ -21,10 +21,13 @@ const CLINICAL_ADVANCED_DIMS = [
 ]
 
 
-const FAQS = [
+type FAQ = { q: string; a: string; link?: { href: string; label: string } }
+
+const FAQS: FAQ[] = [
   {
     q: 'Why did I get partial credit for the right diagnosis?',
     a: 'If you named the correct pathological entity but omitted a qualifying modifier, that\'s accepted only when the qualifier does not change management (e.g. "pharyngitis" instead of "viral pharyngitis"). When the qualifier carries management weight — such as a STEMI territory or injury laterality — omitting it costs points. Partial credit is reserved for cases where you identified the right organ system but the wrong pathological process.',
+    link: { href: '#scoring-rubric', label: 'See scoring rubric →' },
   },
   {
     q: 'Why does my score vary even on similar cases?',
@@ -37,6 +40,7 @@ const FAQS = [
   {
     q: 'How does the recommendation algorithm choose what to study?',
     a: 'Systems are ranked by urgency = (100 − avg_score) × (1.2 if only 1 case, else 1.0). Single-case systems get the 1.2× multiplier because one data point is less reliable; multi-case systems carry a factor of 1.0 (no multiplier). Your weekly plan then fills active days with the top-urgency systems in order.',
+    link: { href: '#recommendation-algorithm', label: 'See algorithm details →' },
   },
   {
     q: 'How do I redo a case?',
@@ -45,6 +49,7 @@ const FAQS = [
   {
     q: 'What does STEMI vs NSTEMI mean for my score?',
     a: 'STEMI and NSTEMI are not clinically equivalent — they differ in ECG findings and urgency of invasive management: STEMI mandates immediate cath-lab activation, while NSTEMI management is risk-stratified and may also require early catheterization in high-risk presentations. Submitting one when the other is correct caps Diagnosis Accuracy at approximately 43–44% of its dimension (16/36 at Foundations; 13/30 at Clinical/Advanced) and marks the case incorrect, regardless of other correct elements.',
+    link: { href: '#scoring-rubric', label: 'See scoring rubric →' },
   },
 ]
 
@@ -79,7 +84,7 @@ export default function HelpPage() {
           </div>
 
           {/* Scoring */}
-          <div className="dx-card">
+          <div id="scoring-rubric" className="dx-card">
             <div className="dx-card-header">
               <div style={{ fontWeight: 700 }}>How scoring works</div>
               <div style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)', marginTop: 2 }}>
@@ -111,7 +116,7 @@ export default function HelpPage() {
                   </div>
                 ))}
                 <div style={{ fontWeight: 600, fontSize: 12, color: 'var(--text-secondary)', marginTop: 14, marginBottom: 6 }}>
-                  Clinical &amp; Advanced — 5 categories, 100 pts total
+                  Clinical &amp; Advanced — 5 scored categories (100 pts) + Efficiency indicator (/10, separate)
                 </div>
                 {CLINICAL_ADVANCED_DIMS.map(d => (
                   <div className="dx-help-rubric-row" key={d.name}>
@@ -120,6 +125,17 @@ export default function HelpPage() {
                     <span className="dx-help-dim-desc">{d.desc}</span>
                   </div>
                 ))}
+                <div
+                  aria-label="Efficiency indicator — not included in the /100 score"
+                  style={{
+                    marginTop: 12, padding: '10px 14px', borderRadius: 8,
+                    border: '1px solid var(--border)', background: 'var(--surface2)',
+                    fontSize: 11, color: 'var(--muted)', lineHeight: 1.5,
+                  }}
+                >
+                  <strong style={{ color: 'var(--text-secondary)' }}>Efficiency (/10, not included in /100 score):</strong>{' '}
+                  At Clinical and Advanced difficulty, a timer tracks how quickly you complete the case. Efficiency is shown as a separate indicator on the scorecard and does not affect your rubric score.
+                </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 4 }}>
                   {[
                     { label: 'Correct', threshold: '≥ 75', color: 'var(--green)' },
@@ -171,7 +187,7 @@ export default function HelpPage() {
           </div>
 
           {/* Recommendation algorithm */}
-          <div className="dx-card">
+          <div id="recommendation-algorithm" className="dx-card">
             <div className="dx-card-header" style={{ fontWeight: 700 }}>How the recommendation algorithm works</div>
             <div className="dx-card-body">
               <div className="dx-help-section">
@@ -205,6 +221,11 @@ export default function HelpPage() {
                   <div className="dx-help-faq-item" key={i}>
                     <p className="dx-help-faq-q">{faq.q}</p>
                     <p className="dx-help-faq-a">{faq.a}</p>
+                    {faq.link && (
+                      <a href={faq.link.href} style={{ fontSize: 11, color: 'var(--accent)', textDecoration: 'none' }}>
+                        {faq.link.label}
+                      </a>
+                    )}
                   </div>
                 ))}
               </div>

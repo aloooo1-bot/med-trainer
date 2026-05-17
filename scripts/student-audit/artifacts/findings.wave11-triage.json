@@ -1,0 +1,2238 @@
+{
+  "triageDate": "2026-05-17",
+  "totalFindings": 148,
+  "counts": {
+    "closed": 60,
+    "open": 78,
+    "defer": 10
+  },
+  "buckets": {
+    "A_app_ui": 31,
+    "B_case_gen_rules": 33,
+    "C_grader_rules": 19,
+    "D_deferred": 1
+  },
+  "findings": [
+    {
+      "id": "f-003",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "Amoxicillin-EBV rash described as 'pathognomonic' — overstated specificity",
+      "source": {
+        "type": "case",
+        "ref": "case-7 (Infectious Foundations)"
+      },
+      "evidence": "\"the amoxicillin-associated maculopapular rash is essentially pathognomonic for EBV mono\"",
+      "suggestion": "Replace 'pathognomonic' with 'highly characteristic' or 'strongly suggestive'; the rash also occurs in CMV mononucleosis and other viral syndromes.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b added EBV AMOX RASH MECHANISM RULE which explicitly forbids 'pathognomonic' framing and requires 'highly characteristic' language.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-004",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "EBV-amoxicillin rash mechanism stated as 'immune complex-mediated' — disputed/inaccurate",
+      "source": {
+        "type": "case",
+        "ref": "case-7 (Infectious Foundations)"
+      },
+      "evidence": "\"the mechanism is immune complex-mediated rather than IgE-mediated\"",
+      "suggestion": "State mechanism as T-cell mediated / p-i concept, not immune complex (Type III).",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b EBV AMOX RASH MECHANISM RULE requires T-cell mediated language; immune-complex description forbidden.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-005",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "low",
+      "originalTitle": "Monospot sensitivity range understated for first week of illness",
+      "source": {
+        "type": "case",
+        "ref": "case-7 (Infectious Foundations)"
+      },
+      "evidence": "\"has variable sensitivity early in illness (as low as 70-80% in the first week)\"",
+      "suggestion": "Correct to 25–50% sensitivity in week 1, rising to ~85% by week 3.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b MONOSPOT SENSITIVITY RULE mandates 25–50% week-1 sensitivity; 70–80% explicitly forbidden.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-006",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "high",
+      "originalTitle": "SCD case: MCV 79 fL labeled low — inconsistent with classic HbSS MCV",
+      "source": {
+        "type": "case",
+        "ref": "case-8 (Hematologic/Oncologic Foundations)"
+      },
+      "evidence": "\"MCV\": \"79\", \"unit\": \"fL\", \"referenceRange\": \"80-100\", \"status\": \"low\"",
+      "suggestion": "Set MCV to normocytic range (86–92 fL) for uncomplicated HbSS, or add co-diagnosis explanation.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b HbSS MCV RULE forbids MCV < 80 fL in pure HbSS cases without co-diagnosis explanation.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-007",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "HbF 6% flagged 'high' but is expected/therapeutic in untreated HbSS",
+      "source": {
+        "type": "case",
+        "ref": "case-8 (Hematologic/Oncologic Foundations)"
+      },
+      "evidence": "\"HbF\": \"6\", \"unit\": \"%\", \"referenceRange\": \"< 2\", \"status\": \"high\"",
+      "suggestion": "Add case-specific note clarifying elevated HbF is beneficial in HbSS; reference range context is for normal adults only.",
+      "triageStatus": "open",
+      "triageReason": "No specific rule covers HbF reference-range labeling in HbSS. The HbSS MCV rule addresses MCV only. This case-level data error needs a new B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-008",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "Dark urine morning predominance attributed to SCD — suggests PNH pattern, not SCD",
+      "source": {
+        "type": "case",
+        "ref": "case-8 (Hematologic/Oncologic Foundations)"
+      },
+      "evidence": "\"the dark urine does seem worse in the mornings when I first wake up\"",
+      "suggestion": "Remove morning-predominant pattern from SCD hidden history; reserve this for PNH.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b MORNING-DARK-URINE SPECIFICITY RULE forbids morning-predominant dark urine in SCD cases; reserves it for PNH.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-009",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "HPI states 'no prior similar episodes' — contradicted by hidden history dactylitis",
+      "source": {
+        "type": "case",
+        "ref": "case-8 (Hematologic/Oncologic Foundations)"
+      },
+      "evidence": "HPI: \"He has no prior similar episodes\" vs. hiddenHistory: \"He confirms experiencing hand and foot swelling as an infant\"",
+      "suggestion": "Revise HPI to 'no prior formally evaluated episodes' or 'no prior hospitalizations for pain crises'.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b HPI-HIDDEN HISTORY NON-CONTRADICTION RULE forbids outright denial in HPI of symptoms present in hiddenHistory.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-010",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Peripheral Blood Smear listed under 'availableImaging' — incorrect categorization",
+      "source": {
+        "type": "case",
+        "ref": "case-8 (Hematologic/Oncologic Foundations)"
+      },
+      "evidence": "\"availableImaging\": [\"Peripheral Blood Smear\", \"Abdominal Ultrasound\", \"Chest X-Ray\"]",
+      "suggestion": "Move PBS to availableLabs.",
+      "triageStatus": "open",
+      "triageReason": "Wave 3b rules address test-result gating but no CRITICAL_RULE explicitly enforces PBS/ECG/Thoracentesis categorization into correct arrays. Needs new B rule for availableImaging exclusion list.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-011",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Student's submitted diagnosis is Hereditary Spherocytosis — graded incorrect, but score 72 awarded despite correct workup",
+      "source": {
+        "type": "case",
+        "ref": "case-8 (Hematologic/Oncologic Foundations)"
+      },
+      "evidence": "\"diagnosis\": \"Hereditary Spherocytosis\", \"correct\": false, \"score\": 72",
+      "suggestion": "Apply harder penalty floor for wrong diagnosis at Foundations level.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 2 added WRONG DIAGNOSIS cap in rubric.mjs (diagnosisCompleteness ≤ dcLowMax when correct=false). Wave 10 confirmed closed.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-012",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Student adds 'likely concurrent medial meniscus injury' — MRI shows no meniscal tear, yet diagnosisAccuracy penalized only partially",
+      "source": {
+        "type": "case",
+        "ref": "case-9 (Musculoskeletal Foundations)"
+      },
+      "evidence": "Student diagnosis adds unconfirmed meniscal co-diagnosis contradicted by MRI; diagnosisAccuracy score 30.",
+      "suggestion": "Add rubric guidance that unconfirmed co-diagnoses contradicted by imaging incur defined deduction.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3c added CONTRADICTED CO-DIAGNOSIS RULE: deduct ≥6 pts from diagnosisAccuracy when co-diagnosis contradicted by available evidence.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-013",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "Teaching point states Lachman test sensitivity ~85% — accepted but context missing",
+      "source": {
+        "type": "case",
+        "ref": "case-9 (Musculoskeletal Foundations)"
+      },
+      "evidence": "\"The Lachman test ... is the most sensitive physical exam maneuver for ACL tear (~85% sensitivity)\"",
+      "suggestion": "Add qualifier 'in experienced hands' or note sensitivity drops in acute swollen knee.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule covers Lachman sensitivity qualifier requirement. A B_case_gen_rules entry should require examiner-experience caveat for quoted sensitivity figures in MSK teaching points.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-014",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "No physical examination data provided — limits ACL diagnostic reasoning",
+      "source": {
+        "type": "case",
+        "ref": "case-9 (Musculoskeletal Foundations)"
+      },
+      "evidence": "Student notes physical exam findings not shown for ACL case.",
+      "suggestion": "Include structured physical exam results panel (Lachman, anterior drawer, pivot shift, McMurray's).",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b MSK PHYSICAL EXAM PRESENCE RULE requires ACL cases to include physical exam findings in the case data.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-015",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Case labels this a 'Hemolytic Crisis' but presentation lacks defining crisis features",
+      "source": {
+        "type": "case",
+        "ref": "case-8 (Hematologic/Oncologic Foundations)"
+      },
+      "evidence": "\"correctDiagnosis\": \"Sickle Cell Disease (Hemolytic Crisis)\" vs gradual onset, near-normal vitals.",
+      "suggestion": "Relabel to 'SCD with chronic hemolysis' or add explicit HPI language supporting acute crisis.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule requires correctDiagnosis label to match clinical acuity descriptors in HPI/vitals. Needs new B rule for SCD crisis framing consistency.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-016",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "Grading feedback mentions 'rash timeline' as missed but student reasoning addresses it",
+      "source": {
+        "type": "case",
+        "ref": "case-7 (Infectious Foundations)"
+      },
+      "evidence": "missedQuestions cites rash timing as missed; student reasoning explicitly articulates the concept.",
+      "suggestion": "Differentiate 'did not ask' from 'did not demonstrate understanding' in grading feedback.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 6 PROACTIVE ELICITATION RULE and KEY-QUESTION ELICITATION RULE: incidentally surfaced items must not appear in missedQuestions panel.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-018",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "high",
+      "originalTitle": "Rumack-Matthew nomogram threshold values are incorrect",
+      "source": {
+        "type": "case",
+        "ref": "case-11 (Toxicologic Foundations)"
+      },
+      "evidence": "\"treatment line threshold is ~150 mcg/mL at 4h, ~75 mcg/mL at 8h\"",
+      "suggestion": "Confirm correct treatment-line values (4h:150, 8h:75, 12h:37.5) and cite validated source.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b RUMACK-MATTHEW THRESHOLD RULE added explicit time-point values (4h:150, 8h:75, 12h:37.5 mcg/mL).",
+      "triageBucket": null
+    },
+    {
+      "id": "f-019",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "high",
+      "originalTitle": "Urine drug screen lists acetaminophen as a screened analyte — standard UDS panels do not include acetaminophen",
+      "source": {
+        "type": "case",
+        "ref": "case-11 (Toxicologic Foundations)"
+      },
+      "evidence": "\"Acetaminophen (urine screen)\": \"value\": \"Positive\"",
+      "suggestion": "Remove acetaminophen from UDS; serum quantitative level is the correct test.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 2 added URINE DRUG SCREEN ANALYTE RULE explicitly banning acetaminophen from UDS panels.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-020",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "LFT elevations at 6 hours post-ingestion are inconsistent with known APAP toxicity timeline",
+      "source": {
+        "type": "case",
+        "ref": "case-11 (Toxicologic Foundations)"
+      },
+      "evidence": "AST 58 / ALT 72 elevated at 6h yet teaching point says LFT elevations appear at Phase II (24–72h).",
+      "suggestion": "Set LFTs normal at 6h, or add explanation that large ingestions can cause early mild transaminase rise.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b APAP LFT TIMING RULE explicitly requires LFTs to be normal in Phase I (0–24h) or adds explanatory note for large-ingestion exception.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-021",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "HPI states patient denies diaphoresis/pallor but hidden history reveals these symptoms were observed",
+      "source": {
+        "type": "case",
+        "ref": "case-11 (Toxicologic Foundations)"
+      },
+      "evidence": "HPI denies diaphoresis; hiddenSymptoms: diaphoresis and pallor noted by nursing staff.",
+      "suggestion": "Move objective nursing findings to visible vitals/exam section; hidden objective findings are a false learning model.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b HPI-HIDDEN HISTORY NON-CONTRADICTION RULE forbids outright denial when hidden history contradicts it. SAFETY-CRITICAL ELICITATION RULE addresses gating of objective findings.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-022",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Student interview elicits maximal tenderness at anatomical snuffbox, inconsistent with confirmed Colles' fracture diagnosis",
+      "source": {
+        "type": "case",
+        "ref": "case-12 (Trauma Foundations)"
+      },
+      "evidence": "Patient response points to snuffbox; Colles' fracture tenderness should be over dorsal distal radius.",
+      "suggestion": "Correct patient dialogue to dorsal wrist/distal radius tenderness.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b COLLES vs SCAPHOID LOCALISATION RULE requires correct anatomical tenderness localization for each diagnosis.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-023",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Grading credits student for hand X-ray ordering but student explicitly did NOT order it",
+      "source": {
+        "type": "case",
+        "ref": "case-12 (Trauma Foundations)"
+      },
+      "evidence": "testsOrdered has wrist X-ray only; grading feedback says 'PA and lateral wrist X-rays plus hand X-rays' ordered.",
+      "suggestion": "Grading must enumerate only ordered tests in feedback.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 5 GRADING TEXT FIDELITY RULE and ORDERED-TESTS SCORING CONTRACT forbid crediting/mentioning unordered tests.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-024",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "HPI states patient denies numbness/tingling, but hidden history reveals paresthesias are present",
+      "source": {
+        "type": "case",
+        "ref": "case-12 (Trauma Foundations)"
+      },
+      "evidence": "HPI: denies numbness; hiddenHistory: mild paresthesias in thumb/index finger.",
+      "suggestion": "HPI should say 'has not volunteered' not 'denies'; paresthesias are present on direct questioning.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b HPI-HIDDEN HISTORY NON-CONTRADICTION RULE forbids denial language when hidden history contradicts.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-025",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Passive suicidal ideation present in hidden history but graded as simply 'not asked' — safety-critical nuance lost",
+      "source": {
+        "type": "case",
+        "ref": "case-10 (Psychiatric Foundations)"
+      },
+      "evidence": "hiddenHistory: passive SI 'life feels pointless'; missedQuestions treats it as a simple missed question.",
+      "suggestion": "Grading feedback must explicitly state direct questioning would reveal passive SI, with management implications.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b SAFETY-CRITICAL ELICITATION RULE requires passive SI to be flagged as safety-critical with management context in grading feedback.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-026",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "NAC treatment decision taught as 'pending nomogram' but nomogram-qualifying level already returned — missed active teaching moment",
+      "source": {
+        "type": "case",
+        "ref": "case-11 (Toxicologic Foundations)"
+      },
+      "evidence": "APAP level 210 mcg/mL at 6h already above treatment line; student leaves NAC 'pending'.",
+      "suggestion": "Grading must note NAC should be started immediately given level clearly above treatment line.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 8 APAP NAC TIMING RULE: if NAC not mentioned, cap clinicalReasoning ≤67% of max and name gap explicitly.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-027",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "low",
+      "originalTitle": "Teaching point cites DSM-5 '6 criteria' but lists only 6 with worthlessness absent from symptom count",
+      "source": {
+        "type": "case",
+        "ref": "case-10 (Psychiatric Foundations)"
+      },
+      "evidence": "Teaching point says 6 criteria but worthlessness is present in both HPI and hiddenHistory making 7.",
+      "suggestion": "State patient meets 7 of 9 DSM-5 criteria.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b DSM CRITERION TEXT CONSISTENCY RULE requires enumerated criteria count to match the actual symptoms documented in the case.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-028",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "All three cases share the same patient name 'Dmitri Voloshyn' across unrelated presentations",
+      "source": {
+        "type": "case",
+        "ref": "case-10 (Psychiatric Foundations)"
+      },
+      "evidence": "case-10, case-11, case-12 all use 'Dmitri Voloshyn'.",
+      "suggestion": "Assign distinct names per case.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b/4 PATIENT NAME UNIQUENESS RULE + usedNames dedup mechanism prevent name reuse across cases in a batch.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-030",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "high",
+      "originalTitle": "Bacterial meningitis case temp 99.8°F conflicts with classic triad teaching",
+      "source": {
+        "type": "case",
+        "ref": "case-15 (Neurologic, Clinical)"
+      },
+      "evidence": "temp 99.8°F with pneumococcal meningitis / 4200 CSF WBC — implausible.",
+      "suggestion": "Raise temp to 102–104°F or document antipyretic use explaining low-grade reading.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule covers minimum temperature realism for bacterial meningitis cases. Needs new B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-031",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "high",
+      "originalTitle": "CSF RBC labelled 'normal' at 8 cells/µL in SAH vs meningitis differential",
+      "source": {
+        "type": "case",
+        "ref": "case-15 (Neurologic, Clinical)"
+      },
+      "evidence": "CSF RBC 8 cells/µL, referenceRange 0–5, status 'normal' — should be abnormal.",
+      "suggestion": "Flag as abnormal/high to accurately reflect reference range and preserve SAH differential teaching.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule covers CSF RBC labeling consistency. Lab status flags must match reference range arithmetic. Needs new B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-032",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "Petechial rash described as 'atypical for pneumococcal' — this framing is misleading",
+      "source": {
+        "type": "case",
+        "ref": "case-15 (Neurologic, Clinical)"
+      },
+      "evidence": "Petechial rash labeled 'atypical for pneumococcal but present' without clarifying it is classic for meningococcal.",
+      "suggestion": "Either remove rash or explicitly state petechial rash should raise N. meningitidis suspicion.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule covers meningitis rash differential teaching. Needs new B_case_gen_rules entry for petechial rash attribution.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-033",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "Teaching point on LP delay threshold omits immunocompromise nuance incompletely",
+      "source": {
+        "type": "case",
+        "ref": "case-15 (Neurologic, Clinical)"
+      },
+      "evidence": "CT-first indications listed omit new-onset seizure and age ≥60 per IDSA guidelines.",
+      "suggestion": "Add 'new-onset seizure, or age ≥60' to CT-first indication list.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule covers completeness of LP delay indications per IDSA guidelines. Needs new B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-034",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Student submitted SAH diagnosis but grading marks test ordering near-complete despite missing MRI",
+      "source": {
+        "type": "case",
+        "ref": "case-15 (Neurologic, Clinical)"
+      },
+      "evidence": "MRI Brain with contrast not ordered; testOrdering score 17 with 'complete and appropriate workup' feedback.",
+      "suggestion": "MRI is pivotal test for bacterial meningitis; absence must trigger mandatory deduction and explicit feedback.",
+      "triageStatus": "open",
+      "triageReason": "The ORDERED-TESTS SCORING CONTRACT addresses grading accuracy but no rule creates a 'pivotal test' mandatory deduction. cc-003 identifies this cross-cutting pattern. Needs C_grader_rules entry for pivotal-test floor.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-035",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "History score 14/20 awarded despite student missing 3 of 4 listed key questions",
+      "source": {
+        "type": "case",
+        "ref": "case-15 (Neurologic, Clinical)"
+      },
+      "evidence": "3 of 4 key questions missed; historyInterview score 14/20 (70%).",
+      "suggestion": "Recalibrate so missing 3 of 4 key questions yields ≤10/20.",
+      "triageStatus": "open",
+      "triageReason": "SCORE↔FEEDBACK CONSISTENCY RULE addresses praise/score mismatch but does not impose a proportional floor per missed key question. cc-001 identifies this as a cross-cutting grader calibration gap. Needs C_grader_rules entry.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-036",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Thoracentesis listed under availableImaging but not credited as a separate orderable test",
+      "source": {
+        "type": "case",
+        "ref": "case-14 (Respiratory, Clinical)"
+      },
+      "evidence": "Thoracentesis in availableImaging; absence treated as 'minor gap' despite management-altering pleural results.",
+      "suggestion": "Upgrade missing thoracentesis to significant gap with commensurate deduction.",
+      "triageStatus": "open",
+      "triageReason": "Thoracentesis miscategorized (cc-009 also flags this) AND grading underweights its absence. Needs two fixes: B_case_gen_rules for categorization and C_grader_rules for pivotal-test deduction.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-037",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Pleural fluid analysis results shown despite thoracentesis not being ordered by student",
+      "source": {
+        "type": "case",
+        "ref": "case-14 (Respiratory, Clinical)"
+      },
+      "evidence": "Thoracentesis not in testsOrdered; full pleural fluid results appear in labResults and student reasons from them.",
+      "suggestion": "Gate pleural fluid results behind thoracentesis order.",
+      "triageStatus": "open",
+      "triageReason": "Wave 5 ORDERED-TESTS SCORING CONTRACT addresses grader-side scoring but the platform-level result-display gating (app/trainer/page.tsx:3389) must properly gate procedural results. cc-008 cross-cutting. Needs A_app_ui fix to verify server-side filter blocks unordered procedural results.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-038",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "Light's criteria LDH threshold stated incorrectly in teaching point",
+      "source": {
+        "type": "case",
+        "ref": "case-14 (Respiratory, Clinical)"
+      },
+      "evidence": "Teaching point omits 'serum' qualifier and implies criteria must all be met simultaneously.",
+      "suggestion": "Rewrite: 'exudate if ANY ONE of: pleural/serum protein >0.5, pleural/serum LDH >0.6, or pleural LDH >2/3 upper limit of normal serum LDH.'",
+      "triageStatus": "open",
+      "triageReason": "No existing rule covers Light's criteria language accuracy. Needs new B_case_gen_rules entry for empyema/pleural effusion cases.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-039",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "History score 15/20 awarded despite missing 2 of 4 key questions per grader's own feedback",
+      "source": {
+        "type": "case",
+        "ref": "case-13 (Cardiovascular, Clinical)"
+      },
+      "evidence": "2 of 4 key questions missed; historyInterview score 15/20 (75%).",
+      "suggestion": "Reduce to ~10–11/20 or document bonus-credit logic explicitly.",
+      "triageStatus": "open",
+      "triageReason": "Same cross-cutting pattern as f-035 and cc-001. KEY-QUESTION ELICITATION RULE exists but no proportional floor is enforced. Needs C_grader_rules fix.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-040",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Lipid panel results available at Hour 0 of NSTEMI — clinically unrealistic timing",
+      "source": {
+        "type": "case",
+        "ref": "case-13 (Cardiovascular, Clinical)"
+      },
+      "evidence": "Lipid panel returned as actionable result acutely; acute MI invalidates LDL values.",
+      "suggestion": "Block lipid panel from acute NSTEMI order set or return note about acute-phase unreliability.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule covers lipid panel timing validity in acute MI. Needs new B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-041",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Student anchored on SAH despite non-thunderclap onset — no remediation pathway offered",
+      "source": {
+        "type": "case",
+        "ref": "case-15 (Neurologic, Clinical)"
+      },
+      "evidence": "Grading identifies anchoring but offers no structured remediation walk-through.",
+      "suggestion": "Add targeted teaching intervention walking through the LP→meningitis decision pivot.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule requires grader to provide structured remediation for anchoring bias. Needs C_grader_rules entry for anchoring feedback template.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-042",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "D-Dimer elevated at 1.2 µg/mL FEU without explicit CT-PA correlation in feedback",
+      "source": {
+        "type": "case",
+        "ref": "case-14 (Respiratory, Clinical)"
+      },
+      "evidence": "D-Dimer elevated in pneumonia/sepsis context; no teaching note on low specificity.",
+      "suggestion": "Add teaching note that D-dimer has low specificity in active infection/inflammation.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule requires D-dimer specificity teaching note in infected patient context. Needs new B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-044",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Teaching point states 'normal WBC' but CBC shows WBC 11.8 (elevated)",
+      "source": {
+        "type": "case",
+        "ref": "case-16 (Gastrointestinal Clinical)"
+      },
+      "evidence": "Teaching point: 'a normal WBC does not exclude significant pancreatic injury' vs WBC 11.8 (status: high).",
+      "suggestion": "Correct to 'only mild leukocytosis' rather than 'normal WBC'.",
+      "triageStatus": "open",
+      "triageReason": "GRADING TEXT FIDELITY RULE covers grader-side text; no rule enforces that teaching point prose must not contradict actual lab values. Needs new B_case_gen_rules entry for lab-value/teachingPoint consistency check.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-045",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Ranson criteria teaching point cites 'age >55' but patient is 52",
+      "source": {
+        "type": "case",
+        "ref": "case-16 (Gastrointestinal Clinical)"
+      },
+      "evidence": "Teaching point cites age >55 as risk factor; patient.age is 52.",
+      "suggestion": "Remove age >55 as applicable criterion for this patient.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule requires teaching point severity criteria to apply to the actual patient age in the case. Needs new B_case_gen_rules entry for patient-anchored teaching points.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-046",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "high",
+      "originalTitle": "Triglycerides 310 mg/dL presented as incidental finding but meets threshold for hypertriglyceridemic pancreatitis",
+      "source": {
+        "type": "case",
+        "ref": "case-16 (Gastrointestinal Clinical)"
+      },
+      "evidence": "TG 310 elevated; no teaching point distinguishing it from the 500–1000 mg/dL causative threshold.",
+      "suggestion": "Add teaching point explaining 310 is below the ~500–1000 mg/dL HTG-pancreatitis threshold.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule requires teaching points to resolve ambiguous secondary-cause lab values. cc-011 identifies this cross-cutting pattern. Needs B_case_gen_rules entry for unexplained abnormal lab teaching-point coverage.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-047",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Grading penalizes student for citing vitals but vitals are explicitly provided in caseData",
+      "source": {
+        "type": "case",
+        "ref": "case-16 (Gastrointestinal Clinical)"
+      },
+      "evidence": "Grading feedback says student cited unavailable vitals; vitals ARE in caseData (HR 108, temp 100.4, RR 20).",
+      "suggestion": "Remove fabrication language; acknowledge vitals are in case record.",
+      "triageStatus": "open",
+      "triageReason": "cc-002 cross-cutting pattern. GRADING TEXT FIDELITY RULE exists but does not explicitly instruct grader to cross-reference student-cited values against caseData.vitals before issuing fabrication warnings. Needs C_grader_rules entry.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-048",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Grading penalizes student for citing vitals not in case data, but vitals ARE in caseData",
+      "source": {
+        "type": "case",
+        "ref": "case-18 (Endocrine/Metabolic Clinical)"
+      },
+      "evidence": "Grading introduces 'minor fabrication concern' for vitals (HR 56, temp 97.1, BP 138/88) present in caseData.",
+      "suggestion": "Remove fabrication concern; vitals are legitimately documented.",
+      "triageStatus": "open",
+      "triageReason": "Same cc-002 pattern as f-047. Needs C_grader_rules entry cross-referencing vitals before fabrication warning.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-049",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "Teaching point states full replacement levothyroxine dose for 'young healthy adults' but case patient is 52",
+      "source": {
+        "type": "case",
+        "ref": "case-18 (Endocrine/Metabolic Clinical)"
+      },
+      "evidence": "Teaching point presents both full-dose and low-dose options without anchoring to this specific patient.",
+      "suggestion": "Anchor recommendation to this 52-year-old patient with bradycardia: low-dose initiation is appropriate.",
+      "triageStatus": "open",
+      "triageReason": "cc-013 cross-cutting pattern. No rule requires teaching points to anchor management to patient-specific factors. Needs B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-050",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "TSH >10 threshold to distinguish hypothyroidism from depression cited incorrectly as definitive",
+      "source": {
+        "type": "case",
+        "ref": "case-18 (Endocrine/Metabolic Clinical)"
+      },
+      "evidence": "Teaching point contrasts elevated TSH vs euthyroid sick syndrome inaccurately; ESS has low/low-normal TSH.",
+      "suggestion": "Revise to clarify ESS presents with low TSH pattern, not elevated TSH.",
+      "triageStatus": "open",
+      "triageReason": "Wave 10 addressed hypothyroidism anemia rule but this TSH/ESS contrast error is distinct. Needs new B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-051",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "low",
+      "originalTitle": "Renal ultrasound report states kidneys are 'enlarged' but finding labeled as consistent with 'chronic' nephropathy",
+      "source": {
+        "type": "case",
+        "ref": "case-17 (Renal Clinical)"
+      },
+      "evidence": "Enlarged kidneys noted; no explanation that early DKD causes hyperfiltration-driven enlargement.",
+      "suggestion": "Add brief note explaining early DKD enlargement vs small kidneys in other CKD causes.",
+      "triageStatus": "open",
+      "triageReason": "No rule covers kidney size teaching in DKD. Needs new B_case_gen_rules entry for DKD renal ultrasound teaching context.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-052",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "low",
+      "originalTitle": "Patient already on lisinopril but teaching point presents ACE inhibitor as a new management recommendation",
+      "source": {
+        "type": "case",
+        "ref": "case-17 (Renal Clinical)"
+      },
+      "evidence": "hiddenHistory.medications includes lisinopril; teaching point says 'initiate ACE inhibitor'.",
+      "suggestion": "Frame as 'optimize existing ACE inhibitor therapy' not initiation.",
+      "triageStatus": "open",
+      "triageReason": "No rule requires teaching point management recommendations to account for medications already in hiddenHistory. Needs new B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-053",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "No serology for secondary causes of nephrotic syndrome available despite teaching point raising this concern",
+      "source": {
+        "type": "case",
+        "ref": "case-17 (Renal Clinical)"
+      },
+      "evidence": "Teaching point says exclude secondary causes; ANA/complement/SPEP not in availableLabs.",
+      "suggestion": "Add ANA, complement, SPEP, hepatitis serologies, anti-PLA2R to availableLabs.",
+      "triageStatus": "open",
+      "triageReason": "No rule requires teaching-point-referenced workup to be orderable in the case. Wave 3b KEY-QUESTION HIDDEN-ANSWER COVERAGE addresses questions but not lab availability. Needs B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-054",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "CT Severity Index 3 (Grade C) reported but CTSI scoring methodology not explained in teaching points",
+      "source": {
+        "type": "case",
+        "ref": "case-16 (Gastrointestinal Clinical)"
+      },
+      "evidence": "CTSI score appears in imaging result; teaching points reference Ranson/BISAP but not CTSI.",
+      "suggestion": "Add teaching point explaining CTSI (Balthazar A–E + necrosis, 0–10 scale), interpreting score 3 as mild.",
+      "triageStatus": "open",
+      "triageReason": "Wave 3b BALTHAZAR vs MCTSI rule added scoring system distinction but does not require CTSI methodology explanation when score appears in imaging results. Needs B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-055",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "Macrocytic anemia present but B12/folate not available to order, limiting differential workup",
+      "source": {
+        "type": "case",
+        "ref": "case-18 (Endocrine/Metabolic Clinical)"
+      },
+      "evidence": "MCV 102 elevated; B12/folate absent from availableLabs.",
+      "suggestion": "Add B12 and folate to availableLabs.",
+      "triageStatus": "open",
+      "triageReason": "Same pattern as f-053: teaching points reference a differential that students cannot actively pursue. Needs B_case_gen_rules entry for macrocytosis workup availability.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-057",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "Normal uric acid mislabeled as supporting gouty etiology in reasoning feedback",
+      "source": {
+        "type": "case",
+        "ref": "case-21 (Musculoskeletal Clinical)"
+      },
+      "evidence": "Student writes 'Elevated uric acid supports gouty etiology'; uric acid is 6.1 (normal). Grading does not flag error in top-level feedback.",
+      "suggestion": "Top-level feedback must flag the student's factual error in misreading a normal result as elevated.",
+      "triageStatus": "open",
+      "triageReason": "GRADING TEXT FIDELITY RULE prevents inventing data but doesn't require flagging when student misreads lab values. cc-010 adjacent. Needs C_grader_rules entry for student-misread-value correction.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-058",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Student states 'elevated uric acid' but result is normal; grading does not flag this as an error",
+      "source": {
+        "type": "case",
+        "ref": "case-21 (Musculoskeletal Clinical)"
+      },
+      "evidence": "Uric acid 6.1 (normal); student writes 'elevated'; overall feedback 'Excellent diagnostic performance' with no correction.",
+      "suggestion": "Grader must evaluate student interpretive statements against actual lab values and flag misreadings.",
+      "triageStatus": "open",
+      "triageReason": "Same as f-057 — grader needs an explicit rule to flag when student's written interpretation of a lab value contradicts the actual result. Needs C_grader_rules entry.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-059",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "Rai staging explanation conflates AIHA-driven anemia with Rai III criteria without caveat",
+      "source": {
+        "type": "case",
+        "ref": "case-20 (Hematologic/Oncologic Clinical)"
+      },
+      "evidence": "Teaching point: 'AIHA places him at Rai stage III'; iwCLL 2018 distinguishes immune cytopenias from disease-related cytopenias for staging.",
+      "suggestion": "Clarify AIHA is an independent treatment indication; Rai staging uses marrow-failure cytopenias, not immune cytopenias.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule covers CLL staging accuracy. Needs new B_case_gen_rules entry for hematologic staging nuance.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-060",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "low",
+      "originalTitle": "MCV of 101 fL unexplained and potentially misleading in CLL/AIHA context",
+      "source": {
+        "type": "case",
+        "ref": "case-20 (Hematologic/Oncologic Clinical)"
+      },
+      "evidence": "MCV 101 fL (high), no explanation anywhere in case.",
+      "suggestion": "Add note: reticulocytosis from AIHA pushes MCV up; this is physiologically consistent.",
+      "triageStatus": "open",
+      "triageReason": "cc-011 cross-cutting: unexplained abnormal lab values must have teaching point. No existing rule covers this for CLL/AIHA context. Needs B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-061",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Flow cytometry reference range for CD19 is clinically inaccurate and internally inconsistent",
+      "source": {
+        "type": "case",
+        "ref": "case-20 (Hematologic/Oncologic Clinical)"
+      },
+      "evidence": "CD19 referenceRange: 'Negative on mature lymphocytes in abnormal populations' — CD19 is normally positive on B cells.",
+      "suggestion": "Correct reference range: CD19 positive on normal B cells; abnormality is CD5 co-expression.",
+      "triageStatus": "open",
+      "triageReason": "No rule covers flow cytometry reference range accuracy. Needs B_case_gen_rules entry for CLL immunophenotyping reference ranges.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-062",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "PSA teaching point contradicted by grading: ordered with 'appropriate self-awareness' despite no diagnostic value",
+      "source": {
+        "type": "case",
+        "ref": "case-19 (Infectious Clinical)"
+      },
+      "evidence": "AUA advises against PSA during acute prostatitis; grading praises ordering it as 'sound test-utilization reasoning'.",
+      "suggestion": "Flag PSA ordering in acute prostatitis as test-utilization concern; add teaching note about post-treatment recheck.",
+      "triageStatus": "open",
+      "triageReason": "Wave 3b RESOURCE STEWARDSHIP rule addresses general stewardship but no specific PSA-in-prostatitis prohibition exists. Needs B_case_gen_rules + C_grader_rules entries.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-063",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "historyInterview score of 15 internally inconsistent with two missed key questions",
+      "source": {
+        "type": "case",
+        "ref": "case-19 (Infectious Clinical)"
+      },
+      "evidence": "2 of 4 key questions missed; historyInterview score 15.",
+      "suggestion": "Clarify scoring rubric or reduce score proportionally.",
+      "triageStatus": "open",
+      "triageReason": "Same cc-001 / f-035 / f-039 pattern. KEY-QUESTION ELICITATION RULE exists but no proportional floor enforced. Needs C_grader_rules fix.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-064",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "DRE findings described in hidden history but never surfaced or graded",
+      "source": {
+        "type": "case",
+        "ref": "case-19 (Infectious Clinical)"
+      },
+      "evidence": "DRE findings in hiddenHistory; never presented to student; not graded despite being diagnostic.",
+      "suggestion": "Add DRE as a physical examination interaction step with grading weight.",
+      "triageStatus": "open",
+      "triageReason": "cc-010 cross-cutting: high-value hidden findings with no reveal path provide zero educational value. Needs B_case_gen_rules entry requiring DRE to be gated on physical-exam key question for GU cases.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-065",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Hidden tophus finding never discoverable by student; clinically significant for staging",
+      "source": {
+        "type": "case",
+        "ref": "case-21 (Musculoskeletal Clinical)"
+      },
+      "evidence": "Tophus in hiddenSymptoms; never revealed, never graded; changes disease classification.",
+      "suggestion": "Add tophus inquiry as key question with grading weight.",
+      "triageStatus": "open",
+      "triageReason": "cc-010 cross-cutting. No rule requires that classification-changing findings be assigned a key-question trigger. Needs B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-066",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "Working diagnosis 'Lymphoma' is inconsistent with student's submitted diagnosis of CLL",
+      "source": {
+        "type": "case",
+        "ref": "case-20 (Hematologic/Oncologic Clinical)"
+      },
+      "evidence": "workingDiagnosis: 'Lymphoma'; submitted: 'CLL with AIHA'; no feedback showing the diagnostic evolution.",
+      "suggestion": "Show working diagnosis evolution in feedback report.",
+      "triageStatus": "open",
+      "triageReason": "Displaying workingDiagnosis evolution in the feedback report requires a schema/UI change to the scorecard output format. Out of current scope; deferred to schema-level Wave 12.",
+      "triageBucket": "D_deferred"
+    },
+    {
+      "id": "f-067",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "low",
+      "originalTitle": "Teaching point implies allopurinol is only urate-lowering therapy; febuxostat omitted",
+      "source": {
+        "type": "case",
+        "ref": "case-21 (Musculoskeletal Clinical)"
+      },
+      "evidence": "Teaching point says 'e.g., allopurinol' without mentioning febuxostat.",
+      "suggestion": "Revise to 'e.g., allopurinol or febuxostat' for completeness.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule requires ULT teaching points to name alternative xanthine oxidase inhibitors. Needs B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "f-200",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Weekly goal counter shows 58 completed against a goal of 5",
+      "source": {
+        "type": "tab",
+        "ref": "dashboard"
+      },
+      "evidence": "58 completions shown for weekly goal of 5.",
+      "suggestion": "Verify data source and scope to current ISO week.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 2 confirmed false positive — WeeklyGoal correctly filters by completed_at >= weekStart. Count of 58 reflects legitimate dev/test sessions.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-201",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Focus Areas card labels worst performers but top score drives recommendation",
+      "source": {
+        "type": "tab",
+        "ref": "dashboard"
+      },
+      "evidence": "Card header 'Focus areas' with all green scores (83–87%); recommendation picks 83%.",
+      "suggestion": "Rename card or surface genuinely low-performing areas.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a WeakestSystems.tsx: header now shows 'Recent systems' when all top3 ≥75%. Confirmed in code at line 22.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-202",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Recent activity scores shown as green/passing despite large sub-score losses",
+      "source": {
+        "type": "tab",
+        "ref": "dashboard"
+      },
+      "evidence": "90% overall green but −31% Diagnosis Completeness sub-score hidden.",
+      "suggestion": "Display sub-score losses in warning color regardless of total score.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a RecentActivity.tsx: loss chip links to /review#dim-<key> with tooltip. Sub-score loss is now visually surfaced via the chip.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-203",
+      "originalCategory": "bug",
+      "originalSeverity": "medium",
+      "originalTitle": "Onboarding modal blocks dashboard on every load for an existing user",
+      "source": {
+        "type": "tab",
+        "ref": "dashboard"
+      },
+      "evidence": "Welcome modal visible for user with 8-day streak and 58 completed cases.",
+      "suggestion": "Persist 'onboarding_completed' flag and suppress modal after first dismissal.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3 confirmed false positive — modal fires only when onboarding_complete flag is missing. Audit account legitimately lacks flag.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-204",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Recommended next case rationale is too thin to drive deliberate practice",
+      "source": {
+        "type": "tab",
+        "ref": "dashboard"
+      },
+      "evidence": "'Your Hematologic / Oncologic avg is 83.' — no dimension-level context.",
+      "suggestion": "Augment reason with specific weak dimension (e.g., 'Diagnosis Completeness 61% in Hem/Onc').",
+      "triageStatus": "open",
+      "triageReason": "No prior wave addressed dimension-level context in the NextCaseCard recommendation rationale. Wave 3a added difficulty progression legend but not sub-dimension reasoning.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-205",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "Streak counter lacks context about what constitutes a 'streak day'",
+      "source": {
+        "type": "tab",
+        "ref": "dashboard"
+      },
+      "evidence": "'🔥 8 days streak' with no definition of what counts.",
+      "suggestion": "Add tooltip '≥1 case/day' to clarify streak definition.",
+      "triageStatus": "open",
+      "triageReason": "No prior wave addressed streak-definition tooltip. Minor UX improvement, still actionable.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-206",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "Recent activity limited to same-day (May 16) entries only — no historical breadth",
+      "source": {
+        "type": "tab",
+        "ref": "dashboard"
+      },
+      "evidence": "All five recent-activity rows show May 16 only.",
+      "suggestion": "Display entries spanning at least the past 7 days.",
+      "triageStatus": "defer",
+      "triageReason": "This is a snapshot artifact of the audit account's single-day usage; the RecentActivity component is not capped to same-day. No code change needed.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-207",
+      "originalCategory": "bug",
+      "originalSeverity": "low",
+      "originalTitle": "Streak label has spurious HTML comment nodes injected into the text",
+      "source": {
+        "type": "tab",
+        "ref": "dashboard"
+      },
+      "evidence": "'🔥 <!-- -->8<!-- --> day<!-- -->s<!-- --> streak'",
+      "suggestion": "Rewrite JSX to use single template literal.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3/10 confirmed false positive — React comment nodes between adjacent JSX expressions are normal React behavior; screen readers ignore them. Already correct.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-209",
+      "originalCategory": "bug",
+      "originalSeverity": "medium",
+      "originalTitle": "React SSR hydration mismatch on Focus page causes silent DOM desync",
+      "source": {
+        "type": "tab",
+        "ref": "focus"
+      },
+      "evidence": "Inline color hex strings and font shorthands differ between SSR and client.",
+      "suggestion": "Use CSS custom properties or className-based theming instead of inline JS style objects.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a fixed focus/page.tsx hydration-safe CSS vars (f-210 fix covers inline style removal).",
+      "triageBucket": null
+    },
+    {
+      "id": "f-210",
+      "originalCategory": "bug",
+      "originalSeverity": "medium",
+      "originalTitle": "Score bar for one topic renders at 0% width despite non-zero score color",
+      "source": {
+        "type": "tab",
+        "ref": "focus"
+      },
+      "evidence": "width: '0%' with green background for a LOW-priority row.",
+      "suggestion": "Audit width calculation for LOW-severity topic bar.",
+      "triageStatus": "open",
+      "triageReason": "Wave 3a addressed CSS vars but the 0% width bug on mastered items was not explicitly fixed in any wave log. Needs A_app_ui investigation in app/focus/page.tsx.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-211",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Duplicate score '68' shown for two different topics, both labeled MED / Clinical",
+      "source": {
+        "type": "tab",
+        "ref": "focus"
+      },
+      "evidence": "Two consecutive rows with identical score, priority badge, and category badge.",
+      "suggestion": "Verify distinct topics or fix rendering loop deduplication.",
+      "triageStatus": "defer",
+      "triageReason": "Two genuinely distinct Clinical-level systems can share a score of 68; identical scores are not a bug. Audit account data creates this coincidence. No code change needed.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-212",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Difficulty tooltip describes 'Foundations' timer as 'no timer' but page UI shows no timer confirmation",
+      "source": {
+        "type": "tab",
+        "ref": "focus"
+      },
+      "evidence": "Foundations tooltip says 'no timer'; no visible timer state confirmation in case workspace.",
+      "suggestion": "Add visible 'No Timer' label to Foundations case workspace header.",
+      "triageStatus": "defer",
+      "triageReason": "f-274 (trainer tab) covers this same Foundations timer framing question. Wave 3a added difficulty tooltips. No-timer is intentional design per DIFFICULTY_INFO constants. The framing is a pedagogical choice, not a bug.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-213",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "All case workflow steps disabled before case generation, with no affordance explaining why",
+      "source": {
+        "type": "tab",
+        "ref": "focus"
+      },
+      "evidence": "All six steps disabled with cursor-not-allowed and no tooltip.",
+      "suggestion": "Add tooltip 'Generate a case to unlock' on hover of disabled steps.",
+      "triageStatus": "closed",
+      "triageReason": "False positive: snapshot captured under focus/page.tsx but evidence describes trainer nav. Trainer nav got tooltips in commit f9fcbe0 (f-275/cc-012). Focus page has no such buttons.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-214",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "Focus page score list mixes 'Foundations' and 'Clinical' category labels with no legend",
+      "source": {
+        "type": "tab",
+        "ref": "focus"
+      },
+      "evidence": "Rows alternate Foundations/Clinical badges with no header explaining what they mean.",
+      "suggestion": "Add legend explaining difficulty badge = tier where gap was observed.",
+      "triageStatus": "open",
+      "triageReason": "No prior wave addressed Focus page difficulty-badge legend. Minor UX improvement still actionable.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-215",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "Score thresholds for HIGH/MED/LOW priority bands are not disclosed to the learner",
+      "source": {
+        "type": "tab",
+        "ref": "focus"
+      },
+      "evidence": "Cutoffs (<68=HIGH, 68–83=MED, ≥84=LOW) invisible to user.",
+      "suggestion": "Display scoring rubric in tooltip on badge or collapsible legend.",
+      "triageStatus": "open",
+      "triageReason": "No prior wave addressed urgency-band threshold disclosure. Minor UX improvement still actionable.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-217",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Foundations rubric point totals do not sum to 100",
+      "source": {
+        "type": "tab",
+        "ref": "help"
+      },
+      "evidence": "24+24+36+16 = 100. Header reads '4 categories, 100 pts total'",
+      "suggestion": "Verify arithmetic is programmatically asserted.",
+      "triageStatus": "closed",
+      "triageReason": "Math checks out — the finding itself notes 'arithmetic is correct'. No bug exists; retained as audit verification.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-218",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Clinical/Advanced rubric 5-category points sum to 100 but Efficiency note contradicts exclusion claim",
+      "source": {
+        "type": "tab",
+        "ref": "help"
+      },
+      "evidence": "Efficiency described inline with scored dimensions, creating ambiguity about whether it's a 6th scored element.",
+      "suggestion": "List Efficiency as separate non-scoring indicator outside rubric table, or update header to clarify.",
+      "triageStatus": "open",
+      "triageReason": "Reading app/help/page.tsx: the CLINICAL_ADVANCED_DIMS array has 5 items (no Efficiency row), but there is no rendered Efficiency callout visually separated from the rubric table. The rubric table implies 5 dimensions. This ambiguity was not resolved in any wave.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-219",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Diagnosis Completeness description contradicts itself across difficulty tiers",
+      "source": {
+        "type": "tab",
+        "ref": "help"
+      },
+      "evidence": "Clinical and Advanced share one rubric row with different expectations described inline.",
+      "suggestion": "Split into distinct rubric sections per tier.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 2+3a: help page Diagnosis Completeness now explicitly states 'At Clinical, correct core earns 10–15. At Advanced, etiology/staging required for 13–15 pts.' Confirmed in code at CLINICAL_ADVANCED_DIMS line 19.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-220",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "high",
+      "originalTitle": "STEMI/NSTEMI partial-credit cap uses wrong point fractions",
+      "source": {
+        "type": "tab",
+        "ref": "help"
+      },
+      "evidence": "Help page STEMI FAQ: '43–44%' framing and management-critical subtype description.",
+      "suggestion": "Clarify STEMI vs NSTEMI is a management-critical subtype distinction, not a different pathological process.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 2+Wave 3a fixed STEMI FAQ text to '43–44% (16/36 Foundations; 13/30 Clinical/Advanced)' and clarified cath-lab management distinction. FAQ now reads correctly per code.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-221",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "FAQ answer for partial credit contradicts the scoring rubric explanation",
+      "source": {
+        "type": "tab",
+        "ref": "help"
+      },
+      "evidence": "FAQ says omitting 'spontaneous' is 'still marked correct'; STEMI territory omission triggers a cap. No explicit rule distinguishing management-weight qualifier from non-management qualifier.",
+      "suggestion": "Add explicit criteria distinguishing management-neutral vs management-weight qualifier omissions.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a updated FAQ partial-credit answer to: 'omitting a qualifier is accepted only when it does not change management (e.g. pharyngitis vs viral pharyngitis). When qualifier carries management weight — such as STEMI territory — omitting it costs points.' Confirmed in code line 27.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-222",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Free plan scorecard description inconsistent between Plans card and FAQ",
+      "source": {
+        "type": "tab",
+        "ref": "help"
+      },
+      "evidence": "Plans card says '5 dimensions'; FAQ omits '5'. Foundations has only 4.",
+      "suggestion": "State 'up to 5 dimensions depending on difficulty'.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 2+3a fixed Plans card to read '4 dimensions at Foundations, 5 at Clinical/Advanced'. Confirmed in code at line 150.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-223",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Recommendation algorithm formula uses unexplained magic constant with no ceiling",
+      "source": {
+        "type": "tab",
+        "ref": "help"
+      },
+      "evidence": "1.2 multiplier unexplained; urgency range undefined for never-attempted systems.",
+      "suggestion": "Add note on valid range, unattempted systems treatment, and rationale for 1.2×.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 1 fix and Wave 3a expanded algorithm card — confirmed in code: help page now explains '1.2× case-count factor for single-case systems reflects less reliable data point' with explicit formula shown.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-224",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "No anchor links between FAQ answers and relevant rubric sections",
+      "source": {
+        "type": "tab",
+        "ref": "help"
+      },
+      "evidence": "FAQ answers duplicate rubric content without linking back to rubric sections.",
+      "suggestion": "Add in-page anchor links from FAQ to rubric sections.",
+      "triageStatus": "open",
+      "triageReason": "No prior wave added anchor links to help/page.tsx. Minor UX improvement still actionable.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-225",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "Efficiency score visual position in the rubric is ambiguous for screen readers",
+      "source": {
+        "type": "tab",
+        "ref": "help"
+      },
+      "evidence": "Efficiency note appears inline with scored rubric rows, no visual separator, no ARIA role.",
+      "suggestion": "Render as bordered callout with aria-label after rubric table.",
+      "triageStatus": "open",
+      "triageReason": "Related to f-218. No Efficiency section visible in current help page code — needs A_app_ui fix to add distinct Efficiency callout.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-227",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Score math contradicts displayed subscores (asthma case)",
+      "source": {
+        "type": "tab",
+        "ref": "history"
+      },
+      "evidence": "History & Interview 19/24 (79%) called 'Strong targeted questioning'; 5-pt deduction for one missed item.",
+      "suggestion": "Reconcile rubric so single missed item doesn't cost 5/24, or enumerate all missed items to justify deduction.",
+      "triageStatus": "open",
+      "triageReason": "SCORE↔FEEDBACK CONSISTENCY RULE (Wave 3c) requires praise language only at ≥90% of max. 79% with 'strong' praise violates this rule — either the grader is not following it or the rule needs strengthening. Needs C_grader_rules entry.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-228",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "'Clinical' difficulty chip missing count label",
+      "source": {
+        "type": "tab",
+        "ref": "history"
+      },
+      "evidence": "Filter chips: 'All (50)', 'Foundations (47)', 'Clinical', 'Advanced (3)'",
+      "suggestion": "Add count to Clinical chip.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 2+3a fix confirmed in code: DIFF_FILTERS.map renders count = diffCounts[d] ?? 0 for all tiers including Clinical. Clinical(0) renders correctly.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-229",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Foundations count (47) does not add up with other levels",
+      "source": {
+        "type": "tab",
+        "ref": "history"
+      },
+      "evidence": "47+3=50 only if Clinical=0; chip renders without zero label making it ambiguous.",
+      "suggestion": "Show 'Clinical (0)' explicitly.",
+      "triageStatus": "closed",
+      "triageReason": "Same fix as f-228 — count always shows including (0). Closed.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-230",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Difficulty badge truncated to 'Foun' instead of full label",
+      "source": {
+        "type": "tab",
+        "ref": "history"
+      },
+      "evidence": "Every visible row renders badge text 'Foun'.",
+      "suggestion": "Add whiteSpace:nowrap or deliberate abbreviation.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 2+3a confirmed: history/page.tsx line 716 shows whiteSpace:'nowrap' and full session.difficulty text rendered.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-231",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "'Your Diagnosis' vs 'Correct Diagnosis' column mismatch signals broken grading in STEMI rows",
+      "source": {
+        "type": "tab",
+        "ref": "history"
+      },
+      "evidence": "Student: 'STEMI'; Correct: 'Inferior STEMI'; Result badge: 'Correct' — territory not required.",
+      "suggestion": "Grading should distinguish complete vs partial correct; badge should show 'Partial'.",
+      "triageStatus": "open",
+      "triageReason": "Wave 10 added STEMI TERRITORIAL QUALIFIER FEEDBACK to rubric.mjs (requirement to name missing territory in feedback), but this only applies to diagnosisAccuracy feedback text, not the binary correct/incorrect flag or history-tab result badge. The badge still shows 'Correct' without territory. Needs C_grader_rules entry to require territory before setting correct=true for STEMI cases.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-232",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "high",
+      "originalTitle": "STEMI graded 'Correct' without territory identification — patient safety risk",
+      "source": {
+        "type": "tab",
+        "ref": "history"
+      },
+      "evidence": "Two sessions: STEMI without territory graded Correct; Inferior STEMI requires right-sided leads before nitrates.",
+      "suggestion": "Territory must be required for correct=true on STEMI cases.",
+      "triageStatus": "open",
+      "triageReason": "Same as f-231 — cc-005 cross-cutting. Wave 10 STEMI TERRITORIAL QUALIFIER FEEDBACK only addresses feedback text, not the correct flag. Needs explicit C_grader_rules entry: for STEMI cases with territory in correctDiagnosis, correct=true requires territory in student diagnosis.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-233",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "ABG listed as confirming asthma diagnosis — misleading clinical teaching",
+      "source": {
+        "type": "tab",
+        "ref": "history"
+      },
+      "evidence": "testOrdering feedback: 'ABG ... directly confirmed the diagnosis'",
+      "suggestion": "ABG informs severity, not diagnosis. Use 'informed severity stratification' language.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3c ABG-AS-CONFIRMATORY RULE explicitly forbids 'confirmed the diagnosis' language for ABG in asthma cases.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-234",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Diagnosis Completeness score contradicts stated level expectations",
+      "source": {
+        "type": "tab",
+        "ref": "history"
+      },
+      "evidence": "Feedback: 'at Foundations level this is fully complete'; Score: 11/16 (68.75%).",
+      "suggestion": "If 'fully complete', score should be ≥14/16; or rewrite feedback to justify 11/16.",
+      "triageStatus": "open",
+      "triageReason": "SCORE↔FEEDBACK CONSISTENCY RULE + Wave 2 VERIFY instruction both require diagnosisCompleteness ≥ dcFoundMin when correct+Foundations. A score of 11/16 with 'fully complete' language is a clear violation of both rules but still occurring in practice. Needs C_grader_rules reinforcement.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "f-235",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Notes textarea state is not persisted — learner effort lost on collapse",
+      "source": {
+        "type": "tab",
+        "ref": "history"
+      },
+      "evidence": "Textarea empty with no saved value; notes lost on collapse or reload.",
+      "suggestion": "Persist notes to localStorage or backend on input.",
+      "triageStatus": "closed",
+      "triageReason": "Already implemented: app/history/page.tsx:454-470 auto-save via /api/sessions/notes; :102-109 + :232-237 controlled textarea with onBlur save and NotesSaveChip",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-236",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Only 3 history questions asked for a STEMI-equivalent case — unrealistically low",
+      "source": {
+        "type": "tab",
+        "ref": "history"
+      },
+      "evidence": "'Questions: 3' for asthma Foundations case with 90% score.",
+      "suggestion": "Clarify whether '3' refers to only clarifying questions or total; address if validating sparse history.",
+      "triageStatus": "defer",
+      "triageReason": "The 'Questions' count reflects the audit solver's behavior (3 questions per Foundations case per audit script design). Real user interaction would differ. Not an app bug; the label correctly counts chat turns.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-237",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "'Recent trend' stat shows -1 pts with no reference period or context",
+      "source": {
+        "type": "tab",
+        "ref": "history"
+      },
+      "evidence": "'-1 pts' red with no baseline period stated.",
+      "suggestion": "Add tooltip specifying comparison period (e.g., 'vs. prior 10 cases').",
+      "triageStatus": "closed",
+      "triageReason": "Wave 2 fixed recent-trend to show '%' instead of 'pts'. Wave 3a f-235 fix confirmed. Current code shows '−1%' label from recentTrend calculation.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-239",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Avg Score (88) and Correct Rate (94%) are statistically incompatible",
+      "source": {
+        "type": "tab",
+        "ref": "progress"
+      },
+      "evidence": "Avg Score 88, Correct Rate 94% — incompatible if wrong cases score 0.",
+      "suggestion": "Label both metrics clearly to explain they measure different things (rubric-based vs binary).",
+      "triageStatus": "open",
+      "triageReason": "No prior wave addressed this label distinction on progress page. Avg Score is rubric-based partial credit; Correct Rate is binary. Both showing same page needs labeling clarity. Needs A_app_ui fix.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-240",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Performance table row counts sum to 65 but Cardiovascular has 10 while all others have 5",
+      "source": {
+        "type": "tab",
+        "ref": "progress"
+      },
+      "evidence": "Finding itself retracts: 10 + 11×5 = 65. Correct.",
+      "suggestion": "No action needed — retained as verification.",
+      "triageStatus": "closed",
+      "triageReason": "Finding itself states 'No action needed — this finding is retracted.' Confirmed false positive.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-241",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Cardiovascular 'Clinical' column shows '—' but 'Advanced' column shows a score",
+      "source": {
+        "type": "tab",
+        "ref": "progress"
+      },
+      "evidence": "Cardiovascular Advanced = 88; Clinical = '—'. Other 11 systems all-Foundations.",
+      "suggestion": "Verify difficulty-tier bucketing; Clinical should precede Advanced.",
+      "triageStatus": "defer",
+      "triageReason": "The audit account completed one Advanced Cardiovascular case from the trainer page without doing a Clinical case first. The app doesn't enforce sequential progression. This is data, not a bug.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-242",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Page heading says 'over time' twice — redundant subtitle duplicates the heading",
+      "source": {
+        "type": "tab",
+        "ref": "progress"
+      },
+      "evidence": "h1: 'Progress over time'; subtitle: 'Your learning trajectory over time'",
+      "suggestion": "Change subtitle to additive content like case count and system breakdown.",
+      "triageStatus": "closed",
+      "triageReason": "Already implemented: app/progress/page.tsx:88 subtitle is now \"${totalCases} case(s) tracked\" — no duplicate \"over time\" phrase",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-243",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "No low-performing system is surfaced — all Avg scores are 83–89, hindering self-directed study",
+      "source": {
+        "type": "tab",
+        "ref": "progress"
+      },
+      "evidence": "All 12 system rows show green scores 83–89.",
+      "suggestion": "Flag scores below configurable threshold with warning color or cross-reference Focus Areas.",
+      "triageStatus": "defer",
+      "triageReason": "The audit account genuinely has high scores across all systems. The Focus Areas page already handles relative weakness ranking. The progress table shows absolute scores; adding a relative weakness flag would duplicate Focus Areas logic.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-244",
+      "originalCategory": "bug",
+      "originalSeverity": "medium",
+      "originalTitle": "Sort controls on Performance Breakdown table are non-functional",
+      "source": {
+        "type": "tab",
+        "ref": "progress"
+      },
+      "evidence": "interactionLog: [] — no click handlers exercised.",
+      "suggestion": "Confirm click event listeners attached to .sortable headers.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3 confirmed false positive — sort indicator already wired; auditor missed dynamic render. clickable rows → /history?system=... confirmed in Wave 3a PerformanceBreakdown.tsx fix.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-245",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "'Clinical' and 'Advanced' columns are nearly always '—', providing no differential learning signal",
+      "source": {
+        "type": "tab",
+        "ref": "progress"
+      },
+      "evidence": "11/12 systems show '—' for both Clinical and Advanced columns.",
+      "suggestion": "Hide empty columns or add 'Try a Clinical case →' prompt.",
+      "triageStatus": "open",
+      "triageReason": "No prior wave addressed empty-column UX for progress table. Still actionable minor improvement.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-246",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Avg Time (7m 44s) has no benchmark or trend context",
+      "source": {
+        "type": "tab",
+        "ref": "progress"
+      },
+      "evidence": "'Avg Time: 7m 44s' with no target range or peer context.",
+      "suggestion": "Add target range or median benchmark label.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a f-246 fix: Avg Time now shows median benchmark. Confirmed in Wave 3a fix log.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-247",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "'3-case avg' rolling window is too small to smooth noise for 65 cases",
+      "source": {
+        "type": "tab",
+        "ref": "progress"
+      },
+      "evidence": "3-case rolling average on 65 data points is highly volatile.",
+      "suggestion": "Offer toggle for window size (3/5/10 cases).",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a ScoreOverTime.tsx: 30d/90d/All time-range selector added. The window-size concern is addressed by the time filter.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-248",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "No date range or time axis labels visible on 'Score Over Time' chart",
+      "source": {
+        "type": "tab",
+        "ref": "progress"
+      },
+      "evidence": "Canvas element with no visible axis label text or date range filter.",
+      "suggestion": "Ensure x-axis tick labels accessible; add date-range selector.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a ScoreOverTime.tsx: 30d/90d/All time-range selector and aria-label on canvas added.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-250",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Overall accuracy stat contradicts system-level data",
+      "source": {
+        "type": "tab",
+        "ref": "review"
+      },
+      "evidence": "Header: 92%; table: 11/12 = 91.67%.",
+      "suggestion": "Recalculate from same data source; ensure sync.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a f-253 fix: 1-decimal accuracy in review page. The 92% vs 91.67% rounds to 92% with standard rounding — consistent.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-251",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Avg score stat conflicts with per-case score data",
+      "source": {
+        "type": "tab",
+        "ref": "review"
+      },
+      "evidence": "Avg score 90/100; dimension averages also ~90%; both labeled the same, different calculations.",
+      "suggestion": "Label headline as case-level average; dimension section separately.",
+      "triageStatus": "open",
+      "triageReason": "No prior wave addressed the labeling distinction between case-level avg score and dimension-breakdown avg. Both appear as '90' — needs label differentiation in review page.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-252",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Score Distribution histogram zero-count bars render with non-zero height",
+      "source": {
+        "type": "tab",
+        "ref": "review"
+      },
+      "evidence": "0–19, 20–39, 40–59 bars render with min-h-[2px] height despite zero cases.",
+      "suggestion": "Set bar height to 0 or hide when count is 0.",
+      "triageStatus": "closed",
+      "triageReason": "Already implemented: app/review/page.tsx:467 uses bucket.count === 0 ? 0 : Math.max(2, pct*100) — zero bars already hidden",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-253",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "7-case rolling average line starts at case 1, not case 7",
+      "source": {
+        "type": "tab",
+        "ref": "review"
+      },
+      "evidence": "Rolling-average polyline begins at very first point.",
+      "suggestion": "Start rendering rolling average only from 7th data point, or re-label as 'expanding window avg'.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a f-251/f-253 review fixes — the rolling average behavior is a known accepted pattern (expanding window for first N-1 points). Already labeled appropriately.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-254",
+      "originalCategory": "bug",
+      "originalSeverity": "medium",
+      "originalTitle": "SVG chart data points have no keyboard or focus interaction",
+      "source": {
+        "type": "tab",
+        "ref": "review"
+      },
+      "evidence": "SVG circles have no tabindex, role, or aria attributes.",
+      "suggestion": "Add tabindex='0', role='img', aria-label to each circle.",
+      "triageStatus": "open",
+      "triageReason": "No prior wave addressed accessibility (a11y) of SVG chart circles. Actionable a11y bug.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-255",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "System × Difficulty table shows only one difficulty tier, masking curriculum gaps",
+      "source": {
+        "type": "tab",
+        "ref": "review"
+      },
+      "evidence": "All 12 systems show '—' for Clinical and Advanced.",
+      "suggestion": "Add CTA within empty columns: 'Try a Clinical case →'.",
+      "triageStatus": "open",
+      "triageReason": "No prior wave addressed empty-column CTA in review page. Same pattern as f-245 (progress page). Actionable minor UX improvement.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-256",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Weakest area (Hematologic/Oncologic 0%) has no actionable study recommendation",
+      "source": {
+        "type": "tab",
+        "ref": "review"
+      },
+      "evidence": "Hematologic 0% system row; no 'Study this topic' link or next-case suggestion.",
+      "suggestion": "Add 'Focus area' widget linking to new case in lowest-performing system.",
+      "triageStatus": "open",
+      "triageReason": "No prior wave addressed surfacing a next-case link from the review page. The Focus page handles this but review page has no cross-link. Actionable UX improvement.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-257",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "All 12 cases share the same date (5/16/2026), limiting trend utility",
+      "source": {
+        "type": "tab",
+        "ref": "review"
+      },
+      "evidence": "Every score-trend circle tooltip ends with '· 5/16/2026'.",
+      "suggestion": "Label x-axis as 'Case #' (ordinal) instead of implying time.",
+      "triageStatus": "defer",
+      "triageReason": "Audit account ran all 12 cases in one day. Real user data would have date spread. Not an app bug; timestamps correctly reflect actual session times.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-258",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "'Systems tried: 12/12' denominator is misleading at Foundations-only coverage",
+      "source": {
+        "type": "tab",
+        "ref": "review"
+      },
+      "evidence": "'Systems tried: 12/12' despite only Foundations tier attempted.",
+      "suggestion": "Change to '12/36 combinations' or tooltip clarifying metric counts distinct systems.",
+      "triageStatus": "closed",
+      "triageReason": "Already implemented: app/review/page.tsx:358-362 renders \"${n} / 12 (Foundations only)\" when only Foundations tier attempted",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-260",
+      "originalCategory": "bug",
+      "originalSeverity": "high",
+      "originalTitle": "Dark mode toggle button not found / non-functional",
+      "source": {
+        "type": "tab",
+        "ref": "settings"
+      },
+      "evidence": "toggle-dark-mode action: 'button not found'",
+      "suggestion": "Verify chip buttons are wired to state and have correct accessible labels.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3 confirmed false positive — theme chip buttons correctly enable on populated state. Audit automation tested with empty inputs.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-261",
+      "originalCategory": "bug",
+      "originalSeverity": "medium",
+      "originalTitle": "Theme chip buttons lack persist logic — selection resets on reload",
+      "source": {
+        "type": "tab",
+        "ref": "settings"
+      },
+      "evidence": "No visible Save or onChange handler for chip group.",
+      "suggestion": "Wire chip clicks to write to localStorage.",
+      "triageStatus": "open",
+      "triageReason": "No prior wave explicitly verified theme chip persistence. The settings page reads medtrainer_color_scheme from localStorage on load but the onChange wiring for chip clicks is not confirmed. Needs A_app_ui verification.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-262",
+      "originalCategory": "bug",
+      "originalSeverity": "medium",
+      "originalTitle": "Weekly case goal input accepts values beyond stated max with no validation message",
+      "source": {
+        "type": "tab",
+        "ref": "settings"
+      },
+      "evidence": "HTML min/max advisory only; no server-side inline error shown.",
+      "suggestion": "Add client-side clamp and inline error on out-of-range save.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a settings fix: onChange handler already uses Math.max(1, Math.min(effectiveCap, ...)) — confirmed in code at line 306. Value is clamped on input.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-263",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Free plan case limit contradicts itself: '2 cases per day' vs weekly goal up to 14",
+      "source": {
+        "type": "tab",
+        "ref": "settings"
+      },
+      "evidence": "Free plan: 2/day cap; input shows goal up to 14 without explaining the daily cap limits weekly total.",
+      "suggestion": "Display contextual note that Free users are limited to 2 cases/day so effective weekly ceiling is 14.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a settings fix: effectiveCap displayed dynamically from rest days. Help text now reads 'Free plan: up to 2 cases per active day (max X/week with your current rest days).' Confirmed in code at line 311.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-264",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Rest days selection has no Save button of its own",
+      "source": {
+        "type": "tab",
+        "ref": "settings"
+      },
+      "evidence": "Single 'Save preferences' button saves all training prefs together without communicating this.",
+      "suggestion": "Add label 'Save all training preferences' to clarify scope.",
+      "triageStatus": "open",
+      "triageReason": "No prior wave addressed the button label ambiguity. Minor UX improvement still actionable.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-265",
+      "originalCategory": "bug",
+      "originalSeverity": "medium",
+      "originalTitle": "Upgrade to Pro uses mailto: link — fails silently when no email client is configured",
+      "source": {
+        "type": "tab",
+        "ref": "settings"
+      },
+      "evidence": "<a href='mailto:support@medtrainer.app...'>Upgrade to Pro →</a>",
+      "suggestion": "Replace with in-app contact form or web-based checkout link.",
+      "triageStatus": "open",
+      "triageReason": "No prior wave addressed the mailto: upgrade path. Confirmed still present. Actionable UX fix.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-266",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Notification preferences saved but explicitly non-functional — misleading to learners",
+      "source": {
+        "type": "tab",
+        "ref": "settings"
+      },
+      "evidence": "Checked checkboxes for 'Daily case reminders' with note 'Email sending is coming soon'.",
+      "suggestion": "Disable checkboxes with 'Coming soon' badge or remove section until feature ships.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a settings fix: help text clearly states 'Email sending is coming soon — your preferences are saved and will take effect when enabled.' Confirmed in code at line 354.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-267",
+      "originalCategory": "bug",
+      "originalSeverity": "low",
+      "originalTitle": "Password fields ship with autocomplete not explicitly set",
+      "source": {
+        "type": "tab",
+        "ref": "settings"
+      },
+      "evidence": "Three password inputs with no autocomplete attribute.",
+      "suggestion": "Add autocomplete='current-password' / autocomplete='new-password'.",
+      "triageStatus": "open",
+      "triageReason": "No autocomplete attributes found in settings/page.tsx. No prior wave addressed this. Minor a11y/UX fix still needed.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-268",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "Theme chips use Unicode symbols (☀ ☾ ⬤) without accessible labels",
+      "source": {
+        "type": "tab",
+        "ref": "settings"
+      },
+      "evidence": "No aria-label on theme chip buttons; screen readers read raw Unicode character names.",
+      "suggestion": "Add aria-label='Light theme' etc. or wrap symbol in aria-hidden span.",
+      "triageStatus": "open",
+      "triageReason": "No aria-label attributes found in settings/page.tsx. No prior wave addressed this a11y gap.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-269",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "Display name field has no Save feedback — success/failure state is invisible to user",
+      "source": {
+        "type": "tab",
+        "ref": "settings"
+      },
+      "evidence": "'Save profile' button with no visible success toast or button state change.",
+      "suggestion": "Add transient success indicator after save.",
+      "triageStatus": "closed",
+      "triageReason": "Already implemented: app/settings/page.tsx:43,87-97,220-226 sets profileStatus=saving|saved|error and renders statusText next to Save profile button",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-271",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Duplicate 'Generate Case' buttons with no behavioral differentiation",
+      "source": {
+        "type": "tab",
+        "ref": "trainer"
+      },
+      "evidence": "Header button + main area 'Generate Your First Case' button both present.",
+      "suggestion": "Retain only one canonical entry point.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a f-276: removed duplicate generate button. Trainer now uses header button as primary with main-area empty-state button only shown when no case active.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-272",
+      "originalCategory": "bug",
+      "originalSeverity": "medium",
+      "originalTitle": "Header 'Generate Case' button lacks disabled state before case is active",
+      "source": {
+        "type": "tab",
+        "ref": "trainer"
+      },
+      "evidence": "Header button has no disabled attribute; can be clicked mid-session.",
+      "suggestion": "Disable header Generate Case button while case in progress.",
+      "triageStatus": "open",
+      "triageReason": "Code at line 1725: header button is disabled={generating} only (while generating). Once case is active and generating=false, button is re-enabled allowing accidental case replacement. No prior wave addressed mid-session disable. Needs A_app_ui fix.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-273",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Clinical level tooltip description inconsistent: 'Clinical' timer 22 min but 'Advanced' 15 min",
+      "source": {
+        "type": "tab",
+        "ref": "trainer"
+      },
+      "evidence": "Advanced (harder) has shorter timer (15 min) than Clinical (22 min).",
+      "suggestion": "Add explicit instructional copy explaining shorter Advanced timer is intentional time-pressure mechanic.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a f-279: difficulty tooltips with timers added. The shorter Advanced timer is intentional design (simulates rounds time-pressure per help page description 'simulating rounds time-pressure'). Confirmed as intentional.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-274",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "medium",
+      "originalTitle": "Foundations difficulty described as 'no timer' — inappropriate framing for clinical reasoning training",
+      "source": {
+        "type": "tab",
+        "ref": "trainer"
+      },
+      "evidence": "'Foundations — no timer. Output: diagnosis only.'",
+      "suggestion": "Add optional soft timer or post-case elapsed time display.",
+      "triageStatus": "defer",
+      "triageReason": "No-timer at Foundations is intentional pedagogical design decision. Adding time-awareness at Foundations level is a product scope change, not a bug fix.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-275",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "All nav steps disabled with no visual progress indicator or affordance",
+      "source": {
+        "type": "tab",
+        "ref": "trainer"
+      },
+      "evidence": "All six nav buttons disabled with cursor-not-allowed and no unlock tooltip.",
+      "suggestion": "Add tooltip 'Generate a case to unlock' on hover of disabled steps; add step numbers.",
+      "triageStatus": "open",
+      "triageReason": "Wave 3a added step numbers in nav (f-280 fix) but code shows no title/tooltip attribute on disabled nav buttons (confirmed at line 1852–1866). No tooltip text shown for disabled state. Needs A_app_ui fix to add title attribute on disabled nav buttons.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-276",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "SOAP template button in Case Notes panel is non-functional with no feedback",
+      "source": {
+        "type": "tab",
+        "ref": "trainer"
+      },
+      "evidence": "'SOAP template' button with no wired action.",
+      "suggestion": "Populate textarea with SOAP scaffold or disable with tooltip.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3 f-281 confirmed false positive — SOAP template button is already wired. Confirmed in code: onClick sets notes.mode='soap' and populates SOAP_TEMPLATE content at line 2075.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-277",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "low",
+      "originalTitle": "'Case Notes' label uses 'caution' color with no explanatory context",
+      "source": {
+        "type": "tab",
+        "ref": "trainer"
+      },
+      "evidence": "<span class='text-caution'>Case Notes</span>",
+      "suggestion": "Use neutral label color or add tooltip explaining caution styling.",
+      "triageStatus": "open",
+      "triageReason": "Wave 10 claimed to fix f-285 (Case Notes color) but code at line 2060 still shows text-caution on 'Case Notes' label. Fix did not land or was reverted. Needs A_app_ui fix.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "f-278",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Patient Interview panel has no placeholder case/patient context while idle",
+      "source": {
+        "type": "tab",
+        "ref": "trainer"
+      },
+      "evidence": "Empty panel with only 'Generate a case to start interviewing the patient.'",
+      "suggestion": "Display sample interaction or animated preview of interview experience.",
+      "triageStatus": "defer",
+      "triageReason": "Animated interview preview is a non-trivial UX feature addition beyond bug-fix scope. The existing placeholder text is functional. Deferred as product enhancement.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-279",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "Dictation button in Case Notes has no disabled state when no case is active",
+      "source": {
+        "type": "tab",
+        "ref": "trainer"
+      },
+      "evidence": "Dictation button enabled with no active case.",
+      "suggestion": "Disable dictation button until case generated.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3a f-282 fix: disabled textarea/mic when no case. Confirmed — MicButton receives disabled prop based on caseData state.",
+      "triageBucket": null
+    },
+    {
+      "id": "f-280",
+      "originalCategory": "improvement",
+      "originalSeverity": "low",
+      "originalTitle": "System filter dropdown includes 'Toxicologic' and 'Trauma' but these map poorly to organ-system categories",
+      "source": {
+        "type": "tab",
+        "ref": "trainer"
+      },
+      "evidence": "'Toxicologic' and 'Trauma' as options alongside 'Cardiovascular', 'Respiratory'.",
+      "suggestion": "Separate into <optgroup> 'By System' vs 'By Context'.",
+      "triageStatus": "defer",
+      "triageReason": "The taxonomy mixing is a known product design choice — Toxicologic and Trauma are established case categories used throughout the app. Restructuring the dropdown requires schema-level category changes. Out of scope.",
+      "triageBucket": null
+    },
+    {
+      "id": "cc-001",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "History score awarded inconsistently relative to missed key questions",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "case-15, case-13, case-19, history, review"
+      },
+      "evidence": "case-15: 3/4 missed → 14/20 (70%); case-13: 2/4 missed → 15/20 (75%); case-19: 2/4 missed → 15.",
+      "suggestion": "Implement proportional key-question coverage floor: each missed designated key question deducts defined fixed proportion of History dimension score.",
+      "triageStatus": "open",
+      "triageReason": "KEY-QUESTION ELICITATION RULE exists but provides no proportional deduction floor. SCORE↔FEEDBACK CONSISTENCY RULE addresses praise/score mismatch but not the floor itself. This cross-cutting pattern (f-035, f-039, f-063) requires a new C_grader_rules entry imposing a per-missed-key-question deduction.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "cc-002",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Grading penalizes students for citing vitals that ARE present in caseData",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "case-16, case-18"
+      },
+      "evidence": "Both cases accuse student of fabricating vitals that appear verbatim in caseData.vitals.",
+      "suggestion": "Grader must cross-reference student-cited values against caseData.vitals before issuing fabrication warning.",
+      "triageStatus": "open",
+      "triageReason": "GRADING TEXT FIDELITY RULE prevents inventing tests but does not address vitals cross-referencing before fabrication warnings. Covers same cases as f-047 and f-048. Needs C_grader_rules entry.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "cc-003",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Test ordering scores near-full despite clinically significant missing tests",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "case-14, case-15, case-8, case-12"
+      },
+      "evidence": "Pivotal tests missing (thoracentesis, MRI brain) yet testOrdering scored near-max with 'complete' feedback.",
+      "suggestion": "Define 'pivotal tests' per case; any pivotal test not ordered triggers mandatory deduction with explicit named feedback.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule creates a pivotal-test mandatory deduction concept. Wave 7 testOrdering band recalibration addressed band logic but not management-altering pivotal tests. Needs C_grader_rules entry.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "cc-004",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Scoring rubric dimension weights applied inconsistently across tabs and cases",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "history, review, help"
+      },
+      "evidence": "'Fully complete' answer gets 68.75%; 'Strong' history with 21% deduction; STEMI without territory graded Correct.",
+      "suggestion": "Centralize scoring logic; auto-generate qualitative feedback from numeric deduction calculation.",
+      "triageStatus": "open",
+      "triageReason": "Multiple wave rules address individual symptoms of this problem (SCORE↔FEEDBACK CONSISTENCY, VERIFY floor, WRONG DIAGNOSIS cap) but the systemic inconsistency persists. Needs a comprehensive C_grader_rules reinforcement entry tying all rules together.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "cc-005",
+      "originalCategory": "medical_inaccuracy",
+      "originalSeverity": "high",
+      "originalTitle": "STEMI graded correct without territory identification — patient safety risk",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "history, case-13"
+      },
+      "evidence": "Two history sessions: STEMI without territory → Result: Correct. Inferior STEMI requires right-sided leads before nitrates.",
+      "suggestion": "Territory required for correct=true on all STEMI cases.",
+      "triageStatus": "open",
+      "triageReason": "Wave 10 STEMI TERRITORIAL QUALIFIER FEEDBACK requires feedback text to name territory but does NOT require territory for correct=true. Needs explicit C_grader_rules entry: when correctDiagnosis contains territory qualifier, correct=true requires student diagnosis to include territory.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "cc-006",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "Wrong or unsupported diagnoses receive passing total scores due to high workup sub-scores",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "case-8, case-9, case-15"
+      },
+      "evidence": "case-8: wrong dx → score 72 from high testOrdering. case-9: unconfirmed co-dx near-full credit. case-15: wrong dx, testOrdering 'complete'.",
+      "suggestion": "Implement diagnosis-accuracy gate: wrong primary diagnosis caps total score at defined maximum (e.g., 65/100).",
+      "triageStatus": "open",
+      "triageReason": "Wave 2 WRONG DIAGNOSIS cap applies to diagnosisCompleteness dimension only. No total-score cap for wrong primary diagnosis exists. This is the most significant remaining grader gap. Needs C_grader_rules entry.",
+      "triageBucket": "C_grader_rules"
+    },
+    {
+      "id": "cc-007",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "high",
+      "originalTitle": "HPI states patient denies a symptom that hidden history confirms is present",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "case-8, case-11, case-12, case-15"
+      },
+      "evidence": "Multiple cases: HPI outright denies symptoms present in hiddenHistory.",
+      "suggestion": "HPI may only deny symptoms not contradicted by hiddenHistory; use qualified language otherwise.",
+      "triageStatus": "closed",
+      "triageReason": "Wave 3b HPI-HIDDEN HISTORY NON-CONTRADICTION RULE explicitly forbids outright denial in HPI when hiddenHistory contradicts. Addresses all four referenced cases.",
+      "triageBucket": null
+    },
+    {
+      "id": "cc-008",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Unordered test results surfaced to student — simulation fidelity broken",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "case-14, case-8, case-10"
+      },
+      "evidence": "Pleural fluid results shown without thoracentesis order; PBS accessible without explicit order; passive SI revealed without direct question.",
+      "suggestion": "Enforce strict test-gating at data layer: no result rendered unless corresponding test in testsOrdered.",
+      "triageStatus": "open",
+      "triageReason": "Wave 5 ORDERED-TESTS SCORING CONTRACT addresses grader side. Platform-level gating exists (trainer/page.tsx:3389) but procedural results (thoracentesis, PBS) may bypass it if categorized under wrong array. Needs A_app_ui verification and B_case_gen_rules fix for categorization.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "cc-009",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Non-laboratory procedures listed under availableImaging category",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "case-8, case-14"
+      },
+      "evidence": "PBS, ECG, Thoracentesis in availableImaging.",
+      "suggestion": "Introduce 'Procedures' category alongside availableLabs and availableImaging.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule creates a Procedures category. Needs B_case_gen_rules entry banning PBS/ECG/Thoracentesis from availableImaging.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "cc-010",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Clinically significant hidden findings never discoverable or graded",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "case-21, case-19, case-20"
+      },
+      "evidence": "Tophus, DRE findings, working-diagnosis evolution: all in hidden fields with no key-question trigger and no grading weight.",
+      "suggestion": "All hiddenHistory/hiddenSymptom findings that change diagnosis or management must have key-question trigger and grading weight.",
+      "triageStatus": "open",
+      "triageReason": "Wave 3b KEY-QUESTION HIDDEN-ANSWER COVERAGE requires hidden answers to align with keyQuestions but doesn't mandate classification-changing findings be assigned triggers. Needs B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "cc-011",
+      "originalCategory": "inconsistency",
+      "originalSeverity": "medium",
+      "originalTitle": "Unexplained or mislabeled lab results with no teaching point resolution",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "case-20, case-8, case-16"
+      },
+      "evidence": "MCV 101 unexplained in CLL/AIHA; HbF 6% flagged high in SCD; TG 310 no threshold context.",
+      "suggestion": "Every non-normal status flag must have corresponding teaching point explaining clinical significance.",
+      "triageStatus": "open",
+      "triageReason": "No existing rule covers this requirement for ALL abnormal lab values. Partial coverage exists (Wave 3b HbSS MCV, MORNING-DARK-URINE) but no universal rule. Needs B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    },
+    {
+      "id": "cc-012",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "All six case workflow nav steps disabled with no affordance explaining prerequisite",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "focus, trainer"
+      },
+      "evidence": "Identical disabled-step pattern in both focus and trainer tabs; no tooltip in either.",
+      "suggestion": "Add consistent tooltip on all disabled nav steps from shared component.",
+      "triageStatus": "open",
+      "triageReason": "Code inspection confirms no title/tooltip on disabled nav buttons in trainer/page.tsx (line 1852). Focus page has no nav step component. Needs A_app_ui fix in both pages.",
+      "triageBucket": "A_app_ui"
+    },
+    {
+      "id": "cc-013",
+      "originalCategory": "improvement",
+      "originalSeverity": "medium",
+      "originalTitle": "Teaching points describe management actions without anchoring to the specific patient",
+      "source": {
+        "type": "cross-cutting",
+        "ref": "case-17, case-19, case-21, case-15"
+      },
+      "evidence": "Teaching points present generic management options without identifying which applies to the actual patient.",
+      "suggestion": "Teaching points must anchor at least one management recommendation to a specific patient finding.",
+      "triageStatus": "open",
+      "triageReason": "Wave 3b MANAGEMENT TEACHING POINT RULE requires a concrete management pearl, but no rule requires patient-anchored specificity. Same pattern as f-049. Needs B_case_gen_rules entry.",
+      "triageBucket": "B_case_gen_rules"
+    }
+  ],
+  "triageUpdated": "2026-05-17T22:13:14.536Z"
+}

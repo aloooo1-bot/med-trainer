@@ -116,7 +116,7 @@ export default function ProgressPage() {
               </div>
               <ScoreOverTime sessions={sessions} />
               <ComponentScoreTrends sessions={sessions} />
-              <PerformanceBreakdown sessions={sessions.filter(s => s.system)} />
+              <PerformanceBreakdown sessions={sessions.filter(s => s.system)} tier={tier} />
               <ActivityCalendar sessions={sessions} />
             </>
           )}

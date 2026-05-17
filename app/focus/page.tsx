@@ -146,7 +146,8 @@ export default function FocusAreasPage() {
             <div className="dx-card-header">
               <div style={{ fontWeight: 700 }}>Your Study Queue</div>
               <div style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)', marginTop: 2 }}>
-                Systems ranked by urgency — gap from 100, boosted if only one case on record
+                Systems ranked by urgency — gap from 100, boosted if only one case on record.
+                Tier shown is the recommended next attempt based on your current score.
               </div>
             </div>
             <div style={{ padding: '4px 0' }}>
@@ -177,10 +178,12 @@ export default function FocusAreasPage() {
                     <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, fontSize: 13, color: urgencyColor, flexShrink: 0 }}>
                       {s.score}
                     </span>
-                    <span style={{
-                      fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4,
-                      color: urgencyColor, background: urgencyBg, flexShrink: 0,
-                    }}>
+                    <span
+                      title={urgency === 'HIGH' ? 'Urgency > 50 — high priority' : urgency === 'MED' ? 'Urgency 25–50 — medium priority' : 'Urgency ≤ 25 — strong; minimal practice need'}
+                      style={{
+                        fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4,
+                        color: urgencyColor, background: urgencyBg, flexShrink: 0,
+                      }}>
                       {urgencyLabel}
                     </span>
                     <span style={{
@@ -237,7 +240,7 @@ export default function FocusAreasPage() {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 6 }}>
                         <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{label}</span>
                         <span style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, fontWeight: 700, color: lossColor }}>
-                          Avg loss: {avgLoss}%
+                          {avgLoss < 5 ? 'Good — minimal loss' : `Avg loss: ${avgLoss}%`}
                         </span>
                       </div>
                       <div style={{ height: 5, borderRadius: 3, background: 'var(--surface3)', overflow: 'hidden', marginBottom: 6 }}>
