@@ -122,6 +122,9 @@ function ScoreTrendChart({ sessions }: { sessions: CaseSessionRecord[] }) {
         <circle key={i} cx={xFor(i)} cy={yFor(s.score)} r="3.5"
           fill={s.correct ? theme.confirmed : theme.critical}
           stroke="var(--color-surface-0)" strokeWidth="1.5"
+          tabIndex={0}
+          aria-label={`${s.system} · ${s.difficulty} — Score ${s.score} (${s.correct ? 'correct' : 'incorrect'}) · ${new Date(s.completedAt).toLocaleDateString()}`}
+          style={{ outline: 'none' }}
         >
           <title>{s.system} · {s.difficulty} — Score {s.score} ({s.correct ? 'correct' : 'incorrect'}) · {new Date(s.completedAt).toLocaleDateString()}</title>
         </circle>
@@ -349,7 +352,7 @@ export default function ReviewPage() {
           {[
             { label: 'Cases',          value: stats.total.toString(),             color: 'text-ink-primary' },
             { label: 'Accuracy (dx correct)', value: fmtPct1(stats.accuracy),   color: pctColor(stats.accuracy) },
-            { label: 'Avg score',      value: `${stats.avgScore.toFixed(0)}/100`, color: pctColor(stats.avgScore / 100) },
+            { label: 'Avg rubric score', value: `${stats.avgScore.toFixed(0)}/100`, color: pctColor(stats.avgScore / 100) },
             { label: 'Correct streak', value: stats.streak.toString(),            color: stats.streak >= 3 ? 'text-green-400' : 'text-ink-primary' },
             {
               label: 'Systems tried',

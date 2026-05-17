@@ -1723,6 +1723,7 @@ Student message: "${msg}"`
             }
           }}
           disabled={generating}
+          title={caseData && !gradingResult ? 'A case is in progress — generating a new case will replace it' : undefined}
           className="rounded-md bg-primary-500 px-4 py-1.5 text-[11px] font-semibold text-ink-inverse hover:bg-primary-400 disabled:opacity-60 disabled:cursor-not-allowed transition-colors shadow-lg shadow-primary-900/20"
         >
           {generating ? 'Generating...' : 'Generate Case'}
@@ -1853,6 +1854,7 @@ Student message: "${msg}"`
                     key={id}
                     onClick={() => !isDisabled && setActiveSection(id)}
                     disabled={isDisabled}
+                    title={isDisabled ? 'Generate a case to enable this step' : label}
                     className={`flex w-full items-center gap-2.5 py-2.5 pl-3 pr-2 text-left text-[11px] transition-colors -ml-[2px] ${
                       isDisabled
                         ? 'cursor-not-allowed text-ink-tertiary/50'
@@ -2057,9 +2059,9 @@ Student message: "${msg}"`
             <div className="flex flex-col border-t border-surface-4">
               <div className="flex items-center justify-between border-b border-surface-4 px-4 py-2 flex-shrink-0">
                 <div className="flex items-center gap-2">
-                  <span className="text-[11px] font-semibold uppercase tracking-wider text-caution">Case Notes</span>
+                  <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-secondary">Case Notes</span>
                   {notes.mode === 'soap' && (
-                    <span className="rounded bg-caution-bg px-1.5 py-0.5 text-[10px] text-caution border border-caution-border">SOAP</span>
+                    <span className="rounded bg-surface-3 px-1.5 py-0.5 text-[10px] text-ink-secondary border border-surface-4">SOAP</span>
                   )}
                 </div>
                 <div className="flex items-center gap-2">

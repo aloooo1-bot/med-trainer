@@ -103,8 +103,8 @@ export default function ProgressPage() {
               <div className="dx-stats-row">
                 {[
                   { label: 'Total Cases',  value: String(totalCases), color: 'var(--text)',    tip: 'Total completed cases with a recognized system', note: undefined },
-                  { label: 'Avg Score',    value: `${avgScore}/100`,  color: cssScore(avgScore), tip: 'Mean rubric score across all completed cases (0–100)', note: undefined },
-                  { label: 'Correct Rate', value: `${correctRate}%`,  color: 'var(--green)',  tip: 'Percent of cases where the core diagnosis was marked correct', note: undefined },
+                  { label: 'Avg Rubric Score', value: `${avgScore}/100`, color: cssScore(avgScore), tip: 'Mean rubric score (0–100): combines history, test ordering, diagnosis accuracy & completeness — a wrong diagnosis can still earn partial workup credit', note: undefined },
+                  { label: 'Dx Accuracy',    value: `${correctRate}%`, color: 'var(--green)',   tip: 'Percent of cases where the submitted diagnosis was correct — distinct from rubric score', note: undefined },
                   { label: 'Avg Time',     value: avgTimeStr,         color: 'var(--muted)',  tip: 'Average time spent per case from first question to diagnosis', note: medianTimeStr ? `· median ${medianTimeStr}` : undefined },
                 ].map(({ label, value, color, tip, note }) => (
                   <div key={label} className="dx-stat-card">

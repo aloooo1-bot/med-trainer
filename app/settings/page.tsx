@@ -250,11 +250,26 @@ export default function SettingsPage() {
                     <a
                       href={`mailto:${SUPPORT_EMAIL}?subject=MedTrainer Pro upgrade`}
                       className="dx-btn-primary"
+                      onClick={e => {
+                        if (!navigator.userAgent.includes('Mobi') && !document.createElement('a').href.startsWith('mailto')) {
+                          e.preventDefault()
+                          navigator.clipboard?.writeText(SUPPORT_EMAIL).catch(() => {})
+                        }
+                      }}
                       style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, padding: '7px 18px' }}
                     >
                       Upgrade to Pro →
                     </a>
-                    <p className="dx-help-text" style={{ margin: 0 }}>Opens your email to contact us.</p>
+                    <p className="dx-help-text" style={{ margin: 0 }}>
+                      Opens your email app. No email client?{' '}
+                      <button
+                        className="underline text-ink-secondary bg-transparent border-0 cursor-pointer p-0 text-[inherit]"
+                        onClick={() => navigator.clipboard?.writeText(SUPPORT_EMAIL)}
+                      >
+                        Copy address
+                      </button>{' '}
+                      ({SUPPORT_EMAIL})
+                    </p>
                   </div>
                 ) : (
                   <a
@@ -395,6 +410,8 @@ export default function SettingsPage() {
                   {(['light', 'dark', 'auto'] as Scheme[]).map(s => (
                     <button
                       key={s}
+                      aria-label={`${s === 'auto' ? 'Auto (system)' : s.charAt(0).toUpperCase() + s.slice(1)} theme`}
+                      aria-pressed={colorScheme === s}
                       className={`dx-chip${colorScheme === s ? ' active' : ''}`}
                       onClick={() => {
                         setColorScheme(s)
@@ -402,7 +419,7 @@ export default function SettingsPage() {
                       }}
                       style={{ textTransform: 'capitalize' }}
                     >
-                      {s === 'light' ? '☀ Light' : s === 'dark' ? '☾ Dark' : '⬤ Auto'}
+                      {s === 'light' ? 'Light' : s === 'dark' ? 'Dark' : 'Auto'}
                     </button>
                   ))}
                 </div>
@@ -432,6 +449,7 @@ export default function SettingsPage() {
                   <input
                     className="dx-input"
                     type="password"
+                    autoComplete="current-password"
                     value={currentPw}
                     onChange={e => setCurrentPw(e.target.value)}
                     placeholder="Enter current password"
@@ -443,6 +461,7 @@ export default function SettingsPage() {
                   <input
                     className="dx-input"
                     type="password"
+                    autoComplete="new-password"
                     value={newPw}
                     onChange={e => setNewPw(e.target.value)}
                     placeholder="At least 8 characters"
@@ -454,6 +473,7 @@ export default function SettingsPage() {
                   <input
                     className="dx-input"
                     type="password"
+                    autoComplete="new-password"
                     value={confirmPw}
                     onChange={e => setConfirmPw(e.target.value)}
                     placeholder="Re-enter new password"
