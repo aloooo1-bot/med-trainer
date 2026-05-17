@@ -119,12 +119,19 @@ function checkInterpretationObjectivity(c, diagnosis) {
 // ── Management teaching point heuristic ───────────────────────────────────────
 const DOSE_PATTERN      = /\b\d+(\.\d+)?\s*(mg|mcg|g|mEq|mL|mmol|units?|IU)\b/i
 const THRESHOLD_PATTERN = /[<>≤≥]\s*\d+/
-const DRUG_KEYWORDS     = /\b(antibiotic|antifungal|anticoagul|heparin|warfarin|apixaban|rivaroxaban|aspirin|statin|atorvastatin|metformin|insulin|thrombolytic|tPA|alteplase|corticosteroid|prednisone|dexamethasone|vancomycin|ceftriaxone|piperacillin|meropenem|azithromycin|amoxicillin|ciprofloxacin|metoprolol|labetalol|lisinopril|amlodipine|nitroglycerin|epinephrine|atropine|naloxone|flumazenil|N-acetylcysteine|NAC|FFP|platelets|PRBC|transfus|dialysis|cardioversion|defibrillation|intubat|vasopressor|norepinephrine|dopamine|dobutamine)\b/i
+const DRUG_KEYWORDS     = /\b(antibiotic|antifungal|anticoagul|heparin|warfarin|apixaban|rivaroxaban|aspirin|statin|atorvastatin|metformin|insulin|thrombolytic|tPA|alteplase|corticosteroid|prednisone|dexamethasone|vancomycin|ceftriaxone|piperacillin|meropenem|azithromycin|amoxicillin|ciprofloxacin|metoprolol|labetalol|lisinopril|amlodipine|nitroglycerin|epinephrine|atropine|naloxone|flumazenil|N-acetylcysteine|NAC|FFP|platelets|PRBC|transfus|dialysis|cardioversion|defibrillation|intubat|vasopressor|norepinephrine|dopamine|dobutamine|rituximab|ibrutinib|venetoclax|ruxolitinib|obinutuzumab|bortezomib|lenalidomide|thalidomide|imatinib|levothyroxine|methimazole|propylthiouracil|propranolol|allopurinol|febuxostat|colchicine|hydroxychloroquine|methotrexate|sulfasalazine|leflunomide|ivermectin|albendazole|mebendazole|TMP-SMX|trimethoprim|doxycycline|tetracycline|clindamycin|fluconazole|voriconazole|itraconazole|amphotericin|acyclovir|valacyclovir|oseltamivir|lithium|valproate|olanzapine|quetiapine|haloperidol|risperidone|aripiprazole|ferrous|iron supplement|iron infusion|IV iron|thiamine|folate|vitamin B12|cyanocobalamin|cholestyramine|ursodeoxycholic|pyridoxine|eculizumab|ravulizumab|hydroxyurea|hydroxycarbamide|physostigmine|hemin|hematin|IVIG|immunoglobulin|opioid|morphine|oxycodone|hydromorphone|fentanyl|ketamine|phenobarbital|phenytoin|levetiracetam|lamotrigine|carbamazepine|antiepileptic|antiretroviral|tacrolimus|cyclosporine|mycophenolate|azathioprine|cyclophosphamide|secukinumab|adalimumab|infliximab|dupilumab|omalizumab)\b/i
+// Procedural management: handles cases where treatment is a procedure, not a drug
+const PROCEDURE_KEYWORDS = /\b(chest tube|tube thoracostomy|needle aspiration|needle decompression|paracentesis|thoracentesis|pericardiocentesis|lumbar puncture|bone marrow|pericardial window|fasciotomy|laminectomy|discectomy|surgical decompression|decompressive|escharotomy|colectomy|gastrectomy|nephrectomy|splenectomy|hepatic resection|abscess drainage|incision and drainage|debridement|ERCP|endoscopy|bronchoscopy|upper endoscopy|EGD|colonoscopy|cystoscopy|angiography|embolization|thrombectomy|endarterectomy|stent|pacemaker|ICD|ablation|cardiovert|plasmapheresis|plasma exchange|physical therapy|radiation therapy|chemotherapy|stem cell transplant|bone marrow transplant|liver transplant|kidney transplant)\b/i
 
 function checkManagementTeachingPoint(c) {
   const points = c.teachingPoints ?? []
   for (const pt of points) {
-    if (DOSE_PATTERN.test(pt) || THRESHOLD_PATTERN.test(pt) || DRUG_KEYWORDS.test(pt)) return true
+    if (
+      DOSE_PATTERN.test(pt) ||
+      THRESHOLD_PATTERN.test(pt) ||
+      DRUG_KEYWORDS.test(pt) ||
+      PROCEDURE_KEYWORDS.test(pt)
+    ) return true
   }
   return false
 }
@@ -209,7 +216,9 @@ function auditCase(row) {
   flags.push(...checkInterpretationObjectivity(c, diagnosis))
 
   // 9. MANAGEMENT TEACHING POINT
-  if ((c.teachingPoints?.length ?? 0) > 0 && !checkManagementTeachingPoint(c)) {
+  // Skip purely radiographic/descriptive diagnoses where no specific treatment is expected
+  const isPurelyRadiographic = /\bnormal\b.*\bradiograph|\bradiograph.*\bnormal\b|^normal chest|^normal radiograph|incidental|^cardiomegaly|^left atrial.*enlargement|surgical clip/i.test(diagnosis)
+  if (!isPurelyRadiographic && (c.teachingPoints?.length ?? 0) > 0 && !checkManagementTeachingPoint(c)) {
     flags.push('MANAGEMENT TEACHING POINT: no teaching point contains a concrete management directive')
   }
 

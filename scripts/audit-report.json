@@ -1,338 +1,5 @@
 [
   {
-    "id": "endocrine-metabolic-foundations-severe-hypoglycemia-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Foundations",
-    "diagnosis": "Severe Hypoglycemia",
-    "structuralFlags": [
-      "Missing expectedImaging",
-      "physicalExam.Skin: diagnostic interpretation — \"Cool and diaphoretic diffusely. No rash or jaundice. Insulin injection sites noted on bilateral ante\""
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-advanced-severe-hypoglycemia-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Advanced",
-    "diagnosis": "Severe Hypoglycemia",
-    "structuralFlags": [
-      "Missing expectedImaging",
-      "physicalExam.Skin: diagnostic interpretation — \"Cool and diaphoretic diffusely. No rash or jaundice. Insulin injection sites noted on bilateral ante\""
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-clinical-severe-hypoglycemia-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Clinical",
-    "diagnosis": "Severe Hypoglycemia",
-    "structuralFlags": [
-      "Missing expectedImaging",
-      "physicalExam.Skin: diagnostic interpretation — \"Cool and diaphoretic diffusely. No rash or jaundice. Insulin injection sites noted on bilateral ante\""
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-foundations-immune-thrombocytopenia-itp-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Foundations",
-    "diagnosis": "Immune Thrombocytopenia (ITP)",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-advanced-paroxysmal-nocturnal-hemoglobinuria-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Paroxysmal Nocturnal Hemoglobinuria",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-foundations-cellulitis-0",
-    "system": "Infectious",
-    "difficulty": "Foundations",
-    "diagnosis": "Cellulitis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-advanced-diabetic-ketoacidosis-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Advanced",
-    "diagnosis": "Diabetic Ketoacidosis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "renal-clinical-rhabdomyolysis-with-acute-kidney-injury-0",
-    "system": "Renal",
-    "difficulty": "Clinical",
-    "diagnosis": "Rhabdomyolysis with Acute Kidney Injury",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "gastrointestinal-advanced-autoimmune-hepatitis-0",
-    "system": "Gastrointestinal",
-    "difficulty": "Advanced",
-    "diagnosis": "Autoimmune Hepatitis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-advanced-leptospirosis-0",
-    "system": "Infectious",
-    "difficulty": "Advanced",
-    "diagnosis": "Leptospirosis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "renal-clinical-acute-interstitial-nephritis-0",
-    "system": "Renal",
-    "difficulty": "Clinical",
-    "diagnosis": "Acute Interstitial Nephritis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-clinical-acetaminophen-overdose-0",
-    "system": "Toxicologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Acetaminophen Overdose",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-foundations-hypothyroidism-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Foundations",
-    "diagnosis": "Hypothyroidism",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "neurologic-clinical-migraine-with-aura-0",
-    "system": "Neurologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Migraine with Aura",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-foundations-influenza-0",
-    "system": "Infectious",
-    "difficulty": "Foundations",
-    "diagnosis": "Influenza",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "gastrointestinal-clinical-acute-hepatitis-b-0",
-    "system": "Gastrointestinal",
-    "difficulty": "Clinical",
-    "diagnosis": "Acute Hepatitis B",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-advanced-acute-intermittent-porphyria-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Advanced",
-    "diagnosis": "Acute Intermittent Porphyria",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "renal-advanced-thrombotic-microangiopathy-tma-0",
-    "system": "Renal",
-    "difficulty": "Advanced",
-    "diagnosis": "Thrombotic Microangiopathy (TMA)",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-clinical-diabetic-ketoacidosis-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Clinical",
-    "diagnosis": "Diabetic Ketoacidosis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-foundations-graves-disease-hyperthyroidism-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Foundations",
-    "diagnosis": "Graves' Disease (Hyperthyroidism)",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-advanced-rocky-mountain-spotted-fever-0",
-    "system": "Infectious",
-    "difficulty": "Advanced",
-    "diagnosis": "Rocky Mountain Spotted Fever",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "cardiovascular-clinical-non-st-elevation-myocardial-infarction-nstemi-0",
-    "system": "Cardiovascular",
-    "difficulty": "Clinical",
-    "diagnosis": "Non-ST-Elevation Myocardial Infarction (NSTEMI)",
-    "structuralFlags": [
-      "STEMI case missing explicit ST elevation in ecgFindings"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "renal-foundations-prerenal-acute-kidney-injury-0",
-    "system": "Renal",
-    "difficulty": "Foundations",
-    "diagnosis": "Prerenal Acute Kidney Injury",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-foundations-opioid-use-disorder-with-withdrawal-0",
-    "system": "Psychiatric",
-    "difficulty": "Foundations",
-    "diagnosis": "Opioid Use Disorder with Withdrawal",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-clinical-warm-autoimmune-hemolytic-anemia-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Warm Autoimmune Hemolytic Anemia",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-foundations-acetaminophen-overdose-0",
-    "system": "Toxicologic",
-    "difficulty": "Foundations",
-    "diagnosis": "Acetaminophen Overdose",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-foundations-sepsis-bacterial-urinary-source-0",
-    "system": "Infectious",
-    "difficulty": "Foundations",
-    "diagnosis": "Sepsis (Bacterial — Urinary Source)",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-foundations-sickle-cell-vaso-occlusive-crisis-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Foundations",
-    "diagnosis": "Sickle Cell Vaso-Occlusive Crisis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-advanced-anticholinergic-toxidrome-0",
-    "system": "Toxicologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Anticholinergic Toxidrome",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "renal-advanced-acute-interstitial-nephritis-0",
-    "system": "Renal",
-    "difficulty": "Advanced",
-    "diagnosis": "Acute Interstitial Nephritis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
     "id": "img-MPX1723_synpic34923",
     "system": "Neurologic",
     "difficulty": "Clinical",
@@ -344,859 +11,12 @@
     "aiError": null
   },
   {
-    "id": "neurologic-clinical-bell-s-palsy-0",
-    "system": "Neurologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Bell's Palsy",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-clinical-addison-s-disease-primary-adrenal-insufficiency-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Clinical",
-    "diagnosis": "Addison's Disease (Primary Adrenal Insufficiency)",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-foundations-rheumatoid-arthritis-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Foundations",
-    "diagnosis": "Rheumatoid Arthritis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "renal-clinical-siadh-with-symptomatic-hyponatremia-0",
-    "system": "Renal",
-    "difficulty": "Clinical",
-    "diagnosis": "SIADH with Symptomatic Hyponatremia",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-clinical-hyperosmolar-hyperglycemic-state-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Clinical",
-    "diagnosis": "Hyperosmolar Hyperglycemic State",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-clinical-generalized-anxiety-disorder-0",
-    "system": "Psychiatric",
-    "difficulty": "Clinical",
-    "diagnosis": "Generalized Anxiety Disorder",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-foundations-benzodiazepine-overdose-0",
-    "system": "Toxicologic",
-    "difficulty": "Foundations",
-    "diagnosis": "Benzodiazepine Overdose",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-advanced-antiphospholipid-syndrome-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Advanced",
-    "diagnosis": "Antiphospholipid Syndrome",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-advanced-cyanide-poisoning-0",
-    "system": "Toxicologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Cyanide Poisoning",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "trauma-advanced-traumatic-rhabdomyolysis-with-multi-organ-dysfunction-0",
-    "system": "Trauma",
-    "difficulty": "Advanced",
-    "diagnosis": "Traumatic Rhabdomyolysis with Multi-organ Dysfunction",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-clinical-polymyalgia-rheumatica-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Clinical",
-    "diagnosis": "Polymyalgia Rheumatica",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-clinical-ptsd-0",
-    "system": "Psychiatric",
-    "difficulty": "Clinical",
-    "diagnosis": "PTSD",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-foundations-acute-gouty-arthritis-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Foundations",
-    "diagnosis": "Acute Gouty Arthritis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-advanced-adult-onset-still-s-disease-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Advanced",
-    "diagnosis": "Adult-Onset Still's Disease",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-foundations-carbon-monoxide-poisoning-0",
-    "system": "Toxicologic",
-    "difficulty": "Foundations",
-    "diagnosis": "Carbon Monoxide Poisoning",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-advanced-myelodysplastic-syndrome-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Myelodysplastic Syndrome",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-clinical-methanol-ingestion-0",
-    "system": "Toxicologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Methanol Ingestion",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-clinical-bipolar-i-disorder-manic-episode-0",
-    "system": "Psychiatric",
-    "difficulty": "Clinical",
-    "diagnosis": "Bipolar I Disorder — Manic Episode",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-clinical-salicylate-toxicity-0",
-    "system": "Toxicologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Salicylate Toxicity",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-advanced-serotonin-syndrome-0",
-    "system": "Psychiatric",
-    "difficulty": "Advanced",
-    "diagnosis": "Serotonin Syndrome",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-advanced-waldenstr-m-macroglobulinemia-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Waldenström Macroglobulinemia",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-advanced-systemic-lupus-erythematosus-with-nephritis-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Advanced",
-    "diagnosis": "Systemic Lupus Erythematosus with Nephritis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-foundations-iron-deficiency-anemia-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Foundations",
-    "diagnosis": "Iron Deficiency Anemia",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-advanced-lithium-toxicity-0",
-    "system": "Psychiatric",
-    "difficulty": "Advanced",
-    "diagnosis": "Lithium Toxicity",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-advanced-organophosphate-poisoning-0",
-    "system": "Toxicologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Organophosphate Poisoning",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-advanced-neuroleptic-malignant-syndrome-0",
-    "system": "Psychiatric",
-    "difficulty": "Advanced",
-    "diagnosis": "Neuroleptic Malignant Syndrome",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-clinical-digoxin-toxicity-0",
-    "system": "Toxicologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Digoxin Toxicity",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-foundations-panic-disorder-0",
-    "system": "Psychiatric",
-    "difficulty": "Foundations",
-    "diagnosis": "Panic Disorder",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-foundations-opioid-toxidrome-0",
-    "system": "Toxicologic",
-    "difficulty": "Foundations",
-    "diagnosis": "Opioid Toxidrome",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-foundations-first-episode-psychosis-0",
-    "system": "Psychiatric",
-    "difficulty": "Foundations",
-    "diagnosis": "First-Episode Psychosis",
-    "structuralFlags": [
-      "physicalExam.Skin: diagnostic interpretation — \"No rashes, lesions, or signs of trauma.\""
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-clinical-reactive-arthritis-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Clinical",
-    "diagnosis": "Reactive Arthritis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-advanced-disseminated-histoplasmosis-0",
-    "system": "Infectious",
-    "difficulty": "Advanced",
-    "diagnosis": "Disseminated Histoplasmosis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-clinical-alcohol-withdrawal-syndrome-0",
-    "system": "Psychiatric",
-    "difficulty": "Clinical",
-    "diagnosis": "Alcohol Withdrawal Syndrome",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-foundations-meningococcal-meningitis-0",
-    "system": "Infectious",
-    "difficulty": "Foundations",
-    "diagnosis": "Meningococcal Meningitis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-advanced-cll-with-autoimmune-hemolytic-anemia-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Advanced",
-    "diagnosis": "CLL with Autoimmune Hemolytic Anemia",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-foundations-major-depressive-episode-0",
-    "system": "Psychiatric",
-    "difficulty": "Foundations",
-    "diagnosis": "Major Depressive Episode",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-clinical-vitamin-b12-deficiency-megaloblastic-anemia-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Vitamin B12 Deficiency Megaloblastic Anemia",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "neurologic-foundations-migraine-with-aura-0",
-    "system": "Neurologic",
-    "difficulty": "Foundations",
-    "diagnosis": "Migraine with Aura",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-foundations-diabetic-ketoacidosis-0",
+    "id": "endocrine-metabolic-foundations-severe-hypoglycemia-0",
     "system": "Endocrine / Metabolic",
     "difficulty": "Foundations",
-    "diagnosis": "Diabetic Ketoacidosis",
+    "diagnosis": "Severe Hypoglycemia",
     "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-clinical-hypothyroidism-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Clinical",
-    "diagnosis": "Hypothyroidism",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "cardiovascular-advanced-non-st-elevation-myocardial-infarction-nstemi-0",
-    "system": "Cardiovascular",
-    "difficulty": "Advanced",
-    "diagnosis": "Non-ST-Elevation Myocardial Infarction (NSTEMI)",
-    "structuralFlags": [
-      "STEMI case missing explicit ST elevation in ecgFindings"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-advanced-hypothyroidism-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Advanced",
-    "diagnosis": "Hypothyroidism",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-advanced-opioid-toxidrome-0",
-    "system": "Toxicologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Opioid Toxidrome",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-advanced-strongyloidiasis-with-hyperinfection-syndrome-0",
-    "system": "Infectious",
-    "difficulty": "Advanced",
-    "diagnosis": "Strongyloidiasis with Hyperinfection Syndrome",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "renal-advanced-prerenal-acute-kidney-injury-0",
-    "system": "Renal",
-    "difficulty": "Advanced",
-    "diagnosis": "Prerenal Acute Kidney Injury",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "renal-clinical-prerenal-acute-kidney-injury-0",
-    "system": "Renal",
-    "difficulty": "Clinical",
-    "diagnosis": "Prerenal Acute Kidney Injury",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-clinical-influenza-0",
-    "system": "Infectious",
-    "difficulty": "Clinical",
-    "diagnosis": "Influenza",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-advanced-influenza-0",
-    "system": "Infectious",
-    "difficulty": "Advanced",
-    "diagnosis": "Influenza",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "gastrointestinal-advanced-acute-hepatitis-b-0",
-    "system": "Gastrointestinal",
-    "difficulty": "Advanced",
-    "diagnosis": "Acute Hepatitis B",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-clinical-cellulitis-0",
-    "system": "Infectious",
-    "difficulty": "Clinical",
-    "diagnosis": "Cellulitis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-advanced-graves-disease-hyperthyroidism-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Advanced",
-    "diagnosis": "Graves' Disease (Hyperthyroidism)",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-clinical-graves-disease-hyperthyroidism-0",
-    "system": "Endocrine / Metabolic",
-    "difficulty": "Clinical",
-    "diagnosis": "Graves' Disease (Hyperthyroidism)",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-clinical-iron-deficiency-anemia-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Iron Deficiency Anemia",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-advanced-iron-deficiency-anemia-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Iron Deficiency Anemia",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-advanced-bipolar-i-disorder-manic-episode-0",
-    "system": "Psychiatric",
-    "difficulty": "Advanced",
-    "diagnosis": "Bipolar I Disorder — Manic Episode",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-advanced-methanol-ingestion-0",
-    "system": "Toxicologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Methanol Ingestion",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-clinical-immune-thrombocytopenia-itp-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Immune Thrombocytopenia (ITP)",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-advanced-alcohol-withdrawal-syndrome-0",
-    "system": "Psychiatric",
-    "difficulty": "Advanced",
-    "diagnosis": "Alcohol Withdrawal Syndrome",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-advanced-meningococcal-meningitis-0",
-    "system": "Infectious",
-    "difficulty": "Advanced",
-    "diagnosis": "Meningococcal Meningitis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "renal-advanced-rhabdomyolysis-with-acute-kidney-injury-0",
-    "system": "Renal",
-    "difficulty": "Advanced",
-    "diagnosis": "Rhabdomyolysis with Acute Kidney Injury",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-clinical-carbon-monoxide-poisoning-0",
-    "system": "Toxicologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Carbon Monoxide Poisoning",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-advanced-carbon-monoxide-poisoning-0",
-    "system": "Toxicologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Carbon Monoxide Poisoning",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-advanced-salicylate-toxicity-0",
-    "system": "Toxicologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Salicylate Toxicity",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-advanced-acute-gouty-arthritis-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Advanced",
-    "diagnosis": "Acute Gouty Arthritis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-clinical-acute-gouty-arthritis-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Clinical",
-    "diagnosis": "Acute Gouty Arthritis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-clinical-meningococcal-meningitis-0",
-    "system": "Infectious",
-    "difficulty": "Clinical",
-    "diagnosis": "Meningococcal Meningitis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-clinical-sickle-cell-vaso-occlusive-crisis-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Sickle Cell Vaso-Occlusive Crisis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-advanced-opioid-use-disorder-with-withdrawal-0",
-    "system": "Psychiatric",
-    "difficulty": "Advanced",
-    "diagnosis": "Opioid Use Disorder with Withdrawal",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-clinical-opioid-use-disorder-with-withdrawal-0",
-    "system": "Psychiatric",
-    "difficulty": "Clinical",
-    "diagnosis": "Opioid Use Disorder with Withdrawal",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-clinical-first-episode-psychosis-0",
-    "system": "Psychiatric",
-    "difficulty": "Clinical",
-    "diagnosis": "First-Episode Psychosis",
-    "structuralFlags": [
-      "physicalExam.Skin: diagnostic interpretation — \"No rashes, lesions, or signs of trauma.\""
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-advanced-first-episode-psychosis-0",
-    "system": "Psychiatric",
-    "difficulty": "Advanced",
-    "diagnosis": "First-Episode Psychosis",
-    "structuralFlags": [
-      "physicalExam.Skin: diagnostic interpretation — \"No rashes, lesions, or signs of trauma.\""
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-advanced-acetaminophen-overdose-0",
-    "system": "Toxicologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Acetaminophen Overdose",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-advanced-immune-thrombocytopenia-itp-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Immune Thrombocytopenia (ITP)",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-advanced-warm-autoimmune-hemolytic-anemia-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Warm Autoimmune Hemolytic Anemia",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-advanced-sickle-cell-vaso-occlusive-crisis-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Sickle Cell Vaso-Occlusive Crisis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-clinical-sepsis-bacterial-urinary-source-0",
-    "system": "Infectious",
-    "difficulty": "Clinical",
-    "diagnosis": "Sepsis (Bacterial — Urinary Source)",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-advanced-sepsis-bacterial-urinary-source-0",
-    "system": "Infectious",
-    "difficulty": "Advanced",
-    "diagnosis": "Sepsis (Bacterial — Urinary Source)",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "neurologic-advanced-bell-s-palsy-0",
-    "system": "Neurologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Bell's Palsy",
-    "structuralFlags": [
-      "Missing expectedImaging"
+      "physicalExam.Skin: diagnostic interpretation — \"Cool and diaphoretic diffusely. No rash or jaundice. Insulin injection sites noted on bilateral ante\""
     ],
     "aiReview": null,
     "aiError": null
@@ -1213,231 +33,24 @@
     "aiError": null
   },
   {
-    "id": "endocrine-metabolic-advanced-addison-s-disease-primary-adrenal-insufficiency-0",
+    "id": "endocrine-metabolic-advanced-severe-hypoglycemia-0",
     "system": "Endocrine / Metabolic",
     "difficulty": "Advanced",
-    "diagnosis": "Addison's Disease (Primary Adrenal Insufficiency)",
+    "diagnosis": "Severe Hypoglycemia",
     "structuralFlags": [
-      "Missing expectedImaging"
+      "physicalExam.Skin: diagnostic interpretation — \"Cool and diaphoretic diffusely. No rash or jaundice. Insulin injection sites noted on bilateral ante\""
     ],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "renal-advanced-siadh-with-symptomatic-hyponatremia-0",
-    "system": "Renal",
-    "difficulty": "Advanced",
-    "diagnosis": "SIADH with Symptomatic Hyponatremia",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-clinical-rheumatoid-arthritis-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Clinical",
-    "diagnosis": "Rheumatoid Arthritis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-advanced-rheumatoid-arthritis-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Advanced",
-    "diagnosis": "Rheumatoid Arthritis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "endocrine-metabolic-advanced-hyperosmolar-hyperglycemic-state-0",
+    "id": "endocrine-metabolic-clinical-severe-hypoglycemia-0",
     "system": "Endocrine / Metabolic",
-    "difficulty": "Advanced",
-    "diagnosis": "Hyperosmolar Hyperglycemic State",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-advanced-generalized-anxiety-disorder-0",
-    "system": "Psychiatric",
-    "difficulty": "Advanced",
-    "diagnosis": "Generalized Anxiety Disorder",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-clinical-benzodiazepine-overdose-0",
-    "system": "Toxicologic",
     "difficulty": "Clinical",
-    "diagnosis": "Benzodiazepine Overdose",
+    "diagnosis": "Severe Hypoglycemia",
     "structuralFlags": [
-      "Missing expectedImaging"
+      "physicalExam.Skin: diagnostic interpretation — \"Cool and diaphoretic diffusely. No rash or jaundice. Insulin injection sites noted on bilateral ante\""
     ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-advanced-benzodiazepine-overdose-0",
-    "system": "Toxicologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Benzodiazepine Overdose",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-clinical-opioid-toxidrome-0",
-    "system": "Toxicologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Opioid Toxidrome",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-advanced-cellulitis-0",
-    "system": "Infectious",
-    "difficulty": "Advanced",
-    "diagnosis": "Cellulitis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-advanced-polymyalgia-rheumatica-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Advanced",
-    "diagnosis": "Polymyalgia Rheumatica",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-advanced-ptsd-0",
-    "system": "Psychiatric",
-    "difficulty": "Advanced",
-    "diagnosis": "PTSD",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-clinical-major-depressive-episode-0",
-    "system": "Psychiatric",
-    "difficulty": "Clinical",
-    "diagnosis": "Major Depressive Episode",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-advanced-major-depressive-episode-0",
-    "system": "Psychiatric",
-    "difficulty": "Advanced",
-    "diagnosis": "Major Depressive Episode",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "neurologic-advanced-migraine-with-aura-0",
-    "system": "Neurologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Migraine with Aura",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-clinical-panic-disorder-0",
-    "system": "Psychiatric",
-    "difficulty": "Clinical",
-    "diagnosis": "Panic Disorder",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-advanced-digoxin-toxicity-0",
-    "system": "Toxicologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Digoxin Toxicity",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-advanced-reactive-arthritis-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Advanced",
-    "diagnosis": "Reactive Arthritis",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "hematologic-oncologic-advanced-vitamin-b12-deficiency-megaloblastic-anemia-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Vitamin B12 Deficiency Megaloblastic Anemia",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-advanced-panic-disorder-0",
-    "system": "Psychiatric",
-    "difficulty": "Advanced",
-    "diagnosis": "Panic Disorder",
-    "structuralFlags": [
-      "Missing expectedImaging"
-    ],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "respiratory-foundations-spontaneous-pneumothorax-0",
-    "system": "Respiratory",
-    "difficulty": "Foundations",
-    "diagnosis": "Spontaneous Pneumothorax",
-    "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
@@ -1460,10 +73,19 @@
     "aiError": null
   },
   {
-    "id": "cardiovascular-clinical-acute-pericarditis-0",
+    "id": "cardiovascular-advanced-acute-pericarditis-0",
     "system": "Cardiovascular",
-    "difficulty": "Clinical",
+    "difficulty": "Advanced",
     "diagnosis": "Acute Pericarditis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "local-urine-uti-0",
+    "system": "Renal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Uncomplicated Cystitis (UTI)",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1496,19 +118,28 @@
     "aiError": null
   },
   {
-    "id": "local-urine-uti-0",
-    "system": "Renal",
+    "id": "hematologic-oncologic-foundations-immune-thrombocytopenia-itp-0",
+    "system": "Hematologic / Oncologic",
     "difficulty": "Foundations",
-    "diagnosis": "Acute Uncomplicated Cystitis (UTI)",
+    "diagnosis": "Immune Thrombocytopenia (ITP)",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "respiratory-clinical-community-acquired-pneumonia-0",
-    "system": "Respiratory",
-    "difficulty": "Clinical",
-    "diagnosis": "Community-Acquired Pneumonia",
+    "id": "hematologic-oncologic-advanced-paroxysmal-nocturnal-hemoglobinuria-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Paroxysmal Nocturnal Hemoglobinuria",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "gastrointestinal-advanced-small-bowel-obstruction-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Small Bowel Obstruction",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1523,10 +154,10 @@
     "aiError": null
   },
   {
-    "id": "gastrointestinal-foundations-acute-cholecystitis-0",
-    "system": "Gastrointestinal",
+    "id": "respiratory-foundations-spontaneous-pneumothorax-0",
+    "system": "Respiratory",
     "difficulty": "Foundations",
-    "diagnosis": "Acute Cholecystitis",
+    "diagnosis": "Spontaneous Pneumothorax",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1550,19 +181,19 @@
     "aiError": null
   },
   {
-    "id": "gastrointestinal-advanced-small-bowel-obstruction-0",
+    "id": "img-MPX1508_synpic48380",
     "system": "Gastrointestinal",
-    "difficulty": "Advanced",
-    "diagnosis": "Small Bowel Obstruction",
+    "difficulty": "Clinical",
+    "diagnosis": "Hepatic cirrhosis with splenomegaly",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "img-MPX1508_synpic48380",
-    "system": "Gastrointestinal",
-    "difficulty": "Clinical",
-    "diagnosis": "Hepatic cirrhosis with splenomegaly",
+    "id": "endocrine-metabolic-advanced-diabetic-ketoacidosis-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Diabetic Ketoacidosis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1595,6 +226,15 @@
     "aiError": null
   },
   {
+    "id": "renal-clinical-severe-hyperkalemia-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "Severe Hyperkalemia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "neurologic-clinical-acute-ischemic-stroke-0",
     "system": "Neurologic",
     "difficulty": "Clinical",
@@ -1613,19 +253,19 @@
     "aiError": null
   },
   {
-    "id": "renal-clinical-severe-hyperkalemia-0",
-    "system": "Renal",
+    "id": "cardiovascular-clinical-hypertensive-emergency-0",
+    "system": "Cardiovascular",
     "difficulty": "Clinical",
-    "diagnosis": "Severe Hyperkalemia",
+    "diagnosis": "Hypertensive Emergency",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "cardiovascular-clinical-hypertensive-emergency-0",
-    "system": "Cardiovascular",
-    "difficulty": "Clinical",
-    "diagnosis": "Hypertensive Emergency",
+    "id": "infectious-foundations-cellulitis-0",
+    "system": "Infectious",
+    "difficulty": "Foundations",
+    "diagnosis": "Cellulitis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1640,15 +280,6 @@
     "aiError": null
   },
   {
-    "id": "infectious-clinical-infective-endocarditis-0",
-    "system": "Infectious",
-    "difficulty": "Clinical",
-    "diagnosis": "Infective Endocarditis",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
     "id": "img-CXR3945_IM-2014-2001-clinical",
     "system": "Respiratory",
     "difficulty": "Clinical",
@@ -1658,19 +289,19 @@
     "aiError": null
   },
   {
-    "id": "neurologic-clinical-bacterial-meningitis-0",
-    "system": "Neurologic",
+    "id": "infectious-clinical-infective-endocarditis-0",
+    "system": "Infectious",
     "difficulty": "Clinical",
-    "diagnosis": "Bacterial Meningitis",
+    "diagnosis": "Infective Endocarditis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "neurologic-advanced-bacterial-meningitis-0",
-    "system": "Neurologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Bacterial Meningitis",
+    "id": "respiratory-clinical-community-acquired-pneumonia-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Community-Acquired Pneumonia",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1680,6 +311,15 @@
     "system": "Renal",
     "difficulty": "Clinical",
     "diagnosis": "Minimal Change Disease (Nephrotic Syndrome)",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "neurologic-advanced-bacterial-meningitis-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Bacterial Meningitis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1703,6 +343,24 @@
     "aiError": null
   },
   {
+    "id": "neurologic-clinical-bacterial-meningitis-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Bacterial Meningitis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-clinical-rhabdomyolysis-with-acute-kidney-injury-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "Rhabdomyolysis with Acute Kidney Injury",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "local-urine-kidney_stone-0",
     "system": "Renal",
     "difficulty": "Foundations",
@@ -1712,19 +370,37 @@
     "aiError": null
   },
   {
-    "id": "respiratory-foundations-pulmonary-embolism-0",
+    "id": "respiratory-advanced-lung-abscess-0",
     "system": "Respiratory",
-    "difficulty": "Foundations",
-    "diagnosis": "Pulmonary Embolism",
+    "difficulty": "Advanced",
+    "diagnosis": "Lung Abscess",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "img-CXR3945_IM-2014-1001-clinical",
-    "system": "Respiratory",
+    "id": "gastrointestinal-advanced-autoimmune-hepatitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Autoimmune Hepatitis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-clinical-acetaminophen-overdose-0",
+    "system": "Toxicologic",
     "difficulty": "Clinical",
-    "diagnosis": "Normal chest radiograph",
+    "diagnosis": "Acetaminophen Overdose",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-clinical-acute-interstitial-nephritis-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Interstitial Nephritis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1739,10 +415,28 @@
     "aiError": null
   },
   {
-    "id": "endocrine-metabolic-advanced-primary-hyperparathyroidism-0",
-    "system": "Endocrine / Metabolic",
+    "id": "infectious-advanced-leptospirosis-0",
+    "system": "Infectious",
     "difficulty": "Advanced",
-    "diagnosis": "Primary Hyperparathyroidism",
+    "diagnosis": "Leptospirosis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-CXR3945_IM-2014-1001-clinical",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Normal chest radiograph",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "neurologic-advanced-anti-nmdar-autoimmune-encephalitis-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Anti-NMDAR Autoimmune Encephalitis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1757,10 +451,19 @@
     "aiError": null
   },
   {
-    "id": "img-MPX1902_synpic35486-advanced",
-    "system": "Neurologic",
+    "id": "endocrine-metabolic-advanced-primary-hyperparathyroidism-0",
+    "system": "Endocrine / Metabolic",
     "difficulty": "Advanced",
-    "diagnosis": "Colloid cyst of the third ventricle",
+    "diagnosis": "Primary Hyperparathyroidism",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-foundations-influenza-0",
+    "system": "Infectious",
+    "difficulty": "Foundations",
+    "diagnosis": "Influenza",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1775,10 +478,64 @@
     "aiError": null
   },
   {
-    "id": "cardiovascular-foundations-hypertensive-emergency-0",
-    "system": "Cardiovascular",
+    "id": "endocrine-metabolic-foundations-hypothyroidism-0",
+    "system": "Endocrine / Metabolic",
     "difficulty": "Foundations",
-    "diagnosis": "Hypertensive Emergency",
+    "diagnosis": "Hypothyroidism",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "cardiovascular-clinical-acute-pericarditis-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Pericarditis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "gastrointestinal-foundations-acute-cholecystitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Cholecystitis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX1902_synpic35486-advanced",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Colloid cyst of the third ventricle",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "neurologic-clinical-migraine-with-aura-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Migraine with Aura",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "gastrointestinal-clinical-acute-hepatitis-b-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Hepatitis B",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-clinical-acute-asthma-exacerbation-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Asthma Exacerbation",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1793,10 +550,10 @@
     "aiError": null
   },
   {
-    "id": "img-MPX1161_synpic40025-advanced",
-    "system": "Gastrointestinal",
+    "id": "endocrine-metabolic-advanced-acute-intermittent-porphyria-0",
+    "system": "Endocrine / Metabolic",
     "difficulty": "Advanced",
-    "diagnosis": "Bowel obstruction",
+    "diagnosis": "Acute Intermittent Porphyria",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1811,6 +568,24 @@
     "aiError": null
   },
   {
+    "id": "cardiovascular-foundations-hypertensive-emergency-0",
+    "system": "Cardiovascular",
+    "difficulty": "Foundations",
+    "diagnosis": "Hypertensive Emergency",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-foundations-pulmonary-embolism-0",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Pulmonary Embolism",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "gastrointestinal-advanced-ischemic-colitis-0",
     "system": "Gastrointestinal",
     "difficulty": "Advanced",
@@ -1820,19 +595,28 @@
     "aiError": null
   },
   {
-    "id": "endocrine-metabolic-clinical-cushing-s-syndrome-0",
+    "id": "endocrine-metabolic-foundations-graves-disease-hyperthyroidism-0",
     "system": "Endocrine / Metabolic",
-    "difficulty": "Clinical",
-    "diagnosis": "Cushing's Syndrome",
+    "difficulty": "Foundations",
+    "diagnosis": "Graves' Disease (Hyperthyroidism)",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "cardiovascular-advanced-acute-pericarditis-0",
-    "system": "Cardiovascular",
+    "id": "img-MPX1603_synpic10084-clinical",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Small bowel obstruction",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX1161_synpic40025-advanced",
+    "system": "Gastrointestinal",
     "difficulty": "Advanced",
-    "diagnosis": "Acute Pericarditis",
+    "diagnosis": "Bowel obstruction",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1847,10 +631,64 @@
     "aiError": null
   },
   {
-    "id": "img-MPX1603_synpic10084-clinical",
-    "system": "Gastrointestinal",
+    "id": "endocrine-metabolic-clinical-cushing-s-syndrome-0",
+    "system": "Endocrine / Metabolic",
     "difficulty": "Clinical",
-    "diagnosis": "Small bowel obstruction",
+    "diagnosis": "Cushing's Syndrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "endocrine-metabolic-clinical-diabetic-ketoacidosis-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Diabetic Ketoacidosis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-advanced-thrombotic-microangiopathy-tma-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Thrombotic Microangiopathy (TMA)",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-advanced-rocky-mountain-spotted-fever-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Rocky Mountain Spotted Fever",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-foundations-prerenal-acute-kidney-injury-0",
+    "system": "Renal",
+    "difficulty": "Foundations",
+    "diagnosis": "Prerenal Acute Kidney Injury",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-advanced-goodpasture-syndrome-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Goodpasture Syndrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "cardiovascular-clinical-non-st-elevation-myocardial-infarction-nstemi-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Non-ST-Elevation Myocardial Infarction (NSTEMI)",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1892,28 +730,28 @@
     "aiError": null
   },
   {
-    "id": "respiratory-advanced-goodpasture-syndrome-0",
-    "system": "Respiratory",
-    "difficulty": "Advanced",
-    "diagnosis": "Goodpasture Syndrome",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "cardiovascular-clinical-aortic-stenosis-0",
-    "system": "Cardiovascular",
-    "difficulty": "Clinical",
-    "diagnosis": "Aortic Stenosis",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "img-MPX1723_synpic34922",
+    "id": "neurologic-clinical-transient-ischemic-attack-0",
     "system": "Neurologic",
     "difficulty": "Clinical",
-    "diagnosis": "Subarachnoid hemorrhage",
+    "diagnosis": "Transient Ischemic Attack",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-clinical-pelvic-fracture-0",
+    "system": "Trauma",
+    "difficulty": "Clinical",
+    "diagnosis": "Pelvic Fracture",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-foundations-sepsis-bacterial-urinary-source-0",
+    "system": "Infectious",
+    "difficulty": "Foundations",
+    "diagnosis": "Sepsis (Bacterial — Urinary Source)",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1937,19 +775,82 @@
     "aiError": null
   },
   {
-    "id": "cardiovascular-foundations-st-elevation-myocardial-infarction-inferior-stemi-0",
-    "system": "Cardiovascular",
-    "difficulty": "Foundations",
-    "diagnosis": "ST-Elevation Myocardial Infarction (Inferior STEMI)",
+    "id": "toxicologic-advanced-anticholinergic-toxidrome-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Anticholinergic Toxidrome",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "trauma-clinical-pelvic-fracture-0",
-    "system": "Trauma",
+    "id": "psychiatric-foundations-opioid-use-disorder-with-withdrawal-0",
+    "system": "Psychiatric",
+    "difficulty": "Foundations",
+    "diagnosis": "Opioid Use Disorder with Withdrawal",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-clinical-multiple-myeloma-0",
+    "system": "Hematologic / Oncologic",
     "difficulty": "Clinical",
-    "diagnosis": "Pelvic Fracture",
+    "diagnosis": "Multiple Myeloma",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "cardiovascular-clinical-aortic-stenosis-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Aortic Stenosis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-clinical-warm-autoimmune-hemolytic-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Warm Autoimmune Hemolytic Anemia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-foundations-acetaminophen-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Acetaminophen Overdose",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX1723_synpic34922",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Subarachnoid hemorrhage",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-foundations-sickle-cell-vaso-occlusive-crisis-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Sickle Cell Vaso-Occlusive Crisis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "cardiovascular-foundations-st-elevation-myocardial-infarction-inferior-stemi-0",
+    "system": "Cardiovascular",
+    "difficulty": "Foundations",
+    "diagnosis": "ST-Elevation Myocardial Infarction (Inferior STEMI)",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -1982,10 +883,19 @@
     "aiError": null
   },
   {
-    "id": "respiratory-advanced-hypersensitivity-pneumonitis-0",
-    "system": "Respiratory",
+    "id": "renal-advanced-acute-interstitial-nephritis-0",
+    "system": "Renal",
     "difficulty": "Advanced",
-    "diagnosis": "Hypersensitivity Pneumonitis",
+    "diagnosis": "Acute Interstitial Nephritis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "neurologic-clinical-guillain-barr-syndrome-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Guillain-Barré Syndrome",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2000,6 +910,15 @@
     "aiError": null
   },
   {
+    "id": "neurologic-clinical-bell-s-palsy-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Bell's Palsy",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "neurologic-foundations-acute-ischemic-stroke-0",
     "system": "Neurologic",
     "difficulty": "Foundations",
@@ -2009,19 +928,19 @@
     "aiError": null
   },
   {
-    "id": "gastrointestinal-clinical-small-bowel-obstruction-0",
-    "system": "Gastrointestinal",
-    "difficulty": "Clinical",
-    "diagnosis": "Small Bowel Obstruction",
+    "id": "respiratory-advanced-hypersensitivity-pneumonitis-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Hypersensitivity Pneumonitis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "neurologic-clinical-guillain-barr-syndrome-0",
-    "system": "Neurologic",
+    "id": "gastrointestinal-clinical-small-bowel-obstruction-0",
+    "system": "Gastrointestinal",
     "difficulty": "Clinical",
-    "diagnosis": "Guillain-Barré Syndrome",
+    "diagnosis": "Small Bowel Obstruction",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2045,15 +964,6 @@
     "aiError": null
   },
   {
-    "id": "img-MPX2266_synpic21022",
-    "system": "Infectious",
-    "difficulty": "Clinical",
-    "diagnosis": "Cerebral abscesses",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
     "id": "img-MPX1063_synpic22166",
     "system": "Cardiovascular",
     "difficulty": "Clinical",
@@ -2063,10 +973,10 @@
     "aiError": null
   },
   {
-    "id": "respiratory-foundations-community-acquired-pneumonia-0",
-    "system": "Respiratory",
-    "difficulty": "Foundations",
-    "diagnosis": "Community-Acquired Pneumonia",
+    "id": "endocrine-metabolic-clinical-addison-s-disease-primary-adrenal-insufficiency-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Addison's Disease (Primary Adrenal Insufficiency)",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2081,10 +991,10 @@
     "aiError": null
   },
   {
-    "id": "respiratory-advanced-lung-abscess-0",
-    "system": "Respiratory",
-    "difficulty": "Advanced",
-    "diagnosis": "Lung Abscess",
+    "id": "img-MPX2266_synpic21022",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Cerebral abscesses",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2108,15 +1018,6 @@
     "aiError": null
   },
   {
-    "id": "hematologic-oncologic-foundations-deep-vein-thrombosis-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Foundations",
-    "diagnosis": "Deep Vein Thrombosis",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
     "id": "img-CXR216_IM-0777-2001-clinical",
     "system": "Cardiovascular",
     "difficulty": "Clinical",
@@ -2135,10 +1036,10 @@
     "aiError": null
   },
   {
-    "id": "img-MPX1765_synpic52690",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Cerebral metastases",
+    "id": "musculoskeletal-advanced-pseudogout-cppd-crystal-arthropathy-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Pseudogout (CPPD Crystal Arthropathy)",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2153,19 +1054,19 @@
     "aiError": null
   },
   {
-    "id": "musculoskeletal-advanced-pseudogout-cppd-crystal-arthropathy-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Advanced",
-    "diagnosis": "Pseudogout (CPPD Crystal Arthropathy)",
+    "id": "img-MPX1765_synpic52690",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Cerebral metastases",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "local-biopsy-breast_cancer-0",
+    "id": "hematologic-oncologic-foundations-deep-vein-thrombosis-0",
     "system": "Hematologic / Oncologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Invasive Ductal Carcinoma of the Breast",
+    "difficulty": "Foundations",
+    "diagnosis": "Deep Vein Thrombosis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2180,55 +1081,19 @@
     "aiError": null
   },
   {
-    "id": "gastrointestinal-foundations-peptic-ulcer-disease-with-upper-gi-bleed-0",
-    "system": "Gastrointestinal",
+    "id": "musculoskeletal-foundations-rheumatoid-arthritis-0",
+    "system": "Musculoskeletal",
     "difficulty": "Foundations",
-    "diagnosis": "Peptic Ulcer Disease with Upper GI Bleed",
+    "diagnosis": "Rheumatoid Arthritis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "trauma-foundations-epidural-hematoma-0",
-    "system": "Trauma",
-    "difficulty": "Foundations",
-    "diagnosis": "Epidural Hematoma",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "gastrointestinal-advanced-primary-sclerosing-cholangitis-0",
-    "system": "Gastrointestinal",
-    "difficulty": "Advanced",
-    "diagnosis": "Primary Sclerosing Cholangitis",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "respiratory-clinical-spontaneous-pneumothorax-0",
-    "system": "Respiratory",
+    "id": "local-biopsy-breast_cancer-0",
+    "system": "Hematologic / Oncologic",
     "difficulty": "Clinical",
-    "diagnosis": "Spontaneous Pneumothorax",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "respiratory-clinical-pulmonary-arterial-hypertension-0",
-    "system": "Respiratory",
-    "difficulty": "Clinical",
-    "diagnosis": "Pulmonary Arterial Hypertension",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "img-MPX1580_synpic57544",
-    "system": "Respiratory",
-    "difficulty": "Clinical",
-    "diagnosis": "Right middle lobe pneumonia",
+    "diagnosis": "Invasive Ductal Carcinoma of the Breast",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2243,19 +1108,28 @@
     "aiError": null
   },
   {
-    "id": "neurologic-advanced-cerebral-venous-sinus-thrombosis-0",
-    "system": "Neurologic",
+    "id": "gastrointestinal-advanced-primary-sclerosing-cholangitis-0",
+    "system": "Gastrointestinal",
     "difficulty": "Advanced",
-    "diagnosis": "Cerebral Venous Sinus Thrombosis",
+    "diagnosis": "Primary Sclerosing Cholangitis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "img-MPX2266_synpic21020",
-    "system": "Hematologic / Oncologic",
+    "id": "gastrointestinal-foundations-peptic-ulcer-disease-with-upper-gi-bleed-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Foundations",
+    "diagnosis": "Peptic Ulcer Disease with Upper GI Bleed",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX1580_synpic57544",
+    "system": "Respiratory",
     "difficulty": "Clinical",
-    "diagnosis": "Cerebral metastases with hemorrhage",
+    "diagnosis": "Right middle lobe pneumonia",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2270,10 +1144,73 @@
     "aiError": null
   },
   {
+    "id": "renal-clinical-siadh-with-symptomatic-hyponatremia-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "SIADH with Symptomatic Hyponatremia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-foundations-epidural-hematoma-0",
+    "system": "Trauma",
+    "difficulty": "Foundations",
+    "diagnosis": "Epidural Hematoma",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-clinical-spontaneous-pneumothorax-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Spontaneous Pneumothorax",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "neurologic-advanced-cerebral-venous-sinus-thrombosis-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Cerebral Venous Sinus Thrombosis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-clinical-pulmonary-arterial-hypertension-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Pulmonary Arterial Hypertension",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "endocrine-metabolic-clinical-hyperosmolar-hyperglycemic-state-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Hyperosmolar Hyperglycemic State",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "trauma-clinical-compartment-syndrome-0",
     "system": "Trauma",
     "difficulty": "Clinical",
     "diagnosis": "Compartment Syndrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX2266_synpic21020",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Cerebral metastases with hemorrhage",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2297,6 +1234,15 @@
     "aiError": null
   },
   {
+    "id": "toxicologic-foundations-benzodiazepine-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Benzodiazepine Overdose",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "respiratory-clinical-copd-exacerbation-0",
     "system": "Respiratory",
     "difficulty": "Clinical",
@@ -2306,19 +1252,55 @@
     "aiError": null
   },
   {
-    "id": "local-biopsy-liver-0",
+    "id": "img-MPX2036_synpic52417",
     "system": "Gastrointestinal",
     "difficulty": "Clinical",
-    "diagnosis": "Alcoholic Liver Cirrhosis",
+    "diagnosis": "Gallbladder sludge with polyp",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "img-MPX1902_synpic35486",
-    "system": "Neurologic",
+    "id": "musculoskeletal-advanced-antiphospholipid-syndrome-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Antiphospholipid Syndrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-advanced-cyanide-poisoning-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Cyanide Poisoning",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-advanced-traumatic-rhabdomyolysis-with-multi-organ-dysfunction-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Traumatic Rhabdomyolysis with Multi-organ Dysfunction",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-foundations-community-acquired-pneumonia-0",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Community-Acquired Pneumonia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "local-biopsy-liver-0",
+    "system": "Gastrointestinal",
     "difficulty": "Clinical",
-    "diagnosis": "Colloid cyst of the third ventricle",
+    "diagnosis": "Alcoholic Liver Cirrhosis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2342,10 +1324,19 @@
     "aiError": null
   },
   {
-    "id": "img-MPX2036_synpic52417",
-    "system": "Gastrointestinal",
+    "id": "psychiatric-clinical-generalized-anxiety-disorder-0",
+    "system": "Psychiatric",
     "difficulty": "Clinical",
-    "diagnosis": "Gallbladder sludge with polyp",
+    "diagnosis": "Generalized Anxiety Disorder",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX1902_synpic35486",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Colloid cyst of the third ventricle",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2360,24 +1351,6 @@
     "aiError": null
   },
   {
-    "id": "local-derm-melanoma-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Cutaneous Melanoma",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "img-MPX1161_synpic40025",
-    "system": "Gastrointestinal",
-    "difficulty": "Clinical",
-    "diagnosis": "Bowel obstruction",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
     "id": "img-MPX2036_synpic52419",
     "system": "Gastrointestinal",
     "difficulty": "Clinical",
@@ -2387,10 +1360,19 @@
     "aiError": null
   },
   {
-    "id": "img-MPX1896_synpic27390",
-    "system": "Respiratory",
+    "id": "local-derm-melanoma-0",
+    "system": "Hematologic / Oncologic",
     "difficulty": "Clinical",
-    "diagnosis": "Congenital diaphragmatic hernia",
+    "diagnosis": "Cutaneous Melanoma",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "musculoskeletal-clinical-polymyalgia-rheumatica-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Polymyalgia Rheumatica",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2405,6 +1387,15 @@
     "aiError": null
   },
   {
+    "id": "img-MPX1161_synpic40025",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Bowel obstruction",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "trauma-foundations-splenic-laceration-0",
     "system": "Trauma",
     "difficulty": "Foundations",
@@ -2414,10 +1405,28 @@
     "aiError": null
   },
   {
+    "id": "img-MPX1896_synpic27390",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Congenital diaphragmatic hernia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "infectious-clinical-pulmonary-tuberculosis-0",
     "system": "Infectious",
     "difficulty": "Clinical",
     "diagnosis": "Pulmonary Tuberculosis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-advanced-pulmonary-embolism-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Pulmonary Embolism",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2441,10 +1450,19 @@
     "aiError": null
   },
   {
-    "id": "img-MPX1669_synpic19442",
-    "system": "Respiratory",
+    "id": "img-MPX2075_synpic33088",
+    "system": "Hematologic / Oncologic",
     "difficulty": "Clinical",
-    "diagnosis": "Right-sided pneumothorax with deep sulcus sign",
+    "diagnosis": "Hepatic metastasis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-clinical-ptsd-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "PTSD",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2459,10 +1477,10 @@
     "aiError": null
   },
   {
-    "id": "img-MPX2075_synpic33088",
-    "system": "Hematologic / Oncologic",
+    "id": "img-MPX1669_synpic19442",
+    "system": "Respiratory",
     "difficulty": "Clinical",
-    "diagnosis": "Hepatic metastasis",
+    "diagnosis": "Right-sided pneumothorax with deep sulcus sign",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2486,6 +1504,15 @@
     "aiError": null
   },
   {
+    "id": "local-derm-nevus-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Dysplastic Melanocytic Nevus",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "img-MPX1749_synpic15007",
     "system": "Cardiovascular",
     "difficulty": "Clinical",
@@ -2504,15 +1531,6 @@
     "aiError": null
   },
   {
-    "id": "local-derm-nevus-0",
-    "system": "Hematologic / Oncologic",
-    "difficulty": "Foundations",
-    "diagnosis": "Dysplastic Melanocytic Nevus",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
     "id": "img-MPX2544_synpic55622",
     "system": "Cardiovascular",
     "difficulty": "Advanced",
@@ -2522,19 +1540,19 @@
     "aiError": null
   },
   {
-    "id": "img-CXR3848_IM-1946-1001-0001",
-    "system": "Cardiovascular",
-    "difficulty": "Clinical",
-    "diagnosis": "Cardiomegaly with pulmonary congestion",
+    "id": "musculoskeletal-advanced-adult-onset-still-s-disease-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Adult-Onset Still's Disease",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "trauma-clinical-rib-fractures-with-hemothorax-0",
-    "system": "Trauma",
-    "difficulty": "Clinical",
-    "diagnosis": "Rib Fractures with Hemothorax",
+    "id": "psychiatric-advanced-lithium-toxicity-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Lithium Toxicity",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2549,64 +1567,172 @@
     "aiError": null
   },
   {
+    "id": "musculoskeletal-foundations-acute-gouty-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Gouty Arthritis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-advanced-myelodysplastic-syndrome-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Myelodysplastic Syndrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-foundations-carbon-monoxide-poisoning-0",
+    "system": "Toxicologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Carbon Monoxide Poisoning",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-foundations-iron-deficiency-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Iron Deficiency Anemia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-CXR3848_IM-1946-1001-0001",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Cardiomegaly with pulmonary congestion",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-advanced-serotonin-syndrome-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Serotonin Syndrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-advanced-waldenstr-m-macroglobulinemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Waldenström Macroglobulinemia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-clinical-methanol-ingestion-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Methanol Ingestion",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-clinical-bipolar-i-disorder-manic-episode-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "Bipolar I Disorder — Manic Episode",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-advanced-organophosphate-poisoning-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Organophosphate Poisoning",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-clinical-rib-fractures-with-hemothorax-0",
+    "system": "Trauma",
+    "difficulty": "Clinical",
+    "diagnosis": "Rib Fractures with Hemothorax",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-clinical-salicylate-toxicity-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Salicylate Toxicity",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "musculoskeletal-advanced-systemic-lupus-erythematosus-with-nephritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Systemic Lupus Erythematosus with Nephritis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "musculoskeletal-foundations-osteoporotic-vertebral-compression-fracture-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Foundations",
+    "diagnosis": "Osteoporotic Vertebral Compression Fracture",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-clinical-alcohol-withdrawal-syndrome-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "Alcohol Withdrawal Syndrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "gastrointestinal-foundations-acute-pancreatitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Pancreatitis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-clinical-acute-osteomyelitis-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Osteomyelitis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-foundations-major-depressive-episode-0",
+    "system": "Psychiatric",
+    "difficulty": "Foundations",
+    "diagnosis": "Major Depressive Episode",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "endocrine-metabolic-advanced-carcinoid-syndrome-0",
     "system": "Endocrine / Metabolic",
     "difficulty": "Advanced",
     "diagnosis": "Carcinoid Syndrome",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "trauma-clinical-traumatic-aortic-injury-0",
-    "system": "Trauma",
-    "difficulty": "Clinical",
-    "diagnosis": "Traumatic Aortic Injury",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "psychiatric-advanced-wernicke-s-encephalopathy-0",
-    "system": "Psychiatric",
-    "difficulty": "Advanced",
-    "diagnosis": "Wernicke's Encephalopathy",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "toxicologic-clinical-tricyclic-antidepressant-overdose-0",
-    "system": "Toxicologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Tricyclic Antidepressant Overdose",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "gastrointestinal-clinical-acute-diverticulitis-0",
-    "system": "Gastrointestinal",
-    "difficulty": "Clinical",
-    "diagnosis": "Acute Diverticulitis",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "gastrointestinal-clinical-crohn-s-disease-flare-0",
-    "system": "Gastrointestinal",
-    "difficulty": "Clinical",
-    "diagnosis": "Crohn's Disease Flare",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "neurologic-clinical-chronic-subdural-hematoma-0",
-    "system": "Neurologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Chronic Subdural Hematoma",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2621,10 +1747,19 @@
     "aiError": null
   },
   {
-    "id": "gastrointestinal-advanced-whipple-s-disease-0",
-    "system": "Gastrointestinal",
-    "difficulty": "Advanced",
-    "diagnosis": "Whipple's Disease",
+    "id": "neurologic-clinical-chronic-subdural-hematoma-0",
+    "system": "Neurologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Chronic Subdural Hematoma",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-foundations-first-episode-psychosis-0",
+    "system": "Psychiatric",
+    "difficulty": "Foundations",
+    "diagnosis": "First-Episode Psychosis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2657,10 +1792,145 @@
     "aiError": null
   },
   {
+    "id": "gastrointestinal-advanced-whipple-s-disease-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Whipple's Disease",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-advanced-disseminated-histoplasmosis-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Disseminated Histoplasmosis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-advanced-neuroleptic-malignant-syndrome-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Neuroleptic Malignant Syndrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-advanced-membranous-nephropathy-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Membranous Nephropathy",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-advanced-cll-with-autoimmune-hemolytic-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "CLL with Autoimmune Hemolytic Anemia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-advanced-wernicke-s-encephalopathy-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Wernicke's Encephalopathy",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-clinical-digoxin-toxicity-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Digoxin Toxicity",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-clinical-traumatic-aortic-injury-0",
+    "system": "Trauma",
+    "difficulty": "Clinical",
+    "diagnosis": "Traumatic Aortic Injury",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-clinical-tricyclic-antidepressant-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Tricyclic Antidepressant Overdose",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "gastrointestinal-clinical-acute-diverticulitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Diverticulitis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "musculoskeletal-clinical-reactive-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Reactive Arthritis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "gastrointestinal-clinical-crohn-s-disease-flare-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Crohn's Disease Flare",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "musculoskeletal-advanced-dermatomyositis-0",
     "system": "Musculoskeletal",
     "difficulty": "Advanced",
     "diagnosis": "Dermatomyositis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-foundations-panic-disorder-0",
+    "system": "Psychiatric",
+    "difficulty": "Foundations",
+    "diagnosis": "Panic Disorder",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-foundations-opioid-toxidrome-0",
+    "system": "Toxicologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Opioid Toxidrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-foundations-meningococcal-meningitis-0",
+    "system": "Infectious",
+    "difficulty": "Foundations",
+    "diagnosis": "Meningococcal Meningitis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2684,64 +1954,28 @@
     "aiError": null
   },
   {
-    "id": "renal-advanced-membranous-nephropathy-0",
-    "system": "Renal",
-    "difficulty": "Advanced",
-    "diagnosis": "Membranous Nephropathy",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "musculoskeletal-foundations-osteoporotic-vertebral-compression-fracture-0",
-    "system": "Musculoskeletal",
-    "difficulty": "Foundations",
-    "diagnosis": "Osteoporotic Vertebral Compression Fracture",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "gastrointestinal-foundations-acute-pancreatitis-0",
-    "system": "Gastrointestinal",
-    "difficulty": "Foundations",
-    "diagnosis": "Acute Pancreatitis",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "infectious-clinical-acute-osteomyelitis-0",
-    "system": "Infectious",
-    "difficulty": "Clinical",
-    "diagnosis": "Acute Osteomyelitis",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "local-fundus-amd-0",
-    "system": "Neurologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Neovascular Age-Related Macular Degeneration",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "img-MPX2544_synpic55621",
-    "system": "Cardiovascular",
-    "difficulty": "Advanced",
-    "diagnosis": "Left ventricular non-compaction cardiomyopathy",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
     "id": "cardiovascular-advanced-takotsubo-cardiomyopathy-0",
     "system": "Cardiovascular",
     "difficulty": "Advanced",
     "diagnosis": "Takotsubo Cardiomyopathy",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-clinical-vitamin-b12-deficiency-megaloblastic-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Vitamin B12 Deficiency Megaloblastic Anemia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "neurologic-foundations-migraine-with-aura-0",
+    "system": "Neurologic",
+    "difficulty": "Foundations",
+    "diagnosis": "Migraine with Aura",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2756,24 +1990,6 @@
     "aiError": null
   },
   {
-    "id": "trauma-foundations-tension-pneumothorax-0",
-    "system": "Trauma",
-    "difficulty": "Foundations",
-    "diagnosis": "Tension Pneumothorax",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "respiratory-advanced-pulmonary-alveolar-proteinosis-0",
-    "system": "Respiratory",
-    "difficulty": "Advanced",
-    "diagnosis": "Pulmonary Alveolar Proteinosis",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
     "id": "img-MPX2031_synpic38141",
     "system": "Gastrointestinal",
     "difficulty": "Advanced",
@@ -2783,10 +1999,19 @@
     "aiError": null
   },
   {
-    "id": "cardiovascular-clinical-dilated-cardiomyopathy-0",
-    "system": "Cardiovascular",
+    "id": "trauma-foundations-tension-pneumothorax-0",
+    "system": "Trauma",
+    "difficulty": "Foundations",
+    "diagnosis": "Tension Pneumothorax",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "local-fundus-amd-0",
+    "system": "Neurologic",
     "difficulty": "Clinical",
-    "diagnosis": "Dilated Cardiomyopathy",
+    "diagnosis": "Neovascular Age-Related Macular Degeneration",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2801,28 +2026,46 @@
     "aiError": null
   },
   {
-    "id": "local-fundus-glaucoma-0",
-    "system": "Neurologic",
+    "id": "cardiovascular-clinical-dilated-cardiomyopathy-0",
+    "system": "Cardiovascular",
     "difficulty": "Clinical",
-    "diagnosis": "Primary Open-Angle Glaucoma",
+    "diagnosis": "Dilated Cardiomyopathy",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "neurologic-clinical-transient-ischemic-attack-0",
-    "system": "Neurologic",
-    "difficulty": "Clinical",
-    "diagnosis": "Transient Ischemic Attack",
+    "id": "img-MPX2544_synpic55621",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Left ventricular non-compaction cardiomyopathy",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "respiratory-foundations-acute-asthma-exacerbation-0",
+    "id": "respiratory-advanced-pulmonary-alveolar-proteinosis-0",
     "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Pulmonary Alveolar Proteinosis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "endocrine-metabolic-foundations-diabetic-ketoacidosis-0",
+    "system": "Endocrine / Metabolic",
     "difficulty": "Foundations",
-    "diagnosis": "Acute Asthma Exacerbation",
+    "diagnosis": "Diabetic Ketoacidosis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-clinical-pulmonary-embolism-0",
+    "system": "Respiratory",
+    "difficulty": "Clinical",
+    "diagnosis": "Pulmonary Embolism",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2837,10 +2080,19 @@
     "aiError": null
   },
   {
-    "id": "hematologic-oncologic-clinical-multiple-myeloma-0",
-    "system": "Hematologic / Oncologic",
+    "id": "respiratory-foundations-acute-asthma-exacerbation-0",
+    "system": "Respiratory",
+    "difficulty": "Foundations",
+    "diagnosis": "Acute Asthma Exacerbation",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "local-fundus-glaucoma-0",
+    "system": "Neurologic",
     "difficulty": "Clinical",
-    "diagnosis": "Multiple Myeloma",
+    "diagnosis": "Primary Open-Angle Glaucoma",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2873,10 +2125,55 @@
     "aiError": null
   },
   {
+    "id": "toxicologic-advanced-opioid-toxidrome-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Opioid Toxidrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-advanced-strongyloidiasis-with-hyperinfection-syndrome-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Strongyloidiasis with Hyperinfection Syndrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "neurologic-advanced-first-unprovoked-seizure-0",
     "system": "Neurologic",
     "difficulty": "Advanced",
     "diagnosis": "First Unprovoked Seizure",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "cardiovascular-advanced-non-st-elevation-myocardial-infarction-nstemi-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Non-ST-Elevation Myocardial Infarction (NSTEMI)",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-clinical-prerenal-acute-kidney-injury-0",
+    "system": "Renal",
+    "difficulty": "Clinical",
+    "diagnosis": "Prerenal Acute Kidney Injury",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "endocrine-metabolic-clinical-hypothyroidism-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Hypothyroidism",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2909,10 +2206,46 @@
     "aiError": null
   },
   {
-    "id": "neurologic-advanced-anti-nmdar-autoimmune-encephalitis-0",
-    "system": "Neurologic",
+    "id": "endocrine-metabolic-advanced-hypothyroidism-0",
+    "system": "Endocrine / Metabolic",
     "difficulty": "Advanced",
-    "diagnosis": "Anti-NMDAR Autoimmune Encephalitis",
+    "diagnosis": "Hypothyroidism",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-advanced-prerenal-acute-kidney-injury-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Prerenal Acute Kidney Injury",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-clinical-influenza-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Influenza",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-advanced-influenza-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Influenza",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "gastrointestinal-advanced-acute-hepatitis-b-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Hepatitis B",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2936,10 +2269,55 @@
     "aiError": null
   },
   {
-    "id": "musculoskeletal-advanced-septic-arthritis-0",
-    "system": "Musculoskeletal",
+    "id": "infectious-clinical-cellulitis-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Cellulitis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "endocrine-metabolic-advanced-graves-disease-hyperthyroidism-0",
+    "system": "Endocrine / Metabolic",
     "difficulty": "Advanced",
-    "diagnosis": "Septic Arthritis",
+    "diagnosis": "Graves' Disease (Hyperthyroidism)",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "endocrine-metabolic-clinical-graves-disease-hyperthyroidism-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Clinical",
+    "diagnosis": "Graves' Disease (Hyperthyroidism)",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-advanced-traumatic-aortic-injury-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Traumatic Aortic Injury",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-advanced-carbon-monoxide-poisoning-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Carbon Monoxide Poisoning",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-clinical-meningococcal-meningitis-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Meningococcal Meningitis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2954,10 +2332,37 @@
     "aiError": null
   },
   {
-    "id": "infectious-advanced-pneumocystis-jirovecii-pneumonia-pcp-0",
-    "system": "Infectious",
+    "id": "musculoskeletal-clinical-acute-gouty-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Gouty Arthritis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-advanced-tricyclic-antidepressant-overdose-0",
+    "system": "Toxicologic",
     "difficulty": "Advanced",
-    "diagnosis": "Pneumocystis Jirovecii Pneumonia (PCP)",
+    "diagnosis": "Tricyclic Antidepressant Overdose",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-advanced-alcohol-withdrawal-syndrome-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Alcohol Withdrawal Syndrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "neurologic-advanced-chronic-subdural-hematoma-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Chronic Subdural Hematoma",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2972,10 +2377,37 @@
     "aiError": null
   },
   {
+    "id": "renal-advanced-acute-pyelonephritis-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Acute Pyelonephritis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-advanced-meningococcal-meningitis-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Meningococcal Meningitis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "renal-advanced-nephrotic-syndrome-0",
     "system": "Renal",
     "difficulty": "Advanced",
     "diagnosis": "Nephrotic Syndrome",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-advanced-rhabdomyolysis-with-acute-kidney-injury-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Rhabdomyolysis with Acute Kidney Injury",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -2999,6 +2431,15 @@
     "aiError": null
   },
   {
+    "id": "toxicologic-advanced-salicylate-toxicity-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Salicylate Toxicity",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "gastrointestinal-advanced-acute-diverticulitis-0",
     "system": "Gastrointestinal",
     "difficulty": "Advanced",
@@ -3008,64 +2449,109 @@
     "aiError": null
   },
   {
-    "id": "renal-advanced-acute-pyelonephritis-0",
-    "system": "Renal",
+    "id": "musculoskeletal-advanced-acute-gouty-arthritis-0",
+    "system": "Musculoskeletal",
     "difficulty": "Advanced",
-    "diagnosis": "Acute Pyelonephritis",
+    "diagnosis": "Acute Gouty Arthritis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "trauma-advanced-traumatic-aortic-injury-0",
-    "system": "Trauma",
+    "id": "musculoskeletal-advanced-septic-arthritis-0",
+    "system": "Musculoskeletal",
     "difficulty": "Advanced",
-    "diagnosis": "Traumatic Aortic Injury",
+    "diagnosis": "Septic Arthritis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "neurologic-advanced-chronic-subdural-hematoma-0",
-    "system": "Neurologic",
-    "difficulty": "Advanced",
-    "diagnosis": "Chronic Subdural Hematoma",
+    "id": "hematologic-oncologic-clinical-iron-deficiency-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Iron Deficiency Anemia",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "toxicologic-advanced-tricyclic-antidepressant-overdose-0",
+    "id": "hematologic-oncologic-advanced-iron-deficiency-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Iron Deficiency Anemia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-advanced-bipolar-i-disorder-manic-episode-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Bipolar I Disorder — Manic Episode",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-advanced-methanol-ingestion-0",
     "system": "Toxicologic",
     "difficulty": "Advanced",
-    "diagnosis": "Tricyclic Antidepressant Overdose",
+    "diagnosis": "Methanol Ingestion",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "cardiovascular-advanced-aortic-stenosis-0",
-    "system": "Cardiovascular",
+    "id": "infectious-advanced-pneumocystis-jirovecii-pneumonia-pcp-0",
+    "system": "Infectious",
     "difficulty": "Advanced",
-    "diagnosis": "Aortic Stenosis",
+    "diagnosis": "Pneumocystis Jirovecii Pneumonia (PCP)",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "img-MPX2313_synpic27141-advanced",
-    "system": "Respiratory",
-    "difficulty": "Advanced",
-    "diagnosis": "Right upper lobe pneumonia",
+    "id": "hematologic-oncologic-clinical-immune-thrombocytopenia-itp-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Immune Thrombocytopenia (ITP)",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "trauma-advanced-pelvic-fracture-0",
-    "system": "Trauma",
+    "id": "toxicologic-clinical-carbon-monoxide-poisoning-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Carbon Monoxide Poisoning",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-clinical-sickle-cell-vaso-occlusive-crisis-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Sickle Cell Vaso-Occlusive Crisis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-advanced-opioid-use-disorder-with-withdrawal-0",
+    "system": "Psychiatric",
     "difficulty": "Advanced",
-    "diagnosis": "Pelvic Fracture",
+    "diagnosis": "Opioid Use Disorder with Withdrawal",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-clinical-opioid-use-disorder-with-withdrawal-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "Opioid Use Disorder with Withdrawal",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3080,6 +2566,51 @@
     "aiError": null
   },
   {
+    "id": "cardiovascular-advanced-st-elevation-myocardial-infarction-inferior-stemi-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "ST-Elevation Myocardial Infarction (Inferior STEMI)",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "cardiovascular-advanced-aortic-stenosis-0",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Aortic Stenosis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-advanced-sickle-cell-vaso-occlusive-crisis-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Sickle Cell Vaso-Occlusive Crisis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-advanced-immune-thrombocytopenia-itp-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Immune Thrombocytopenia (ITP)",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "hematologic-oncologic-advanced-warm-autoimmune-hemolytic-anemia-0",
+    "system": "Hematologic / Oncologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Warm Autoimmune Hemolytic Anemia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "cardiovascular-clinical-st-elevation-myocardial-infarction-inferior-stemi-0",
     "system": "Cardiovascular",
     "difficulty": "Clinical",
@@ -3089,10 +2620,73 @@
     "aiError": null
   },
   {
-    "id": "cardiovascular-advanced-st-elevation-myocardial-infarction-inferior-stemi-0",
+    "id": "infectious-advanced-sepsis-bacterial-urinary-source-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Sepsis (Bacterial — Urinary Source)",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-clinical-sepsis-bacterial-urinary-source-0",
+    "system": "Infectious",
+    "difficulty": "Clinical",
+    "diagnosis": "Sepsis (Bacterial — Urinary Source)",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX2313_synpic27141-advanced",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Right upper lobe pneumonia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-clinical-first-episode-psychosis-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "First-Episode Psychosis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-advanced-pelvic-fracture-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Pelvic Fracture",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-advanced-first-episode-psychosis-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "First-Episode Psychosis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-advanced-acetaminophen-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Acetaminophen Overdose",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX1063_synpic22166-advanced",
     "system": "Cardiovascular",
     "difficulty": "Advanced",
-    "diagnosis": "ST-Elevation Myocardial Infarction (Inferior STEMI)",
+    "diagnosis": "Stanford type A aortic dissection with hemopericardium",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3107,10 +2701,10 @@
     "aiError": null
   },
   {
-    "id": "img-MPX1063_synpic22166-advanced",
-    "system": "Cardiovascular",
+    "id": "neurologic-advanced-bell-s-palsy-0",
+    "system": "Neurologic",
     "difficulty": "Advanced",
-    "diagnosis": "Stanford type A aortic dissection with hemopericardium",
+    "diagnosis": "Bell's Palsy",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3143,19 +2737,19 @@
     "aiError": null
   },
   {
-    "id": "img-CXR3945_IM-2014-2001-advanced",
-    "system": "Respiratory",
+    "id": "endocrine-metabolic-advanced-addison-s-disease-primary-adrenal-insufficiency-0",
+    "system": "Endocrine / Metabolic",
     "difficulty": "Advanced",
-    "diagnosis": "Surgical clip in right lung, otherwise unremarkable chest",
+    "diagnosis": "Addison's Disease (Primary Adrenal Insufficiency)",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "img-MPX2266_synpic21022-advanced",
-    "system": "Infectious",
+    "id": "img-CXR3945_IM-2014-2001-advanced",
+    "system": "Respiratory",
     "difficulty": "Advanced",
-    "diagnosis": "Cerebral abscesses",
+    "diagnosis": "Surgical clip in right lung, otherwise unremarkable chest",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3179,6 +2773,15 @@
     "aiError": null
   },
   {
+    "id": "img-MPX2266_synpic21022-advanced",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Cerebral abscesses",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "hematologic-oncologic-advanced-deep-vein-thrombosis-0",
     "system": "Hematologic / Oncologic",
     "difficulty": "Advanced",
@@ -3192,6 +2795,78 @@
     "system": "Hematologic / Oncologic",
     "difficulty": "Advanced",
     "diagnosis": "Cerebral metastases",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-advanced-hemorrhagic-shock-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Hemorrhagic Shock",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "respiratory-advanced-pulmonary-arterial-hypertension-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Pulmonary Arterial Hypertension",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX1603_synpic10084-advanced",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Small bowel obstruction",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX1580_synpic57544-advanced",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Right middle lobe pneumonia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "musculoskeletal-clinical-rheumatoid-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Clinical",
+    "diagnosis": "Rheumatoid Arthritis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-advanced-siadh-with-symptomatic-hyponatremia-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "SIADH with Symptomatic Hyponatremia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "endocrine-metabolic-advanced-hyperosmolar-hyperglycemic-state-0",
+    "system": "Endocrine / Metabolic",
+    "difficulty": "Advanced",
+    "diagnosis": "Hyperosmolar Hyperglycemic State",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "renal-advanced-severe-hyperkalemia-0",
+    "system": "Renal",
+    "difficulty": "Advanced",
+    "diagnosis": "Severe Hyperkalemia",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3224,6 +2899,15 @@
     "aiError": null
   },
   {
+    "id": "img-MPX1580_synpic57545-clinical",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Post-sternotomy with coronary artery bypass graft",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "trauma-clinical-hemorrhagic-shock-0",
     "system": "Trauma",
     "difficulty": "Clinical",
@@ -3242,55 +2926,10 @@
     "aiError": null
   },
   {
-    "id": "renal-advanced-severe-hyperkalemia-0",
-    "system": "Renal",
+    "id": "musculoskeletal-advanced-rheumatoid-arthritis-0",
+    "system": "Musculoskeletal",
     "difficulty": "Advanced",
-    "diagnosis": "Severe Hyperkalemia",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "trauma-advanced-hemorrhagic-shock-0",
-    "system": "Trauma",
-    "difficulty": "Advanced",
-    "diagnosis": "Hemorrhagic Shock",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "respiratory-advanced-pulmonary-arterial-hypertension-0",
-    "system": "Respiratory",
-    "difficulty": "Advanced",
-    "diagnosis": "Pulmonary Arterial Hypertension",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "img-MPX1580_synpic57544-advanced",
-    "system": "Respiratory",
-    "difficulty": "Advanced",
-    "diagnosis": "Right middle lobe pneumonia",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "img-MPX1580_synpic57545-clinical",
-    "system": "Cardiovascular",
-    "difficulty": "Clinical",
-    "diagnosis": "Post-sternotomy with coronary artery bypass graft",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "img-MPX1603_synpic10084-advanced",
-    "system": "Gastrointestinal",
-    "difficulty": "Advanced",
-    "diagnosis": "Small bowel obstruction",
+    "diagnosis": "Rheumatoid Arthritis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3305,6 +2944,33 @@
     "aiError": null
   },
   {
+    "id": "psychiatric-advanced-generalized-anxiety-disorder-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Generalized Anxiety Disorder",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-clinical-benzodiazepine-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Benzodiazepine Overdose",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-advanced-benzodiazepine-overdose-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Benzodiazepine Overdose",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "img-MPX1580_synpic57545-advanced",
     "system": "Cardiovascular",
     "difficulty": "Advanced",
@@ -3314,10 +2980,19 @@
     "aiError": null
   },
   {
-    "id": "respiratory-advanced-copd-exacerbation-0",
-    "system": "Respiratory",
+    "id": "infectious-advanced-cellulitis-0",
+    "system": "Infectious",
     "difficulty": "Advanced",
-    "diagnosis": "COPD Exacerbation",
+    "diagnosis": "Cellulitis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-clinical-opioid-toxidrome-0",
+    "system": "Toxicologic",
+    "difficulty": "Clinical",
+    "diagnosis": "Opioid Toxidrome",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3332,46 +3007,19 @@
     "aiError": null
   },
   {
+    "id": "respiratory-advanced-copd-exacerbation-0",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "COPD Exacerbation",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "img-MPX2036_synpic52419-advanced",
     "system": "Gastrointestinal",
     "difficulty": "Advanced",
     "diagnosis": "Gallbladder adenomatous polyp",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "img-CXR3245_IM-1537-4001-advanced",
-    "system": "Cardiovascular",
-    "difficulty": "Advanced",
-    "diagnosis": "Cardiomegaly with pulmonary venous congestion",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "trauma-advanced-splenic-laceration-0",
-    "system": "Trauma",
-    "difficulty": "Advanced",
-    "diagnosis": "Splenic Laceration",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "trauma-clinical-splenic-laceration-0",
-    "system": "Trauma",
-    "difficulty": "Clinical",
-    "diagnosis": "Splenic Laceration",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "respiratory-advanced-pulmonary-embolism-0",
-    "system": "Respiratory",
-    "difficulty": "Advanced",
-    "diagnosis": "Pulmonary Embolism",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3386,6 +3034,33 @@
     "aiError": null
   },
   {
+    "id": "psychiatric-advanced-ptsd-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "PTSD",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "trauma-advanced-splenic-laceration-0",
+    "system": "Trauma",
+    "difficulty": "Advanced",
+    "diagnosis": "Splenic Laceration",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-CXR3245_IM-1537-4001-advanced",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Cardiomegaly with pulmonary venous congestion",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "img-MPX2075_synpic33088-advanced",
     "system": "Hematologic / Oncologic",
     "difficulty": "Advanced",
@@ -3395,46 +3070,19 @@
     "aiError": null
   },
   {
-    "id": "img-MPX1749_synpic15007-advanced",
-    "system": "Cardiovascular",
-    "difficulty": "Advanced",
-    "diagnosis": "Left atrial and left ventricular enlargement (cardiomegaly)",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "img-MPX1669_synpic19442-advanced",
-    "system": "Respiratory",
-    "difficulty": "Advanced",
-    "diagnosis": "Right-sided pneumothorax with deep sulcus sign",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "img-CXR3848_IM-1946-1001-0001-advanced",
-    "system": "Cardiovascular",
-    "difficulty": "Advanced",
-    "diagnosis": "Cardiomegaly with pulmonary congestion",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "gastrointestinal-clinical-acute-cholecystitis-0",
-    "system": "Gastrointestinal",
+    "id": "trauma-clinical-splenic-laceration-0",
+    "system": "Trauma",
     "difficulty": "Clinical",
-    "diagnosis": "Acute Cholecystitis",
+    "diagnosis": "Splenic Laceration",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "img-MPX1771_synpic16984-advanced",
-    "system": "Gastrointestinal",
+    "id": "musculoskeletal-advanced-polymyalgia-rheumatica-0",
+    "system": "Musculoskeletal",
     "difficulty": "Advanced",
-    "diagnosis": "Small bowel enteritis with mural edema",
+    "diagnosis": "Polymyalgia Rheumatica",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3449,10 +3097,82 @@
     "aiError": null
   },
   {
+    "id": "gastrointestinal-clinical-acute-cholecystitis-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Cholecystitis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX1669_synpic19442-advanced",
+    "system": "Respiratory",
+    "difficulty": "Advanced",
+    "diagnosis": "Right-sided pneumothorax with deep sulcus sign",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX1749_synpic15007-advanced",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Left atrial and left ventricular enlargement (cardiomegaly)",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-MPX1771_synpic16984-advanced",
+    "system": "Gastrointestinal",
+    "difficulty": "Advanced",
+    "diagnosis": "Small bowel enteritis with mural edema",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "img-CXR3848_IM-1946-1001-0001-advanced",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Cardiomegaly with pulmonary congestion",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-advanced-major-depressive-episode-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Major Depressive Episode",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "neurologic-advanced-migraine-with-aura-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Migraine with Aura",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
     "id": "musculoskeletal-advanced-lumbar-disc-herniation-with-radiculopathy-0",
     "system": "Musculoskeletal",
     "difficulty": "Advanced",
     "diagnosis": "Lumbar Disc Herniation with Radiculopathy",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-clinical-panic-disorder-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "Panic Disorder",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3467,19 +3187,37 @@
     "aiError": null
   },
   {
-    "id": "cardiovascular-clinical-acute-heart-failure-exacerbation-0",
+    "id": "cardiovascular-advanced-dilated-cardiomyopathy-0",
     "system": "Cardiovascular",
-    "difficulty": "Clinical",
-    "diagnosis": "Acute Heart Failure Exacerbation",
+    "difficulty": "Advanced",
+    "diagnosis": "Dilated Cardiomyopathy",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
   },
   {
-    "id": "infectious-advanced-infective-endocarditis-0",
-    "system": "Infectious",
+    "id": "hematologic-oncologic-advanced-vitamin-b12-deficiency-megaloblastic-anemia-0",
+    "system": "Hematologic / Oncologic",
     "difficulty": "Advanced",
-    "diagnosis": "Infective Endocarditis",
+    "diagnosis": "Vitamin B12 Deficiency Megaloblastic Anemia",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-advanced-panic-disorder-0",
+    "system": "Psychiatric",
+    "difficulty": "Advanced",
+    "diagnosis": "Panic Disorder",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "musculoskeletal-advanced-reactive-arthritis-0",
+    "system": "Musculoskeletal",
+    "difficulty": "Advanced",
+    "diagnosis": "Reactive Arthritis",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3512,28 +3250,28 @@
     "aiError": null
   },
   {
-    "id": "cardiovascular-advanced-atrial-fibrillation-with-rapid-ventricular-response-0",
-    "system": "Cardiovascular",
-    "difficulty": "Advanced",
-    "diagnosis": "Atrial Fibrillation with Rapid Ventricular Response",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "cardiovascular-advanced-dilated-cardiomyopathy-0",
-    "system": "Cardiovascular",
-    "difficulty": "Advanced",
-    "diagnosis": "Dilated Cardiomyopathy",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
     "id": "gastrointestinal-advanced-crohn-s-disease-flare-0",
     "system": "Gastrointestinal",
     "difficulty": "Advanced",
     "diagnosis": "Crohn's Disease Flare",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "cardiovascular-clinical-acute-heart-failure-exacerbation-0",
+    "system": "Cardiovascular",
+    "difficulty": "Clinical",
+    "diagnosis": "Acute Heart Failure Exacerbation",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "toxicologic-advanced-digoxin-toxicity-0",
+    "system": "Toxicologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Digoxin Toxicity",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3557,10 +3295,28 @@
     "aiError": null
   },
   {
-    "id": "neurologic-advanced-transient-ischemic-attack-0",
-    "system": "Neurologic",
+    "id": "cardiovascular-advanced-atrial-fibrillation-with-rapid-ventricular-response-0",
+    "system": "Cardiovascular",
     "difficulty": "Advanced",
-    "diagnosis": "Transient Ischemic Attack",
+    "diagnosis": "Atrial Fibrillation with Rapid Ventricular Response",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "infectious-advanced-infective-endocarditis-0",
+    "system": "Infectious",
+    "difficulty": "Advanced",
+    "diagnosis": "Infective Endocarditis",
+    "structuralFlags": [],
+    "aiReview": null,
+    "aiError": null
+  },
+  {
+    "id": "psychiatric-clinical-major-depressive-episode-0",
+    "system": "Psychiatric",
+    "difficulty": "Clinical",
+    "diagnosis": "Major Depressive Episode",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3575,19 +3331,10 @@
     "aiError": null
   },
   {
-    "id": "respiratory-clinical-acute-asthma-exacerbation-0",
-    "system": "Respiratory",
-    "difficulty": "Clinical",
-    "diagnosis": "Acute Asthma Exacerbation",
-    "structuralFlags": [],
-    "aiReview": null,
-    "aiError": null
-  },
-  {
-    "id": "respiratory-clinical-pulmonary-embolism-0",
-    "system": "Respiratory",
-    "difficulty": "Clinical",
-    "diagnosis": "Pulmonary Embolism",
+    "id": "neurologic-advanced-transient-ischemic-attack-0",
+    "system": "Neurologic",
+    "difficulty": "Advanced",
+    "diagnosis": "Transient Ischemic Attack",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3602,10 +3349,10 @@
     "aiError": null
   },
   {
-    "id": "gastrointestinal-clinical-peptic-ulcer-disease-with-upper-gi-bleed-0",
-    "system": "Gastrointestinal",
-    "difficulty": "Clinical",
-    "diagnosis": "Peptic Ulcer Disease with Upper GI Bleed",
+    "id": "img-MPX1063_synpic22165-advanced",
+    "system": "Cardiovascular",
+    "difficulty": "Advanced",
+    "diagnosis": "Stanford type A aortic dissection",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null
@@ -3620,10 +3367,10 @@
     "aiError": null
   },
   {
-    "id": "img-MPX1063_synpic22165-advanced",
-    "system": "Cardiovascular",
-    "difficulty": "Advanced",
-    "diagnosis": "Stanford type A aortic dissection",
+    "id": "gastrointestinal-clinical-peptic-ulcer-disease-with-upper-gi-bleed-0",
+    "system": "Gastrointestinal",
+    "difficulty": "Clinical",
+    "diagnosis": "Peptic Ulcer Disease with Upper GI Bleed",
     "structuralFlags": [],
     "aiReview": null,
     "aiError": null

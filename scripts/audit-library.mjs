@@ -133,8 +133,8 @@ function structuralCheck(row) {
     }
   }
 
-  // STEMI ECG rule
-  if (/stemi/i.test(row.diagnosis)) {
+  // STEMI ECG rule (word-boundary prevents false match on "NSTEMI")
+  if (/\bSTEMI\b/i.test(row.diagnosis)) {
     const ecg = c.ecgFindings ?? ''
     if (!/st.{0,10}elevation|st-elevation|\bmm\b/i.test(ecg)) {
       flags.push('STEMI case missing explicit ST elevation in ecgFindings')
@@ -153,7 +153,7 @@ function structuralCheck(row) {
   const EXAM_DIAGNOSTIC = [
     /\bconsistent with\b/i, /\bsuggesting\b/i, /\bindicating\b/i,
     /\bfindings? of\b/i, /\bpattern of\b/i, /\bin keeping with\b/i,
-    /\bsigns? of\b/i, /\bsecondary to\b/i,
+    /\bsigns? of\b.{0,40}(disease|syndrome|failure|disorder|injury|cirrhosis|inflammation|infection|deficiency|toxicity|malignancy|anemia)/i, /\bsecondary to\b/i,
     /\bdue to\b.{0,30}(disease|syndrome|failure|disorder|injury|nephritis|hepatitis)/i,
   ]
   for (const [region, finding] of Object.entries(c.physicalExam ?? {})) {
