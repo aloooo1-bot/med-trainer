@@ -72,3 +72,9 @@ Landing Page.html
 
 # Sentry Config File
 .env.sentry-build-plugin
+
+# Claude Code local config and worktrees — per-user, not for version control
+.claude/
+
+# Student-audit transcripts — machine-generated source data, not tracked
+scripts/student-audit/artifacts/transcripts/
