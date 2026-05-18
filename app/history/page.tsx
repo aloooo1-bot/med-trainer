@@ -290,6 +290,8 @@ type DiffFilter = typeof DIFF_FILTERS[number]
 const SCORE_BUCKETS = ['<60', '60-69', '70-79', '80-89', '90+'] as const
 type DateRange = 'all' | '7d' | '30d' | '90d'
 
+const WAVE11_RUBRIC_CUTOFF_MS = Date.parse('2026-05-17T20:36:25Z')
+
 export default function HistoryPage() {
   const [sessions, setSessions]         = useState<CaseSessionRecord[]>([])
   const [loaded, setLoaded]             = useState(false)
@@ -309,6 +311,8 @@ export default function HistoryPage() {
   const [scoreBuckets, setScoreBuckets]   = useState<Set<string>>(new Set())
   const [dateRange, setDateRange]         = useState<DateRange>('all')
   const [onlyBookmarked, setOnlyBookmarked] = useState(false)
+  const [lowScoreOnly, setLowScoreOnly]     = useState(false)
+  const [wrongDxOnly, setWrongDxOnly]       = useState(false)
 
   useEffect(() => {
     async function load() {
@@ -379,12 +383,14 @@ export default function HistoryPage() {
       if (scoreBuckets.size > 0 && !scoreBuckets.has(scoreBucketFor(s.score))) return false
       if (dateCutoff > 0 && s.completedAt < dateCutoff) return false
       if (onlyBookmarked && !s.bookmarked) return false
+      if (lowScoreOnly && s.score >= 60) return false
+      if (wrongDxOnly && s.correct !== false) return false
       if (q && !(s.userDiagnosis ?? '').toLowerCase().includes(q) && !s.diagnosis.toLowerCase().includes(q) && !(s.notes ?? '').toLowerCase().includes(q)) return false
       return true
     })
-  }, [sessions, diffFilter, systemFilter, scoreBuckets, dateCutoff, onlyBookmarked, searchQuery])
+  }, [sessions, diffFilter, systemFilter, scoreBuckets, dateCutoff, onlyBookmarked, searchQuery, lowScoreOnly, wrongDxOnly])
 
-  const isFiltered = diffFilter !== 'All' || systemFilter.size > 0 || scoreBuckets.size > 0 || dateRange !== 'all' || onlyBookmarked || searchQuery.length > 0
+  const isFiltered = diffFilter !== 'All' || systemFilter.size > 0 || scoreBuckets.size > 0 || dateRange !== 'all' || onlyBookmarked || searchQuery.length > 0 || lowScoreOnly || wrongDxOnly
 
   function clearAllFilters() {
     setDiffFilter('All')
@@ -392,6 +398,8 @@ export default function HistoryPage() {
     setScoreBuckets(new Set())
     setDateRange('all')
     setOnlyBookmarked(false)
+    setLowScoreOnly(false)
+    setWrongDxOnly(false)
     setSearchRaw('')
     setExpandedId(null)
   }
@@ -568,13 +576,27 @@ export default function HistoryPage() {
               )}
             </div>
 
-            {/* Bookmarked chip (separate row for consistent grouping) */}
+            {/* Bookmarked + study filter chips */}
             <div className="dx-filter-chips">
               <button
                 className={`dx-chip${onlyBookmarked ? ' active' : ''}`}
                 onClick={() => { setOnlyBookmarked(v => !v); setExpandedId(null) }}
               >
                 {onlyBookmarked ? '★' : '☆'} Bookmarked
+              </button>
+              <button
+                className={`dx-chip${lowScoreOnly ? ' active' : ''}`}
+                onClick={() => { setLowScoreOnly(v => !v); setExpandedId(null) }}
+                title="Only show cases with rubric score below 60"
+              >
+                Score &lt;60
+              </button>
+              <button
+                className={`dx-chip${wrongDxOnly ? ' active' : ''}`}
+                onClick={() => { setWrongDxOnly(v => !v); setExpandedId(null) }}
+                title="Only show cases where the submitted diagnosis was incorrect"
+              >
+                Wrong diagnosis
               </button>
             </div>
 
@@ -719,8 +741,18 @@ export default function HistoryPage() {
                           {session.difficulty}
                         </span>
                       </span>
-                      <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 17, letterSpacing: '-0.01em', color: scoreColorVar(session.score) }}>
-                        {session.score}<span style={{ fontSize: 10, fontWeight: 500, opacity: 0.6, marginLeft: 1, verticalAlign: 'top', lineHeight: '2' }}>%</span>
+                      <span style={{ display: 'flex', flexDirection: 'column', gap: 1, alignItems: 'flex-start' }}>
+                        <span style={{ fontFamily: "'JetBrains Mono', monospace", fontWeight: 700, fontSize: 17, letterSpacing: '-0.01em', color: scoreColorVar(session.score) }}>
+                          {session.score}<span style={{ fontSize: 10, fontWeight: 500, opacity: 0.6, marginLeft: 1, verticalAlign: 'top', lineHeight: '2' }}>%</span>
+                        </span>
+                        {session.completedAt < WAVE11_RUBRIC_CUTOFF_MS && (
+                          <span
+                            title="Graded before the 2026-05-17 rubric update. Scores reflect prior grading rules and may differ from current rubric."
+                            style={{ fontSize: 9, fontWeight: 600, padding: '1px 5px', borderRadius: 3, color: 'var(--muted)', background: 'var(--surface3)', border: '1px solid var(--border)', whiteSpace: 'nowrap' }}
+                          >
+                            legacy
+                          </span>
+                        )}
                       </span>
                       <span>
                         {(() => {
