@@ -1,4 +1,9 @@
+'use client'
+
 import Link from 'next/link'
+import { useState, useEffect } from 'react'
+import { loadReviewItems } from '@/app/lib/reasoning/store'
+import { dueCount } from '@/app/lib/reasoning/spacedRepetition'
 
 type ActivePage = 'dashboard' | 'case-history' | 'progress' | 'focus-areas' | 'recall' | 'settings' | 'help'
 
@@ -51,6 +56,14 @@ export default function Sidebar({ displayName, tier, activePage = 'dashboard' }:
   displayName: string; tier: string; activePage?: ActivePage
 }) {
   const initials = displayName.slice(0, 2).toUpperCase()
+  const [recallDue, setRecallDue] = useState(0)
+
+  useEffect(() => {
+    // Mount-only read of the review deck from localStorage (unavailable during SSR).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setRecallDue(dueCount(loadReviewItems(), Date.now()))
+  }, [])
+
   return (
     <aside className="dx-sidebar">
       <div className="dx-logo">
@@ -66,6 +79,18 @@ export default function Sidebar({ displayName, tier, activePage = 'dashboard' }:
           >
             {item.icon}
             {item.label}
+            {item.page === 'recall' && recallDue > 0 && (
+              <span
+                style={{
+                  marginLeft: 'auto', minWidth: 18, height: 18, padding: '0 5px', borderRadius: 9,
+                  background: 'var(--red, #ef4444)', color: '#fff', fontSize: 10, fontWeight: 700,
+                  display: 'inline-flex', alignItems: 'center', justifyContent: 'center',
+                }}
+                aria-label={`${recallDue} cards due for review`}
+              >
+                {recallDue > 99 ? '99+' : recallDue}
+              </span>
+            )}
           </Link>
         ))}
       </nav>

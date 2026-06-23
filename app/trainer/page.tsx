@@ -179,8 +179,6 @@ export default function MedTrainer() {
   const [feedbackText, setFeedbackText] = useState('')
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false)
-  const [chatPanelHeight, setChatPanelHeight] = useState(28)
-  const chatDragRef = useRef<{ startY: number; startHeight: number } | null>(null)
   const timerExpireRef = useRef<(() => void) | null>(null)
   const analyticsSessionRef = useRef<ActiveSession | null>(null)
   const activeSectionRef = useRef<string>('hpi')
@@ -274,36 +272,6 @@ export default function MedTrainer() {
     window.addEventListener('beforeunload', handler)
     return () => window.removeEventListener('beforeunload', handler)
   }, [])
-
-  useEffect(() => {
-    try {
-      const saved = localStorage.getItem('medtrainer_chat_height')
-      // Mount-only restore of the persisted chat panel height from localStorage.
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      if (saved) setChatPanelHeight(Number(saved) || 28)
-    } catch {}
-  }, [])
-
-  // Ready-to-wire chat-panel resize handler (drag to resize, persists height).
-  // Not yet attached to a drag handle in the JSX. Underscore marks intentional-unused.
-  const _handleChatDragStart = (e: React.MouseEvent) => {
-    e.preventDefault()
-    chatDragRef.current = { startY: e.clientY, startHeight: chatPanelHeight }
-    const handleMove = (ev: MouseEvent) => {
-      if (!chatDragRef.current) return
-      const deltaPercent = ((chatDragRef.current.startY - ev.clientY) / window.innerHeight) * 100
-      const newH = Math.min(50, Math.max(15, chatDragRef.current.startHeight + deltaPercent))
-      setChatPanelHeight(newH)
-      try { localStorage.setItem('medtrainer_chat_height', String(Math.round(newH))) } catch {}
-    }
-    const handleUp = () => {
-      chatDragRef.current = null
-      window.removeEventListener('mousemove', handleMove)
-      window.removeEventListener('mouseup', handleUp)
-    }
-    window.addEventListener('mousemove', handleMove)
-    window.addEventListener('mouseup', handleUp)
-  }
 
   useEffect(() => {
     // Reset/advance the generation phase indicator in response to the generating flag.
