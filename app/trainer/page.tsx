@@ -122,9 +122,10 @@ export default function MedTrainer() {
   const [chatLoading, setChatLoading] = useState(false)
   const [userDiagnosis, setUserDiagnosis] = useState('')
   const [gradingResult, setGradingResult] = useState<GradingResult | null>(null)
+  // Pre-test differential ranking the student commits before ordering tests (null = not yet locked).
+  const [prediction, setPrediction] = useState<string[] | null>(null)
   const [expandedCategory, setExpandedCategory] = useState<DimensionKey | null>(null)
   const [gradingLoading, setGradingLoading] = useState(false)
-  const [revealed, setRevealed] = useState(false)
 
   const [caseDifficulty, setCaseDifficulty] = useState<string>('')
   const [revealedExamRegions, setRevealedExamRegions] = useState<Set<string>>(new Set())
@@ -165,7 +166,7 @@ export default function MedTrainer() {
   const [caseStarted, setCaseStarted] = useState(true)
   const [zoomedImage, setZoomedImage] = useState<{ src: string; alt: string } | null>(null)
   const [showHistory, setShowHistory] = useState(false)
-  const [historyEntries, setHistoryEntries] = useState<CaseHistoryEntry[]>([])
+  const [historyEntries] = useState<CaseHistoryEntry[]>([])
   const [pendingGenerateWithNotes, setPendingGenerateWithNotes] = useState(false)
   const [helpSection, setHelpSection] = useState<string | null>(null)
   const [generationError, setGenerationError] = useState<string | null>(null)
@@ -177,7 +178,6 @@ export default function MedTrainer() {
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false)
   const [chatPanelHeight, setChatPanelHeight] = useState(28)
-  const [chatPanelCollapsed, setChatPanelCollapsed] = useState(false)
   const chatDragRef = useRef<{ startY: number; startHeight: number } | null>(null)
   const timerExpireRef = useRef<(() => void) | null>(null)
   const analyticsSessionRef = useRef<ActiveSession | null>(null)
@@ -282,7 +282,9 @@ export default function MedTrainer() {
     } catch {}
   }, [])
 
-  const handleChatDragStart = (e: React.MouseEvent) => {
+  // Ready-to-wire chat-panel resize handler (drag to resize, persists height).
+  // Not yet attached to a drag handle in the JSX. Underscore marks intentional-unused.
+  const _handleChatDragStart = (e: React.MouseEvent) => {
     e.preventDefault()
     chatDragRef.current = { startY: e.clientY, startHeight: chatPanelHeight }
     const handleMove = (ev: MouseEvent) => {
@@ -568,7 +570,7 @@ Return ONLY valid JSON — no markdown, no explanation:
     setRevealedExamRegions(new Set())
     setChatMessages([])
     setGradingResult(null)
-    setRevealed(false)
+    setPrediction(null)
     setUserDiagnosis('')
     setFeedbackRatings({})
     setFeedbackHover({})
@@ -1626,6 +1628,8 @@ Student message: "${msg}"`
         return <OrderView
           caseData={caseData}
           caseDifficulty={caseDifficulty}
+          prediction={prediction}
+          onLockPrediction={setPrediction}
           orderedTests={orderedTests}
           selectedTests={selectedTests}
           toggleTest={toggleTest}
@@ -1673,6 +1677,7 @@ Student message: "${msg}"`
         return <DiagnosisView
           caseData={caseData}
           caseDifficulty={caseDifficulty}
+          prediction={prediction}
           resolvedSystem={resolvedSystemRef.current}
           gradingLoading={gradingLoading}
           gradingError={gradingError}

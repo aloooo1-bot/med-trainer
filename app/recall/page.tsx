@@ -1,10 +1,10 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import '@/app/dashboard.css'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import { createClient } from '@/app/lib/supabase/client'
-import { loadReviewItems, gradeReviewItem } from '@/app/lib/reasoning/store'
+import { loadReviewItems, gradeReviewItem, recordReviewDay, loadStreak } from '@/app/lib/reasoning/store'
 import { dueItems } from '@/app/lib/reasoning/spacedRepetition'
 import type { ReviewItem, ReviewGrade, ReviewTag } from '@/app/lib/reasoning/types'
 
@@ -32,6 +32,7 @@ export default function RecallPage() {
   const [idx, setIdx] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
   const [reviewedCount, setReviewedCount] = useState(0)
+  const [streak, setStreak] = useState(0)
 
   useEffect(() => {
     const supabase = createClient()
@@ -46,23 +47,41 @@ export default function RecallPage() {
   }, [])
 
   useEffect(() => {
-    // Mount-only load of review cards from localStorage (unavailable during SSR).
+    // Mount-only load of review cards + streak from localStorage (unavailable during SSR).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setQueue(dueItems(loadReviewItems(), Date.now()))
+    setStreak(loadStreak().streak)
     setLoaded(true)
   }, [])
 
   const current = queue[idx]
 
-  function grade(g: ReviewGrade, now: number) {
+  const grade = useCallback((g: ReviewGrade, now: number) => {
     if (!current) return
     gradeReviewItem(current.id, g, now)
+    setStreak(recordReviewDay(now).streak)
     setReviewedCount(c => c + 1)
     setShowAnswer(false)
     // A lapse re-shows the card later this session.
     if (g === 'again') setQueue(q => [...q, current])
     setIdx(i => i + 1)
-  }
+  }, [current])
+
+  // Keyboard shortcuts: space/enter reveals, 1-4 grade Again/Hard/Good/Easy.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if (!current) return
+      if (!showAnswer) {
+        if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setShowAnswer(true) }
+        return
+      }
+      const map: Record<string, ReviewGrade> = { '1': 'again', '2': 'hard', '3': 'good', '4': 'easy' }
+      const g = map[e.key]
+      if (g) { e.preventDefault(); grade(g, Date.now()) }
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [showAnswer, current, grade])
 
   const remaining = queue.length - idx
   const done = loaded && (queue.length === 0 || idx >= queue.length)
@@ -93,13 +112,19 @@ export default function RecallPage() {
                     ? `You reviewed ${reviewedCount} card${reviewedCount === 1 ? '' : 's'}. Come back tomorrow for the next batch.`
                     : 'Complete cases in the trainer to build your review deck, then check back as cards come due.'}
                 </p>
+                {streak > 0 && (
+                  <div style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 999, background: 'var(--surface-2, transparent)', border: '1px solid var(--border)' }}>
+                    <span style={{ fontSize: 15 }}>🔥</span>
+                    <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{streak}-day review streak</span>
+                  </div>
+                )}
               </div>
             </div>
           ) : (
             <>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                 <span style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'JetBrains Mono, monospace' }}>
-                  {remaining} due
+                  {remaining} due{streak > 0 ? `  ·  🔥 ${streak}` : ''}
                 </span>
                 <span style={{ fontSize: 12, color: 'var(--muted)' }}>{TAG_LABEL[current.tag]} · {current.diagnosis}</span>
               </div>
@@ -120,22 +145,22 @@ export default function RecallPage() {
                       onClick={() => setShowAnswer(true)}
                       style={{ alignSelf: 'flex-start', marginTop: 'auto', padding: '8px 18px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface-2, transparent)', color: 'var(--text)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
                     >
-                      Show answer
+                      Show answer <span style={{ opacity: 0.5, fontWeight: 400 }}>(space)</span>
                     </button>
                   )}
                 </div>
 
                 {showAnswer && (
                   <div style={{ display: 'flex', gap: 8, padding: '14px 24px', borderTop: '1px solid var(--border)' }}>
-                    {GRADES.map(g => (
+                    {GRADES.map((g, gi) => (
                       <button
                         key={g.grade}
                         onClick={() => grade(g.grade, Date.now())}
                         style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: `1px solid ${g.color}`, background: 'transparent', color: g.color, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
-                        title={g.hint}
+                        title={`${g.hint} — press ${gi + 1}`}
                       >
                         {g.label}
-                        <span style={{ display: 'block', fontSize: 10, fontWeight: 400, opacity: 0.7 }}>{g.hint}</span>
+                        <span style={{ display: 'block', fontSize: 10, fontWeight: 400, opacity: 0.7 }}>{gi + 1} · {g.hint}</span>
                       </button>
                     ))}
                   </div>

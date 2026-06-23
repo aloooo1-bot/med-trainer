@@ -75,7 +75,6 @@ export function buildRubricPrompt(input) {
   const hardFloorGeneric     = isFoundations ? 86 : 82
   const hardFloorFoundCorr   = 86
 
-  const crFloor = cr ? Math.round(cr.max * 0.73) : 0
 
   const weightBlock = rubric
     .map(d => `- ${d.label} (${d.key}): ${d.max} points`)

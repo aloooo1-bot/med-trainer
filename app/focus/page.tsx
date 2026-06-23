@@ -20,12 +20,6 @@ import {
 import { useChartTheme } from '@/app/lib/useChartTheme'
 import { useRouter } from 'next/navigation'
 
-function cssScore(score: number): string {
-  if (score < 60) return 'var(--red)'
-  if (score < 75) return 'var(--amber)'
-  return 'var(--green)'
-}
-
 const CAT_KEYS = ['history', 'testing', 'diagnosis', 'completeness', 'reasoning'] as const
 const CAT_LABELS: Record<typeof CAT_KEYS[number], string> = {
   history: 'History & Interview',

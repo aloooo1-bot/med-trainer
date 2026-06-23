@@ -15,8 +15,8 @@ export function ResultsView({
   caseData, orderedTests, imagingCache, ecgCache,
   smearCache, biopsyImgCache, fundusCache, dermCache, urineImgCache,
   collapsedPanels, setCollapsedPanels,
-  generatingOnDemand, failedOnDemand, setFailedOnDemand,
-  gradingResult, setZoomedImage, setActiveSection, setOrderedTests, onRetryFailed,
+  generatingOnDemand, failedOnDemand,
+  gradingResult, setZoomedImage, setActiveSection, onRetryFailed,
 }: {
   caseData: CaseData
   orderedTests: Set<string>

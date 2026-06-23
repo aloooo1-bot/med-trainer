@@ -5,13 +5,15 @@ import { FeedbackCarousel, type FeedbackSection } from './FeedbackCarousel'
 import { DiagnosisInput } from './DiagnosisInput'
 import { WhyPanel } from './WhyPanel'
 import { MicButton } from './MicButton'
+import { computeBeliefs } from '@/app/lib/reasoning/differential'
+import { scorePrediction } from '@/app/lib/reasoning/prediction'
 import { getRubric, type DimensionKey } from '@/app/grading/rubric'
 import { type GradingResult } from '@/app/grading/types'
 import { type TimerState, type NotesState, SOAP_TEMPLATE } from '../_lib/types'
 import type { CaseData } from '../_lib/types'
 
 export function DiagnosisView({
-  caseData, caseDifficulty, resolvedSystem,
+  caseData, caseDifficulty, prediction, resolvedSystem,
   gradingLoading, gradingError, gradingResult,
   userDiagnosis, setUserDiagnosis,
   userPresentation, setUserPresentation,
@@ -22,11 +24,12 @@ export function DiagnosisView({
   feedbackText, setFeedbackText,
   feedbackSubmitted, setFeedbackSubmitted,
   feedbackSubmitting, setFeedbackSubmitting,
-  notes, setNotes,
+  notes,
   submitDiagnosis, generateCase, orderedTests,
 }: {
   caseData: CaseData
   caseDifficulty: string
+  prediction: string[] | null
   resolvedSystem: string
   gradingLoading: boolean
   gradingError: string | null
@@ -355,6 +358,21 @@ export function DiagnosisView({
             </div>
           </div>
         )}
+
+        {prediction && (caseData.differentialPriors?.length ?? 0) > 0 && (() => {
+          const beliefs = computeBeliefs(caseData.differentialPriors!, caseData.testImpacts ?? {}, Array.from(orderedTests))
+          const ps = scorePrediction(prediction, beliefs)
+          if (ps.comparedCount === 0) return null
+          return (
+            <div className="border-t border-rule px-5 py-4">
+              <h3 className="font-serif text-sm font-semibold text-ink mb-2">Pre-test calibration</h3>
+              <p style={{ fontSize: 12, color: 'var(--color-ink-secondary)', lineHeight: 1.6 }}>
+                Your initial read led with <strong>{ps.studentTop}</strong>; after the workup the evidence pointed to <strong>{ps.engineTop}</strong>.
+                {' '}Ranking agreement: <strong>{ps.score}/100</strong>{ps.topHit ? ' — your top pick was correct ✓' : ' — your top pick shifted with the data.'}
+              </p>
+            </div>
+          )
+        })()}
 
         {caseData.mechanism && (
           <div className="border-t border-rule px-5 py-4">

@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import type { CaseEntry } from '@/app/lib/dashboardData'
-import { scoreClass, scoreColor } from '@/app/lib/scoreColor'
+import { scoreClass } from '@/app/lib/scoreColor'
 import CaseDetailPanel from './CaseDetailPanel'
 
 const TABS = ['All', 'Foundations', 'Clinical', 'Advanced'] as const

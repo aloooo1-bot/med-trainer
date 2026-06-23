@@ -197,7 +197,7 @@ Invent a completely unique patient name. ${clause} Never reuse first names or la
  * @param {string|null} [variantSeed] - unused (kept for backwards compat)
  * @returns {string}
  */
-export function buildCasePrompt(system: string, difficulty: string, diagnosis?: string, variantSeed?: string | null) {
+export function buildCasePrompt(system: string, difficulty: string, diagnosis?: string, _variantSeed?: string | null) {
   const diffRules = DIFFICULTY_RULES[difficulty as keyof typeof DIFFICULTY_RULES] ?? DIFFICULTY_RULES.Foundations
   const diffCount = difficulty === 'Foundations' ? '2-3' : difficulty === 'Clinical' ? '3-4' : '4-5'
   const schema = JSON_SCHEMA.replace('DIFF_COUNT', diffCount)

@@ -15,7 +15,9 @@ import type { ReviewGrade } from './types'
 
 const REVIEW_KEY = 'medtrainer_review_items'
 const MASTERY_KEY = 'medtrainer_mastery'
+const STREAK_KEY = 'medtrainer_recall_streak'
 const MAX_REVIEW = 2000
+const DAY_MS = 86_400_000
 
 // ── Review-item extraction (pure) ───────────────────────────────────────────
 
@@ -135,6 +137,29 @@ export function recordMastery(system: string, difficulty: string, score: number,
 
 export function clearMastery(): void {
   try { localStorage.removeItem(MASTERY_KEY) } catch {}
+}
+
+// ── Daily review streak ─────────────────────────────────────────────────────
+
+export interface RecallStreak { lastDay: string; streak: number }
+
+function dayString(ms: number): string {
+  return new Date(ms).toISOString().slice(0, 10) // YYYY-MM-DD (UTC)
+}
+
+export function loadStreak(): RecallStreak {
+  try { return JSON.parse(localStorage.getItem(STREAK_KEY) ?? '{"lastDay":"","streak":0}') as RecallStreak } catch { return { lastDay: '', streak: 0 } }
+}
+
+/** Mark a review as done today; extends the streak if yesterday was reviewed, else resets to 1. Idempotent within a day. */
+export function recordReviewDay(now: number): RecallStreak {
+  const day = dayString(now)
+  const cur = loadStreak()
+  if (cur.lastDay === day) return cur
+  const yesterday = dayString(now - DAY_MS)
+  const next: RecallStreak = { lastDay: day, streak: cur.lastDay === yesterday ? cur.streak + 1 : 1 }
+  try { localStorage.setItem(STREAK_KEY, JSON.stringify(next)) } catch {}
+  return next
 }
 
 // ── Combined entry point ────────────────────────────────────────────────────
