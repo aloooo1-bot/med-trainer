@@ -166,16 +166,35 @@ export function recordReviewDay(now: number): RecallStreak {
 
 // ── Predict-then-compare calibration history ────────────────────────────────
 
-export interface CalibrationEntry { ts: number; score: number; topHit: boolean }
+export interface CalibrationEntry {
+  ts: number
+  /** Ranking agreement vs the engine's evidence-based order (0-100). */
+  score: number
+  /** Student's top pick matched the engine's top. */
+  topHit: boolean
+  /** Stated confidence in the top pick (0-1), if the student set one. */
+  confidence?: number
+  /** Top pick matched the actual correct diagnosis (for Brier calibration). */
+  correct?: boolean
+}
 
 export function loadCalibration(): CalibrationEntry[] {
   try { return JSON.parse(localStorage.getItem(CALIBRATION_KEY) ?? '[]') as CalibrationEntry[] } catch { return [] }
 }
 
-/** Append one case's pre-test calibration result (how the student's ranking matched the evidence). */
-export function recordCalibration(score: number, topHit: boolean, now: number): CalibrationEntry[] {
+/** Append one case's pre-test calibration result. confidence/correct power the Brier calibration view. */
+export function recordCalibration(
+  score: number,
+  topHit: boolean,
+  now: number,
+  confidence?: number,
+  correct?: boolean,
+): CalibrationEntry[] {
   const entries = loadCalibration()
-  entries.push({ ts: now, score, topHit })
+  const entry: CalibrationEntry = { ts: now, score, topHit }
+  if (confidence != null) entry.confidence = confidence
+  if (correct != null) entry.correct = correct
+  entries.push(entry)
   const capped = entries.slice(-MAX_CALIBRATION)
   try { localStorage.setItem(CALIBRATION_KEY, JSON.stringify(capped)) } catch {}
   return capped

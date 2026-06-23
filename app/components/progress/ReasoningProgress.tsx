@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { loadMastery, loadCalibration, type CalibrationEntry } from '@/app/lib/reasoning/store'
 import { recommendNext, isMastered, masteryKey } from '@/app/lib/reasoning/mastery'
+import { calibrationSummary } from '@/app/lib/reasoning/prediction'
 import type { MasteryRecord } from '@/app/lib/reasoning/types'
 
 const SYSTEMS = [
@@ -44,6 +45,19 @@ export default function ReasoningProgress() {
       recent: calibration.slice(-12),
     }
   }, [calibration])
+
+  const confCal = useMemo(
+    () => calibrationSummary(
+      calibration
+        .filter(c => c.confidence != null && c.correct != null)
+        .map(c => ({ confidence: c.confidence!, correct: c.correct! })),
+    ),
+    [calibration],
+  )
+
+  const VERDICT_COLOR: Record<string, string> = {
+    overconfident: 'var(--red)', underconfident: 'var(--amber)', 'well-calibrated': 'var(--green)',
+  }
 
   if (!loaded) return null
 
@@ -128,6 +142,14 @@ export default function ReasoningProgress() {
                 ))}
               </div>
             </div>
+            {confCal && (
+              <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 12, lineHeight: 1.6 }}>
+                Confidence calibration: you average <strong style={{ color: 'var(--text)' }}>{confCal.avgConfidence}%</strong> confidence
+                but your top pick is right <strong style={{ color: 'var(--text)' }}>{confCal.actualAccuracy}%</strong> of the time —{' '}
+                <strong style={{ color: VERDICT_COLOR[confCal.verdict] }}>{confCal.verdict}</strong>
+                {' '}(Brier {confCal.brier}, {confCal.n} rated).
+              </p>
+            )}
           </div>
         )}
 

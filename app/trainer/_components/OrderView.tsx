@@ -5,7 +5,7 @@ import { PredictionPanel } from './PredictionPanel'
 import type { CaseData } from '../_lib/types'
 
 export function OrderView({
-  caseData, caseDifficulty, prediction, onLockPrediction, orderedTests, selectedTests,
+  caseData, caseDifficulty, prediction, predictionConfidence, onLockPrediction, orderedTests, selectedTests,
   toggleTest, orderTests, orderCustomTest, removeOrderedTest,
   testSearchQuery, setTestSearchQuery, showSearchDropdown, setShowSearchDropdown,
   customTestInput, setCustomTestInput, locked,
@@ -13,7 +13,8 @@ export function OrderView({
   caseData: CaseData
   caseDifficulty: string
   prediction: string[] | null
-  onLockPrediction: (ranking: string[]) => void
+  predictionConfidence: number | null
+  onLockPrediction: (ranking: string[], confidence: number) => void
   orderedTests: Set<string>
   selectedTests: Set<string>
   toggleTest: (name: string) => void
@@ -36,7 +37,7 @@ export function OrderView({
     const allOrdered = (name: string) => orderedTests.has(name)
     return (
       <div className="space-y-4">
-        <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} prediction={prediction} onLock={onLockPrediction} />
+        <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
         <SectionCard title="Laboratory Studies">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {caseData.availableLabs.map(lab => {
@@ -101,7 +102,7 @@ export function OrderView({
 
     return (
       <div className="space-y-4">
-        <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} prediction={prediction} onLock={onLockPrediction} />
+        <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
             <svg className="h-4 w-4 text-ink-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -255,7 +256,7 @@ export function OrderView({
 
   return (
     <div className="space-y-4">
-      <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} prediction={prediction} onLock={onLockPrediction} />
+      <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
       <div className="rounded-md border border-primary-200 bg-primary-50 px-4 py-3">
         <p className="text-xs text-primary-700">
           <span className="font-semibold">Advanced difficulty:</span> no pre-listed lab panels — search and type test names from memory. Imaging modalities are listed below for reference.

@@ -24,6 +24,53 @@ function maxDisplacement(n: number): number {
   return Math.floor((n * n) / 2) || 1
 }
 
+// ── Confidence calibration (Brier) ──────────────────────────────────────────
+
+/**
+ * Brier score for a single binary forecast: (confidence − outcome)².
+ * confidence in [0,1]; outcome 1 if the prediction was correct, else 0.
+ * 0 = perfect, 1 = maximally wrong. Lower is better.
+ */
+export function brierScore(confidence: number, correct: boolean): number {
+  const c = Math.max(0, Math.min(1, confidence))
+  const o = correct ? 1 : 0
+  return (c - o) * (c - o)
+}
+
+export interface CalibrationSummary {
+  n: number
+  /** Mean stated confidence (0-100). */
+  avgConfidence: number
+  /** Mean actual hit rate of the top pick (0-100). */
+  actualAccuracy: number
+  /** Mean Brier score (0-1, lower is better). */
+  brier: number
+  verdict: 'overconfident' | 'underconfident' | 'well-calibrated'
+}
+
+/**
+ * Aggregate confidence-vs-outcome pairs into a calibration verdict. A gap of
+ * >10 points between stated confidence and actual accuracy flags over/under-confidence.
+ */
+export function calibrationSummary(
+  pairs: Array<{ confidence: number; correct: boolean }>,
+): CalibrationSummary | null {
+  if (!pairs.length) return null
+  const n = pairs.length
+  const avgConfidence = pairs.reduce((a, p) => a + Math.max(0, Math.min(1, p.confidence)), 0) / n
+  const actualAccuracy = pairs.filter(p => p.correct).length / n
+  const brier = pairs.reduce((a, p) => a + brierScore(p.confidence, p.correct), 0) / n
+  const gap = avgConfidence - actualAccuracy
+  const verdict = gap > 0.1 ? 'overconfident' : gap < -0.1 ? 'underconfident' : 'well-calibrated'
+  return {
+    n,
+    avgConfidence: Math.round(avgConfidence * 100),
+    actualAccuracy: Math.round(actualAccuracy * 100),
+    brier: Math.round(brier * 1000) / 1000,
+    verdict,
+  }
+}
+
 /**
  * Compare a student's pre-test ranking (most-likely first) against the engine's
  * post-workup belief order. Only diagnoses present in both are scored.

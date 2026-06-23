@@ -124,8 +124,9 @@ export default function MedTrainer() {
   const [chatLoading, setChatLoading] = useState(false)
   const [userDiagnosis, setUserDiagnosis] = useState('')
   const [gradingResult, setGradingResult] = useState<GradingResult | null>(null)
-  // Pre-test differential ranking the student commits before ordering tests (null = not yet locked).
+  // Pre-test differential ranking + confidence the student commits before ordering tests (null = not yet locked).
   const [prediction, setPrediction] = useState<string[] | null>(null)
+  const [predictionConfidence, setPredictionConfidence] = useState<number | null>(null)
   const [expandedCategory, setExpandedCategory] = useState<DimensionKey | null>(null)
   const [gradingLoading, setGradingLoading] = useState(false)
 
@@ -541,6 +542,7 @@ Return ONLY valid JSON — no markdown, no explanation:
     setChatMessages([])
     setGradingResult(null)
     setPrediction(null)
+    setPredictionConfidence(null)
     setUserDiagnosis('')
     setFeedbackRatings({})
     setFeedbackHover({})
@@ -1331,7 +1333,11 @@ Student message: "${msg}"`
         if (prediction && (caseData.differentialPriors?.length ?? 0) > 0) {
           const beliefs = computeBeliefs(caseData.differentialPriors!, caseData.testImpacts ?? {}, Array.from(orderedTests))
           const ps = scorePrediction(prediction, beliefs)
-          if (ps.comparedCount > 0) recordCalibration(ps.score, ps.topHit, Date.now())
+          // Brier calibration: stated confidence vs whether the top pick was the actual diagnosis.
+          const topCorrect = prediction[0] === caseData.diagnosis
+          if (ps.comparedCount > 0) {
+            recordCalibration(ps.score, ps.topHit, Date.now(), predictionConfidence ?? undefined, topCorrect)
+          }
         }
       } catch {}
 
@@ -1605,7 +1611,8 @@ Student message: "${msg}"`
           caseData={caseData}
           caseDifficulty={caseDifficulty}
           prediction={prediction}
-          onLockPrediction={setPrediction}
+          predictionConfidence={predictionConfidence}
+          onLockPrediction={(ranking, confidence) => { setPrediction(ranking); setPredictionConfidence(confidence) }}
           orderedTests={orderedTests}
           selectedTests={selectedTests}
           toggleTest={toggleTest}
