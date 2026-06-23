@@ -7,6 +7,7 @@ import { createClient } from '@/app/lib/supabase/client'
 import { loadReviewItems, gradeReviewItem, recordReviewDay, loadStreak } from '@/app/lib/reasoning/store'
 import { dueItems } from '@/app/lib/reasoning/spacedRepetition'
 import type { ReviewItem, ReviewGrade, ReviewTag } from '@/app/lib/reasoning/types'
+import DeckBrowser from './DeckBrowser'
 
 const TAG_LABEL: Record<ReviewTag, string> = {
   discriminator: 'Discriminator',
@@ -28,6 +29,8 @@ export default function RecallPage() {
 
   // Session state — the due queue is frozen at session start.
   const [loaded, setLoaded] = useState(false)
+  const [allItems, setAllItems] = useState<ReviewItem[]>([])
+  const [now, setNow] = useState(0)
   const [queue, setQueue] = useState<ReviewItem[]>([])
   const [idx, setIdx] = useState(0)
   const [showAnswer, setShowAnswer] = useState(false)
@@ -48,8 +51,12 @@ export default function RecallPage() {
 
   useEffect(() => {
     // Mount-only load of review cards + streak from localStorage (unavailable during SSR).
+    const t = Date.now()
+    const items = loadReviewItems()
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    setQueue(dueItems(loadReviewItems(), Date.now()))
+    setAllItems(items)
+    setNow(t)
+    setQueue(dueItems(items, t))
     setStreak(loadStreak().streak)
     setLoaded(true)
   }, [])
@@ -71,6 +78,9 @@ export default function RecallPage() {
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
       if (!current) return
+      // Don't hijack typing in the deck search box or any form field.
+      const t = e.target as HTMLElement | null
+      if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return
       if (!showAnswer) {
         if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setShowAnswer(true) }
         return
@@ -129,8 +139,8 @@ export default function RecallPage() {
                 <span style={{ fontSize: 12, color: 'var(--muted)' }}>{TAG_LABEL[current.tag]} · {current.diagnosis}</span>
               </div>
 
-              <div className="dx-card">
-                <div style={{ padding: '28px 24px', minHeight: 180, display: 'flex', flexDirection: 'column', gap: 18 }}>
+              <div className="dx-card" role="group" aria-label="Review card">
+                <div aria-live="polite" style={{ padding: '28px 24px', minHeight: 180, display: 'flex', flexDirection: 'column', gap: 18 }}>
                   <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>
                     {current.system}
                   </div>
@@ -168,6 +178,8 @@ export default function RecallPage() {
               </div>
             </>
           )}
+
+          {loaded && <DeckBrowser items={allItems} now={now} />}
         </div>
       </div>
     </div>

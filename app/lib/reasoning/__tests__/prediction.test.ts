@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { scorePrediction, brierScore, calibrationSummary } from '../prediction'
+import { scorePrediction, brierScore, calibrationSummary, reliabilityBuckets } from '../prediction'
 import type { BeliefState } from '../types'
 
 const beliefs = (order: string[]): BeliefState[] =>
@@ -77,4 +77,20 @@ test('calibrationSummary flags underconfidence and well-calibrated', () => {
   ])!
   assert.equal(ok.verdict, 'well-calibrated')
   assert.equal(calibrationSummary([]), null)
+})
+
+test('reliabilityBuckets groups by confidence band with per-band accuracy', () => {
+  const buckets = reliabilityBuckets([
+    { confidence: 0.9, correct: true },
+    { confidence: 0.95, correct: false }, // both land in the 90-100 band
+    { confidence: 0.5, correct: true },
+  ])
+  assert.equal(buckets.length, 2)
+  const hi = buckets.find(b => b.lo === 90)!
+  assert.equal(hi.n, 2)
+  assert.equal(hi.accuracy, 50)
+  assert.equal(hi.mid, 95)
+  const lo = buckets.find(b => b.lo === 50)!
+  assert.equal(lo.accuracy, 100)
+  assert.deepEqual(buckets.map(b => b.lo), [50, 90]) // sorted ascending
 })

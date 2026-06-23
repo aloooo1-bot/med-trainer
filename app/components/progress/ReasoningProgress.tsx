@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { loadMastery, loadCalibration, type CalibrationEntry } from '@/app/lib/reasoning/store'
 import { recommendNext, isMastered, masteryKey } from '@/app/lib/reasoning/mastery'
-import { calibrationSummary } from '@/app/lib/reasoning/prediction'
+import { calibrationSummary, reliabilityBuckets, type ReliabilityBucket } from '@/app/lib/reasoning/prediction'
 import type { MasteryRecord } from '@/app/lib/reasoning/types'
 
 const SYSTEMS = [
@@ -17,6 +17,45 @@ function scoreColor(score: number): string {
   if (score < 60) return 'var(--red)'
   if (score < 75) return 'var(--amber)'
   return 'var(--green)'
+}
+
+/** Reliability diagram: confidence (x) vs actual accuracy (y) with the perfect-calibration diagonal. */
+function ReliabilityDiagram({ buckets }: { buckets: ReliabilityBucket[] }) {
+  const W = 200, H = 200, pad = 28
+  const px = (c: number) => pad + (c / 100) * (W - pad - 8)
+  const py = (a: number) => H - pad - (a / 100) * (H - pad - 8)
+  return (
+    <div style={{ marginTop: 14 }}>
+      <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 6 }}>Reliability — on the diagonal = well-calibrated; above = underconfident; below = overconfident</div>
+      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} role="img" aria-label="Calibration reliability diagram: confidence versus actual accuracy">
+        {/* axes */}
+        <line x1={pad} y1={H - pad} x2={W - 8} y2={H - pad} stroke="var(--border)" strokeWidth="1" />
+        <line x1={pad} y1={H - pad} x2={pad} y2={8} stroke="var(--border)" strokeWidth="1" />
+        {/* perfect-calibration diagonal */}
+        <line x1={px(0)} y1={py(0)} x2={px(100)} y2={py(100)} stroke="var(--muted)" strokeWidth="1" strokeDasharray="4 3" opacity="0.6" />
+        {/* connecting path */}
+        {buckets.length > 1 && (
+          <polyline
+            points={buckets.map(b => `${px(b.mid)},${py(b.accuracy)}`).join(' ')}
+            fill="none" stroke="var(--primary, #6366f1)" strokeWidth="1.5" opacity="0.7"
+          />
+        )}
+        {/* points (radius ~ sample size) */}
+        {buckets.map(b => {
+          const calibrated = Math.abs(b.mid - b.accuracy) <= 10
+          return (
+            <circle key={b.lo} cx={px(b.mid)} cy={py(b.accuracy)} r={Math.min(7, 3 + b.n)}
+              fill={calibrated ? 'var(--green)' : b.accuracy < b.mid ? 'var(--red)' : 'var(--amber)'} opacity="0.85">
+              <title>{`${b.lo}-${b.hi}% confidence: ${b.accuracy}% accurate (${b.n})`}</title>
+            </circle>
+          )
+        })}
+        {/* axis labels */}
+        <text x={(W + pad) / 2} y={H - 6} fontSize="9" fill="var(--muted)" textAnchor="middle">Confidence</text>
+        <text x={10} y={(H - pad) / 2} fontSize="9" fill="var(--muted)" textAnchor="middle" transform={`rotate(-90 10 ${(H - pad) / 2})`}>Actual</text>
+      </svg>
+    </div>
+  )
 }
 
 export default function ReasoningProgress() {
@@ -48,6 +87,15 @@ export default function ReasoningProgress() {
 
   const confCal = useMemo(
     () => calibrationSummary(
+      calibration
+        .filter(c => c.confidence != null && c.correct != null)
+        .map(c => ({ confidence: c.confidence!, correct: c.correct! })),
+    ),
+    [calibration],
+  )
+
+  const buckets = useMemo(
+    () => reliabilityBuckets(
       calibration
         .filter(c => c.confidence != null && c.correct != null)
         .map(c => ({ confidence: c.confidence!, correct: c.correct! })),
@@ -150,6 +198,7 @@ export default function ReasoningProgress() {
                 {' '}(Brier {confCal.brier}, {confCal.n} rated).
               </p>
             )}
+            {buckets.length > 0 && <ReliabilityDiagram buckets={buckets} />}
           </div>
         )}
 

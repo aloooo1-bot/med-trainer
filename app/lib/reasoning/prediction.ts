@@ -48,6 +48,46 @@ export interface CalibrationSummary {
   verdict: 'overconfident' | 'underconfident' | 'well-calibrated'
 }
 
+export interface ReliabilityBucket {
+  /** Confidence band, percent. */
+  lo: number
+  hi: number
+  mid: number
+  /** Predictions that fell in this band. */
+  n: number
+  /** Actual accuracy in this band, percent. */
+  accuracy: number
+}
+
+/**
+ * Group confidence-vs-outcome pairs into confidence bands for a reliability
+ * diagram. A well-calibrated learner's accuracy tracks the diagonal (band
+ * midpoint ≈ accuracy). Only populated bands are returned.
+ */
+export function reliabilityBuckets(
+  pairs: Array<{ confidence: number; correct: boolean }>,
+  bandWidth = 0.1,
+): ReliabilityBucket[] {
+  const bands = new Map<number, { correct: number; n: number }>()
+  for (const p of pairs) {
+    const c = Math.max(0, Math.min(0.999, p.confidence))
+    const idx = Math.floor(c / bandWidth)
+    const b = bands.get(idx) ?? { correct: 0, n: 0 }
+    b.n++
+    if (p.correct) b.correct++
+    bands.set(idx, b)
+  }
+  return [...bands.entries()]
+    .sort((a, b) => a[0] - b[0])
+    .map(([idx, b]) => ({
+      lo: Math.round(idx * bandWidth * 100),
+      hi: Math.round((idx + 1) * bandWidth * 100),
+      mid: Math.round((idx + 0.5) * bandWidth * 100),
+      n: b.n,
+      accuracy: Math.round((b.correct / b.n) * 100),
+    }))
+}
+
 /**
  * Aggregate confidence-vs-outcome pairs into a calibration verdict. A gap of
  * >10 points between stated confidence and actual accuracy flags over/under-confidence.

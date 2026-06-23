@@ -72,6 +72,8 @@ export function PredictionPanel({
               key={name}
               type="button"
               onClick={() => toggle(name)}
+              aria-pressed={ranked}
+              aria-label={ranked ? `${name}, ranked ${rank + 1} — click to remove` : `Rank ${name}`}
               className={`flex items-center gap-2 rounded border px-2.5 py-1.5 text-left text-[12px] transition-colors ${
                 ranked ? 'border-primary-500 text-ink-primary' : 'border-surface-3 text-ink-secondary hover:border-surface-4'
               }`}

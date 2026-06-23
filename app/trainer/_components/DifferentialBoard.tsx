@@ -45,7 +45,7 @@ export function DifferentialBoard({
   if (!beliefs.length) return null
 
   return (
-    <div className="rounded-md border border-surface-4 bg-surface-1 p-3">
+    <div className="rounded-md border border-surface-4 bg-surface-1 p-3" role="group" aria-label="Differential probabilities">
       <div className="mb-2 flex items-center justify-between">
         <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-tertiary">
           Differential
@@ -82,7 +82,14 @@ export function DifferentialBoard({
                 </span>
                 <span className="font-mono tabular-nums text-ink-tertiary">{excluded ? '✗' : `${pct}%`}</span>
               </div>
-              <div className="h-1.5 overflow-hidden rounded-full bg-surface-3">
+              <div
+                className="h-1.5 overflow-hidden rounded-full bg-surface-3"
+                role="progressbar"
+                aria-valuenow={excluded ? 0 : pct}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`${b.name}: ${excluded ? 'excluded' : `${pct}%`}`}
+              >
                 <div
                   className="h-full rounded-full transition-[width] duration-500"
                   style={{
