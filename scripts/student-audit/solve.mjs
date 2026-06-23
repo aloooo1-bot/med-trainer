@@ -231,6 +231,8 @@ DIAGNOSIS-ACUITY CONSISTENCY RULE: The correctDiagnosis label MUST match the cli
 PATIENT-ANCHORED TEACHING RULE: Teaching points giving management recommendations MUST account for this patient's specific characteristics: existing medications, age-adjusted dosing, and whether quoted severity criteria actually apply to this patient's demographics.
 MENINGITIS FEVER RULE: Bacterial meningitis cases MUST present with temp ≥ 101.5°F (38.6°C) unless explicitly modeling a partially-treated or immunocompromised presentation, with the reason stated in HPI.
 PHYSICAL EXAM SENSITIVITY CONTEXT RULE: Teaching points quoting sensitivity/specificity for physical exam maneuvers (Lachman, McMurray's, etc.) MUST include "in experienced hands" or "examiner-dependent."
+TEACHING–DATA NUMERIC FIDELITY RULE: teachingPoints/differentialExplanations/*Findings MUST NOT mischaracterize the case's own data. If a lab/vital is flagged high/low/critical, prose MUST NOT call that parameter normal/absent (e.g., never "without leukocytosis" when WBC is flagged high; never "afebrile" when temp is elevated). Anchor "can be unimpressive" teaching to the patient's actual value, not a false "normal" claim.
+HEMATURIA RBC MORPHOLOGY RULE: RBC morphology in urineFindings/urinalysis MUST match the bleeding source. Glomerular (GN: IgA, PSGN, lupus) = DYSMORPHIC RBCs ± RBC casts. Urologic/post-renal (stone, trauma, cystitis, BPH, malignancy) = ISOMORPHIC normal RBCs without casts. NEVER call RBCs "dysmorphic" in a stone/urologic case or pair a non-glomerular source conclusion with dysmorphic morphology.
 ${buildExcludedNamesBlock(excluded)}IMPORTANT: vitals.temp must be in Fahrenheit (normal is 98.6°F — never output Celsius values like 36-38).`
 
   let text
