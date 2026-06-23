@@ -1,3 +1,5 @@
+import type { DifferentialPrior, TestImpacts } from '../../lib/reasoning/types'
+
 export interface CaseData {
   patientInfo: { name: string; age: number; gender: string; chiefComplaint: string; height?: string; heightInches?: number }
   hpi: string
@@ -31,6 +33,13 @@ export interface CaseData {
   differentials: string[]
   teachingPoints: string[]
   keyQuestions: string[]
+  // ── Reasoning engine (optional; cases generated before this feature lack them) ──
+  /** Pre-test weights for the correct diagnosis + every differential. */
+  differentialPriors?: DifferentialPrior[]
+  /** How THIS case's result for each test moves each tracked hypothesis. */
+  testImpacts?: TestImpacts
+  /** 2-3 sentence pathophysiology for the "Why" layer. */
+  mechanism?: string
   imagingCategory?: string
   ecgFindings?: string
   hematologyFindings?: string

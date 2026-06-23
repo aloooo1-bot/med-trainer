@@ -16,7 +16,7 @@ import {
   classifyFinding,
 } from '../lib/rosDetector'
 import { type OpenIResult, fetchImagingResults } from '../lib/imagingSearch'
-import { type ECGImage, getECGCategory, getRandomECGImage } from '../lib/ecgImageLookup'
+import { type ECGImage, getECGCategory, getBestECGImage } from '../lib/ecgImageLookup'
 import {
   type SpecialImage, type SpecialModality,
   getSpecialModality, getSpecialCategory, getRandomSpecialImage,
@@ -33,6 +33,7 @@ import {
   makeCallRecord, recordToSession, createActiveSession, finalizeSession, syncSessionToSupabase,
   recordAbandonedSession,
 } from '../lib/analytics'
+import { recordCaseOutcome } from '../lib/reasoning/store'
 import { type CaseData, type NotesState, selectHpi, SOAP_TEMPLATE } from './_lib/types'
 import { isPendingTest } from './_lib/pendingTests'
 import { findResultKey, getVitalStatus, isECGTest } from './_lib/testUtils'
@@ -420,7 +421,7 @@ export default function MedTrainer() {
         try {
           const ecgReport = caseData.imagingResults[findResultKey(t, caseData.imagingResults)!] ?? ''
           const category = getECGCategory(caseData.diagnosis, caseData.ecgFindings ?? ecgReport)
-          const image = await getRandomECGImage(category)
+          const image = await getBestECGImage(category, caseData.ecgFindings ?? ecgReport)
           setEcgCache(prev => ({ ...prev, [t]: image ?? 'none' }))
         } catch {
           setEcgCache(prev => ({ ...prev, [t]: 'none' }))
@@ -1343,6 +1344,18 @@ Student message: "${msg}"`
         syncSessionToSupabase(record)
         analyticsSessionRef.current = null
       }
+
+      // Update mastery + extract spaced-repetition cards for the retention features
+      try {
+        recordCaseOutcome(
+          caseData,
+          resolvedSystemRef.current || system,
+          caseDifficulty,
+          result.score ?? 0,
+          result.correct ?? false,
+          Date.now(),
+        )
+      } catch {}
 
       // Mark first case done for free users
       const isFirstCase = gateStatus.tier === 'free' && !gateStatus.firstCaseDone

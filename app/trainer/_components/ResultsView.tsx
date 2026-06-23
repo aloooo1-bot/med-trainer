@@ -2,6 +2,7 @@ import { getSpecialModality, type SpecialImage, type SpecialModality } from '@/a
 import { type OpenIResult } from '@/app/lib/imagingSearch'
 import { type ECGImage } from '@/app/lib/ecgImageLookup'
 import { SectionCard } from './SectionCard'
+import { DifferentialBoard } from './DifferentialBoard'
 import { ECGPanel } from './ECGPanel'
 import { ImagingPanel } from './ImagingPanel'
 import { SpecialPanel, SPECIAL_LABELS } from './SpecialPanel'
@@ -103,6 +104,13 @@ export function ResultsView({
 
   return (
     <div className="space-y-4">
+      <DifferentialBoard
+        priors={caseData.differentialPriors}
+        testImpacts={caseData.testImpacts}
+        orderedTests={orderedArr}
+        correctDiagnosis={caseData.diagnosis}
+        reveal={diagnosisSubmitted}
+      />
       {allResultPanels.length > 0 && (
         <div className="flex justify-end">
           <button

@@ -3,6 +3,7 @@ import { SectionCard } from './SectionCard'
 import { ScoreRing, CategoryRow, ScorecardNotesPanel } from './ScoreRing'
 import { FeedbackCarousel, type FeedbackSection } from './FeedbackCarousel'
 import { DiagnosisInput } from './DiagnosisInput'
+import { WhyPanel } from './WhyPanel'
 import { MicButton } from './MicButton'
 import { getRubric, type DimensionKey } from '@/app/grading/rubric'
 import { type GradingResult } from '@/app/grading/types'
@@ -352,6 +353,12 @@ export function DiagnosisView({
                 )
               })}
             </div>
+          </div>
+        )}
+
+        {caseData.mechanism && (
+          <div className="border-t border-rule px-5 py-4">
+            <WhyPanel mechanism={caseData.mechanism} />
           </div>
         )}
 

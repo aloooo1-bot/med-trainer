@@ -16,7 +16,8 @@ export default function NextCaseCard({
   } else {
     const w = systems[0]
     system = w.name
-    tier = w.score < 70 ? 'Foundations' : 'Clinical'
+    // Progress Foundations → Clinical → Advanced as the system average climbs.
+    tier = w.score < 70 ? 'Foundations' : w.score < 85 ? 'Clinical' : 'Advanced'
     reason = `Your ${w.name} avg is ${w.score}${w.count ? ` across ${w.count} case${w.count === 1 ? '' : 's'}` : ''}.`
   }
 

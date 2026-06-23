@@ -119,3 +119,53 @@ export async function getRandomECGImage(category: string): Promise<ECGImage | nu
     report: meta[`${category}/${file}`] ?? '',
   }
 }
+
+// 12-lead names + distinctive ECG vocabulary used to score how well a candidate
+// tracing's report matches the case's stated ECG findings.
+const ECG_LEADS = ['i', 'ii', 'iii', 'avr', 'avl', 'avf', 'v1', 'v2', 'v3', 'v4', 'v5', 'v6']
+const ECG_TERMS = [
+  'elevation', 'depression', 'inversion', 'q wave', 'st', 't wave', 'block', 'fibrillation',
+  'flutter', 'hypertrophy', 'tachycardia', 'bradycardia', 'bundle', 'branch', 'ischem',
+  'infarct', 'anterior', 'inferior', 'lateral', 'posterior', 'septal', 'pre-excitation', 'delta',
+]
+
+/**
+ * Score how well a PTB-XL report matches the case's ECG findings. Lead-territory
+ * overlap (e.g. both mention II/III/aVF) is weighted highest. Pure + testable.
+ */
+export function scoreEcgMatch(report: string, findings: string): number {
+  if (!report || !findings) return 0
+  const r = report.toLowerCase()
+  const f = findings.toLowerCase()
+  let score = 0
+  for (const lead of ECG_LEADS) {
+    const re = new RegExp(`\\b${lead}\\b`)
+    if (re.test(r) && re.test(f)) score += 2
+  }
+  for (const term of ECG_TERMS) {
+    if (r.includes(term) && f.includes(term)) score += 1
+  }
+  return score
+}
+
+/**
+ * Pick the tracing in a category whose report best overlaps the case's findings,
+ * so the displayed ECG is case-matched rather than random. Falls back to a random
+ * tracing when there is no matching signal (or no findings supplied).
+ */
+export async function getBestECGImage(category: string, ecgFindings?: string): Promise<ECGImage | null> {
+  const [index, meta] = await Promise.all([loadIndex(), loadMeta()])
+  const files = index[category]
+  if (!files || files.length === 0) return null
+  if (!ecgFindings) return getRandomECGImage(category)
+
+  let best = files[0]
+  let bestScore = -1
+  for (const file of files) {
+    const s = scoreEcgMatch(meta[`${category}/${file}`] ?? '', ecgFindings)
+    if (s > bestScore) { bestScore = s; best = file }
+  }
+  // No distinctive overlap → keep variety with a random pick.
+  if (bestScore <= 0) return getRandomECGImage(category)
+  return { path: `/ecg/${category}/${best}`, report: meta[`${category}/${best}`] ?? '' }
+}

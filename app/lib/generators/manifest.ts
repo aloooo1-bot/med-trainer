@@ -4,6 +4,8 @@ import {
   repairJson, reconcileHistoryConsistency, sanitizePmhLeak,
   buildExcludedNamesBlock, nameCollides,
 } from './shared'
+import { formatProfileForPrompt } from '../knowledge/format'
+import type { DiagnosisProfile } from '../reasoning/types'
 
 export async function generateManifest(params: {
   system: string
@@ -11,15 +13,18 @@ export async function generateManifest(params: {
   diagnosis: string
   variantIndex: number
   usedNames?: string[]
+  /** Optional verified knowledge-spine profile; if provided, the case is generated to conform to it (Tier-0 accuracy). */
+  profile?: DiagnosisProfile
 }): Promise<Record<string, unknown>> {
-  const { system, difficulty, diagnosis, usedNames = [] } = params
+  const { system, difficulty, diagnosis, usedNames = [], profile } = params
   const diffRules = DIFFICULTY_RULES[difficulty] ?? DIFFICULTY_RULES.Foundations
   const diffCount = difficulty === 'Foundations' ? '2-3' : difficulty === 'Clinical' ? '3-4' : '4-5'
   const schema = JSON_SCHEMA_TEMPLATE.replace('DIFF_COUNT', diffCount)
+  const profileBlock = profile ? `\n${formatProfileForPrompt(profile)}\n` : ''
   const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY! })
 
   const buildPrompt = (excluded: string[]) =>
-    `Generate a realistic ${system} clinical case. The diagnosis for this case MUST be "${diagnosis}". Do not substitute a different diagnosis. Strictly follow the difficulty rules below.\n\n${diffRules}\n${buildExcludedNamesBlock(excluded)}\n${CRITICAL_RULES}\n${schema}`
+    `Generate a realistic ${system} clinical case. The diagnosis for this case MUST be "${diagnosis}". Do not substitute a different diagnosis. Strictly follow the difficulty rules below.\n\n${diffRules}\n${profileBlock}${buildExcludedNamesBlock(excluded)}\n${CRITICAL_RULES}\n${schema}`
 
   const postProcess = (parsed: Record<string, unknown>): Record<string, unknown> => {
     parsed.nativeDifficulty = difficulty
