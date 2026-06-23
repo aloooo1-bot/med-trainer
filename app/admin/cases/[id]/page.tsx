@@ -3,6 +3,7 @@ import { createAdminClient } from '../../../lib/supabase/admin'
 import type { RatingRow } from '../../../lib/supabase/types'
 import CaseActions from './CaseActions'
 import CasePreview from './CasePreview'
+import Link from 'next/link'
 
 interface CaseDetail {
   id: string
@@ -88,8 +89,8 @@ export default async function AdminCaseDetailPage({ params }: { params: Promise<
           <p className="text-xs text-ink-tertiary mt-0.5">{caseRow.id}</p>
         </div>
         <div className="flex items-center gap-2 shrink-0">
-          <a href="/admin/cases" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">← All Cases</a>
-          <a href="/"            className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">Trainer</a>
+          <Link href="/admin/cases" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">← All Cases</Link>
+          <Link href="/" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">Trainer</Link>
         </div>
       </header>
 

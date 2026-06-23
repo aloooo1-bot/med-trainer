@@ -54,7 +54,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={`h-full bg-surface-0 ${inter.variable} ${sourceSerif4.variable} ${jetbrainsMono.variable}`}>
       <head>
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
         <script dangerouslySetInnerHTML={{ __html: `(function(){try{var s=localStorage.getItem('medtrainer_color_scheme')||'auto';var eff=s==='auto'?(window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'):s;if(eff==='dark')document.documentElement.classList.add('scheme-dark');}catch(e){}})();` }} />
       </head>
       <body className="font-sans antialiased min-h-full flex flex-col">

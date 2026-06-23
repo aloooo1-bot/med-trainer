@@ -1,6 +1,7 @@
 ﻿import { createAdminClient } from '../../lib/supabase/admin'
-import type { RatingRow, CaseRow } from '../../lib/supabase/types'
+import type { RatingRow } from '../../lib/supabase/types'
 import RatingsDashboard from '../../ratings/RatingsDashboard'
+import Link from 'next/link'
 
 interface CaseSummary {
   id: string
@@ -51,7 +52,7 @@ export default async function AdminRatingsPage() {
           <div className="text-3xl text-ink-muted mb-4">⚙️</div>
           <p className="text-ink-secondary text-sm mb-2">Supabase not configured.</p>
           <p className="text-ink-tertiary text-xs mb-6">Set SUPABASE_SERVICE_ROLE_KEY in .env.local</p>
-          <a href="/" className="text-xs text-blue-400 hover:text-blue-300 underline">← Back to trainer</a>
+          <Link href="/" className="text-xs text-blue-400 hover:text-blue-300 underline">← Back to trainer</Link>
         </div>
       </div>
     )
@@ -91,10 +92,10 @@ export default async function AdminRatingsPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <a href="/admin"        className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">Usage Admin</a>
-          <a href="/admin/cases" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">Cases</a>
-          <a href="/ratings"     className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">Ratings</a>
-          <a href="/"            className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">← Trainer</a>
+          <Link href="/admin" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">Usage Admin</Link>
+          <Link href="/admin/cases" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">Cases</Link>
+          <Link href="/ratings" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">Ratings</Link>
+          <Link href="/" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">← Trainer</Link>
         </div>
       </header>
 

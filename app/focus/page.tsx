@@ -80,6 +80,8 @@ export default function FocusAreasPage() {
   }, [])
 
   useEffect(() => {
+    // Mount-only load of focus settings/skips from localStorage (unavailable during SSR).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSettings(loadFocusSettings())
     setSkips(loadFocusSkips())
   }, [])

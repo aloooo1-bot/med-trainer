@@ -1,5 +1,6 @@
 import styles from '../../landing.module.css'
 import { HERO_CASE, SYSTEM_HEATMAP, STUDY_QUEUE, ANIMATION_DIAGNOSIS, EXAM_FINDINGS, LAB_ROWS, IMAGING_RESULT, CLINICAL_REASONING } from './_fixtures/heroCase'
+import Link from 'next/link'
 
 function CheckIcon() {
   return (
@@ -21,10 +22,10 @@ function Nav({ anonUsed }: { anonUsed: boolean }) {
   return (
     <nav className={styles.nav}>
       <div className={styles.navInner}>
-        <a href="/" className={styles.navLogo}>
+        <Link href="/" className={styles.navLogo}>
           <div className={styles.navLogoMark}>Rx</div>
           <span className={styles.navWordmark}>MedTrainer</span>
-        </a>
+        </Link>
         <div className={styles.navLinks}>
           <a href="#scorecard" className={styles.navLink}>Scorecard</a>
           <a href="#focus" className={styles.navLink}>Focus Areas</a>
@@ -222,7 +223,7 @@ function InterviewAnimation() {
         </div>
         <div className={styles.hiwAnimMsgP}>
           <div className={styles.hiwAnimBubbleP}>
-            Yes — started dry, but now I'm bringing up yellow-green mucus.
+            Yes — started dry, but now I&apos;m bringing up yellow-green mucus.
           </div>
         </div>
         <div className={styles.hiwAnimLock}>
@@ -741,10 +742,10 @@ function Footer() {
   return (
     <footer className={styles.footer}>
       <div className={styles.footerInner}>
-        <a href="/" className={styles.footerLogo}>
+        <Link href="/" className={styles.footerLogo}>
           <div className={styles.footerLogoMark}>Rx</div>
           <span className={styles.footerLogoText}>MedTrainer</span>
-        </a>
+        </Link>
         <div className={styles.footerCopy}>Clinical reasoning practice for medical students and trainees.</div>
         <div className={styles.footerMark}>&copy; 2026 MedTrainer</div>
       </div>

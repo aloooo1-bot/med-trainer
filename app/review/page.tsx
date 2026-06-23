@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import { type CaseSessionRecord, loadSessionRecords } from '../lib/analytics'
-import type { GradingResult } from '../grading/types'
+import Link from 'next/link'
 import { getRubric, type RubricDimension } from '../grading/rubric'
 import { useChartTheme } from '../lib/useChartTheme'
 
@@ -272,6 +272,8 @@ export default function ReviewPage() {
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
+    // Mount-only load of client-side session records from localStorage (unavailable during SSR).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSessions(loadSessionRecords())
     setLoaded(true)
   }, [])
@@ -295,9 +297,9 @@ export default function ReviewPage() {
           <p className="text-ink-tertiary text-xs">
             Submit your first diagnosis to start tracking performance.
           </p>
-          <a href="/" className="mt-6 inline-block text-xs text-blue-400 hover:text-blue-300 underline">
+          <Link href="/" className="mt-6 inline-block text-xs text-blue-400 hover:text-blue-300 underline">
             ← Back to trainer
-          </a>
+          </Link>
         </div>
       </div>
     )
@@ -326,22 +328,22 @@ export default function ReviewPage() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <a href="/ratings"
+          <Link href="/ratings"
             className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
             Ratings
-          </a>
-          <a href="/history"
+          </Link>
+          <Link href="/history"
             className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
             History
-          </a>
-          <a href="/admin"
+          </Link>
+          <Link href="/admin"
             className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
             Admin
-          </a>
-          <a href="/"
+          </Link>
+          <Link href="/"
             className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
             ← Trainer
-          </a>
+          </Link>
         </div>
       </header>
 

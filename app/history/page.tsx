@@ -351,6 +351,8 @@ export default function HistoryPage() {
     if (!loaded || !sessions.length) return
     const target = new URLSearchParams(window.location.search).get('expand')
     if (!target || !sessions.some(s => s.id === target)) return
+    // Deep-link expansion is driven by the URL query, only available after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setExpandedId(target)
     requestAnimationFrame(() =>
       document.getElementById(`session-${target}`)?.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -372,6 +374,9 @@ export default function HistoryPage() {
   const dateCutoff = useMemo(() => {
     if (dateRange === 'all') return 0
     const days = dateRange === '7d' ? 7 : dateRange === '30d' ? 30 : 90
+    // Cutoff is intentionally evaluated relative to "now" when the range changes;
+    // day-granularity staleness across a long-open session is harmless here.
+    // eslint-disable-next-line react-hooks/purity
     return Date.now() - days * 24 * 60 * 60 * 1000
   }, [dateRange])
 

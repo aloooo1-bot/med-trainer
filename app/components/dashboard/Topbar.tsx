@@ -54,6 +54,8 @@ export default function Topbar({ streakDays, onStartTraining }: { streakDays: nu
   const [scheme, setSchemeState] = useState<Scheme>('auto')
 
   useEffect(() => {
+    // Mount-only sync of the persisted color scheme (resolved client-side after hydration).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSchemeState(getScheme())
     return subscribeOSChanges(() => setSchemeState(s => s))
   }, [])

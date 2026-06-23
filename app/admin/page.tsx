@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import Link from 'next/link'
 import {
   type CaseSessionRecord, type APICallType, type AbandonedSessionRecord,
   loadSessionRecords, clearAnalytics,
@@ -177,6 +178,8 @@ export default function AdminPage() {
   const abandonStats = useMemo(() => computeAbandonStats(sessions, abandoned), [sessions, abandoned])
 
   useEffect(() => {
+    // Mount-only load of client-side analytics from localStorage (unavailable during SSR).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSessions(loadSessionRecords())
     setAbandoned(loadAbandonedSessions())
     setLoaded(true)
@@ -201,7 +204,7 @@ export default function AdminPage() {
           <div className="text-3xl text-ink-muted mb-3">📊</div>
           <p className="text-ink-secondary text-sm mb-1">No sessions recorded yet.</p>
           <p className="text-ink-tertiary text-xs">Generate and submit cases to start collecting analytics.</p>
-          <a href="/" className="mt-6 inline-block text-xs text-blue-400 hover:text-blue-300 underline">← Back to trainer</a>
+          <Link href="/" className="mt-6 inline-block text-xs text-blue-400 hover:text-blue-300 underline">← Back to trainer</Link>
         </div>
       </div>
     )
@@ -233,21 +236,21 @@ export default function AdminPage() {
           >
             Clear data
           </button>
-          <a href="/admin/ratings" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
+          <Link href="/admin/ratings" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
             Ratings Admin
-          </a>
-          <a href="/ratings" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
+          </Link>
+          <Link href="/ratings" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
             Ratings
-          </a>
-          <a href="/review" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
+          </Link>
+          <Link href="/review" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
             Review
-          </a>
-          <a href="/history" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
+          </Link>
+          <Link href="/history" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
             History
-          </a>
-          <a href="/" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
+          </Link>
+          <Link href="/" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">
             ← Trainer
-          </a>
+          </Link>
         </div>
       </header>
 

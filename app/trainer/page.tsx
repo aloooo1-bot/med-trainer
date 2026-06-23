@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useCallback } from 'react'
 import Link from 'next/link'
 import { Stethoscope, ListChecks, Hand, FlaskConical, Activity, ClipboardCheck } from 'lucide-react'
 import {
@@ -33,11 +33,10 @@ import {
   makeCallRecord, recordToSession, createActiveSession, finalizeSession, syncSessionToSupabase,
   recordAbandonedSession,
 } from '../lib/analytics'
-import { type CaseData, type TimerState, type NotesState, selectHpi, SOAP_TEMPLATE } from './_lib/types'
+import { type CaseData, type NotesState, selectHpi, SOAP_TEMPLATE } from './_lib/types'
 import { isPendingTest } from './_lib/pendingTests'
-import { normalizeTestName, findResultKey, getVitalStatus, isECGTest } from './_lib/testUtils'
-import { type CaseHistoryEntry, getHistory, addHistoryEntry, hasUsedROSBefore, markROSUsed, getUsedNames, recordUsedName } from './_lib/localHistory'
-import { markCaseSeen, loadFromLibrary } from './_lib/caseLibrary'
+import { findResultKey, getVitalStatus, isECGTest } from './_lib/testUtils'
+import { type CaseHistoryEntry, addHistoryEntry, hasUsedROSBefore, markROSUsed, getUsedNames, recordUsedName } from './_lib/localHistory'
 import { useTimer, fmtTime } from './_lib/useTimer'
 import { callClaude } from './_lib/callClaude'
 import { Badge } from './_components/Badge'
@@ -191,6 +190,8 @@ export default function MedTrainer() {
   useEffect(() => {
     const p = new URLSearchParams(window.location.search)
     const s = p.get('system')
+    // Pre-selection comes from URL query params, only readable after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (s && SYSTEMS.includes(s)) setSystem(s)
     const d = p.get('difficulty')
     if (d === 'Foundations' || d === 'Clinical' || d === 'Advanced') setDifficulty(d)
@@ -214,15 +215,15 @@ export default function MedTrainer() {
     recordToSession(session, makeCallRecord(type, usage))
   }
 
-  const handleTimerExpire = useRef(() => {
+  const handleTimerExpire = useCallback(() => {
     setTimedOutToast(true)
     setTimeout(() => {
       setTimedOutToast(false)
       timerExpireRef.current?.()
     }, 2000)
-  })
+  }, [])
 
-  const { timerState, startTimer, pauseTimer, resumeTimer, completeTimer, resetTimer } = useTimer(handleTimerExpire.current)
+  const { timerState, startTimer, pauseTimer, resumeTimer, completeTimer, resetTimer } = useTimer(handleTimerExpire)
 
   const chatEndRef = useRef<HTMLDivElement>(null)
   const chatInputRef = useRef<HTMLInputElement>(null)
@@ -243,7 +244,6 @@ export default function MedTrainer() {
         }
       })
       .catch(() => setGateStatus(g => ({ ...g, loaded: true })))
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
@@ -275,6 +275,8 @@ export default function MedTrainer() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem('medtrainer_chat_height')
+      // Mount-only restore of the persisted chat panel height from localStorage.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (saved) setChatPanelHeight(Number(saved) || 28)
     } catch {}
   }, [])
@@ -299,6 +301,8 @@ export default function MedTrainer() {
   }
 
   useEffect(() => {
+    // Reset/advance the generation phase indicator in response to the generating flag.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (!generating) { setGenerationPhase(0); return }
     const id = setInterval(() => {
       setGenerationPhase(p => Math.min(p + 1, GENERATION_PHASES.length - 1))
@@ -308,6 +312,8 @@ export default function MedTrainer() {
 
   useEffect(() => {
     if (activeSection === 'diagnosis' && notes.content.trim()) {
+      // Auto-open the notes panel when the user reaches the diagnosis step.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setNotes(prev => ({ ...prev, open: true }))
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -320,6 +326,8 @@ export default function MedTrainer() {
       const id = setTimeout(() => setShowRosHint(true), 50)
       return () => clearTimeout(id)
     } else {
+      // Hide the ROS hint whenever the active section is not the ROS tab.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       setShowRosHint(false)
     }
   }, [activeSection, caseData])
@@ -334,6 +342,8 @@ export default function MedTrainer() {
   // Permanently dismiss once any ROS field is unlocked
   useEffect(() => {
     const anyUnlocked = ROS_CATEGORIES.some(c => rosState[c]?.status !== 'locked')
+    // Permanently dismiss the hint once the user interacts with any ROS field.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (anyUnlocked) { setShowRosHint(false); markROSUsed() }
   }, [rosState])
 
@@ -355,6 +365,8 @@ export default function MedTrainer() {
     const toFetch = imagingTests.filter(t => !(t in imagingCache))
     if (toFetch.length === 0) return
 
+    // Mark newly-ordered imaging as loading before the async fetch resolves.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setImagingCache(prev => {
       const next = { ...prev }
       for (const t of toFetch) next[t] = null
@@ -395,6 +407,8 @@ export default function MedTrainer() {
     const toFetch = ecgTests.filter(t => !(t in ecgCache))
     if (toFetch.length === 0) return
 
+    // Mark newly-ordered ECGs as loading before the async fetch resolves.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setEcgCache(prev => {
       const next = { ...prev }
       for (const t of toFetch) next[t] = null
@@ -523,7 +537,6 @@ Return ONLY valid JSON — no markdown, no explanation:
         }
       })()
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [orderedTests, caseData])
 
   const generateCase = async (overrideSystem?: string, overrideDifficulty?: string, overrideDiagnosis?: string): Promise<CaseData | null> => {
@@ -954,7 +967,7 @@ PMH LEAK RULE: The pastMedicalHistory fields (conditions, surgeries, hospitaliza
   const toggleTest = (name: string) => {
     setSelectedTests(prev => {
       const next = new Set(prev)
-      next.has(name) ? next.delete(name) : next.add(name)
+      if (next.has(name)) next.delete(name); else next.add(name)
       return next
     })
   }
@@ -1350,8 +1363,11 @@ Student message: "${msg}"`
     }
   }
 
-  // Wire the expire callback so it can call submitDiagnosis (defined above)
-  timerExpireRef.current = () => submitDiagnosis('Time expired', '', true)
+  // Wire the expire callback so it can call submitDiagnosis (defined above).
+  // Updated in an effect (not during render) so the ref always points at the latest closure.
+  useEffect(() => {
+    timerExpireRef.current = () => submitDiagnosis('Time expired', '', true)
+  })
 
   const addTerminalLines = (...lines: TerminalLine[]) => {
     setTerminalLines(prev => [...prev, ...lines])
@@ -1744,7 +1760,7 @@ Student message: "${msg}"`
               {gateStatus.casesLeft} case{gateStatus.casesLeft !== 1 ? 's' : ''} left today
             </span>
           )}
-          <a href="/" className="rounded-md border border-surface-4 bg-surface-2 px-2.5 py-1.5 text-[11px] text-ink-secondary hover:border-surface-5 hover:text-ink-primary transition-colors">Home</a>
+          <Link href="/" className="rounded-md border border-surface-4 bg-surface-2 px-2.5 py-1.5 text-[11px] text-ink-secondary hover:border-surface-5 hover:text-ink-primary transition-colors">Home</Link>
           {gateStatus.tier !== 'anonymous' && (
             <form action="/auth/logout" method="POST">
               <button type="submit" className="rounded-md border border-surface-4 bg-surface-2 px-2.5 py-1.5 text-[11px] text-ink-secondary hover:border-surface-5 hover:text-ink-primary transition-colors">
@@ -1999,6 +2015,9 @@ Student message: "${msg}"`
                     ?
                   </button>
                 )}
+                {/* renderMain reads resolvedSystemRef.current, set during async generation
+                    alongside the setCaseData that drives this render — value is current. */}
+                {/* eslint-disable-next-line react-hooks/refs */}
                 {renderMain()}
               </div>
             )}
@@ -2229,7 +2248,7 @@ Student message: "${msg}"`
                 <h3 className="text-base font-semibold text-ink-primary mb-2">Daily limit reached</h3>
                 <p className="text-sm text-ink-secondary mb-5">You&apos;ve used your 2 free cases for today. Upgrade to Pro for unlimited access.</p>
                 <div className="flex gap-3">
-                  <a href="/" className="flex-1 rounded-md bg-primary-500 py-2 text-sm font-semibold text-ink-inverse hover:bg-primary-400 transition-colors">Upgrade to Pro</a>
+                  <Link href="/" className="flex-1 rounded-md bg-primary-500 py-2 text-sm font-semibold text-ink-inverse hover:bg-primary-400 transition-colors">Upgrade to Pro</Link>
                   <button onClick={() => setGateBlocked(false)} className="flex-1 rounded-md border border-surface-4 py-2 text-sm text-ink-secondary hover:text-ink-primary transition-colors">Close</button>
                 </div>
               </>

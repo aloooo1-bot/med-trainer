@@ -1,5 +1,6 @@
 ﻿import { createAdminClient } from '../../lib/supabase/admin'
 import type { RatingRow } from '../../lib/supabase/types'
+import Link from 'next/link'
 
 interface CaseRow {
   id: string
@@ -152,7 +153,8 @@ export default async function AdminCasesPage({
     return `/admin/cases?${params.toString()}`
   }
 
-  function SortHeader({ col, label, align }: { col: SortKey; label: string; align?: 'right' }) {
+  // Plain render helper (not a component) so it is not re-created on every render.
+  const sortHeader = ({ col, label, align }: { col: SortKey; label: string; align?: 'right' }) => {
     const active = sortKey === col
     const arrow = active ? (sortOrder === 'asc' ? '↑' : '↓') : '↕'
     return (
@@ -175,9 +177,9 @@ export default async function AdminCasesPage({
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <a href="/admin/ratings" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">Ratings</a>
-          <a href="/admin"         className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">Usage Admin</a>
-          <a href="/"              className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">← Trainer</a>
+          <Link href="/admin/ratings" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">Ratings</Link>
+          <Link href="/admin" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">Usage Admin</Link>
+          <Link href="/" className="text-xs text-ink-tertiary hover:text-ink-secondary border border-surface-3 rounded px-3 py-1.5 transition-colors">← Trainer</Link>
         </div>
       </header>
 
@@ -259,19 +261,19 @@ export default async function AdminCasesPage({
             <table className="w-full text-xs">
               <thead>
                 <tr className="border-b border-surface-3 text-left">
-                  <SortHeader col="date"       label="Added" />
+                  {sortHeader({ col: 'date', label: 'Added' })}
                   <th className="px-4 py-3 font-medium">
                     <a href={buildSort('diagnosis')}
                        className={`inline-flex items-center gap-1 transition-colors ${sortKey === 'diagnosis' ? 'text-blue-300' : 'text-ink-tertiary hover:text-ink-secondary'}`}>
                       Diagnosis <span className="text-[10px] opacity-60">{sortKey === 'diagnosis' ? (sortOrder === 'asc' ? '↑' : '↓') : '↕'}</span>
                     </a>
                   </th>
-                  <SortHeader col="system"     label="System" />
-                  <SortHeader col="difficulty" label="Diff" />
-                  <SortHeader col="source"     label="Source" />
-                  <SortHeader col="ratings"    label="Ratings"  align="right" />
-                  <SortHeader col="avg"        label="Avg ★"    align="right" />
-                  <SortHeader col="comments"   label="Comments" align="right" />
+                  {sortHeader({ col: 'system', label: 'System' })}
+                  {sortHeader({ col: 'difficulty', label: 'Diff' })}
+                  {sortHeader({ col: 'source', label: 'Source' })}
+                  {sortHeader({ col: 'ratings', label: 'Ratings', align: 'right' })}
+                  {sortHeader({ col: 'avg', label: 'Avg ★', align: 'right' })}
+                  {sortHeader({ col: 'comments', label: 'Comments', align: 'right' })}
                   <th className="px-3 py-3 font-medium text-right"></th>
                 </tr>
               </thead>

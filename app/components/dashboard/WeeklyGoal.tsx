@@ -24,6 +24,8 @@ export default function WeeklyGoal({ sessions }: { sessions: Session[] }) {
     const stored = localStorage.getItem('medtrainer_weekly_goal')
     if (stored) {
       const n = parseInt(stored, 10)
+      // Mount-only hydration of the persisted weekly goal from localStorage.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (n > 0) { setGoal(n); setDraft(String(n)) }
     }
   }, [])

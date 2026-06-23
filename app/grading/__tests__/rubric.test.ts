@@ -104,13 +104,13 @@ test('Foundations Return JSON template omits clinicalReasoning', () => {
   assert.ok(!returnBlock.includes('"clinicalReasoning"'))
 })
 
-test('Clinical prompt: declares 6 categories summing to 100, includes Clinical Reasoning and Examination Focus', () => {
+test('Clinical prompt: declares 5 categories summing to 100, includes Clinical Reasoning', () => {
   const p = buildRubricPrompt({ ...baseInput, difficulty: 'Clinical' })
   assert.ok(p.includes('must sum to 100'))
-  assert.ok(p.includes('History & Interview (historyInterview): 18 points'))
+  assert.ok(p.includes('History & Interview (historyInterview): 20 points'))
   assert.ok(p.includes('Diagnosis Accuracy (diagnosisAccuracy): 30 points'))
   assert.ok(p.includes('Clinical Reasoning (clinicalReasoning): 15 points'))
-  assert.ok(p.includes('Examination Focus (examinationFocus): 5 points'))
+  assert.ok(!p.includes('examinationFocus'))
   assert.ok(p.match(/CLINICAL REASONING \(\/15\):/))
 })
 

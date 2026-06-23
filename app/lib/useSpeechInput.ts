@@ -35,6 +35,8 @@ export function useSpeechInput(onTranscript: (text: string) => void): {
   const recognitionRef = useRef<any>(null)
   const onTranscriptRef = useRef(onTranscript)
   useEffect(() => { onTranscriptRef.current = onTranscript })
+  // Mount-only feature detection (Web Speech API is browser-only, unavailable during SSR).
+  // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => { setSupported(isSpeechSupported()) }, [])
 
   const stopListening = useCallback(() => {

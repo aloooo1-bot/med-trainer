@@ -3,6 +3,7 @@
 import { Suspense, useState } from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import { createClient } from '@/app/lib/supabase/client'
+import Link from 'next/link'
 
 function LoginForm() {
   const router = useRouter()
@@ -161,7 +162,7 @@ function LoginForm() {
         </div>
 
         <p className="text-center mt-4 text-xs text-ink-tertiary">
-          <a href="/" className="hover:text-ink-secondary transition-colors">← Continue without signing in</a>
+          <Link href="/" className="hover:text-ink-secondary transition-colors">← Continue without signing in</Link>
         </p>
       </div>
     </div>

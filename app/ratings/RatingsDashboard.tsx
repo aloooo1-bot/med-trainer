@@ -302,7 +302,7 @@ export default function RatingsDashboard({ initialRows }: { initialRows: RatingR
                                   <div className="text-xs font-medium text-ink-tertiary mb-2">Comments ({g.rows.filter(r => r.comment).length})</div>
                                   <div className="space-y-2">
                                     {g.rows.filter(r => r.comment).slice(-5).map((r, i) => (
-                                      <p key={i} className="text-xs text-ink-secondary italic border-l-2 border-surface-3 pl-3 leading-snug">"{r.comment}"</p>
+                                      <p key={i} className="text-xs text-ink-secondary italic border-l-2 border-surface-3 pl-3 leading-snug">&ldquo;{r.comment}&rdquo;</p>
                                     ))}
                                   </div>
                                 </div>
@@ -368,7 +368,7 @@ export default function RatingsDashboard({ initialRows }: { initialRows: RatingR
                         <span className="text-[10px] text-ink-tertiary whitespace-nowrap">{fmtDate(r.created_at)}</span>
                       </div>
                     </div>
-                    <p className="text-sm text-ink-secondary leading-snug italic">"{r.comment}"</p>
+                    <p className="text-sm text-ink-secondary leading-snug italic">&ldquo;{r.comment}&rdquo;</p>
                   </div>
                 )
               })}

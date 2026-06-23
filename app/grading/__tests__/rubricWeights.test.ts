@@ -24,21 +24,20 @@ test('Foundations rubric has correct weights: 24/24/36/16', () => {
   assert.equal(r.find(d => d.key === 'diagnosisCompleteness')!.max, 16)
 })
 
-test('Clinical rubric has clinicalReasoning and examinationFocus, exactly 6 categories', () => {
+test('Clinical rubric has clinicalReasoning, exactly 5 categories', () => {
   const r = getRubric('Clinical')
   assert.ok(r.find(d => d.key === 'clinicalReasoning'))
-  assert.ok(r.find(d => d.key === 'examinationFocus'))
-  assert.equal(r.length, 6)
+  assert.ok(!r.find(d => d.key === 'examinationFocus'))
+  assert.equal(r.length, 5)
 })
 
-test('Clinical rubric has correct weights: 18/18/30/14/15/5', () => {
+test('Clinical rubric has correct weights: 20/20/30/15/15', () => {
   const r = getRubric('Clinical')
-  assert.equal(r.find(d => d.key === 'historyInterview')!.max,      18)
-  assert.equal(r.find(d => d.key === 'testOrdering')!.max,          18)
+  assert.equal(r.find(d => d.key === 'historyInterview')!.max,      20)
+  assert.equal(r.find(d => d.key === 'testOrdering')!.max,          20)
   assert.equal(r.find(d => d.key === 'diagnosisAccuracy')!.max,     30)
-  assert.equal(r.find(d => d.key === 'diagnosisCompleteness')!.max, 14)
+  assert.equal(r.find(d => d.key === 'diagnosisCompleteness')!.max, 15)
   assert.equal(r.find(d => d.key === 'clinicalReasoning')!.max,     15)
-  assert.equal(r.find(d => d.key === 'examinationFocus')!.max,       5)
 })
 
 test('Advanced rubric is identical to Clinical', () => {

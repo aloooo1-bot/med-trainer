@@ -49,6 +49,8 @@ export default function Dashboard({
   useEffect(() => {
     if (firstCaseDone || sessions.length > 0) return
     try {
+      // Onboarding visibility depends on localStorage, only readable after mount.
+      // eslint-disable-next-line react-hooks/set-state-in-effect
       if (!localStorage.getItem(ONBOARDING_DISMISSED_KEY)) setShowOnboarding(true)
     } catch {}
   }, [firstCaseDone])

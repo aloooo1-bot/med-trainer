@@ -80,6 +80,8 @@ export default function SettingsPage() {
           setFocusSettings(merged)
         })
     })
+    // Mount-only load of locally-persisted settings/scheme (resolved client-side after hydration).
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setFocusSettings(loadFocusSettings())
     setColorScheme(getScheme())
   }, [])

@@ -10,6 +10,8 @@ export function ImagingPanel({ report, results, diagnosisSubmitted }: {
   const [imgError, setImgError] = useState(false)
 
   useEffect(() => {
+    // Reset image selection/error when a new imaging result set is shown.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedIdx(0)
     setImgError(false)
   }, [results])
