@@ -7,6 +7,7 @@ import type { GradingResult } from '@/app/grading/types'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import Topbar from '@/app/components/dashboard/Topbar'
 import NextCaseCard from '@/app/components/dashboard/NextCaseCard'
+import DueReviewCard from '@/app/components/dashboard/DueReviewCard'
 import WeakestSystems from '@/app/components/dashboard/WeakestSystems'
 import RecentActivity from '@/app/components/dashboard/RecentActivity'
 import WeeklyGoal from '@/app/components/dashboard/WeeklyGoal'
@@ -65,6 +66,7 @@ export default function Dashboard({
         />
         <div className="dx-content">
           <NextCaseCard sessions={sessions} systems={systems} />
+          <DueReviewCard />
           <div className="dx-grid2">
             <WeakestSystems systems={systems} />
             <WeeklyGoal sessions={sessions} />
