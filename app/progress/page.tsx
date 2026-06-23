@@ -11,6 +11,7 @@ const ScoreOverTime = dynamic(() => import('@/app/components/progress/ScoreOverT
 const ComponentScoreTrends = dynamic(() => import('@/app/components/progress/ComponentScoreTrends'), { ssr: false })
 import PerformanceBreakdown from '@/app/components/progress/PerformanceBreakdown'
 import ActivityCalendar from '@/app/components/progress/ActivityCalendar'
+const ReasoningProgress = dynamic(() => import('@/app/components/progress/ReasoningProgress'), { ssr: false })
 
 type Session = {
   id: string
@@ -88,6 +89,9 @@ export default function ProgressPage() {
               {totalCases > 0 ? `${totalCases} case${totalCases !== 1 ? 's' : ''} tracked` : 'Complete your first case to start tracking progress'}
             </p>
           </div>
+
+          {/* Reasoning & mastery — sourced from localStorage, independent of synced sessions */}
+          <ReasoningProgress />
 
           {loaded && totalCases === 0 ? (
             <div className="dx-card">

@@ -16,7 +16,9 @@ import type { ReviewGrade } from './types'
 const REVIEW_KEY = 'medtrainer_review_items'
 const MASTERY_KEY = 'medtrainer_mastery'
 const STREAK_KEY = 'medtrainer_recall_streak'
+const CALIBRATION_KEY = 'medtrainer_calibration'
 const MAX_REVIEW = 2000
+const MAX_CALIBRATION = 500
 const DAY_MS = 86_400_000
 
 // ── Review-item extraction (pure) ───────────────────────────────────────────
@@ -160,6 +162,27 @@ export function recordReviewDay(now: number): RecallStreak {
   const next: RecallStreak = { lastDay: day, streak: cur.lastDay === yesterday ? cur.streak + 1 : 1 }
   try { localStorage.setItem(STREAK_KEY, JSON.stringify(next)) } catch {}
   return next
+}
+
+// ── Predict-then-compare calibration history ────────────────────────────────
+
+export interface CalibrationEntry { ts: number; score: number; topHit: boolean }
+
+export function loadCalibration(): CalibrationEntry[] {
+  try { return JSON.parse(localStorage.getItem(CALIBRATION_KEY) ?? '[]') as CalibrationEntry[] } catch { return [] }
+}
+
+/** Append one case's pre-test calibration result (how the student's ranking matched the evidence). */
+export function recordCalibration(score: number, topHit: boolean, now: number): CalibrationEntry[] {
+  const entries = loadCalibration()
+  entries.push({ ts: now, score, topHit })
+  const capped = entries.slice(-MAX_CALIBRATION)
+  try { localStorage.setItem(CALIBRATION_KEY, JSON.stringify(capped)) } catch {}
+  return capped
+}
+
+export function clearCalibration(): void {
+  try { localStorage.removeItem(CALIBRATION_KEY) } catch {}
 }
 
 // ── Combined entry point ────────────────────────────────────────────────────

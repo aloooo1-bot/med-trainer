@@ -33,7 +33,9 @@ import {
   makeCallRecord, recordToSession, createActiveSession, finalizeSession, syncSessionToSupabase,
   recordAbandonedSession,
 } from '../lib/analytics'
-import { recordCaseOutcome } from '../lib/reasoning/store'
+import { recordCaseOutcome, recordCalibration } from '../lib/reasoning/store'
+import { computeBeliefs } from '../lib/reasoning/differential'
+import { scorePrediction } from '../lib/reasoning/prediction'
 import { type CaseData, type NotesState, selectHpi, SOAP_TEMPLATE } from './_lib/types'
 import { isPendingTest } from './_lib/pendingTests'
 import { findResultKey, getVitalStatus, isECGTest } from './_lib/testUtils'
@@ -1357,6 +1359,12 @@ Student message: "${msg}"`
           result.correct ?? false,
           Date.now(),
         )
+        // Record pre-test calibration if the student committed a ranked differential.
+        if (prediction && (caseData.differentialPriors?.length ?? 0) > 0) {
+          const beliefs = computeBeliefs(caseData.differentialPriors!, caseData.testImpacts ?? {}, Array.from(orderedTests))
+          const ps = scorePrediction(prediction, beliefs)
+          if (ps.comparedCount > 0) recordCalibration(ps.score, ps.topHit, Date.now())
+        }
       } catch {}
 
       // Mark first case done for free users
