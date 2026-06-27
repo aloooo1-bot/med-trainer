@@ -64,7 +64,7 @@ Return ONLY valid JSON, no markdown, with exactly this shape:
   "sources": ["<guideline or reference name>", ...1-3]
 }`
 
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, maxRetries: 8 })
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 async function generateOne({ system, diagnosis }) {

@@ -34,7 +34,8 @@ const dryRun = args.includes('--dry-run')
 const limit = parseInt(getArg('--limit') ?? '0', 10)
 
 const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, { auth: { autoRefreshToken: false, persistSession: false } })
-const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+// maxRetries lets the SDK back off on 429s (rate limit) and resume automatically.
+const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, maxRetries: 8 })
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
 function resultSummary(c) {
@@ -124,7 +125,7 @@ async function main() {
       fail++
       console.error(`  ✗ ${row.id}: ${e.message}`)
     }
-    await sleep(1500)
+    await sleep(2500)
   }
   console.log(`\nDone. ${ok} ok, ${fail} failed.`)
 }
