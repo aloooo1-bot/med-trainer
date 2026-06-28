@@ -32,12 +32,16 @@ export function OrderView({
   setCustomTestInput: React.Dispatch<React.SetStateAction<string>>
   locked: boolean
 }) {
+  // Foundations gets the candidate list (training wheels); Clinical/Advanced commit
+  // a free-text leading diagnosis so the answer isn't cued.
+  const predictionOpen = caseDifficulty !== 'Foundations'
+
   // ── FOUNDATIONS: curated checklist ──
   if (caseDifficulty === 'Foundations') {
     const allOrdered = (name: string) => orderedTests.has(name)
     return (
       <div className="space-y-4">
-        <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
+        <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
         <SectionCard title="Laboratory Studies">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {caseData.availableLabs.map(lab => {
@@ -102,7 +106,7 @@ export function OrderView({
 
     return (
       <div className="space-y-4">
-        <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
+        <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
             <svg className="h-4 w-4 text-ink-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -256,7 +260,7 @@ export function OrderView({
 
   return (
     <div className="space-y-4">
-      <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
+      <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
       <div className="rounded-md border border-primary-200 bg-primary-50 px-4 py-3">
         <p className="text-xs text-primary-700">
           <span className="font-semibold">Advanced difficulty:</span> no pre-listed lab panels — search and type test names from memory. Imaging modalities are listed below for reference.

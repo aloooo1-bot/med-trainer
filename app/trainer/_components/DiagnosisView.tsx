@@ -7,13 +7,14 @@ import { WhyPanel } from './WhyPanel'
 import { MicButton } from './MicButton'
 import { computeBeliefs } from '@/app/lib/reasoning/differential'
 import { scorePrediction } from '@/app/lib/reasoning/prediction'
+import { DifferentialBoard } from './DifferentialBoard'
 import { getRubric, type DimensionKey } from '@/app/grading/rubric'
 import { type GradingResult } from '@/app/grading/types'
 import { type TimerState, type NotesState, SOAP_TEMPLATE } from '../_lib/types'
 import type { CaseData } from '../_lib/types'
 
 export function DiagnosisView({
-  caseData, caseDifficulty, prediction, resolvedSystem,
+  caseData, caseDifficulty, prediction, predictionConfidence, resolvedSystem,
   gradingLoading, gradingError, gradingResult,
   userDiagnosis, setUserDiagnosis,
   userPresentation, setUserPresentation,
@@ -30,6 +31,7 @@ export function DiagnosisView({
   caseData: CaseData
   caseDifficulty: string
   prediction: string[] | null
+  predictionConfidence: number | null
   resolvedSystem: string
   gradingLoading: boolean
   gradingError: string | null
@@ -360,16 +362,37 @@ export function DiagnosisView({
         )}
 
         {prediction && (caseData.differentialPriors?.length ?? 0) > 0 && (() => {
+          const isFoundations = caseDifficulty === 'Foundations'
           const beliefs = computeBeliefs(caseData.differentialPriors!, caseData.testImpacts ?? {}, Array.from(orderedTests))
           const ps = scorePrediction(prediction, beliefs)
-          if (ps.comparedCount === 0) return null
+          const engineTop = beliefs[0]?.name
+          const confPct = predictionConfidence != null ? Math.round(predictionConfidence * 100) : null
           return (
             <div className="border-t border-rule px-5 py-4">
               <h3 className="font-serif text-sm font-semibold text-ink mb-2">Pre-test calibration</h3>
-              <p style={{ fontSize: 12, color: 'var(--color-ink-secondary)', lineHeight: 1.6 }}>
-                Your initial read led with <strong>{ps.studentTop}</strong>; after the workup the evidence pointed to <strong>{ps.engineTop}</strong>.
-                {' '}Ranking agreement: <strong>{ps.score}/100</strong>{ps.topHit ? ' — your top pick was correct ✓' : ' — your top pick shifted with the data.'}
-              </p>
+              {isFoundations && ps.comparedCount > 0 ? (
+                <p style={{ fontSize: 12, color: 'var(--color-ink-secondary)', lineHeight: 1.6 }}>
+                  Your initial read led with <strong>{ps.studentTop}</strong>; after the workup the evidence pointed to <strong>{ps.engineTop}</strong>.
+                  {' '}Ranking agreement: <strong>{ps.score}/100</strong>{ps.topHit ? ' — your top pick was correct ✓' : ' — your top pick shifted with the data.'}
+                </p>
+              ) : (
+                <p style={{ fontSize: 12, color: 'var(--color-ink-secondary)', lineHeight: 1.6 }}>
+                  Before testing you committed to <strong>{prediction[0]}</strong>{confPct != null ? ` at ${confPct}% confidence` : ''}.
+                  {' '}The correct diagnosis was <strong>{caseData.diagnosis}</strong>; after your workup the evidence-based leader was <strong>{engineTop}</strong>. Here is how the differential actually moved:
+                </p>
+              )}
+              {!isFoundations && (
+                <div className="mt-3">
+                  <DifferentialBoard
+                    priors={caseData.differentialPriors}
+                    testImpacts={caseData.testImpacts}
+                    orderedTests={Array.from(orderedTests)}
+                    correctDiagnosis={caseData.diagnosis}
+                    reveal
+                    showHint={false}
+                  />
+                </div>
+              )}
             </div>
           )
         })()}

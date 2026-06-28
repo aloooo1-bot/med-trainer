@@ -203,6 +203,45 @@ export default function MedTrainer() {
     if (redo) pendingRedoOfRef.current = redo
   }, [])
 
+  // Deep link to open a specific existing case by id (lookup-only, no generation).
+  // e.g. /trainer?caseId=cardiovascular-advanced-acute-pericarditis-0
+  useEffect(() => {
+    const cid = new URLSearchParams(window.location.search).get('caseId')
+    if (!cid) return
+    let cancelled = false
+    ;(async () => {
+      setGenerating(true)
+      setGenerationError(null)
+      try {
+        const res = await fetch(`/api/cases/lookup?id=${encodeURIComponent(cid)}`)
+        const j = await res.json()
+        if (cancelled) return
+        if (j.status === 'hit' && j.caseData) {
+          const cd = j.caseData as CaseData & { nativeDifficulty?: string }
+          resolvedSystemRef.current = cid.split('-')[0] || ''
+          setActiveCaseId(cid)
+          setCaseDifficulty(cd.nativeDifficulty ?? 'Clinical')
+          setCaseData(cd)
+          const seed: Record<string, OpenIResult[] | null> = {}
+          for (const [k, v] of Object.entries(j.imagingCache ?? {})) {
+            if (Array.isArray(v)) seed[k] = v as OpenIResult[]
+          }
+          if (Object.keys(seed).length > 0) setImagingCache(seed)
+          setCaseStarted((cd.nativeDifficulty ?? '') === 'Foundations')
+          setActiveSection('order')
+        } else {
+          setGenerationError('Could not load that case — make sure you are signed in and the id is correct.')
+        }
+      } catch {
+        if (!cancelled) setGenerationError('Failed to load case.')
+      } finally {
+        if (!cancelled) setGenerating(false)
+      }
+    })()
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
   // Gate / tier state
   type GateStatus = { tier: 'anonymous' | 'free' | 'pro'; casesLeft: number; firstCaseDone: boolean; loaded: boolean; nextCaseId?: string }
   const [gateStatus, setGateStatus] = useState<GateStatus>({ tier: 'anonymous', casesLeft: ANON_CASE_LIMIT, firstCaseDone: false, loaded: false })
@@ -1329,14 +1368,20 @@ Student message: "${msg}"`
           result.correct ?? false,
           Date.now(),
         )
-        // Record pre-test calibration if the student committed a ranked differential.
-        if (prediction && (caseData.differentialPriors?.length ?? 0) > 0) {
+        // Record pre-test calibration if the student committed a prediction.
+        if (prediction && prediction[0] && (caseData.differentialPriors?.length ?? 0) > 0) {
           const beliefs = computeBeliefs(caseData.differentialPriors!, caseData.testImpacts ?? {}, Array.from(orderedTests))
           const ps = scorePrediction(prediction, beliefs)
-          // Brier calibration: stated confidence vs whether the top pick was the actual diagnosis.
-          const topCorrect = prediction[0] === caseData.diagnosis
-          if (ps.comparedCount > 0) {
+          // Normalized match: did the student's leading pick equal the actual diagnosis?
+          const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+          const np = norm(prediction[0]), nd = norm(caseData.diagnosis)
+          const topCorrect = np.length > 1 && (np === nd || nd.includes(np) || np.includes(nd))
+          if (caseDifficulty === 'Foundations' && ps.comparedCount > 0) {
+            // Ranked mode: rank-agreement + Brier.
             recordCalibration(ps.score, ps.topHit, Date.now(), predictionConfidence ?? undefined, topCorrect)
+          } else {
+            // Open mode (Clinical/Advanced): no candidate ranking — record leading-pick accuracy + Brier.
+            recordCalibration(topCorrect ? 100 : 0, topCorrect, Date.now(), predictionConfidence ?? undefined, topCorrect)
           }
         }
       } catch {}
@@ -1633,6 +1678,7 @@ Student message: "${msg}"`
       case 'results':
         return <ResultsView
           caseData={caseData}
+          caseDifficulty={caseDifficulty}
           orderedTests={orderedTests}
           imagingCache={imagingCache}
           ecgCache={ecgCache}
@@ -1661,6 +1707,7 @@ Student message: "${msg}"`
           caseData={caseData}
           caseDifficulty={caseDifficulty}
           prediction={prediction}
+          predictionConfidence={predictionConfidence}
           resolvedSystem={resolvedSystemRef.current}
           gradingLoading={gradingLoading}
           gradingError={gradingError}

@@ -12,13 +12,14 @@ import type { CaseData } from '../_lib/types'
 import type { GradingResult } from '@/app/grading/types'
 
 export function ResultsView({
-  caseData, orderedTests, imagingCache, ecgCache,
+  caseData, caseDifficulty, orderedTests, imagingCache, ecgCache,
   smearCache, biopsyImgCache, fundusCache, dermCache, urineImgCache,
   collapsedPanels, setCollapsedPanels,
   generatingOnDemand, failedOnDemand,
   gradingResult, setZoomedImage, setActiveSection, onRetryFailed,
 }: {
   caseData: CaseData
+  caseDifficulty: string
   orderedTests: Set<string>
   imagingCache: Record<string, OpenIResult[] | null>
   ecgCache: Record<string, ECGImage | null | 'none'>
@@ -104,13 +105,18 @@ export function ResultsView({
 
   return (
     <div className="space-y-4">
-      <DifferentialBoard
-        priors={caseData.differentialPriors}
-        testImpacts={caseData.testImpacts}
-        orderedTests={orderedArr}
-        correctDiagnosis={caseData.diagnosis}
-        reveal={diagnosisSubmitted}
-      />
+      {/* Live board is a Foundations-only training aid. At Clinical/Advanced the
+          candidate differential is hidden during the case (no cueing) and revealed
+          in the scorecard afterward. */}
+      {caseDifficulty === 'Foundations' && (
+        <DifferentialBoard
+          priors={caseData.differentialPriors}
+          testImpacts={caseData.testImpacts}
+          orderedTests={orderedArr}
+          correctDiagnosis={caseData.diagnosis}
+          reveal={diagnosisSubmitted}
+        />
+      )}
       {allResultPanels.length > 0 && (
         <div className="flex justify-end">
           <button
