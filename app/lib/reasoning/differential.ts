@@ -122,3 +122,31 @@ export function bestNextTest(
   const ranked = rankTestsByValue(beliefs, testImpacts, alreadyOrdered)
   return ranked.length > 0 && ranked[0].value > 0.01 ? ranked[0] : null
 }
+
+/**
+ * Authoritative, human-readable evidence-based differential ranking for the AI
+ * grader — so the grader's differential discussion stays consistent with the
+ * board the student saw (they must not contradict each other). Notes the
+ * confirm/exclude effect of each test the student actually ordered.
+ */
+export function formatEvidenceSummary(
+  priors: DifferentialPrior[],
+  testImpacts: TestImpacts,
+  orderedTests: string[],
+): string {
+  if (!priors?.length) return ''
+  const beliefs = computeBeliefs(priors, testImpacts, orderedTests)
+  return beliefs
+    .map((b, i) => {
+      const decisive: string[] = []
+      for (const test of orderedTests) {
+        const effect = testImpacts[test]?.[b.name]?.effect
+        if (effect === 'confirms') decisive.push(`confirmed by ${test}`)
+        else if (effect === 'excludes') decisive.push(`excluded by ${test}`)
+      }
+      const pct = Math.round(b.probability * 100)
+      const note = decisive.length ? ` — ${decisive.join('; ')}` : ''
+      return `${i + 1}. ${b.name} (${pct}%)${note}`
+    })
+    .join('\n')
+}

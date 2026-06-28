@@ -26,6 +26,27 @@ test('buildRubricPrompt includes patient info', () => {
   assert.ok(prompt.includes('"chest pain"'))
 })
 
+test('buildRubricPrompt omits the differential-consistency block when no analysis is provided', () => {
+  const prompt = buildRubricPrompt(baseInput)
+  // The actual injected ranking block (not the differentials-output instruction) is absent.
+  assert.ok(!prompt.includes('computed from this case'))
+  assert.ok(!prompt.includes("Student's pre-test commitment:"))
+  assert.ok(!prompt.includes('PRE-TEST COMMITMENT:'))
+})
+
+test('buildRubricPrompt binds the differential discussion to the board model when provided', () => {
+  const prompt = buildRubricPrompt({
+    ...baseInput,
+    differentialAnalysis: '1. STEMI (inferior) (100%) — confirmed by EKG\n2. PE (0%) — excluded by EKG',
+    studentPrediction: 'Before ordering any tests, the student committed to a leading diagnosis of "STEMI" at 80% confidence.',
+  })
+  assert.ok(prompt.includes('computed from this case'))
+  assert.ok(prompt.includes('confirmed by EKG'))
+  assert.ok(prompt.includes("Student's pre-test commitment:"))
+  assert.ok(prompt.includes('PRE-TEST COMMITMENT:'))
+  assert.ok(prompt.includes('MUST be consistent with it'))
+})
+
 test('buildRubricPrompt includes submitted and correct diagnosis', () => {
   const prompt = buildRubricPrompt(baseInput)
   assert.ok(prompt.includes('"STEMI"'))

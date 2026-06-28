@@ -84,4 +84,8 @@ export interface GradingInput {
   timedOut: boolean
   revealedExamRegions?: string[]
   relevantExamRegions?: string[]
+  /** Authoritative evidence-based differential ranking the grader's discussion must stay consistent with. */
+  differentialAnalysis?: string
+  /** The student's pre-test leading-diagnosis commitment + confidence, for clinical-reasoning grading. */
+  studentPrediction?: string
 }

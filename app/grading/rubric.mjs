@@ -91,7 +91,8 @@ CLINICAL REASONING (/${cr.max}):
 - If no reasoning text was provided AT CLINICAL OR ADVANCED DIFFICULTY (where the field exists but was left blank) and the interview/test ordering was coherent, score ${Math.round(cr.max * 0.47)}-${Math.round(cr.max * 0.67)}/${cr.max} based on observable reasoning
 - IMAGING IMAGES NOTE: Visual images shown alongside imaging studies are sourced from published medical literature by keyword match and may not exactly depict this case's findings. Evaluate the student's imaging interpretation against the radiology reports in "Tests ordered" above (the authoritative ground truth), not against any specific visual details the student may describe. Do not penalize a student for image-specific descriptions that differ from the reports — the image may simply have been non-representative.
 - ANTI-FABRICATION RULE: Before penalizing the trainee for citing fabricated information, verify the claim is not present anywhere in the Background History block above (which includes past medical history, medications, surgeries, hospitalizations, social history, family history, allergies, and hidden symptoms). Only flag information as fabricated if it is genuinely absent from ALL case fields — HPI, Background History, lab/imaging results, and the interview transcript.
-- ANCHORING BIAS IDENTIFICATION: If the student's transcript shows a clear anchoring pattern — commits early to one diagnosis based on a single finding and fails to revise despite accumulating contradicting evidence — the clinicalReasoning feedback MUST name it as anchoring bias and specify the evidence that should have prompted reassessment. Example: "Your early commitment to SAH appears to have anchored your workup — the non-thunderclap onset and normal CT at 6h without LP significantly lowers post-test probability; bacterial meningitis should have moved up the differential when fever and nuchal rigidity were confirmed."
+- ANCHORING BIAS IDENTIFICATION: If the student's transcript shows a clear anchoring pattern — commits early to one diagnosis based on a single finding and fails to revise despite accumulating contradicting evidence — the clinicalReasoning feedback MUST name it as anchoring bias and specify the evidence that should have prompted reassessment. Example: "Your early commitment to SAH appears to have anchored your workup — the non-thunderclap onset and normal CT at 6h without LP significantly lowers post-test probability; bacterial meningitis should have moved up the differential when fever and nuchal rigidity were confirmed."${input.studentPrediction ? `
+- PRE-TEST COMMITMENT: The student committed to a leading diagnosis BEFORE ordering any tests (see "Student's pre-test commitment" above). A correct pre-test leading diagnosis held with appropriate confidence is strong evidence of hypothesis-driven reasoning — reward it. A confidently-wrong pre-test commitment that the student then failed to revise toward the correct diagnosis despite the evidence is an anchoring/calibration weakness — reflect it in the score and name it in the feedback. Do NOT double-penalize: if you already flagged anchoring above, this is the same deduction, not an additional one.` : ''}
 ` : ''
 
   const crJsonField = cr
@@ -119,7 +120,7 @@ Correct diagnosis: "${input.correctDiagnosis}"
 Key clinical information that should have been elicited: ${input.keyQuestions.join(' | ')}
 Teaching points: ${input.teachingPoints.join(' | ')}
 Differentials: ${input.differentials.join(', ')}
-
+${input.differentialAnalysis ? `\nEVIDENCE-BASED DIFFERENTIAL RANKING (computed from this case's reasoning model over the tests the student actually ordered — this is AUTHORITATIVE and is the same ranking the student saw on the differential board; the "differentials" discussion you output MUST be consistent with it and MUST NOT contradict any confirm/exclude effect or the ordering):\n${input.differentialAnalysis}\n` : ''}${input.studentPrediction ? `\nStudent's pre-test commitment: ${input.studentPrediction}\n` : ''}
 SCORING WEIGHTS (must sum to 100 — efficiency is tracked separately and is NOT part of this rubric):
 ${weightBlock}
 ${input.timedOut ? '\nNOTE: This case was submitted when time expired. Grade whatever was submitted fairly — partial work should receive partial credit. Do not penalize harshly for incomplete reasoning if it appears the student was mid-sentence. Note in the feedback: "This case was submitted when time expired." Do not reduce scores further beyond what the time expiry already reflects.\n' : ''}
@@ -277,6 +278,6 @@ Return:
   },
   "missedQuestions": ["<question that would have meaningfully changed dx or management>", ...omit anything already available],
   "teachingPoints": ${JSON.stringify(input.teachingPoints)},
-  "differentials": ["<dx>: <1 sentence explanation of why it's on the differential and how to distinguish>", ...]
+  "differentials": ["<dx>: <1 sentence explanation of why it's on the differential and how to distinguish — when an EVIDENCE-BASED DIFFERENTIAL RANKING is provided above, this discussion MUST be consistent with it: do not describe a differential as still-likely if that ranking marks it excluded, and do not contradict the confirm/exclude effects or the ordering>", ...]
 }`
 }

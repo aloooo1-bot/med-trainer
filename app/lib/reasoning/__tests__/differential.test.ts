@@ -8,6 +8,7 @@ import {
   discriminatingValue,
   rankTestsByValue,
   bestNextTest,
+  formatEvidenceSummary,
 } from '../differential'
 import type { DifferentialPrior, TestImpacts } from '../types'
 
@@ -101,6 +102,14 @@ test('rankTestsByValue / bestNextTest surface the most informative unordered tes
   // already-ordered tests are excluded
   const afterOrder = rankTestsByValue(beliefs, TEST_IMPACTS, ['Troponin (serial)'])
   assert.ok(!afterOrder.some(r => r.test === 'Troponin (serial)'))
+})
+
+test('formatEvidenceSummary ranks descending and notes confirm/exclude effects', () => {
+  const summary = formatEvidenceSummary(PRIORS, TEST_IMPACTS, ['Troponin (serial)', 'CT aortogram'])
+  const lines = summary.split('\n')
+  assert.equal(lines[0].startsWith('1. NSTEMI'), true)
+  assert.match(summary, /NSTEMI.*confirmed by Troponin \(serial\)/)
+  assert.match(summary, /Aortic dissection.*excluded by CT aortogram/)
 })
 
 // helper: probability of a named differential in a belief array

@@ -34,7 +34,7 @@ import {
   recordAbandonedSession,
 } from '../lib/analytics'
 import { recordCaseOutcome, recordCalibration } from '../lib/reasoning/store'
-import { computeBeliefs } from '../lib/reasoning/differential'
+import { computeBeliefs, formatEvidenceSummary } from '../lib/reasoning/differential'
 import { scorePrediction } from '../lib/reasoning/prediction'
 import { type CaseData, type NotesState, selectHpi, SOAP_TEMPLATE } from './_lib/types'
 import { isPendingTest } from './_lib/pendingTests'
@@ -1317,6 +1317,14 @@ Student message: "${msg}"`
       ...(expectedLabs?.length        ? { expectedLabs }        : {}),
       ...(expectedImaging?.length     ? { expectedImaging }     : {}),
       ...(supplementaryTests?.length  ? { supplementaryTests }  : {}),
+      // Make the board's reasoning model the single source of truth so the grader's
+      // differential discussion can't contradict what the student saw.
+      ...((caseData.differentialPriors?.length ?? 0) > 0
+        ? { differentialAnalysis: formatEvidenceSummary(caseData.differentialPriors!, caseData.testImpacts ?? {}, Array.from(orderedTests)) }
+        : {}),
+      ...(prediction && prediction[0]
+        ? { studentPrediction: `Before ordering any tests, the student committed to a leading diagnosis of "${prediction[0]}"${predictionConfidence != null ? ` at ${Math.round(predictionConfidence * 100)}% confidence` : ''}.` }
+        : {}),
     }
 
     const gradingUsageCb: GradingUsageCallback = (type, usage) => recordApiCall(type, usage)
