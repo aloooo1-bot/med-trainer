@@ -1,0 +1,407 @@
+{
+  "generatedAt": "2026-07-09T00:52:56.068Z",
+  "cases": 7,
+  "namesChecked": 159,
+  "unresolvable": 49,
+  "note": "Each entry is a test name that searchTests() cannot find — add a synonym/abbreviation to MASTER_TEST_LIST (clinician review). fuzzyRescued=true means order-time fuzzy matching still resolves it against the case keys.",
+  "gaps": [
+    {
+      "name": "Urinalysis (UA)",
+      "count": 3,
+      "cases": [
+        "gastrointestinal-advanced-small-bowel-obstruction-0",
+        "neurologic-foundations-bacterial-meningitis-0",
+        "respiratory-clinical-community-acquired-pneumonia-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Complete Metabolic Panel (CMP)",
+      "count": 2,
+      "cases": [
+        "cardiovascular-foundations-hypertensive-emergency-0",
+        "cardiovascular-clinical-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Coagulation Panel (PT/INR, aPTT)",
+      "count": 2,
+      "cases": [
+        "cardiovascular-foundations-hypertensive-emergency-0",
+        "neurologic-foundations-bacterial-meningitis-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Serum Uric Acid",
+      "count": 2,
+      "cases": [
+        "cardiovascular-foundations-st-elevation-myocardial-infarction-inferior-stemi-0",
+        "cardiovascular-clinical-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Chest X-Ray (PA/Lateral)",
+      "count": 2,
+      "cases": [
+        "cardiovascular-clinical-hypertensive-emergency-0",
+        "neurologic-foundations-bacterial-meningitis-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Urine Microalbumin-to-Creatinine Ratio",
+      "count": 1,
+      "cases": [
+        "cardiovascular-foundations-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Magnesium Level",
+      "count": 1,
+      "cases": [
+        "cardiovascular-foundations-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Plasma Renin Activity (PRA)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-foundations-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Aldosterone Level (Serum)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-foundations-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "24-Hour Urine Catecholamines (Epinephrine, Norepinephrine, Dopamine)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-foundations-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Urine Protein-to-Creatinine Ratio (Spot)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-foundations-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Ophthalmoscopy / Dilated Funduscopic Examination",
+      "count": 1,
+      "cases": [
+        "cardiovascular-foundations-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Activated Partial Thromboplastin Time (aPTT)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-foundations-st-elevation-myocardial-infarction-inferior-stemi-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Creatine Kinase (CK) / CK-MB",
+      "count": 1,
+      "cases": [
+        "cardiovascular-foundations-st-elevation-myocardial-infarction-inferior-stemi-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Serial Troponin I (3-hour repeat)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-foundations-st-elevation-myocardial-infarction-inferior-stemi-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "CT Aortography (Chest/Abdomen)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-foundations-st-elevation-myocardial-infarction-inferior-stemi-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Right-Sided ECG Leads (V3R–V6R)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-foundations-st-elevation-myocardial-infarction-inferior-stemi-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Creatinine / BUN",
+      "count": 1,
+      "cases": [
+        "cardiovascular-clinical-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Urine Sodium (Spot)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-clinical-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Aldosterone-to-Renin Ratio (ARR)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-clinical-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Fundoscopic Exam (Ophthalmoscopy)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-clinical-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Plasma Metanephrines (Fractionated)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-clinical-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Urine Albumin-to-Creatinine Ratio (UACR)",
+      "count": 1,
+      "cases": [
+        "cardiovascular-clinical-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "MRI Brain with Diffusion-Weighted Imaging",
+      "count": 1,
+      "cases": [
+        "cardiovascular-clinical-hypertensive-emergency-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Abdominal X-Ray (Supine and Upright)",
+      "count": 1,
+      "cases": [
+        "gastrointestinal-advanced-small-bowel-obstruction-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "CT Abdomen and Pelvis with IV Contrast",
+      "count": 1,
+      "cases": [
+        "gastrointestinal-advanced-small-bowel-obstruction-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Magnesium (Serum)",
+      "count": 1,
+      "cases": [
+        "gastrointestinal-advanced-small-bowel-obstruction-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Phosphorus (Serum)",
+      "count": 1,
+      "cases": [
+        "gastrointestinal-advanced-small-bowel-obstruction-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Lactate Repeat (4-hour)",
+      "count": 1,
+      "cases": [
+        "gastrointestinal-advanced-small-bowel-obstruction-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Phosphate (Whole Blood)",
+      "count": 1,
+      "cases": [
+        "gastrointestinal-advanced-small-bowel-obstruction-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Blood Culture (Aerobic and Anaerobic)",
+      "count": 1,
+      "cases": [
+        "gastrointestinal-advanced-small-bowel-obstruction-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "CT Angiography Abdomen and Pelvis (Mesenteric CTA)",
+      "count": 1,
+      "cases": [
+        "gastrointestinal-advanced-small-bowel-obstruction-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Water-Soluble Contrast Follow-Through (Gastrografin)",
+      "count": 1,
+      "cases": [
+        "gastrointestinal-advanced-small-bowel-obstruction-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Cerebrospinal Fluid (CSF) Analysis",
+      "count": 1,
+      "cases": [
+        "neurologic-foundations-bacterial-meningitis-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "CSF Gram Stain and Culture",
+      "count": 1,
+      "cases": [
+        "neurologic-foundations-bacterial-meningitis-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "CSF Lactate",
+      "count": 1,
+      "cases": [
+        "neurologic-foundations-bacterial-meningitis-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Serum Glucose",
+      "count": 1,
+      "cases": [
+        "neurologic-foundations-bacterial-meningitis-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "HIV Antigen/Antibody (4th Gen)",
+      "count": 1,
+      "cases": [
+        "neurologic-foundations-bacterial-meningitis-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Complement Levels (C3, C4, CH50)",
+      "count": 1,
+      "cases": [
+        "neurologic-foundations-bacterial-meningitis-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Neisseria meningitidis PCR (CSF)",
+      "count": 1,
+      "cases": [
+        "neurologic-foundations-bacterial-meningitis-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Meningococcal Serogroup (Culture-based)",
+      "count": 1,
+      "cases": [
+        "neurologic-foundations-bacterial-meningitis-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Blood Culture (x2 sets)",
+      "count": 1,
+      "cases": [
+        "respiratory-clinical-community-acquired-pneumonia-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Sputum Culture with Gram Stain",
+      "count": 1,
+      "cases": [
+        "respiratory-clinical-community-acquired-pneumonia-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "CURB-65 Score",
+      "count": 1,
+      "cases": [
+        "respiratory-clinical-community-acquired-pneumonia-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Procalcitonin (Serial at 48h)",
+      "count": 1,
+      "cases": [
+        "respiratory-clinical-community-acquired-pneumonia-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Respiratory Pathogen PCR Panel (Sputum)",
+      "count": 1,
+      "cases": [
+        "respiratory-clinical-community-acquired-pneumonia-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Pulse Oximetry on Supplemental Oxygen (2L NC)",
+      "count": 1,
+      "cases": [
+        "respiratory-clinical-community-acquired-pneumonia-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "Sputum Sensitivity and Susceptibility (Final)",
+      "count": 1,
+      "cases": [
+        "respiratory-clinical-community-acquired-pneumonia-0"
+      ],
+      "fuzzyRescued": true
+    },
+    {
+      "name": "CT Chest without contrast (High-Resolution)",
+      "count": 1,
+      "cases": [
+        "respiratory-clinical-community-acquired-pneumonia-0"
+      ],
+      "fuzzyRescued": true
+    }
+  ]
+}

@@ -75,7 +75,7 @@ export interface AskResponse {
 
 export interface OrderedTestResult {
   test: string
-  kind: 'lab' | 'imaging' | 'procedure' | 'pending' | 'none'
+  kind: 'lab' | 'imaging' | 'procedure' | 'pending' | 'ambiguous' | 'none'
   labResult?: CaseData['labResults'][string]
   report?: string
   pendingHours?: string
@@ -84,6 +84,10 @@ export interface OrderedTestResult {
   specialModality?: SpecialModality
   specialFindings?: string
   generatedOnDemand?: boolean
+  /** kind 'ambiguous': canonical names the student should confirm (4.3). */
+  suggestions?: string[]
+  /** Set when the result was fuzzy-resolved from a differently-phrased order. */
+  resolvedFrom?: string
 }
 
 export interface OrderResponse {

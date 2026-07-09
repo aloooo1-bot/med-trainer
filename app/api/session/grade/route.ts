@@ -40,9 +40,15 @@ export async function POST(req: NextRequest) {
     const usages: Array<{ type: string; usage: RawUsage }> = []
     const result = await gradeSession(input, (type, usage) => usages.push({ type, usage }))
 
+    // Presentation time = gap between entering the write-up phase and submitting
+    // (diagnostic time was logged on the enter_presentation event itself).
+    const presentationSeconds = state.enteredPresentationAt
+      ? Math.round((Date.now() - new Date(state.enteredPresentationAt).getTime()) / 1000)
+      : null
+
     const store = await getSessionStore()
     await store.appendEvent(session.id, makeEvent('submit', {
-      diagnosis, reasoningText, timedOut: !!body.timedOut, result, usages,
+      diagnosis, reasoningText, timedOut: !!body.timedOut, presentationSeconds, result, usages,
     }))
     await store.setPhase(session.id, 'graded')
 

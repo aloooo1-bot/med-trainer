@@ -4,7 +4,7 @@ import { GRADING_SYSTEM_PROMPT, buildRubricPrompt, buildOralPrompt } from '../..
 import { clampDimensions } from '../../grading/clamp'
 import { GradingResultSchema } from '../../grading/schemas'
 import { formatEvidenceSummary } from '../reasoning/differential'
-import { findResultKey } from '../../trainer/_lib/testUtils'
+import { resolveResult } from './orderService'
 import { callModel } from './llm'
 import { selectHpiForDifficulty } from './caseTiers'
 import type { TrainerSessionRecord } from './sessionStore'
@@ -61,17 +61,19 @@ export function buildElicitedRecord(state: ReplayedState): string {
   return parts.join('\n')
 }
 
+// Formatting goes through the same resolver as /api/session/order (including
+// fuzzy synonym matching), so a test the student saw a result for is never
+// graded as "(no result available)".
 function formatOrderedLabResults(orderedTests: string[], caseData: CaseData): string {
   return orderedTests
     .flatMap(t => {
-      const key = findResultKey(t, caseData.labResults)
-      const r = key ? caseData.labResults[key] : null
-      if (!r) {
-        // Not a lab — imaging/procedure results are reported separately.
-        const isImg = findResultKey(t, caseData.imagingResults)
-          || (caseData.procedureResults && findResultKey(t, caseData.procedureResults))
-        return isImg ? [] : [`${t}: (no result available for this case)`]
+      const res = resolveResult(t, caseData)
+      if (res.kind === 'imaging' || res.kind === 'procedure') return []
+      if (res.kind === 'pending') return [`${t}: (result still pending at submission — not available to the student)`]
+      if (res.kind !== 'lab' || !res.labResult) {
+        return [`${t}: (no result available for this case — plausible order with no modeled result; treat as NEUTRAL, never as low-value or wasted)`]
       }
+      const r = res.labResult
       if (Array.isArray(r?.components) && r.components.length > 0) {
         return [`${t}:\n` + r.components.map(c => `  ${c.name}: ${c.value} ${c.unit} (ref: ${c.referenceRange}) [${c.status}]`).join('\n')]
       }
@@ -84,10 +86,11 @@ function formatOrderedLabResults(orderedTests: string[], caseData: CaseData): st
 function formatOrderedImagingResults(orderedTests: string[], caseData: CaseData): string {
   return orderedTests
     .flatMap(t => {
-      const imgKey = findResultKey(t, caseData.imagingResults)
-      if (imgKey) return [`${t}: ${caseData.imagingResults[imgKey]}`]
-      const procKey = caseData.procedureResults ? findResultKey(t, caseData.procedureResults) : null
-      return procKey ? [`${t}: ${caseData.procedureResults![procKey]}`] : []
+      const res = resolveResult(t, caseData)
+      if ((res.kind === 'imaging' || res.kind === 'procedure') && res.report !== undefined) {
+        return [`${t}: ${res.report}`]
+      }
+      return []
     })
     .join('\n')
 }

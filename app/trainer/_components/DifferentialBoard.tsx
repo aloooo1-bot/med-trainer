@@ -1,8 +1,21 @@
 'use client'
 
-import { useMemo } from 'react'
+import { useMemo, useState } from 'react'
 import type { DifferentialPrior, TestImpacts } from '../../lib/reasoning/types'
 import { computeBeliefs, bestNextTest } from '../../lib/reasoning/differential'
+
+/**
+ * Qualitative band for a probability. The priors/impacts are LLM-authored
+ * teaching values, not published likelihood ratios — exact percentages imply
+ * false precision, so the reveal shows direction-strength bands by default
+ * and puts the raw numbers behind a toggle.
+ */
+function probabilityBand(p: number): { arrow: string; label: string } {
+  if (p >= 0.6) return { arrow: '↑↑', label: 'strongly favored' }
+  if (p >= 0.25) return { arrow: '↑', label: 'favored' }
+  if (p >= 0.05) return { arrow: '—', label: 'possible' }
+  return { arrow: '↓', label: 'unlikely' }
+}
 
 /**
  * Live "differential board": as the student orders tests, each result shifts the
@@ -37,6 +50,11 @@ export function DifferentialBoard({
   // passes; the reveal (post-grading) mode remains available everywhere.
   const liveBlocked = !reveal && caseDifficulty !== 'Foundations'
 
+  // Post-grading reveal defaults to qualitative bands (anti-false-precision);
+  // the live Foundations board keeps numbers (they drive the teaching loop).
+  const [showNumbers, setShowNumbers] = useState(false)
+  const numeric = !reveal || showNumbers
+
   const beliefs = useMemo(
     () => (priors?.length ? computeBeliefs(priors, impacts, orderedTests) : []),
     [priors, impacts, orderedTests],
@@ -60,9 +78,20 @@ export function DifferentialBoard({
         <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-tertiary">
           Differential
         </span>
-        <span className="text-[10px] text-ink-tertiary">
-          {appliedCount === 0 ? 'pre-test' : `${appliedCount} result${appliedCount === 1 ? '' : 's'} in`}
-        </span>
+        <div className="flex items-center gap-2">
+          {reveal && (
+            <button
+              onClick={() => setShowNumbers(v => !v)}
+              className="text-[10px] text-ink-tertiary underline decoration-dotted hover:text-ink-secondary transition-colors"
+              title="Percentages are model teaching values, not published likelihood ratios"
+            >
+              {showNumbers ? 'hide numbers' : 'show numbers'}
+            </button>
+          )}
+          <span className="text-[10px] text-ink-tertiary">
+            {appliedCount === 0 ? 'pre-test' : `${appliedCount} result${appliedCount === 1 ? '' : 's'} in`}
+          </span>
+        </div>
       </div>
 
       <div className="flex flex-col gap-2">
@@ -90,7 +119,13 @@ export function DifferentialBoard({
                   )}
                   {isAnswer && <span className="ml-1 text-[9px] uppercase">✓ answer</span>}
                 </span>
-                <span className="font-mono tabular-nums text-ink-tertiary">{excluded ? '✗' : `${pct}%`}</span>
+                <span className="font-mono tabular-nums text-ink-tertiary">
+                  {excluded
+                    ? '✗'
+                    : numeric
+                      ? `${pct}%`
+                      : `${probabilityBand(b.probability).arrow} ${probabilityBand(b.probability).label}`}
+                </span>
               </div>
               <div
                 className="h-1.5 overflow-hidden rounded-full bg-surface-3"

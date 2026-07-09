@@ -153,7 +153,8 @@ ${input.supplementaryTests?.length ? `Supplementary/advanced tests (specialty fo
 ` : `- Award full or near-full credit if all ordered tests are appropriate and the core diagnostic workup is complete
 - Minor additions (e.g. a slightly broad panel) should not drop the score
 - Only penalize meaningfully for clearly unnecessary or contraindicated tests
-`}${input.difficulty === 'Advanced' ? `- This student used free-text search with no pre-curated test list. Weight initiative and precision more heavily — ordering the exact right test by name (e.g. "Anti-PLA2R Antibody" rather than just "ANA") should be rewarded.` : ''}
+`}- UNMATCHED-ORDER NEUTRALITY RULE: An ordered test annotated "(no result available for this case ...)" means the simulation had no modeled result for a plausibly-phrased order — it does NOT mean the order was wrong. Treat such orders as strictly NEUTRAL: never describe them as low-value, wasted, or unnecessary, and never deduct for them from any dimension.
+${input.difficulty === 'Advanced' ? `- This student used free-text search with no pre-curated test list. Weight initiative and precision more heavily — ordering the exact right test by name (e.g. "Anti-PLA2R Antibody" rather than just "ANA") should be rewarded.` : ''}
 
 DIAGNOSIS ACCURACY (/${da.max}):
 - A correct primary diagnosis scores at least ${daCorrectMin}/${da.max} regardless of specificity

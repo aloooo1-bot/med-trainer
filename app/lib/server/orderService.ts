@@ -2,6 +2,7 @@ import 'server-only'
 import { findResultKey, isECGTest } from '../../trainer/_lib/testUtils'
 import { isPendingTest, pendingHours } from '../../trainer/_lib/pendingTests'
 import { getSpecialModality, type SpecialModality } from '../specialImageLookup'
+import { fuzzyResolveTest } from '../testMatch'
 import { callModel } from './llm'
 import type { CaseData } from '../../trainer/_lib/types'
 import type { RawUsage } from '../analytics'
@@ -28,6 +29,34 @@ export function resolveResult(test: string, caseData: CaseData): OrderedTestResu
     if (finding) base.specialFindings = finding
   }
 
+  const direct = resolveByKey(test, base, caseData)
+  if (direct) return direct
+
+  // Exact/alias/substring matching missed — fuzzy-match the free-typed order
+  // against this case's result keys + MASTER_TEST_LIST synonyms (4.3) before
+  // declaring no result. A clear winner auto-resolves; a contested match
+  // returns suggestions so the student confirms the canonical name.
+  const candidateKeys = [
+    ...Object.keys(caseData.labResults ?? {}),
+    ...Object.keys(caseData.imagingResults ?? {}),
+    ...Object.keys(caseData.procedureResults ?? {}),
+  ]
+  const fuzzy = fuzzyResolveTest(test, candidateKeys)
+  if (fuzzy.match) {
+    const resolved = resolveByKey(fuzzy.match, base, caseData)
+    if (resolved) return { ...resolved, test, resolvedFrom: fuzzy.match }
+  }
+  if (fuzzy.suggestions.length) {
+    return { ...base, kind: 'ambiguous', suggestions: fuzzy.suggestions }
+  }
+
+  if (isPendingTest(test)) {
+    return { ...base, kind: 'pending', pendingHours: pendingHours(test) }
+  }
+  return base
+}
+
+function resolveByKey(test: string, base: OrderedTestResult, caseData: CaseData): OrderedTestResult | null {
   const labKey = findResultKey(test, caseData.labResults)
   if (labKey) {
     return { ...base, kind: 'lab', labResult: caseData.labResults[labKey] }
@@ -35,7 +64,7 @@ export function resolveResult(test: string, caseData: CaseData): OrderedTestResu
   const imgKey = findResultKey(test, caseData.imagingResults)
   if (imgKey) {
     const out: OrderedTestResult = { ...base, kind: 'imaging', report: caseData.imagingResults[imgKey] }
-    if (isECGTest(test)) {
+    if (isECGTest(base.test)) {
       out.isECG = true
       out.ecgFindings = caseData.ecgFindings
     }
@@ -45,10 +74,7 @@ export function resolveResult(test: string, caseData: CaseData): OrderedTestResu
   if (procKey) {
     return { ...base, kind: 'procedure', report: caseData.procedureResults![procKey] }
   }
-  if (isPendingTest(test)) {
-    return { ...base, kind: 'pending', pendingHours: pendingHours(test) }
-  }
-  return base
+  return null
 }
 
 /** Synthesize a missing result and return an updated snapshot, or null. */

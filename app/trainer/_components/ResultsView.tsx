@@ -16,6 +16,7 @@ export function ResultsView({
   smearCache, biopsyImgCache, fundusCache, dermCache, urineImgCache,
   collapsedPanels, setCollapsedPanels,
   generatingOnDemand, failedOnDemand,
+  ambiguousOrders, onConfirmAmbiguous, onDismissAmbiguous,
   gradingResult, setZoomedImage, setActiveSection, onRetryFailed,
 }: {
   caseData: CaseData
@@ -33,6 +34,10 @@ export function ResultsView({
   generatingOnDemand: Set<string>
   failedOnDemand: Set<string>
   setFailedOnDemand: React.Dispatch<React.SetStateAction<Set<string>>>
+  /** Free-typed orders awaiting canonical-name confirmation (4.3). */
+  ambiguousOrders: Record<string, string[]>
+  onConfirmAmbiguous: (typed: string, canonical: string) => void
+  onDismissAmbiguous: (typed: string) => void
   gradingResult: GradingResult | null
   setZoomedImage: React.Dispatch<React.SetStateAction<{ src: string; alt: string } | null>>
   setActiveSection: React.Dispatch<React.SetStateAction<string>>
@@ -59,7 +64,9 @@ export function ResultsView({
         findResultKey(t, caseData.imagingResults) === null &&
         (caseData.procedureResults == null || findResultKey(t, caseData.procedureResults) === null) &&
         !isPendingTest(t) &&
-        !generatingOnDemand.has(t)) {
+        !generatingOnDemand.has(t) &&
+        !failedOnDemand.has(t) &&
+        !(t in ambiguousOrders)) {
       console.error(`[MedTrainer] No result found for ordered test: "${t}" (not in labResults, imagingResults, procedureResults, pendingTests, or generatingOnDemand)`)
     }
   })
@@ -105,6 +112,37 @@ export function ResultsView({
 
   return (
     <div className="space-y-4">
+      {/* Fuzzy-matched orders that need the student to confirm the canonical name */}
+      {Object.entries(ambiguousOrders).length > 0 && (
+        <SectionCard title="Confirm Test Orders">
+          <div className="space-y-3">
+            {Object.entries(ambiguousOrders).map(([typed, suggestions]) => (
+              <div key={typed} className="rounded-md border border-caution-border bg-caution-bg px-4 py-3">
+                <p className="text-xs text-ink-primary mb-2">
+                  <span className="font-semibold">&ldquo;{typed}&rdquo;</span> didn&apos;t exactly match a test in this case. Did you mean:
+                </p>
+                <div className="flex flex-wrap gap-2">
+                  {suggestions.map(s => (
+                    <button
+                      key={s}
+                      onClick={() => onConfirmAmbiguous(typed, s)}
+                      className="rounded-md border border-primary-300 bg-primary-50 px-3 py-1.5 text-xs font-medium text-primary-700 hover:bg-primary-100 transition-colors"
+                    >
+                      {s}
+                    </button>
+                  ))}
+                  <button
+                    onClick={() => onDismissAmbiguous(typed)}
+                    className="rounded-md border border-surface-4 px-3 py-1.5 text-xs text-ink-tertiary hover:text-ink-secondary transition-colors"
+                  >
+                    None of these — keep as ordered
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </SectionCard>
+      )}
       {/* Live board is a Foundations-only training aid. At Clinical/Advanced the
           candidate differential is hidden during the case (no cueing) and revealed
           in the scorecard afterward. */}

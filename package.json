@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "test": "node -e \"const{globSync}=require('fs');const{execSync}=require('child_process');const f=globSync('app/**/__tests__/*.ts');if(f.length)execSync('npx tsx --test '+f.join(' '),{stdio:'inherit'});\""
+    "test": "node -e \"const{globSync}=require('fs');const{execSync}=require('child_process');const f=globSync('app/**/__tests__/*.ts');if(f.length)execSync('npx tsx --test '+f.join(' '),{stdio:'inherit'});\"",
+    "audit:differentials": "npx tsx scripts/audit-differential-sanity.mjs",
+    "audit:synonyms": "npx tsx scripts/audit-synonym-coverage.mjs"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.90.0",

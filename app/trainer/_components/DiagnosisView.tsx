@@ -19,6 +19,7 @@ export function DiagnosisView({
   userDiagnosis, setUserDiagnosis,
   userPresentation, setUserPresentation,
   timerState, locked,
+  inPresentation, enterPresentation,
   expandedCategory, setExpandedCategory,
   feedbackRatings, setFeedbackRatings,
   feedbackHover, setFeedbackHover,
@@ -42,6 +43,9 @@ export function DiagnosisView({
   setUserPresentation: React.Dispatch<React.SetStateAction<string>>
   timerState: TimerState
   locked: boolean
+  /** Clinical/Advanced: student has committed to the untimed write-up phase. */
+  inPresentation: boolean
+  enterPresentation: () => void
   expandedCategory: DimensionKey | null
   setExpandedCategory: React.Dispatch<React.SetStateAction<DimensionKey | null>>
   feedbackRatings: Record<string, number>
@@ -98,7 +102,39 @@ export function DiagnosisView({
     )
   }
 
+  // Clinical/Advanced: entering the write-up stops the case timer and locks
+  // the chart (server-enforced), so the untimed presentation can't be used to
+  // keep working the case. Foundations has no timer and skips this gate.
+  if (!gradingResult && caseDifficulty !== 'Foundations' && !inPresentation) {
+    return (
+      <SectionCard title="Begin Your Write-Up">
+        <div className="flex flex-col items-center gap-4 py-8 text-center">
+          <div className="max-w-md space-y-2">
+            <p className="text-sm text-ink-primary font-medium">
+              Ready to commit to your {caseDifficulty === 'Advanced' ? 'diagnosis and oral presentation' : 'diagnosis and reasoning'}?
+            </p>
+            <p className="text-xs text-ink-secondary leading-relaxed">
+              Entering the write-up <span className="font-semibold">stops the case timer</span> — your{' '}
+              {caseDifficulty === 'Advanced' ? 'presentation' : 'reasoning'} is untimed. In exchange, the chart locks:
+              no further patient questions, exams, or test orders.
+            </p>
+          </div>
+          <button
+            onClick={enterPresentation}
+            disabled={locked}
+            title={locked ? 'Start the timer to begin the clinical encounter' : undefined}
+            className="rounded-md bg-primary-500 px-6 py-2.5 text-sm font-semibold text-white hover:bg-primary-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          >
+            Begin write-up — stop timer &amp; lock chart
+          </button>
+        </div>
+      </SectionCard>
+    )
+  }
+
   if (!gradingResult) {
+    const reasoningWords = userPresentation.trim() === '' ? 0 : userPresentation.trim().split(/\s+/).filter(Boolean).length
+    const CLINICAL_MIN_WORDS = 25
     return (
       <SectionCard title="Submit Your Diagnosis">
         <div className="space-y-4">
@@ -122,12 +158,17 @@ export function DiagnosisView({
           {caseDifficulty === 'Clinical' && (
             <div>
               <label className="mb-2 flex items-center justify-between text-sm text-ink-secondary">
-                <span>Clinical Reasoning <span className="text-ink-tertiary">(required)</span></span>
-                <MicButton
-                  onTranscript={text => setUserPresentation(prev => prev ? prev + ' ' + text : text)}
-                  paused={timerState.status === 'paused' || gradingLoading || locked}
-                  className="py-1"
-                />
+                <span>Clinical Reasoning <span className="text-ink-tertiary">(required, ≥{CLINICAL_MIN_WORDS} words)</span></span>
+                <div className="flex items-center gap-2">
+                  <MicButton
+                    onTranscript={text => setUserPresentation(prev => prev ? prev + ' ' + text : text)}
+                    paused={timerState.status === 'paused' || gradingLoading || locked}
+                    className="py-1"
+                  />
+                  <span className={`text-xs tabular-nums ${reasoningWords < CLINICAL_MIN_WORDS ? 'text-ink-tertiary' : 'text-ink-secondary'}`}>
+                    {reasoningWords} words
+                  </span>
+                </div>
               </label>
               <textarea
                 value={userPresentation}
@@ -200,6 +241,9 @@ export function DiagnosisView({
               !userDiagnosis.trim() ||
               gradingLoading ||
               locked ||
+              // Clinical requires substantive reasoning — a placeholder like "x"
+              // no longer satisfies the required field (min word count).
+              (caseDifficulty === 'Clinical' && reasoningWords < CLINICAL_MIN_WORDS) ||
               ((caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') && !userPresentation.trim())
             }
             className="w-full rounded-md bg-primary-500 px-4 py-3 text-sm font-semibold text-white hover:bg-primary-400 disabled:cursor-not-allowed disabled:opacity-50 transition-colors"

@@ -191,6 +191,10 @@ export const IMAGING_WITH_IMAGES: string[] = [
   'Electrocardiogram (ECG/EKG)',
 ]
 
+// Alias seeding (remediation 4.4): common alternate phrasings added so
+// free-typed Advanced orders resolve (e.g. "CT pulmonary angiogram" → CTPA,
+// "chem-7" → BMP). Run `npm run audit:synonyms` for the current gap report —
+// its output is the TODO list for clinician review of further synonyms.
 export const MASTER_TEST_LIST: TestEntry[] = [
   // ── HEMATOLOGY ──
   { name: 'Complete Blood Count (CBC)', abbreviations: ['CBC'], synonyms: ['complete blood count', 'blood count', 'hemogram', 'full blood count'], category: 'Hematology' },
@@ -200,8 +204,8 @@ export const MASTER_TEST_LIST: TestEntry[] = [
   { name: 'C-Reactive Protein (CRP)', abbreviations: ['CRP'], synonyms: ['c-reactive protein', 'crp', 'inflammation marker', 'acute phase reactant'], category: 'Hematology' },
 
   // ── METABOLIC & CHEMISTRY ──
-  { name: 'Basic Metabolic Panel (BMP)', abbreviations: ['BMP'], synonyms: ['basic metabolic panel', 'basic metabolic', 'kidney function', 'electrolytes', 'renal panel', 'bmp', 'sodium potassium'], category: 'Metabolic & Chemistry' },
-  { name: 'Comprehensive Metabolic Panel (CMP)', abbreviations: ['CMP'], synonyms: ['comprehensive metabolic panel', 'comprehensive metabolic', 'kidney function', 'liver function', 'electrolytes', 'cmp', 'metabolic panel'], category: 'Metabolic & Chemistry' },
+  { name: 'Basic Metabolic Panel (BMP)', abbreviations: ['BMP'], synonyms: ['basic metabolic panel', 'basic metabolic', 'kidney function', 'electrolytes', 'renal panel', 'bmp', 'sodium potassium', 'chem-7', 'chem 7', 'chem7', 'sma-7'], category: 'Metabolic & Chemistry' },
+  { name: 'Comprehensive Metabolic Panel (CMP)', abbreviations: ['CMP'], synonyms: ['comprehensive metabolic panel', 'comprehensive metabolic', 'kidney function', 'liver function', 'electrolytes', 'cmp', 'metabolic panel', 'chem-14', 'chem 14', 'chem14'], category: 'Metabolic & Chemistry' },
   { name: 'Liver Function Tests (LFTs)', abbreviations: ['LFTs', 'LFT'], synonyms: ['liver function tests', 'liver function', 'liver panel', 'hepatic panel', 'lfts', 'alt ast bilirubin'], category: 'Metabolic & Chemistry' },
   { name: 'Lipid Panel', abbreviations: [], synonyms: ['lipid panel', 'cholesterol', 'triglycerides', 'hdl ldl', 'lipids', 'cardiovascular risk'], category: 'Metabolic & Chemistry' },
   { name: 'Serum Albumin', abbreviations: [], synonyms: ['albumin', 'serum albumin', 'nutrition marker', 'protein'], category: 'Metabolic & Chemistry' },
@@ -301,7 +305,7 @@ export const MASTER_TEST_LIST: TestEntry[] = [
   { name: 'Echocardiogram (Transesophageal)', abbreviations: ['TEE'], synonyms: ['transesophageal echo', 'tee', 'tee echo', 'endocarditis echo', 'detailed heart echo'], category: 'Imaging' },
   { name: 'Venous Doppler Ultrasound Bilateral Lower Extremities', abbreviations: ['LE Doppler', 'DVT US'], synonyms: ['dvt ultrasound', 'lower extremity doppler', 'le doppler', 'deep vein thrombosis ultrasound', 'venous duplex', 'leg ultrasound', 'dvt screen'], category: 'Imaging' },
   { name: 'V/Q Scan', abbreviations: ['VQ scan'], synonyms: ['vq scan', 'ventilation perfusion scan', 'lung scan', 'pulmonary embolism scan', 'vq'], category: 'Imaging' },
-  { name: 'CT Pulmonary Angiography (CTPA)', abbreviations: ['CTPA', 'CTA chest'], synonyms: ['ctpa', 'ct pulmonary angiography', 'pe protocol', 'pe ct', 'pulmonary embolism ct', 'cta chest', 'pe workup'], category: 'Imaging' },
+  { name: 'CT Pulmonary Angiography (CTPA)', abbreviations: ['CTPA', 'CTA chest'], synonyms: ['ctpa', 'ct pulmonary angiography', 'ct pulmonary angiogram', 'pulmonary angiogram', 'spiral ct chest', 'spiral ct', 'pe protocol', 'pe ct', 'pulmonary embolism ct', 'cta chest', 'pe workup'], category: 'Imaging' },
   { name: 'Bone Scan', abbreviations: [], synonyms: ['bone scan', 'nuclear bone scan', 'skeletal scintigraphy', 'metastatic bone scan'], category: 'Imaging' },
   { name: 'DEXA Scan', abbreviations: ['DXA'], synonyms: ['dexa scan', 'dxa scan', 'bone density', 'bone mineral density', 'osteoporosis scan'], category: 'Imaging' },
 

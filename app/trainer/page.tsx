@@ -232,6 +232,10 @@ export default function MedTrainer() {
   // Server-side session id — the authoritative case + event log live behind it.
   const [sessionId, setSessionId] = useState<string | null>(null)
   const [sessionMeta, setSessionMeta] = useState<SessionMeta>(EMPTY_SESSION_META)
+  // True once the student has committed to the write-up phase: the case timer
+  // is stopped and ask/exam/order are locked (server-enforced) so the stopped
+  // clock can't be exploited to keep working the case.
+  const [inPresentation, setInPresentation] = useState(false)
   // Background-history values the server has revealed (gated difficulties).
   const [hpiValues, setHpiValues] = useState<Partial<Record<HPIField, string>>>({})
   const [imagingCache, setImagingCache] = useState<Record<string, OpenIResult[] | null>>({})
@@ -251,6 +255,9 @@ export default function MedTrainer() {
   const [customTestInput, setCustomTestInput] = useState('')
   const [generatingOnDemand, setGeneratingOnDemand] = useState<Set<string>>(new Set())
   const [failedOnDemand, setFailedOnDemand] = useState<Set<string>>(new Set())
+  // Free-typed orders whose fuzzy match was contested — the student confirms
+  // the canonical name instead of being silently penalized (4.3).
+  const [ambiguousOrders, setAmbiguousOrders] = useState<Record<string, string[]>>({})
   const [showRosHint, setShowRosHint] = useState(false)
   const onDemandQueuedRef = useRef<Set<string>>(new Set())
 
@@ -538,6 +545,11 @@ export default function MedTrainer() {
 
     let clientCase = presentationToClientCase(data.presentation)
     for (const r of data.results ?? []) clientCase = mergeOrderResult(clientCase, r)
+    setAmbiguousOrders(Object.fromEntries(
+      (data.results ?? [])
+        .filter(r => r.kind === 'ambiguous' && r.suggestions?.length)
+        .map(r => [r.test, r.suggestions!]),
+    ))
     for (const e of data.exams ?? []) {
       clientCase = { ...clientCase, physicalExam: { ...clientCase.physicalExam, [e.region]: e.finding } }
     }
@@ -567,6 +579,7 @@ export default function MedTrainer() {
       setGradingResult(data.gradingResult)
       if (data.submittedDiagnosis) setUserDiagnosis(data.submittedDiagnosis)
     }
+    setInPresentation(data.session.phase === 'presentation')
     // Timer state is not persisted server-side yet — resume unlocked so the
     // student can continue (the server log still bounds what counts as elicited).
     setCaseStarted(true)
@@ -601,9 +614,11 @@ export default function MedTrainer() {
     setOpenCategories(new Set())
     setGeneratingOnDemand(new Set())
     setFailedOnDemand(new Set())
+    setAmbiguousOrders({})
     onDemandQueuedRef.current = new Set()
     setRosState(makeInitialROSState())
     setHpiValues({})
+    setInPresentation(false)
     setImagingCache({})
     setActiveCaseId(null)
     setEcgCache({})
@@ -696,6 +711,13 @@ export default function MedTrainer() {
       })
       const failed = data.results.filter(r => r.kind === 'none').map(r => r.test)
       if (failed.length) setFailedOnDemand(prev => new Set([...prev, ...failed]))
+      const ambiguous = data.results.filter(r => r.kind === 'ambiguous' && r.suggestions?.length)
+      if (ambiguous.length) {
+        setAmbiguousOrders(prev => ({
+          ...prev,
+          ...Object.fromEntries(ambiguous.map(r => [r.test, r.suggestions!])),
+        }))
+      }
     } catch (e) {
       console.error('[MedTrainer] order failed:', e)
       setFailedOnDemand(prev => new Set([...prev, ...newTests]))
@@ -735,7 +757,7 @@ export default function MedTrainer() {
   }
 
   const examineRegion = async (region: string) => {
-    if (!sessionId) return
+    if (!sessionId || inPresentation) return
     try {
       const data = await postSession<{ region: string; finding: string }>('/api/session/exam', { sessionId, region })
       setCaseData(prev => prev
@@ -752,6 +774,25 @@ export default function MedTrainer() {
     setPredictionConfidence(confidence)
     if (sessionId) {
       postSession('/api/session/predict', { sessionId, ranking, confidence }).catch(() => {})
+    }
+  }
+
+  /**
+   * Enter the diagnosis/presentation phase (Clinical/Advanced): stops the case
+   * timer and locks further questions, exams, and orders — the write-up itself
+   * is untimed so a 50-word oral presentation no longer eats diagnostic time.
+   */
+  const enterPresentation = async () => {
+    if (!sessionId || inPresentation) return
+    setInPresentation(true)
+    completeTimer()
+    try {
+      await postSession('/api/session/present', {
+        sessionId,
+        diagnosticSeconds: timerState.elapsedSeconds,
+      })
+    } catch (e) {
+      console.error('[MedTrainer] enter_presentation failed:', e)
     }
   }
 
@@ -1243,7 +1284,7 @@ export default function MedTrainer() {
           setShowSearchDropdown={setShowSearchDropdown}
           customTestInput={customTestInput}
           setCustomTestInput={setCustomTestInput}
-          locked={locked}
+          locked={locked || inPresentation}
         />
       case 'results':
         return <ResultsView
@@ -1262,6 +1303,17 @@ export default function MedTrainer() {
           generatingOnDemand={generatingOnDemand}
           failedOnDemand={failedOnDemand}
           setFailedOnDemand={setFailedOnDemand}
+          ambiguousOrders={ambiguousOrders}
+          onConfirmAmbiguous={(typed, canonical) => {
+            setAmbiguousOrders(prev => { const n = { ...prev }; delete n[typed]; return n })
+            setOrderedTests(prev => { const n = new Set(prev); n.delete(typed); return n })
+            void submitOrders([canonical])
+          }}
+          onDismissAmbiguous={(typed) => {
+            // Keep the typed order as-is; grading treats it as neutral.
+            setAmbiguousOrders(prev => { const n = { ...prev }; delete n[typed]; return n })
+            setFailedOnDemand(prev => new Set([...prev, typed]))
+          }}
           gradingResult={gradingResult}
           setZoomedImage={setZoomedImage}
           setActiveSection={setActiveSection}
@@ -1288,6 +1340,8 @@ export default function MedTrainer() {
           setUserPresentation={setUserPresentation}
           timerState={timerState}
           locked={locked}
+          inPresentation={inPresentation}
+          enterPresentation={() => { void enterPresentation() }}
           expandedCategory={expandedCategory}
           setExpandedCategory={setExpandedCategory}
           feedbackRatings={feedbackRatings}
@@ -1762,9 +1816,9 @@ export default function MedTrainer() {
                   value={chatInput}
                   onChange={e => setChatInput(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && sendChat()}
-                  disabled={!caseData || chatLoading || locked}
-                  title={locked ? 'Start the timer to begin the clinical encounter' : undefined}
-                  placeholder={locked ? 'Start the timer to begin the clinical encounter' : caseData ? 'Ask the patient...' : 'Generate a case first'}
+                  disabled={!caseData || chatLoading || locked || inPresentation}
+                  title={inPresentation ? 'The chart is locked during the write-up phase' : locked ? 'Start the timer to begin the clinical encounter' : undefined}
+                  placeholder={inPresentation ? 'Chart locked — you are in the write-up phase' : locked ? 'Start the timer to begin the clinical encounter' : caseData ? 'Ask the patient...' : 'Generate a case first'}
                   className={`flex-1 rounded-md border px-3 py-2 text-[11px] text-ink-primary placeholder-ink-tertiary focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 transition-all ${showRosHint ? 'border-insight bg-insight-bg animate-pulse' : 'border-surface-4 bg-surface-2 focus:border-primary-400'}`}
                 />
                 {caseData && (
@@ -1776,7 +1830,7 @@ export default function MedTrainer() {
                 )}
                 <button
                   onClick={() => sendChat()}
-                  disabled={!caseData || chatLoading || !chatInput.trim() || locked}
+                  disabled={!caseData || chatLoading || !chatInput.trim() || locked || inPresentation}
                   className="rounded-md bg-primary-500 px-3 py-2 text-[11px] font-medium text-ink-inverse hover:bg-primary-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Ask
