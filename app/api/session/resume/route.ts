@@ -44,8 +44,14 @@ export async function GET(req: NextRequest) {
       ros: Object.entries(state.ros).map(([category, v]) => ({
         category,
         derivedFinding: v?.derivedFinding ?? '',
-        // Parity with /ask: status from the canonical finding until Phase 2.
-        status: classifyFinding(session.caseData.reviewOfSystems[category] ?? ''),
+        // ANTI-CUEING: while the case is live, status reflects only what the
+        // patient actually reported; the canonical finding drives it only
+        // after grading (when the full ROS is revealed anyway).
+        status: classifyFinding(
+          graded
+            ? (session.caseData.reviewOfSystems[category] ?? '')
+            : (v?.derivedFinding ?? ''),
+        ),
       })),
       hpi: state.hpi,
       exams: state.exams,

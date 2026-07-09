@@ -59,12 +59,19 @@ Student message: "${message}"`
   }
 }
 
-/** Derive a clinical summary of what the patient reported for one category. */
+/**
+ * Derive a clinical summary of what the patient reported for one category.
+ * When `previousSummary` is present (follow-up question about an already
+ * reviewed system), the model produces an updated CUMULATIVE summary so the
+ * record — and therefore the grader — sees everything elicited, not just the
+ * first exchange.
+ */
 export async function deriveRosSummary(
   category: ROSCategory,
   studentMessage: string,
   patientReply: string,
   onUsage: (type: 'ros_derived', usage: RawUsage) => void,
+  previousSummary?: string,
 ): Promise<string> {
   const summarySystem = `You are a clinical documentation assistant. Write a concise clinical sentence summarizing only what the patient actually reported about a specific body system, based on the interview excerpt provided.
 
@@ -75,13 +82,16 @@ Rules:
 - Do NOT infer or assume — only document what was stated
 - If the patient only confirmed one symptom, document only that symptom
 - Format: plain clinical prose, no quotes, no preamble
-- Maximum 2 sentences`
+- Maximum ${previousSummary ? 3 : 2} sentences`
   const summaryPrompt = `Body system: ${category}
-Interview excerpt:
+${previousSummary ? `Previously documented for this system (KEEP everything still accurate from this, and merge in anything new): ${previousSummary}
+` : ''}Interview excerpt:
 Student: ${studentMessage}
 Patient: ${patientReply}
 
-Summarize only what the patient reported about ${category}.`
+${previousSummary
+    ? `Write the updated cumulative summary of everything the patient has reported about ${category} so far.`
+    : `Summarize only what the patient reported about ${category}.`}`
   try {
     const { text, usage } = await callModel('derived_summary', {
       system: summarySystem,
@@ -89,9 +99,9 @@ Summarize only what the patient reported about ${category}.`
       maxTokens: 150,
     })
     onUsage('ros_derived', usage)
-    return text.trim() || `${category}: finding recorded`
+    return text.trim() || previousSummary || `${category}: finding recorded`
   } catch {
-    return `${category}: Finding recorded — review after submission`
+    return previousSummary || `${category}: Finding recorded — review after submission`
   }
 }
 

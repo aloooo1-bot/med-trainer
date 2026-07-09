@@ -14,6 +14,7 @@ export function DifferentialBoard({
   testImpacts,
   orderedTests,
   correctDiagnosis,
+  caseDifficulty,
   reveal = false,
   showHint = true,
 }: {
@@ -22,10 +23,19 @@ export function DifferentialBoard({
   orderedTests: string[]
   /** Only used once `reveal` is true (after submission) to mark the answer. */
   correctDiagnosis?: string
+  caseDifficulty: string
   reveal?: boolean
   showHint?: boolean
 }) {
   const impacts = testImpacts ?? {}
+
+  // ANTI-CUEING GUARD: the live-updating board (and its bestNextTest hint)
+  // shows the candidate differential ranking while the case is still being
+  // worked — that is acceptable ONLY as Foundations training wheels. At
+  // Clinical/Advanced it would cue the answer and defeat the difficulty
+  // gating, so live mode is hard-blocked here regardless of what a caller
+  // passes; the reveal (post-grading) mode remains available everywhere.
+  const liveBlocked = !reveal && caseDifficulty !== 'Foundations'
 
   const beliefs = useMemo(
     () => (priors?.length ? computeBeliefs(priors, impacts, orderedTests) : []),
@@ -42,7 +52,7 @@ export function DifferentialBoard({
     [orderedTests, impacts],
   )
 
-  if (!beliefs.length) return null
+  if (liveBlocked || !beliefs.length) return null
 
   return (
     <div className="rounded-md border border-surface-4 bg-surface-1 p-3" role="group" aria-label="Differential probabilities">

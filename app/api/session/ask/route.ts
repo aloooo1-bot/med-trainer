@@ -50,18 +50,21 @@ export async function POST(req: NextRequest) {
     })
     usages.push({ type: 'chat', usage })
 
-    // ROS unlock classification — only for categories not already unlocked.
+    // ROS classification. First hits unlock the category; repeat hits on an
+    // already-unlocked category UPDATE its cumulative derived record so a
+    // better follow-up question is never dropped from what the grader sees.
     const matched = await classifyRosCategories(message, (t, u) => usages.push({ type: t, usage: u }))
-    const toUnlock = matched.filter(cat => !state.ros[cat])
 
     const rosUnlocks: Array<{ category: ROSCategory; derivedFinding: string; status: 'positive' | 'negative' }> = []
-    await Promise.all(toUnlock.map(async cat => {
-      const derivedFinding = await deriveRosSummary(cat, message, reply, (t, u) => usages.push({ type: t, usage: u }))
-      // NOTE: status is currently classified from the CANONICAL case finding
-      // (parity with the previous client behavior). Phase 2 re-keys this to the
-      // derived finding to stop leaking unelicited positives via row color.
-      const canonical = session.caseData.reviewOfSystems[cat] ?? 'No findings documented for this system.'
-      rosUnlocks.push({ category: cat, derivedFinding, status: classifyFinding(canonical) })
+    await Promise.all(matched.map(async cat => {
+      const previous = state.ros[cat]?.derivedFinding
+      const derivedFinding = await deriveRosSummary(cat, message, reply, (t, u) => usages.push({ type: t, usage: u }), previous)
+      // ANTI-CUEING: status (row color) is classified from what the patient
+      // ACTUALLY reported in this conversation — never from the canonical case
+      // finding. A lazy one-line question about a system with a hidden positive
+      // must not light up the row; the canonical finding is revealed only after
+      // grading.
+      rosUnlocks.push({ category: cat, derivedFinding, status: classifyFinding(derivedFinding) })
     }))
 
     const hpiUnlocks = resolveHpiUnlocks(message, session.caseData)

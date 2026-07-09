@@ -172,22 +172,27 @@ export function DiagnosisView({
               : 'Tip: Consider including the underlying cause in your diagnosis (e.g. "X secondary to Y").'}
           </p>
 
-          <div className="rounded-md border border-surface-4/60 bg-surface-2/40 px-3 py-2.5">
-            <p className="text-xs font-medium text-ink-tertiary mb-1.5">Before submitting — have you asked about:</p>
-            <div className="grid grid-cols-2 gap-x-4 gap-y-1">
-              {[
-                'Family history of similar conditions',
-                'Recent medication changes or new drugs',
-                'OTC medications, NSAIDs, or supplements',
-                'Recent travel or sick contacts',
-              ].map((q) => (
-                <div key={q} className="flex items-start gap-1.5 text-xs text-ink-tertiary">
-                  <span className="mt-px flex-shrink-0 text-ink-tertiary">□</span>
-                  <span>{q}</span>
-                </div>
-              ))}
+          {/* Foundations only: these categories are exactly where hiddenHistory
+              hooks live, so at Clinical/Advanced this box is a free hint that
+              contradicts the gating philosophy. */}
+          {caseDifficulty === 'Foundations' && (
+            <div className="rounded-md border border-surface-4/60 bg-surface-2/40 px-3 py-2.5">
+              <p className="text-xs font-medium text-ink-tertiary mb-1.5">Before submitting — have you asked about:</p>
+              <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                {[
+                  'Family history of similar conditions',
+                  'Recent medication changes or new drugs',
+                  'OTC medications, NSAIDs, or supplements',
+                  'Recent travel or sick contacts',
+                ].map((q) => (
+                  <div key={q} className="flex items-start gap-1.5 text-xs text-ink-tertiary">
+                    <span className="mt-px flex-shrink-0 text-ink-tertiary">□</span>
+                    <span>{q}</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <button
             onClick={() => submitDiagnosis()}
@@ -388,6 +393,7 @@ export function DiagnosisView({
                     testImpacts={caseData.testImpacts}
                     orderedTests={Array.from(orderedTests)}
                     correctDiagnosis={caseData.diagnosis}
+                    caseDifficulty={caseDifficulty}
                     reveal
                     showHint={false}
                   />

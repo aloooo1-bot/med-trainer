@@ -114,6 +114,7 @@ export function ResultsView({
           testImpacts={caseData.testImpacts}
           orderedTests={orderedArr}
           correctDiagnosis={caseData.diagnosis}
+          caseDifficulty={caseDifficulty}
           reveal={diagnosisSubmitted}
         />
       )}

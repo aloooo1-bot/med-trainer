@@ -8,6 +8,7 @@ import {
   type ROSState,
   type HPIField,
   makeInitialROSState,
+  classifyFinding,
 } from '../lib/rosDetector'
 import { type OpenIResult } from '../lib/imagingSearch'
 import { type ECGImage } from '../lib/ecgImageLookup'
@@ -865,7 +866,10 @@ export default function MedTrainer() {
         const next = { ...prev }
         for (const cat of ROS_CATEGORIES) {
           if (next[cat].status !== 'locked') {
-            next[cat] = { ...next[cat], finding: reveal.reviewOfSystems[cat] ?? '' }
+            const canonical = reveal.reviewOfSystems[cat] ?? ''
+            // Post-grading the full finding is revealed, so the row color may
+            // now reflect the canonical content (no longer a cueing risk).
+            next[cat] = { ...next[cat], finding: canonical, status: classifyFinding(canonical) }
           }
         }
         return next
