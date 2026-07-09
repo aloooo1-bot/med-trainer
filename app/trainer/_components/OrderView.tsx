@@ -1,11 +1,41 @@
-import { CLINICAL_CATEGORIES, IMAGING_WITH_IMAGES, MASTER_TEST_LIST, searchTests } from '@/app/lib/testMasterList'
+import { IMAGING_WITH_IMAGES, MASTER_TEST_LIST, searchTests } from '@/app/lib/testMasterList'
+import { matchOrderSets, COMMON_CORE_TESTS } from '@/app/lib/orderSets'
 import { SectionCard } from './SectionCard'
 import { Badge } from './Badge'
 import { PredictionPanel } from './PredictionPanel'
 import type { CaseData } from '../_lib/types'
 
+/** One selectable test button, shared across the Clinical ordering panels. */
+function TestChip({ name, isOrdered, isSelected, locked, onClick }: {
+  name: string
+  isOrdered: boolean
+  isSelected: boolean
+  locked: boolean
+  onClick: () => void
+}) {
+  return (
+    <button
+      onClick={() => !isOrdered && !locked && onClick()}
+      disabled={isOrdered || locked}
+      className={`text-left rounded-md border px-3 py-2 text-sm transition-colors ${
+        isOrdered
+          ? 'border-confirmed-border bg-confirmed-bg text-confirmed cursor-default'
+          : isSelected
+          ? 'border-primary-400 bg-primary-50 text-primary-700 cursor-pointer'
+          : locked
+          ? 'border-surface-4 bg-surface-2 text-ink-tertiary opacity-50 cursor-not-allowed'
+          : 'border-surface-4 bg-surface-1 text-ink-primary hover:border-surface-4 hover:bg-surface-2 cursor-pointer'
+      }`}
+    >
+      {name}
+      {isOrdered && <span className="ml-1.5 text-xs">✓</span>}
+      {isSelected && !isOrdered && <span className="ml-1.5 text-xs">●</span>}
+    </button>
+  )
+}
+
 export function OrderView({
-  caseData, caseDifficulty, prediction, predictionConfidence, onLockPrediction,
+  caseData, caseDifficulty, scaffoldingLevel, prediction, predictionConfidence, onLockPrediction,
   predictionCandidates, hasReasoningModel, caseSearchTests, orderedTests, selectedTests,
   toggleTest, orderTests, orderCustomTest, removeOrderedTest,
   testSearchQuery, setTestSearchQuery, showSearchDropdown, setShowSearchDropdown,
@@ -13,6 +43,8 @@ export function OrderView({
 }: {
   caseData: CaseData
   caseDifficulty: string
+  /** Interface scaffolding tier (5.3) — drives ordering UI density; defaults to caseDifficulty. */
+  scaffoldingLevel?: string
   prediction: string[] | null
   predictionConfidence: number | null
   onLockPrediction: (ranking: string[], confidence: number) => void
@@ -39,12 +71,25 @@ export function OrderView({
   setCustomTestInput: React.Dispatch<React.SetStateAction<string>>
   locked: boolean
 }) {
+  // Scaffolding tier decides ordering UI density (5.3). Today it equals
+  // difficulty; kept as a separate axis so the two can later diverge.
+  const scaffold = scaffoldingLevel ?? caseDifficulty
+
   // Foundations gets the candidate list (training wheels); Clinical/Advanced commit
   // a free-text leading diagnosis so the answer isn't cued.
   const predictionOpen = caseDifficulty !== 'Foundations'
 
+  // Add several tests to the selection at once (order-set "add all"), skipping
+  // any already selected or ordered.
+  const selectMany = (names: string[]) => {
+    if (locked) return
+    for (const n of names) {
+      if (!selectedTests.has(n) && !orderedTests.has(n)) toggleTest(n)
+    }
+  }
+
   // ── FOUNDATIONS: curated checklist ──
-  if (caseDifficulty === 'Foundations') {
+  if (scaffold === 'Foundations') {
     const allOrdered = (name: string) => orderedTests.has(name)
     return (
       <div className="space-y-4">
@@ -107,9 +152,12 @@ export function OrderView({
     )
   }
 
-  // ── CLINICAL: non-case-specific reference lists + master-list search ──
-  if (caseDifficulty === 'Clinical') {
+  // ── CLINICAL: syndrome order sets + common core + searchable long tail ──
+  if (scaffold === 'Clinical') {
     const searchResults = testSearchQuery.length >= 2 ? searchTests(testSearchQuery) : []
+    // Order sets keyed to the presenting complaint (client-visible, so no
+    // cueing). Knowing the standard workup for a presentation is the skill.
+    const sets = matchOrderSets(caseData.patientInfo.chiefComplaint, caseData.hpi)
 
     return (
       <div className="space-y-4">
@@ -181,68 +229,70 @@ export function OrderView({
           )}
         </div>
 
-        <SectionCard title="Common Laboratory Tests">
-          <div className="space-y-4">
-            {CLINICAL_CATEGORIES.filter(cat => cat.name !== 'Imaging').map(cat => (
-              <div key={cat.name}>
-                <p className="mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-primary-400">{cat.name}</p>
-                <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-                  {cat.tests.map(test => {
-                    const isOrdered = orderedTests.has(test)
-                    const isSelected = selectedTests.has(test)
-                    return (
-                      <button
-                        key={test}
-                        onClick={() => !isOrdered && !locked && toggleTest(test)}
-                        disabled={isOrdered || locked}
-                        className={`text-left rounded-md border px-3 py-2 text-sm transition-colors ${
-                          isOrdered
-                            ? 'border-confirmed-border bg-confirmed-bg text-confirmed cursor-default'
-                            : isSelected
-                            ? 'border-primary-400 bg-primary-50 text-primary-700 cursor-pointer'
-                            : locked
-                            ? 'border-surface-4 bg-surface-2 text-ink-tertiary opacity-50 cursor-not-allowed'
-                            : 'border-surface-4 bg-surface-1 text-ink-primary hover:border-surface-4 hover:bg-surface-2 cursor-pointer'
-                        }`}
-                      >
-                        {test}
-                        {isOrdered && <span className="ml-1.5 text-xs">✓</span>}
-                        {isSelected && !isOrdered && <span className="ml-1.5 text-xs">●</span>}
-                      </button>
-                    )
-                  })}
-                </div>
+        {/* Syndrome order sets — the standard workup for this presentation.
+            Add the whole set, or pick individual tests. */}
+        {sets.map(set => {
+          const remaining = set.tests.filter(t => !selectedTests.has(t) && !orderedTests.has(t))
+          return (
+            <SectionCard key={set.id} title={set.label}>
+              <div className="mb-2 flex items-center justify-between gap-2">
+                <p className="text-[11px] text-ink-tertiary">Standard workup for this presentation — order the set or pick individually.</p>
+                <button
+                  onClick={() => selectMany(set.tests)}
+                  disabled={locked || remaining.length === 0}
+                  className="flex-shrink-0 rounded-md bg-primary-500 px-3 py-1 text-xs font-medium text-white hover:bg-primary-400 disabled:opacity-40 disabled:cursor-not-allowed transition-colors"
+                >
+                  {remaining.length === 0 ? 'All added' : `Add all ${remaining.length}`}
+                </button>
               </div>
+              <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+                {set.tests.map(test => (
+                  <TestChip
+                    key={test}
+                    name={test}
+                    isOrdered={orderedTests.has(test)}
+                    isSelected={selectedTests.has(test)}
+                    locked={locked}
+                    onClick={() => toggleTest(test)}
+                  />
+                ))}
+              </div>
+            </SectionCard>
+          )
+        })}
+
+        {/* Common core — the tests that appear in most workups. The long tail
+            lives behind the search box above. */}
+        <SectionCard title="Common tests">
+          <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
+            {COMMON_CORE_TESTS.map(test => (
+              <TestChip
+                key={test}
+                name={test}
+                isOrdered={orderedTests.has(test)}
+                isSelected={selectedTests.has(test)}
+                locked={locked}
+                onClick={() => toggleTest(test)}
+              />
             ))}
           </div>
+          <p className="mt-3 text-[11px] text-ink-tertiary">
+            Need something else? Search any test or imaging study above — hundreds are available.
+          </p>
         </SectionCard>
 
         <SectionCard title="Imaging Studies">
           <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-            {IMAGING_WITH_IMAGES.map(study => {
-              const isOrdered = orderedTests.has(study)
-              const isSelected = selectedTests.has(study)
-              return (
-                <button
-                  key={study}
-                  onClick={() => !isOrdered && !locked && toggleTest(study)}
-                  disabled={isOrdered || locked}
-                  className={`text-left rounded-md border px-3 py-2 text-sm transition-colors ${
-                    isOrdered
-                      ? 'border-confirmed-border bg-confirmed-bg text-confirmed cursor-default'
-                      : isSelected
-                      ? 'border-primary-400 bg-primary-50 text-primary-700 cursor-pointer'
-                      : locked
-                      ? 'border-surface-4 bg-surface-2 text-ink-tertiary opacity-50 cursor-not-allowed'
-                      : 'border-surface-4 bg-surface-1 text-ink-primary hover:border-surface-4 hover:bg-surface-2 cursor-pointer'
-                  }`}
-                >
-                  {study}
-                  {isOrdered && <span className="ml-1.5 text-xs">✓</span>}
-                  {isSelected && !isOrdered && <span className="ml-1.5 text-xs">●</span>}
-                </button>
-              )
-            })}
+            {IMAGING_WITH_IMAGES.map(study => (
+              <TestChip
+                key={study}
+                name={study}
+                isOrdered={orderedTests.has(study)}
+                isSelected={selectedTests.has(study)}
+                locked={locked}
+                onClick={() => toggleTest(study)}
+              />
+            ))}
           </div>
         </SectionCard>
 
@@ -258,7 +308,7 @@ export function OrderView({
     )
   }
 
-  // ── ADVANCED: free-text search ──
+  // ── ADVANCED: free-text search (least scaffolding) ──
   const caseSpecificTests = (caseSearchTests ?? [])
     .filter(rt => !MASTER_TEST_LIST.some(m => m.name === rt.name))
     .map(rt => ({ name: rt.name, abbreviations: [] as string[], synonyms: [] as string[], category: rt.category }))

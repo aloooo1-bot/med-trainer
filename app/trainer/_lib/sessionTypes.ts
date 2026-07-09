@@ -32,6 +32,12 @@ export interface CasePresentation {
   examGated: boolean
   /** True when this case carries a differential reasoning model (priors + impacts). */
   hasReasoningModel: boolean
+  /**
+   * Interface scaffolding tier (5.3). Drives ordering UI density independently
+   * of case complexity; today it equals difficulty. Foundations → curated
+   * checklist; Clinical → order sets + common core + search; Advanced → search.
+   */
+  scaffoldingLevel: ScaffoldingLevel
   /** Foundations only. */
   pastMedicalHistory?: CaseData['pastMedicalHistory']
   currentMedications?: CaseData['currentMedications']

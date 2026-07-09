@@ -105,9 +105,11 @@ interface SessionMeta {
   hasReasoningModel: boolean
   predictionCandidates: string[]
   caseSearchTests?: Array<{ name: string; category: string }>
+  /** Interface scaffolding tier (5.3) — drives ordering UI density. */
+  scaffoldingLevel: string
 }
 
-const EMPTY_SESSION_META: SessionMeta = { examGated: false, hasReasoningModel: false, predictionCandidates: [] }
+const EMPTY_SESSION_META: SessionMeta = { examGated: false, hasReasoningModel: false, predictionCandidates: [], scaffoldingLevel: 'Foundations' }
 
 // Components extracted to _components/ and hooks/utils to _lib/
 
@@ -358,6 +360,7 @@ export default function MedTrainer() {
       hasReasoningModel: data.presentation.hasReasoningModel,
       predictionCandidates: data.presentation.predictionCandidates ?? [],
       caseSearchTests: data.presentation.caseSearchTests,
+      scaffoldingLevel: data.presentation.scaffoldingLevel,
     })
     setCaseData(presentationToClientCase(data.presentation))
     setCaseStarted(data.difficulty === 'Foundations')
@@ -381,6 +384,7 @@ export default function MedTrainer() {
       hasReasoningModel: data.presentation.hasReasoningModel,
       predictionCandidates: data.presentation.predictionCandidates ?? [],
       caseSearchTests: data.presentation.caseSearchTests,
+      scaffoldingLevel: data.presentation.scaffoldingLevel,
     })
 
     let clientCase = presentationToClientCase(data.presentation)
@@ -1035,6 +1039,7 @@ export default function MedTrainer() {
         return <OrderView
           caseData={caseData}
           caseDifficulty={caseDifficulty}
+          scaffoldingLevel={sessionMeta.scaffoldingLevel}
           prediction={prediction}
           predictionConfidence={predictionConfidence}
           onLockPrediction={lockPrediction}

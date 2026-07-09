@@ -45,6 +45,9 @@ export function buildPresentation(caseData: CaseData, difficulty: string): CaseP
     examRegions: Object.keys(caseData.physicalExam ?? {}),
     examGated,
     hasReasoningModel: (caseData.differentialPriors?.length ?? 0) >= 2,
+    // 5.3: scaffolding tier travels separately from case complexity; today the
+    // caller (buildPresentation is invoked with difficulty) keeps them equal.
+    scaffoldingLevel: (difficulty as CasePresentation['scaffoldingLevel']),
   }
 
   if (foundations) {

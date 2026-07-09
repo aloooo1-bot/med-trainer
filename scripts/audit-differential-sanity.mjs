@@ -155,6 +155,29 @@ function auditCase(id, c) {
     }
   }
 
+  // 3. expectedLabs padding: an expected (must-order, scored-against) test that
+  //    moves NEITHER the true diagnosis NOR any can't-miss differential is not a
+  //    must-order — it's padding, and a correct-dx student loses testOrdering
+  //    points for skipping it unfairly. Flag for clinician trimming.
+  const cantMiss = priors.filter(p => p.category === 'cant-miss').map(p => p.name)
+  const loadBearingFor = [c.diagnosis, ...cantMiss]
+  for (const test of workup) {
+    const perDx = impacts[test]
+    if (!perDx) continue // "workup-has-impacts" already flags a test with no model entry
+    const movesSomethingCritical = loadBearingFor.some(dx => {
+      const key = Object.keys(perDx).find(k => sameDx(k, dx))
+      const effect = key ? perDx[key]?.effect : undefined
+      return effect && effect !== 'neutral'
+    })
+    if (!movesSomethingCritical) {
+      issues.push({
+        severity: 'REVIEW',
+        check: 'expected-test-padding',
+        detail: `Expected test "${test}" is neutral for the true diagnosis and every can't-miss differential — it is not a genuine must-order; consider removing it from expectedLabs/expectedImaging so a correct-dx student isn't penalized for skipping it`,
+      })
+    }
+  }
+
   return { id, diagnosis: c.diagnosis, skipped: false, issues }
 }
 
