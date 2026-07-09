@@ -51,6 +51,8 @@ export interface Database {
           case_id: string | null
           system: string
           difficulty: string
+          case_complexity: string | null
+          scaffolding_level: string | null
           phase: 'active' | 'presentation' | 'graded'
           case_snapshot: Record<string, unknown>
           created_at: string
@@ -61,6 +63,8 @@ export interface Database {
           case_id?: string | null
           system: string
           difficulty: string
+          case_complexity?: string | null
+          scaffolding_level?: string | null
           phase?: 'active' | 'presentation' | 'graded'
           case_snapshot: Record<string, unknown>
           created_at?: string

@@ -13,6 +13,10 @@ CREATE TABLE IF NOT EXISTS trainer_sessions (
   case_id       TEXT,
   system        TEXT        NOT NULL,
   difficulty    TEXT        NOT NULL,
+  -- 5.3: case complexity vs interface scaffolding, stored independently even
+  -- though the UX currently always sets them to the same value as difficulty.
+  case_complexity   TEXT,
+  scaffolding_level TEXT,
   phase         TEXT        NOT NULL DEFAULT 'active'
                             CHECK (phase IN ('active','presentation','graded')),
   -- Full jittered case snapshot { caseData, imagingCache } — SERVER-ONLY.
@@ -52,5 +56,5 @@ CREATE POLICY "session_events_own_read"
 -- Column-level guard: the snapshot column is the answer sheet — never
 -- readable by client roles even on their own rows.
 REVOKE SELECT ON trainer_sessions FROM anon, authenticated;
-GRANT SELECT (id, user_id, case_id, system, difficulty, phase, created_at)
+GRANT SELECT (id, user_id, case_id, system, difficulty, case_complexity, scaffolding_level, phase, created_at)
   ON trainer_sessions TO anon, authenticated;

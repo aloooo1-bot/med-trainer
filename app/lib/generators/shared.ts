@@ -1,6 +1,11 @@
 /**
  * Shared constants and utilities for clinical case generation.
  * Used by admin API routes (PATCH/regenerate) and importable from server-side Next.js code.
+ *
+ * KNOWN FORK: this file's DIFFICULTY_RULES / CRITICAL_RULES / JSON_SCHEMA_TEMPLATE
+ * evolved independently from app/lib/casePrompt.ts (which drives live session
+ * generation). Consolidating them is a medical-content decision pending
+ * clinician review — until then, rule fixes must be applied to BOTH files.
  */
 
 // Reads ADMIN_EMAILS env var (comma-separated) with the literal address as fallback.

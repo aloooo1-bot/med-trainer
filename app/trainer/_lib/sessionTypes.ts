@@ -10,6 +10,17 @@ import type { SpecialModality } from '../../lib/specialImageLookup'
  * consumes them without pulling any server-only code.
  */
 
+/**
+ * Data-model future-proofing (5.3): "difficulty" currently welds together two
+ * independent axes — how hard the CASE is, and how much interface scaffolding
+ * the student gets (gating, ordering mode, answer format). They are stored as
+ * two fields that today always move together, so they can later be set
+ * independently (e.g. a Foundations-complexity case with Advanced scaffolding)
+ * without a data migration.
+ */
+export type CaseComplexity = 'Foundations' | 'Clinical' | 'Advanced'
+export type ScaffoldingLevel = 'Foundations' | 'Clinical' | 'Advanced'
+
 /** The client-visible slice of a case, shaped per difficulty by the server. */
 export interface CasePresentation {
   patientInfo: CaseData['patientInfo']

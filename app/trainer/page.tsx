@@ -10,12 +10,6 @@ import {
   makeInitialROSState,
   classifyFinding,
 } from '../lib/rosDetector'
-import { type OpenIResult } from '../lib/imagingSearch'
-import { type ECGImage } from '../lib/ecgImageLookup'
-import {
-  type SpecialImage, type SpecialModality,
-  getSpecialModality,
-} from '../lib/specialImageLookup'
 import { ANON_CASE_IDS, ANON_CASE_LIMIT } from '../lib/anonymousCases'
 import { type GradingResult, stripToBasic } from '../grading/types'
 import { type DimensionKey } from '../grading/rubric'
@@ -29,11 +23,13 @@ import { computeBeliefs } from '../lib/reasoning/differential'
 import { scorePrediction } from '../lib/reasoning/prediction'
 import { type CaseData, type NotesState, selectHpi, SOAP_TEMPLATE } from './_lib/types'
 import {
-  type CasePresentation, type CaseReveal, type StartResponse, type AskResponse,
-  type OrderResponse, type OrderedTestResult, type GradeResponse, type ResumeResponse,
+  type StartResponse, type AskResponse, type GradeResponse, type ResumeResponse,
   type UsageEntry,
 } from './_lib/sessionTypes'
-import { findResultKey, getVitalStatus, isECGTest } from './_lib/testUtils'
+import { postSession, presentationToClientCase, mergeOrderResult, mergeReveal } from './_lib/sessionApi'
+import { useOrders } from './_lib/useOrders'
+import { useSessionImages } from './_lib/useSessionImages'
+import { findResultKey, getVitalStatus } from './_lib/testUtils'
 import { type CaseHistoryEntry, addHistoryEntry, hasUsedROSBefore, markROSUsed } from './_lib/localHistory'
 import { useTimer, fmtTime } from './_lib/useTimer'
 import { Badge } from './_components/Badge'
@@ -113,94 +109,6 @@ interface SessionMeta {
 
 const EMPTY_SESSION_META: SessionMeta = { examGated: false, hasReasoningModel: false, predictionCandidates: [] }
 
-/** Build the client's working CaseData view from a server presentation slice. */
-function presentationToClientCase(p: CasePresentation): CaseData {
-  return {
-    patientInfo: p.patientInfo,
-    hpi: p.hpi,
-    vitals: p.vitals,
-    pastMedicalHistory: p.pastMedicalHistory,
-    currentMedications: p.currentMedications,
-    socialHistory: p.socialHistory,
-    reviewOfSystems: p.reviewOfSystems ?? {},
-    physicalExam: p.physicalExam ?? Object.fromEntries(p.examRegions.map(r => [r, ''])),
-    availableLabs: p.availableLabs ?? [],
-    availableImaging: p.availableImaging ?? [],
-    labGroups: p.labGroups,
-    labResults: {},
-    imagingResults: {},
-    procedureResults: {},
-    hiddenHistory: { fullHistory: '', socialHistory: '', familyHistory: '', medications: '', hiddenSymptoms: '', allergies: '' },
-    diagnosis: '',
-    differentials: [],
-    teachingPoints: [],
-    keyQuestions: [],
-    differentialPriors: p.differentialPriors,
-    testImpacts: p.testImpacts,
-  }
-}
-
-/** Merge one ordered-test result from the server into the client case view. */
-function mergeOrderResult(prev: CaseData, r: OrderedTestResult): CaseData {
-  const next = { ...prev }
-  if (r.kind === 'lab' && r.labResult) {
-    next.labResults = { ...next.labResults, [r.test]: r.labResult }
-  } else if (r.kind === 'imaging' && r.report !== undefined) {
-    next.imagingResults = { ...next.imagingResults, [r.test]: r.report }
-    if (r.ecgFindings) next.ecgFindings = r.ecgFindings
-  } else if (r.kind === 'procedure' && r.report !== undefined) {
-    next.procedureResults = { ...(next.procedureResults ?? {}), [r.test]: r.report }
-  }
-  if (r.specialFindings && r.specialModality) {
-    const field = ({
-      smear: 'hematologyFindings', biopsy: 'biopsyFindings', fundus: 'fundusFindings',
-      derm: 'skinFindings', urine: 'urineFindings',
-    } as const)[r.specialModality]
-    next[field] = r.specialFindings
-  }
-  return next
-}
-
-/** Merge the post-grading reveal into the client case view. */
-function mergeReveal(prev: CaseData, reveal: CaseReveal): CaseData {
-  return {
-    ...prev,
-    diagnosis: reveal.diagnosis,
-    differentials: reveal.differentials,
-    teachingPoints: reveal.teachingPoints,
-    keyQuestions: reveal.keyQuestions,
-    mechanism: reveal.mechanism,
-    differentialPriors: reveal.differentialPriors ?? prev.differentialPriors,
-    testImpacts: reveal.testImpacts ?? prev.testImpacts,
-    reviewOfSystems: Object.keys(reveal.reviewOfSystems).length ? reveal.reviewOfSystems : prev.reviewOfSystems,
-    expectedLabs: reveal.expectedLabs,
-    expectedImaging: reveal.expectedImaging,
-  }
-}
-
-async function postSession<T>(path: string, body: Record<string, unknown>): Promise<T> {
-  const res = await fetch(path, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(180_000),
-  })
-  const contentType = res.headers.get('content-type') ?? ''
-  if (!contentType.includes('application/json')) {
-    const text = await res.text()
-    const preview = text.slice(0, 200).replace(/\s+/g, ' ').trim()
-    throw new Error(`Server error (${res.status}) — unexpected non-JSON response: ${preview || '(empty)'}`)
-  }
-  const data = await res.json()
-  if (!res.ok) {
-    const err = new Error(data?.error ?? `API error ${res.status}`) as Error & { status?: number; data?: unknown }
-    err.status = res.status
-    err.data = data
-    throw err
-  }
-  return data as T
-}
-
 // Components extracted to _components/ and hooks/utils to _lib/
 
 
@@ -210,8 +118,6 @@ export default function MedTrainer() {
   const [caseData, setCaseData] = useState<CaseData | null>(null)
   const [generating, setGenerating] = useState(false)
   const [activeSection, setActiveSection] = useState('hpi')
-  const [selectedTests, setSelectedTests] = useState<Set<string>>(new Set())
-  const [orderedTests, setOrderedTests] = useState<Set<string>>(new Set())
   const [chatMessages, setChatMessages] = useState<ChatMessage[]>([])
   const [chatInput, setChatInput] = useState('')
   const [chatLoading, setChatLoading] = useState(false)
@@ -238,14 +144,7 @@ export default function MedTrainer() {
   const [inPresentation, setInPresentation] = useState(false)
   // Background-history values the server has revealed (gated difficulties).
   const [hpiValues, setHpiValues] = useState<Partial<Record<HPIField, string>>>({})
-  const [imagingCache, setImagingCache] = useState<Record<string, OpenIResult[] | null>>({})
   const [activeCaseId, setActiveCaseId] = useState<string | null>(null)
-  const [ecgCache, setEcgCache] = useState<Record<string, ECGImage | null | 'none'>>({})
-  const [smearCache, setSmearCache] = useState<Record<string, SpecialImage | null | 'none'>>({})
-  const [biopsyImgCache, setBiopsyImgCache] = useState<Record<string, SpecialImage | null | 'none'>>({})
-  const [fundusCache, setFundusCache] = useState<Record<string, SpecialImage | null | 'none'>>({})
-  const [dermCache, setDermCache] = useState<Record<string, SpecialImage | null | 'none'>>({})
-  const [urineImgCache, setUrineImgCache] = useState<Record<string, SpecialImage | null | 'none'>>({})
 
   // Clinical accordion state
   const [openCategories, setOpenCategories] = useState<Set<string>>(new Set())
@@ -253,13 +152,7 @@ export default function MedTrainer() {
   const [testSearchQuery, setTestSearchQuery] = useState('')
   const [showSearchDropdown, setShowSearchDropdown] = useState(false)
   const [customTestInput, setCustomTestInput] = useState('')
-  const [generatingOnDemand, setGeneratingOnDemand] = useState<Set<string>>(new Set())
-  const [failedOnDemand, setFailedOnDemand] = useState<Set<string>>(new Set())
-  // Free-typed orders whose fuzzy match was contested — the student confirms
-  // the canonical name instead of being silently penalized (4.3).
-  const [ambiguousOrders, setAmbiguousOrders] = useState<Record<string, string[]>>({})
   const [showRosHint, setShowRosHint] = useState(false)
-  const onDemandQueuedRef = useRef<Set<string>>(new Set())
 
   const [terminalLines, setTerminalLines] = useState<TerminalLine[]>([
     { type: 'info', content: 'MedTrainer Terminal — type "help" for commands' },
@@ -292,6 +185,33 @@ export default function MedTrainer() {
   const pendingRedoOfRef = useRef<string | null>(null)
   const activeRedoOfRef = useRef<string | null>(null)
 
+  const recordApiCall = (type: APICallType, usage: RawUsage) => {
+    const session = analyticsSessionRef.current
+    if (!session) return
+    recordToSession(session, makeCallRecord(type, usage))
+  }
+
+  /** Record the token usage entries a session route returns. */
+  const recordUsages = (usages: UsageEntry[] | undefined) => {
+    for (const u of usages ?? []) recordApiCall(u.type as APICallType, u.usage)
+  }
+
+  // Test ordering + per-test image caches (extracted hooks — 5.1).
+  const {
+    selectedTests, setSelectedTests,
+    orderedTests,
+    generatingOnDemand, failedOnDemand, setFailedOnDemand,
+    ambiguousOrders,
+    submitOrders, toggleTest, addOrderedTest, removeOrderedTest,
+    confirmAmbiguous, dismissAmbiguous,
+    resetOrders, restoreOrders,
+  } = useOrders({ sessionId, recordUsages, setCaseData })
+
+  const {
+    imagingCache, ecgCache, smearCache, biopsyImgCache, fundusCache, dermCache, urineImgCache,
+    resetImages,
+  } = useSessionImages({ activeSection, caseData, sessionId, orderedTests })
+
   // Pre-select system/difficulty from URL params; capture redo diagnosis and lineage
   useEffect(() => {
     const p = new URLSearchParams(window.location.search)
@@ -314,12 +234,6 @@ export default function MedTrainer() {
 
   // True when a Clinical/Advanced case exists but the timer hasn't been started yet
   const locked = !caseStarted
-
-  const recordApiCall = (type: APICallType, usage: RawUsage) => {
-    const session = analyticsSessionRef.current
-    if (!session) return
-    recordToSession(session, makeCallRecord(type, usage))
-  }
 
   const handleTimerExpire = useCallback(() => {
     setTimedOutToast(true)
@@ -433,80 +347,6 @@ export default function MedTrainer() {
     return () => { clearTimeout(id); document.removeEventListener('click', dismiss) }
   }, [showRosHint])
 
-  // Image lookup for ordered imaging tests. Selection runs SERVER-side
-  // (/api/session/images) because it depends on the case diagnosis; the client
-  // only routes the returned image into the right panel cache by test name.
-  useEffect(() => {
-    if (activeSection !== 'results' || !caseData || !sessionId) return
-    const orderedArr = Array.from(orderedTests)
-    const cacheMap: Record<SpecialModality, {
-      cache: Record<string, SpecialImage | null | 'none'>
-      setter: React.Dispatch<React.SetStateAction<Record<string, SpecialImage | null | 'none'>>>
-    }> = {
-      smear:  { cache: smearCache,     setter: setSmearCache },
-      biopsy: { cache: biopsyImgCache, setter: setBiopsyImgCache },
-      fundus: { cache: fundusCache,    setter: setFundusCache },
-      derm:   { cache: dermCache,      setter: setDermCache },
-      urine:  { cache: urineImgCache,  setter: setUrineImgCache },
-    }
-
-    const imagingTests = orderedArr.filter(t => findResultKey(t, caseData.imagingResults) !== null)
-    const toFetch = imagingTests.filter(t => {
-      if (isECGTest(t)) return !(t in ecgCache)
-      const m = getSpecialModality(t)
-      if (m) return !(t in cacheMap[m].cache)
-      return !(t in imagingCache)
-    })
-    if (toFetch.length === 0) return
-
-    /* eslint-disable react-hooks/set-state-in-effect --
-       mark newly-ordered tests as loading before the async fetch resolves
-       (same pattern as the previous per-modality effects) */
-    for (const t of toFetch) {
-      if (isECGTest(t)) setEcgCache(prev => ({ ...prev, [t]: null }))
-      else {
-        const m = getSpecialModality(t)
-        if (m) cacheMap[m].setter(prev => ({ ...prev, [t]: null }))
-        else setImagingCache(prev => ({ ...prev, [t]: null }))
-      }
-    }
-    /* eslint-enable react-hooks/set-state-in-effect */
-
-    void Promise.all(
-      toFetch.map(async t => {
-        try {
-          const data = await postSession<{
-            kind: 'ecg' | 'special' | 'imaging'
-            ecg?: ECGImage | null
-            modality?: SpecialModality
-            special?: SpecialImage | null
-            results?: OpenIResult[]
-          }>('/api/session/images', { sessionId, test: t })
-          if (data.kind === 'ecg') {
-            setEcgCache(prev => ({ ...prev, [t]: data.ecg ?? 'none' }))
-          } else if (data.kind === 'special' && data.modality) {
-            cacheMap[data.modality].setter(prev => ({ ...prev, [t]: data.special ?? 'none' }))
-          } else {
-            setImagingCache(prev => ({ ...prev, [t]: data.results ?? [] }))
-          }
-        } catch {
-          if (isECGTest(t)) setEcgCache(prev => ({ ...prev, [t]: 'none' }))
-          else {
-            const m = getSpecialModality(t)
-            if (m) cacheMap[m].setter(prev => ({ ...prev, [t]: 'none' }))
-            else setImagingCache(prev => ({ ...prev, [t]: [] }))
-          }
-        }
-      })
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSection, caseData, sessionId])
-
-  /** Record the token usage entries a session route returns. */
-  const recordUsages = (usages: UsageEntry[] | undefined) => {
-    for (const u of usages ?? []) recordApiCall(u.type as APICallType, u.usage)
-  }
-
   /** Apply a /api/session/start response to local state. */
   const applyStartResponse = (data: StartResponse) => {
     resolvedSystemRef.current = data.system
@@ -545,11 +385,14 @@ export default function MedTrainer() {
 
     let clientCase = presentationToClientCase(data.presentation)
     for (const r of data.results ?? []) clientCase = mergeOrderResult(clientCase, r)
-    setAmbiguousOrders(Object.fromEntries(
-      (data.results ?? [])
-        .filter(r => r.kind === 'ambiguous' && r.suggestions?.length)
-        .map(r => [r.test, r.suggestions!]),
-    ))
+    restoreOrders(
+      data.orderedTests ?? [],
+      Object.fromEntries(
+        (data.results ?? [])
+          .filter(r => r.kind === 'ambiguous' && r.suggestions?.length)
+          .map(r => [r.test, r.suggestions!]),
+      ),
+    )
     for (const e of data.exams ?? []) {
       clientCase = { ...clientCase, physicalExam: { ...clientCase.physicalExam, [e.region]: e.finding } }
     }
@@ -570,7 +413,6 @@ export default function MedTrainer() {
     })
     setHpiValues(data.hpi ?? {})
     setRevealedExamRegions(new Set((data.exams ?? []).map(e => e.region)))
-    setOrderedTests(new Set(data.orderedTests ?? []))
     if (data.prediction) {
       setPrediction(data.prediction.ranking)
       setPredictionConfidence(data.prediction.confidence)
@@ -595,8 +437,7 @@ export default function MedTrainer() {
     setSessionId(null)
     setSessionMeta(EMPTY_SESSION_META)
     setCaseData(null)
-    setOrderedTests(new Set())
-    setSelectedTests(new Set())
+    resetOrders()
     setRevealedExamRegions(new Set())
     setChatMessages([])
     setGradingResult(null)
@@ -612,21 +453,11 @@ export default function MedTrainer() {
     setActiveSection('hpi')
     setCollapsedPanels(new Set())
     setOpenCategories(new Set())
-    setGeneratingOnDemand(new Set())
-    setFailedOnDemand(new Set())
-    setAmbiguousOrders({})
-    onDemandQueuedRef.current = new Set()
     setRosState(makeInitialROSState())
     setHpiValues({})
     setInPresentation(false)
-    setImagingCache({})
+    resetImages()
     setActiveCaseId(null)
-    setEcgCache({})
-    setSmearCache({})
-    setBiopsyImgCache({})
-    setFundusCache({})
-    setDermCache({})
-    setUrineImgCache({})
 
     const resolvedDifficulty = overrideDifficulty ?? difficulty
     setCaseDifficulty(resolvedDifficulty)
@@ -681,55 +512,6 @@ export default function MedTrainer() {
     }
   }
 
-  const toggleTest = (name: string) => {
-    setSelectedTests(prev => {
-      const next = new Set(prev)
-      if (next.has(name)) next.delete(name); else next.add(name)
-      return next
-    })
-  }
-
-  /**
-   * Submit test orders to the server session. Results come back from the
-   * server-side case snapshot (which the client never holds in full); missing
-   * results are generated on demand server-side.
-   */
-  const submitOrders = async (tests: string[]) => {
-    if (!sessionId) return
-    const newTests = tests.filter(t => t.trim() && !orderedTests.has(t))
-    if (newTests.length === 0) return
-    setOrderedTests(prev => new Set([...prev, ...newTests]))
-    setGeneratingOnDemand(prev => new Set([...prev, ...newTests]))
-    try {
-      const data = await postSession<OrderResponse>('/api/session/order', { sessionId, tests: newTests })
-      recordUsages(data.usages)
-      setCaseData(prev => {
-        if (!prev) return prev
-        let next = prev
-        for (const r of data.results) next = mergeOrderResult(next, r)
-        return next
-      })
-      const failed = data.results.filter(r => r.kind === 'none').map(r => r.test)
-      if (failed.length) setFailedOnDemand(prev => new Set([...prev, ...failed]))
-      const ambiguous = data.results.filter(r => r.kind === 'ambiguous' && r.suggestions?.length)
-      if (ambiguous.length) {
-        setAmbiguousOrders(prev => ({
-          ...prev,
-          ...Object.fromEntries(ambiguous.map(r => [r.test, r.suggestions!])),
-        }))
-      }
-    } catch (e) {
-      console.error('[MedTrainer] order failed:', e)
-      setFailedOnDemand(prev => new Set([...prev, ...newTests]))
-    } finally {
-      setGeneratingOnDemand(prev => {
-        const n = new Set(prev)
-        newTests.forEach(t => n.delete(t))
-        return n
-      })
-    }
-  }
-
   const orderTests = () => {
     if (selectedTests.size === 0) return
     const toOrder = Array.from(selectedTests)
@@ -738,22 +520,12 @@ export default function MedTrainer() {
     void submitOrders(toOrder)
   }
 
-  const addOrderedTest = (name: string) => {
-    void submitOrders([name])
-  }
-
   const orderCustomTest = () => {
     const name = customTestInput.trim()
     if (!name) return
     addOrderedTest(name)
     setCustomTestInput('')
     setActiveSection('results')
-  }
-
-  const removeOrderedTest = (name: string) => {
-    // Local view only — the server event log keeps the order on record, so
-    // grading still counts it (you can't un-ring the bell).
-    setOrderedTests(prev => { const next = new Set(prev); next.delete(name); return next })
   }
 
   const examineRegion = async (region: string) => {
@@ -1304,25 +1076,12 @@ export default function MedTrainer() {
           failedOnDemand={failedOnDemand}
           setFailedOnDemand={setFailedOnDemand}
           ambiguousOrders={ambiguousOrders}
-          onConfirmAmbiguous={(typed, canonical) => {
-            setAmbiguousOrders(prev => { const n = { ...prev }; delete n[typed]; return n })
-            setOrderedTests(prev => { const n = new Set(prev); n.delete(typed); return n })
-            void submitOrders([canonical])
-          }}
-          onDismissAmbiguous={(typed) => {
-            // Keep the typed order as-is; grading treats it as neutral.
-            setAmbiguousOrders(prev => { const n = { ...prev }; delete n[typed]; return n })
-            setFailedOnDemand(prev => new Set([...prev, typed]))
-          }}
+          onConfirmAmbiguous={confirmAmbiguous}
+          onDismissAmbiguous={dismissAmbiguous}
           gradingResult={gradingResult}
           setZoomedImage={setZoomedImage}
           setActiveSection={setActiveSection}
-          setOrderedTests={setOrderedTests}
-          onRetryFailed={(t) => {
-            setFailedOnDemand(prev => { const n = new Set(prev); n.delete(t); return n })
-            onDemandQueuedRef.current.delete(t)
-            setOrderedTests(prev => new Set(prev))
-          }}
+          onRetryFailed={(t) => { void submitOrders([t], { retry: true }) }}
         />
       case 'diagnosis':
         return <DiagnosisView

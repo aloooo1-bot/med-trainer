@@ -1,7 +1,15 @@
 /**
- * Shared case-generation prompts.
- * Plain JS so it is importable from both Next.js server code and offline scripts.
- * IMPORTANT: Keep in sync with the inline prompt in app/page.tsx (generateCase).
+ * Case-generation prompts for the LIVE session path
+ * (app/lib/server/caseSource.ts → /api/session/start). The old inline
+ * duplicate in the trainer page was removed with the server-side generation
+ * refactor — do not reintroduce one.
+ *
+ * KNOWN FORK (needs clinician-guided consolidation): the admin regeneration
+ * pipeline (app/lib/generators/shared.ts → manifest.ts/local.ts) carries a
+ * much richer, independently-evolved rule set (~43KB CRITICAL_RULES incl.
+ * reasoning-field generation) versus this file's ~8.5KB. Merging them is a
+ * medical-content decision, not a refactor — until then, rule fixes must be
+ * applied to BOTH files.
  */
 
 export const DIFFICULTY_RULES = {

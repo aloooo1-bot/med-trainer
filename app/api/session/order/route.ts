@@ -16,7 +16,7 @@ export const dynamic = 'force-dynamic'
  */
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json().catch(() => ({})) as { sessionId?: string; tests?: string[] }
+    const body = await req.json().catch(() => ({})) as { sessionId?: string; tests?: string[]; retry?: boolean }
     const access = await requireOwnSession(body.sessionId)
     if (!access.ok) return access.response
     const { session, events } = access.data
@@ -33,14 +33,17 @@ export async function POST(req: NextRequest) {
 
     const state = replayEvents(events)
     const already = new Set(state.orderedTests)
-    const newTests = requested.filter(t => !already.has(t))
+    // retry: re-process already-ordered tests (e.g. failed on-demand generation)
+    // without double-logging them.
+    const toProcess = body.retry ? requested : requested.filter(t => !already.has(t))
+    const newTests = toProcess.filter(t => !already.has(t))
 
     const usages: Array<{ type: string; usage: RawUsage }> = []
     let caseData = session.caseData
     let snapshotDirty = false
     const results: OrderedTestResult[] = []
 
-    for (const test of newTests) {
+    for (const test of toProcess) {
       let result = resolveResult(test, caseData)
       if (result.kind === 'none') {
         // No pre-generated result — synthesize one rather than dropping the order.

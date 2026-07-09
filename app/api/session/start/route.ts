@@ -97,6 +97,10 @@ export async function POST(req: NextRequest) {
       caseId: acquired.caseId,
       system,
       difficulty,
+      // 5.3: complexity and scaffolding are recorded independently even though
+      // the UX currently always moves them together.
+      caseComplexity: difficulty,
+      scaffoldingLevel: difficulty,
       phase: 'active',
       createdAt: now,
       caseData: jittered,

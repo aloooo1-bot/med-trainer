@@ -41,7 +41,12 @@ export interface TrainerSessionRecord {
   userId: string
   caseId: string | null
   system: string
+  /** Legacy combined axis — kept as the primary field while UX still couples them. */
   difficulty: string
+  /** How hard the case content is (5.3 — today always equals difficulty). */
+  caseComplexity?: string
+  /** How much interface scaffolding the student gets (5.3 — today always equals difficulty). */
+  scaffoldingLevel?: string
   phase: SessionPhase
   createdAt: string
   /** Full jittered case snapshot — server-only, never returned to the client. */
@@ -143,6 +148,8 @@ class SupabaseSessionStore implements SessionStore {
       case_id: session.caseId,
       system: session.system,
       difficulty: session.difficulty,
+      case_complexity: session.caseComplexity ?? session.difficulty,
+      scaffolding_level: session.scaffoldingLevel ?? session.difficulty,
       phase: session.phase,
       case_snapshot: { caseData: session.caseData, imagingCache: session.imagingCache ?? null } as unknown as Record<string, unknown>,
       created_at: session.createdAt,
@@ -200,6 +207,8 @@ class SupabaseSessionStore implements SessionStore {
       caseId: row.case_id,
       system: row.system,
       difficulty: row.difficulty,
+      caseComplexity: row.case_complexity ?? row.difficulty,
+      scaffoldingLevel: row.scaffolding_level ?? row.difficulty,
       phase: row.phase,
       createdAt: row.created_at,
       caseData: (row.case_snapshot?.caseData ?? row.case_snapshot) as CaseData,

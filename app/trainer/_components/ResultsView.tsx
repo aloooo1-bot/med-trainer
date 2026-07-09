@@ -41,7 +41,6 @@ export function ResultsView({
   gradingResult: GradingResult | null
   setZoomedImage: React.Dispatch<React.SetStateAction<{ src: string; alt: string } | null>>
   setActiveSection: React.Dispatch<React.SetStateAction<string>>
-  setOrderedTests: React.Dispatch<React.SetStateAction<Set<string>>>
   onRetryFailed: (t: string) => void
 }) {
   const orderedArr = Array.from(orderedTests)

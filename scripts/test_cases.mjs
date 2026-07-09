@@ -1,7 +1,6 @@
 // End-to-end case tester — calls the live dev server API
 // Generates + solves Foundations, Clinical, Advanced cases as a 4th-year med student
 
-const BASE = 'http://localhost:3000';
 
 // /api/claude (the open browser proxy) was removed in the security remediation;
 // scripts call the Anthropic API directly with the key from .env.local.
