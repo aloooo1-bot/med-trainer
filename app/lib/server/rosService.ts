@@ -7,7 +7,7 @@ import {
   looksClinical,
   type HPIField,
 } from '../rosDetector'
-import { callModel, extractJsonArray } from './llm'
+import { callModel, extractJson, extractJsonArray } from './llm'
 import type { CaseData } from '../../trainer/_lib/types'
 import type { RawUsage } from '../analytics'
 
@@ -102,6 +102,68 @@ ${previousSummary
     return text.trim() || previousSummary || `${category}: finding recorded`
   } catch {
     return previousSummary || `${category}: Finding recorded — review after submission`
+  }
+}
+
+/**
+ * Batched variant: when one exchange addresses several ROS categories, derive
+ * all summaries in a single call returning JSON keyed by category (previously
+ * one call per category). Falls back to the single-call path for one category
+ * and to safe placeholders when the batch reply is unusable.
+ */
+export async function deriveRosSummaries(
+  items: Array<{ category: ROSCategory; previousSummary?: string }>,
+  studentMessage: string,
+  patientReply: string,
+  onUsage: (type: 'ros_derived', usage: RawUsage) => void,
+): Promise<Record<string, string>> {
+  if (items.length === 0) return {}
+  if (items.length === 1) {
+    const { category, previousSummary } = items[0]
+    return { [category]: await deriveRosSummary(category, studentMessage, patientReply, onUsage, previousSummary) }
+  }
+
+  const system = `You are a clinical documentation assistant. For EACH body system listed, write a concise clinical summary of only what the patient actually reported, based on the interview excerpt provided.
+
+Rules:
+- Only include what the patient explicitly said or confirmed
+- Do NOT include denials of things that were never asked about
+- Do NOT add clinical language or findings not present in the conversation
+- Do NOT infer or assume — only document what was stated
+- Where a previous summary is given, produce the updated CUMULATIVE summary (keep everything still accurate, merge in anything new)
+- Maximum 2 sentences per system
+- Return ONLY a valid JSON object mapping each listed system name (exactly as given) to its summary string. No markdown, no explanation.`
+  const prompt = `Body systems to document:
+${items.map(i => `- ${i.category}${i.previousSummary ? ` (previously documented: ${i.previousSummary})` : ''}`).join('\n')}
+
+Interview excerpt:
+Student: ${studentMessage}
+Patient: ${patientReply}
+
+Return the JSON object now.`
+
+  try {
+    const { text, usage } = await callModel('derived_summary', {
+      system,
+      messages: [{ role: 'user', content: prompt }],
+      maxTokens: 150 * items.length,
+    })
+    onUsage('ros_derived', usage)
+    const parsed = extractJson<Record<string, unknown>>(text)
+    const out: Record<string, string> = {}
+    for (const { category, previousSummary } of items) {
+      const v = parsed[category]
+      out[category] = (typeof v === 'string' && v.trim())
+        ? v.trim()
+        : previousSummary ?? `${category}: finding recorded`
+    }
+    return out
+  } catch {
+    const out: Record<string, string> = {}
+    for (const { category, previousSummary } of items) {
+      out[category] = previousSummary ?? `${category}: Finding recorded — review after submission`
+    }
+    return out
   }
 }
 

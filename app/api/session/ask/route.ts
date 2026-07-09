@@ -4,7 +4,7 @@ import { requireOwnSession } from '@/app/lib/server/sessionAccess'
 import { getSessionStore, makeEvent } from '@/app/lib/server/sessionStore'
 import { replayEvents } from '@/app/lib/server/replay'
 import { buildPatientSystemPrompt } from '@/app/lib/server/patientPrompt'
-import { classifyRosCategories, deriveRosSummary, resolveHpiUnlocks } from '@/app/lib/server/rosService'
+import { classifyRosCategories, deriveRosSummaries, resolveHpiUnlocks } from '@/app/lib/server/rosService'
 import { callModel } from '@/app/lib/server/llm'
 import { classifyFinding, type ROSCategory } from '@/app/lib/rosDetector'
 import type { RawUsage } from '@/app/lib/analytics'
@@ -55,16 +55,23 @@ export async function POST(req: NextRequest) {
     // better follow-up question is never dropped from what the grader sees.
     const matched = await classifyRosCategories(message, (t, u) => usages.push({ type: t, usage: u }))
 
-    const rosUnlocks: Array<{ category: ROSCategory; derivedFinding: string; status: 'positive' | 'negative' }> = []
-    await Promise.all(matched.map(async cat => {
-      const previous = state.ros[cat]?.derivedFinding
-      const derivedFinding = await deriveRosSummary(cat, message, reply, (t, u) => usages.push({ type: t, usage: u }), previous)
-      // ANTI-CUEING: status (row color) is classified from what the patient
-      // ACTUALLY reported in this conversation — never from the canonical case
-      // finding. A lazy one-line question about a system with a hidden positive
-      // must not light up the row; the canonical finding is revealed only after
-      // grading.
-      rosUnlocks.push({ category: cat, derivedFinding, status: classifyFinding(derivedFinding) })
+    // One batched summarizer call for however many categories this exchange
+    // touched (3.2 — previously one call per category).
+    const summaries = await deriveRosSummaries(
+      matched.map(cat => ({ category: cat, previousSummary: state.ros[cat]?.derivedFinding })),
+      message,
+      reply,
+      (t, u) => usages.push({ type: t, usage: u }),
+    )
+    // ANTI-CUEING: status (row color) is classified from what the patient
+    // ACTUALLY reported in this conversation — never from the canonical case
+    // finding. A lazy one-line question about a system with a hidden positive
+    // must not light up the row; the canonical finding is revealed only after
+    // grading.
+    const rosUnlocks = matched.map(cat => ({
+      category: cat,
+      derivedFinding: summaries[cat],
+      status: classifyFinding(summaries[cat]),
     }))
 
     const hpiUnlocks = resolveHpiUnlocks(message, session.caseData)

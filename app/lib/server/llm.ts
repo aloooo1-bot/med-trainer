@@ -18,14 +18,19 @@ export type LLMTask =
   | 'grading_oral'
 
 /**
- * Task → model map. Phase 3 tiers small classification/summarization jobs down
- * to Haiku; grading and case generation stay on the smart model.
+ * Task → model map (server-side only — model names must never reach client code).
+ *
+ * Patient roleplay, ROS classification, and derived summaries are short,
+ * well-scoped jobs — Haiku handles them at a fraction of the cost. Grading
+ * and case generation carry the clinical-accuracy burden and stay on Sonnet,
+ * as do on-demand test results (fabricating clinically consistent values is
+ * the failure mode we least want to cheap out on).
  */
 const TASK_MODELS: Record<LLMTask, string> = {
   case_generation: 'claude-sonnet-4-6',
-  patient_chat: 'claude-sonnet-4-6',
-  ros_classifier: 'claude-sonnet-4-6',
-  derived_summary: 'claude-sonnet-4-6',
+  patient_chat: 'claude-haiku-4-5-20251001',
+  ros_classifier: 'claude-haiku-4-5-20251001',
+  derived_summary: 'claude-haiku-4-5-20251001',
   on_demand_result: 'claude-sonnet-4-6',
   grading: 'claude-sonnet-4-6',
   grading_oral: 'claude-sonnet-4-6',
