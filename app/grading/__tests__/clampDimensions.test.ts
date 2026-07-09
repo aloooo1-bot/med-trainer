@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { clampDimensions } from '../grader'
+import { clampDimensions } from '../clamp'
 import type { GradingResult } from '../types'
 
 function makeResult(overrides: Partial<NonNullable<GradingResult['dimensions']>>): GradingResult {

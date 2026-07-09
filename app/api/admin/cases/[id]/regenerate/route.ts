@@ -5,6 +5,7 @@ import { isAdmin } from '../../../../../lib/generators/shared'
 import { regenerateRatelimit } from '../../../../../lib/ratelimit'
 import { generateManifest } from '../../../../../lib/generators/manifest'
 import { generateLocal, findCombo } from '../../../../../lib/generators/local'
+import { splitCase } from '../../../../../lib/server/caseTiers.mjs'
 import { NextRequest, NextResponse } from 'next/server'
 
 async function checkAdmin(): Promise<{ ok: true } | { ok: false; response: NextResponse }> {
@@ -104,9 +105,19 @@ export async function POST(
         })
       }
 
+      // Write both the legacy blob and the tiered columns (see migration 0001).
+      const tiers = splitCase(caseData)
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await (db.from('cases') as any)
-        .update({ case_data: caseData, is_generated: true, generated_at: new Date().toISOString() })
+        .update({
+          case_data: caseData,
+          presentation_data: tiers.presentation,
+          patient_knowledge: tiers.patientKnowledge,
+          clinical_findings: tiers.clinicalFindings,
+          ground_truth: tiers.groundTruth,
+          is_generated: true,
+          generated_at: new Date().toISOString(),
+        })
         .eq('id', id)
 
       await db.from('case_regeneration_jobs')

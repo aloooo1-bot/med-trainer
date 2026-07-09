@@ -2,10 +2,11 @@ import { type HPIField } from '@/app/lib/rosDetector'
 import { SectionCard } from './SectionCard'
 import { selectHpi, type CaseData } from '../_lib/types'
 
-export function HPIView({ caseData, caseDifficulty, hpiUnlocked, caseStarted, startTimer, setCaseStarted, chatInputRef }: {
+export function HPIView({ caseData, caseDifficulty, hpiValues, caseStarted, startTimer, setCaseStarted, chatInputRef }: {
   caseData: CaseData
   caseDifficulty: string
-  hpiUnlocked: Record<HPIField, boolean>
+  /** Server-revealed background-history values (gated difficulties). Undefined = still locked. */
+  hpiValues: Partial<Record<HPIField, string>>
   caseStarted: boolean
   startTimer: (difficulty: string) => void
   setCaseStarted: React.Dispatch<React.SetStateAction<boolean>>
@@ -43,7 +44,7 @@ export function HPIView({ caseData, caseDifficulty, hpiUnlocked, caseStarted, st
   ]
   const totalBgFields = bgGroups.reduce((s, g) => s + g.fields.length, 0)
   const unlockedHPICount = isGatedHPI
-    ? Object.values(hpiUnlocked).filter(Boolean).length
+    ? Object.values(hpiValues).filter(v => v !== undefined).length
     : totalBgFields
 
   return (
@@ -67,7 +68,7 @@ export function HPIView({ caseData, caseDifficulty, hpiUnlocked, caseStarted, st
       <SectionCard title="History of Present Illness">
         <p className="font-serif text-[15px] leading-relaxed text-ink-primary max-w-[70ch]">{selectHpi(caseData, caseDifficulty)}</p>
       </SectionCard>
-      {(caseData.pastMedicalHistory || caseData.currentMedications || caseData.socialHistory) && (
+      {(isGatedHPI || caseData.pastMedicalHistory || caseData.currentMedications || caseData.socialHistory) && (
         <SectionCard title="Background History">
           {isGatedHPI && (
             <div className="mb-3 flex items-center justify-between">
@@ -83,12 +84,15 @@ export function HPIView({ caseData, caseDifficulty, hpiUnlocked, caseStarted, st
                 <div className="text-[11px] font-semibold uppercase tracking-wide text-primary-400 mb-2">{label}</div>
                 <div className="space-y-1.5">
                   {fields.map(({ field, label: fLabel, value }) => {
-                    const unlocked = !isGatedHPI || hpiUnlocked[field]
+                    // Gated difficulties never receive these values up front —
+                    // the server reveals them per-field through /api/session/ask.
+                    const shownValue = isGatedHPI ? hpiValues[field] : value
+                    const unlocked = !isGatedHPI || hpiValues[field] !== undefined
                     return (
                       <div key={field} className="flex gap-2">
                         <span className="text-[11px] text-ink-tertiary uppercase tracking-wide w-32 flex-shrink-0 pt-0.5">{fLabel}</span>
                         {unlocked ? (
-                          <span className="text-[13px] text-ink-primary">{value ?? 'None documented.'}</span>
+                          <span className="text-[13px] text-ink-primary">{shownValue ?? 'None documented.'}</span>
                         ) : (
                           <span className="text-ink-tertiary/40 text-sm select-none">—</span>
                         )}

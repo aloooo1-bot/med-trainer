@@ -44,11 +44,20 @@ const TO = toArg !== -1 ? parseInt(args[toArg + 1]) : 36
 
 // ── helpers ───────────────────────────────────────────────────────────────────
 
+// /api/claude (the open browser proxy) was removed in the security remediation;
+// scripts call the Anthropic API directly with the key from .env.local.
+const { config: _dotenvConfig } = await import('dotenv')
+_dotenvConfig({ path: '.env.local' })
+
 async function callClaude(system, messages, maxTokens = 800) {
-  const res = await fetch(`${BASE}/api/claude`, {
+  const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ system, messages, max_tokens: maxTokens }),
+    headers: {
+      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ model: 'claude-sonnet-4-6', system, messages, max_tokens: maxTokens }),
   })
   if (!res.ok) throw new Error(`Claude API ${res.status}: ${await res.text()}`)
   const data = await res.json()

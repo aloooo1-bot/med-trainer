@@ -1,0 +1,121 @@
+import 'server-only'
+import {
+  ROS_CATEGORIES,
+  type ROSCategory,
+  scanMessageForROS,
+  scanMessageForHPIFields,
+  looksClinical,
+  type HPIField,
+} from '../rosDetector'
+import { callModel, extractJsonArray } from './llm'
+import type { CaseData } from '../../trainer/_lib/types'
+import type { RawUsage } from '../analytics'
+
+/**
+ * ROS / HPI unlock classification + chat-derived summaries, moved server-side.
+ * Behavior mirrors the previous client implementation.
+ */
+
+export interface RosUnlockResult {
+  category: ROSCategory
+  derivedFinding: string
+}
+
+export interface AskClassification {
+  rosUnlocks: RosUnlockResult[]
+  hpiUnlocks: Partial<Record<HPIField, string>>
+  usages: Array<{ type: 'ros_classifier' | 'ros_derived'; usage: RawUsage }>
+}
+
+/** Which ROS categories does this student message address? */
+export async function classifyRosCategories(
+  message: string,
+  onUsage: (type: 'ros_classifier', usage: RawUsage) => void,
+): Promise<ROSCategory[]> {
+  const keywordMatches = scanMessageForROS(message)
+  if (keywordMatches.length > 0) return keywordMatches
+  if (!looksClinical(message)) return []
+
+  try {
+    const classifierPrompt = `You are a clinical NLP classifier for a medical training app.
+Given the following student message from a patient interview, identify which Review of Systems (ROS) categories were addressed. Return ONLY a JSON array of matched categories from this list:
+["Constitutional","HEENT","Cardiovascular","Respiratory","Gastrointestinal","Genitourinary","Musculoskeletal","Neurological","Psychiatric","Integumentary","Endocrine","Hematologic/Lymphatic","Allergic/Immunologic"]
+Rules:
+- Only include a category if the student ASKED about it
+- If no ROS category was addressed, return []
+- Return raw JSON only, no explanation, no markdown
+Student message: "${message}"`
+    const { text, usage } = await callModel('ros_classifier', {
+      system: 'You are a JSON-only ROS classifier.',
+      messages: [{ role: 'user', content: classifierPrompt }],
+      maxTokens: 100,
+    })
+    onUsage('ros_classifier', usage)
+    const aiMatches = extractJsonArray<string>(text.trim())
+    return aiMatches.filter((c): c is ROSCategory =>
+      (ROS_CATEGORIES as readonly string[]).includes(c))
+  } catch {
+    return [] // classifier failure is non-fatal
+  }
+}
+
+/** Derive a clinical summary of what the patient reported for one category. */
+export async function deriveRosSummary(
+  category: ROSCategory,
+  studentMessage: string,
+  patientReply: string,
+  onUsage: (type: 'ros_derived', usage: RawUsage) => void,
+): Promise<string> {
+  const summarySystem = `You are a clinical documentation assistant. Write a concise clinical sentence summarizing only what the patient actually reported about a specific body system, based on the interview excerpt provided.
+
+Rules:
+- Only include what the patient explicitly said or confirmed
+- Do NOT include denials of things that were never asked about
+- Do NOT add clinical language or findings not present in the conversation
+- Do NOT infer or assume — only document what was stated
+- If the patient only confirmed one symptom, document only that symptom
+- Format: plain clinical prose, no quotes, no preamble
+- Maximum 2 sentences`
+  const summaryPrompt = `Body system: ${category}
+Interview excerpt:
+Student: ${studentMessage}
+Patient: ${patientReply}
+
+Summarize only what the patient reported about ${category}.`
+  try {
+    const { text, usage } = await callModel('derived_summary', {
+      system: summarySystem,
+      messages: [{ role: 'user', content: summaryPrompt }],
+      maxTokens: 150,
+    })
+    onUsage('ros_derived', usage)
+    return text.trim() || `${category}: finding recorded`
+  } catch {
+    return `${category}: Finding recorded — review after submission`
+  }
+}
+
+/** HPI background fields addressed by this message, with their values resolved. */
+export function resolveHpiUnlocks(
+  message: string,
+  caseData: CaseData,
+): Partial<Record<HPIField, string>> {
+  const fields = scanMessageForHPIFields(message)
+  if (!fields.length) return {}
+  const values: Record<HPIField, string | undefined> = {
+    pmh_conditions: caseData.pastMedicalHistory?.conditions,
+    pmh_surgeries: caseData.pastMedicalHistory?.surgeries,
+    pmh_hospitalizations: caseData.pastMedicalHistory?.hospitalizations,
+    med_medications: caseData.currentMedications?.medications,
+    med_otc: caseData.currentMedications?.otc,
+    soc_smoking: caseData.socialHistory?.smoking,
+    soc_alcohol: caseData.socialHistory?.alcohol,
+    soc_drugs: caseData.socialHistory?.drugs,
+    soc_occupation: caseData.socialHistory?.occupation,
+    soc_living: caseData.socialHistory?.living,
+    soc_other: caseData.socialHistory?.other,
+  }
+  const out: Partial<Record<HPIField, string>> = {}
+  for (const f of fields) out[f] = values[f] ?? 'None documented.'
+  return out
+}

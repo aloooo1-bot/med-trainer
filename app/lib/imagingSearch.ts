@@ -506,8 +506,10 @@ export async function fetchImagingResults(params: {
   orderedTest: string
   caseDiagnosis: string
   imagingCategory?: string
+  /** Absolute origin for server-side callers (relative fetch only works in the browser). */
+  baseUrl?: string
 }): Promise<OpenIResult[]> {
-  const { orderedTest, caseDiagnosis, imagingCategory } = params
+  const { orderedTest, caseDiagnosis, imagingCategory, baseUrl } = params
 
   const testParams = getTestParams(orderedTest)
   if (!testParams) return []
@@ -533,7 +535,7 @@ export async function fetchImagingResults(params: {
     const sp = new URLSearchParams({ query, it: testParams.it, m: '1', n: '6' })
     if (testParams.coll) sp.set('coll', testParams.coll)
 
-    const res = await fetch(`/api/imaging?${sp}`)
+    const res = await fetch(`${baseUrl ?? ''}/api/imaging?${sp}`)
     if (!res.ok) return []
     const results: OpenIResult[] = await res.json()
     if (!Array.isArray(results)) return []

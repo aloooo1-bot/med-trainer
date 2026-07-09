@@ -5,28 +5,18 @@ import Link from 'next/link'
 import { Stethoscope, ListChecks, Hand, FlaskConical, Activity, ClipboardCheck } from 'lucide-react'
 import {
   ROS_CATEGORIES,
-  type ROSCategory,
   type ROSState,
   type HPIField,
   makeInitialROSState,
-  scanMessageForROS,
-  scanMessageForHPIFields,
-  makeInitialHPIFieldState,
-  looksClinical,
-  classifyFinding,
 } from '../lib/rosDetector'
-import { type OpenIResult, fetchImagingResults } from '../lib/imagingSearch'
-import { type ECGImage, getECGCategory, getBestECGImage } from '../lib/ecgImageLookup'
+import { type OpenIResult } from '../lib/imagingSearch'
+import { type ECGImage } from '../lib/ecgImageLookup'
 import {
   type SpecialImage, type SpecialModality,
-  getSpecialModality, getSpecialCategory, getRandomSpecialImage,
+  getSpecialModality,
 } from '../lib/specialImageLookup'
-import { MANIFEST, makeCaseId, findCaseInManifest } from '../lib/caseManifest'
 import { ANON_CASE_IDS, ANON_CASE_LIMIT } from '../lib/anonymousCases'
-import { jitterCase } from '../lib/caseJitter'
-import { reconcileHistoryConsistency, sanitizePmhLeak, DIFFICULTY_RULES } from '../lib/generators/shared'
-import { type GradingResult, type GradingInput, stripToBasic } from '../grading/types'
-import { gradeCase, type GradingUsageCallback } from '../grading/grader'
+import { type GradingResult, stripToBasic } from '../grading/types'
 import { type DimensionKey } from '../grading/rubric'
 import {
   type RawUsage, type APICallType, type ActiveSession,
@@ -34,14 +24,17 @@ import {
   recordAbandonedSession,
 } from '../lib/analytics'
 import { recordCaseOutcome, recordCalibration } from '../lib/reasoning/store'
-import { computeBeliefs, formatEvidenceSummary } from '../lib/reasoning/differential'
+import { computeBeliefs } from '../lib/reasoning/differential'
 import { scorePrediction } from '../lib/reasoning/prediction'
 import { type CaseData, type NotesState, selectHpi, SOAP_TEMPLATE } from './_lib/types'
-import { isPendingTest } from './_lib/pendingTests'
+import {
+  type CasePresentation, type CaseReveal, type StartResponse, type AskResponse,
+  type OrderResponse, type OrderedTestResult, type GradeResponse, type ResumeResponse,
+  type UsageEntry,
+} from './_lib/sessionTypes'
 import { findResultKey, getVitalStatus, isECGTest } from './_lib/testUtils'
-import { type CaseHistoryEntry, addHistoryEntry, hasUsedROSBefore, markROSUsed, getUsedNames, recordUsedName } from './_lib/localHistory'
+import { type CaseHistoryEntry, addHistoryEntry, hasUsedROSBefore, markROSUsed } from './_lib/localHistory'
 import { useTimer, fmtTime } from './_lib/useTimer'
-import { callClaude } from './_lib/callClaude'
 import { Badge } from './_components/Badge'
 import { MicButton } from './_components/MicButton'
 import { HelpModal, hasHelpContent } from './_components/HelpModal'
@@ -107,6 +100,105 @@ interface TerminalLine {
   content: string
 }
 
+// Client-side view of the active server session. The server holds the full
+// case (including the answer); the client only ever sees the presentation
+// slice plus whatever it has earned through /api/session/* calls.
+interface SessionMeta {
+  examGated: boolean
+  hasReasoningModel: boolean
+  predictionCandidates: string[]
+  caseSearchTests?: Array<{ name: string; category: string }>
+}
+
+const EMPTY_SESSION_META: SessionMeta = { examGated: false, hasReasoningModel: false, predictionCandidates: [] }
+
+/** Build the client's working CaseData view from a server presentation slice. */
+function presentationToClientCase(p: CasePresentation): CaseData {
+  return {
+    patientInfo: p.patientInfo,
+    hpi: p.hpi,
+    vitals: p.vitals,
+    pastMedicalHistory: p.pastMedicalHistory,
+    currentMedications: p.currentMedications,
+    socialHistory: p.socialHistory,
+    reviewOfSystems: p.reviewOfSystems ?? {},
+    physicalExam: p.physicalExam ?? Object.fromEntries(p.examRegions.map(r => [r, ''])),
+    availableLabs: p.availableLabs ?? [],
+    availableImaging: p.availableImaging ?? [],
+    labGroups: p.labGroups,
+    labResults: {},
+    imagingResults: {},
+    procedureResults: {},
+    hiddenHistory: { fullHistory: '', socialHistory: '', familyHistory: '', medications: '', hiddenSymptoms: '', allergies: '' },
+    diagnosis: '',
+    differentials: [],
+    teachingPoints: [],
+    keyQuestions: [],
+    differentialPriors: p.differentialPriors,
+    testImpacts: p.testImpacts,
+  }
+}
+
+/** Merge one ordered-test result from the server into the client case view. */
+function mergeOrderResult(prev: CaseData, r: OrderedTestResult): CaseData {
+  const next = { ...prev }
+  if (r.kind === 'lab' && r.labResult) {
+    next.labResults = { ...next.labResults, [r.test]: r.labResult }
+  } else if (r.kind === 'imaging' && r.report !== undefined) {
+    next.imagingResults = { ...next.imagingResults, [r.test]: r.report }
+    if (r.ecgFindings) next.ecgFindings = r.ecgFindings
+  } else if (r.kind === 'procedure' && r.report !== undefined) {
+    next.procedureResults = { ...(next.procedureResults ?? {}), [r.test]: r.report }
+  }
+  if (r.specialFindings && r.specialModality) {
+    const field = ({
+      smear: 'hematologyFindings', biopsy: 'biopsyFindings', fundus: 'fundusFindings',
+      derm: 'skinFindings', urine: 'urineFindings',
+    } as const)[r.specialModality]
+    next[field] = r.specialFindings
+  }
+  return next
+}
+
+/** Merge the post-grading reveal into the client case view. */
+function mergeReveal(prev: CaseData, reveal: CaseReveal): CaseData {
+  return {
+    ...prev,
+    diagnosis: reveal.diagnosis,
+    differentials: reveal.differentials,
+    teachingPoints: reveal.teachingPoints,
+    keyQuestions: reveal.keyQuestions,
+    mechanism: reveal.mechanism,
+    differentialPriors: reveal.differentialPriors ?? prev.differentialPriors,
+    testImpacts: reveal.testImpacts ?? prev.testImpacts,
+    reviewOfSystems: Object.keys(reveal.reviewOfSystems).length ? reveal.reviewOfSystems : prev.reviewOfSystems,
+    expectedLabs: reveal.expectedLabs,
+    expectedImaging: reveal.expectedImaging,
+  }
+}
+
+async function postSession<T>(path: string, body: Record<string, unknown>): Promise<T> {
+  const res = await fetch(path, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(180_000),
+  })
+  const contentType = res.headers.get('content-type') ?? ''
+  if (!contentType.includes('application/json')) {
+    const text = await res.text()
+    const preview = text.slice(0, 200).replace(/\s+/g, ' ').trim()
+    throw new Error(`Server error (${res.status}) — unexpected non-JSON response: ${preview || '(empty)'}`)
+  }
+  const data = await res.json()
+  if (!res.ok) {
+    const err = new Error(data?.error ?? `API error ${res.status}`) as Error & { status?: number; data?: unknown }
+    err.status = res.status
+    err.data = data
+    throw err
+  }
+  return data as T
+}
 
 // Components extracted to _components/ and hooks/utils to _lib/
 
@@ -136,7 +228,11 @@ export default function MedTrainer() {
   const [rosState, setRosState] = useState<ROSState>(makeInitialROSState())
   const [userPresentation, setUserPresentation] = useState('')
 
-  const [hpiUnlocked, setHpiUnlocked] = useState<Record<HPIField, boolean>>(makeInitialHPIFieldState())
+  // Server-side session id — the authoritative case + event log live behind it.
+  const [sessionId, setSessionId] = useState<string | null>(null)
+  const [sessionMeta, setSessionMeta] = useState<SessionMeta>(EMPTY_SESSION_META)
+  // Background-history values the server has revealed (gated difficulties).
+  const [hpiValues, setHpiValues] = useState<Partial<Record<HPIField, string>>>({})
   const [imagingCache, setImagingCache] = useState<Record<string, OpenIResult[] | null>>({})
   const [activeCaseId, setActiveCaseId] = useState<string | null>(null)
   const [ecgCache, setEcgCache] = useState<Record<string, ECGImage | null | 'none'>>({})
@@ -201,45 +297,6 @@ export default function MedTrainer() {
     if (dx) pendingDiagnosisRef.current = dx
     const redo = p.get('redoOf')
     if (redo) pendingRedoOfRef.current = redo
-  }, [])
-
-  // Deep link to open a specific existing case by id (lookup-only, no generation).
-  // e.g. /trainer?caseId=cardiovascular-advanced-acute-pericarditis-0
-  useEffect(() => {
-    const cid = new URLSearchParams(window.location.search).get('caseId')
-    if (!cid) return
-    let cancelled = false
-    ;(async () => {
-      setGenerating(true)
-      setGenerationError(null)
-      try {
-        const res = await fetch(`/api/cases/lookup?id=${encodeURIComponent(cid)}`)
-        const j = await res.json()
-        if (cancelled) return
-        if (j.status === 'hit' && j.caseData) {
-          const cd = j.caseData as CaseData & { nativeDifficulty?: string }
-          resolvedSystemRef.current = cid.split('-')[0] || ''
-          setActiveCaseId(cid)
-          setCaseDifficulty(cd.nativeDifficulty ?? 'Clinical')
-          setCaseData(cd)
-          const seed: Record<string, OpenIResult[] | null> = {}
-          for (const [k, v] of Object.entries(j.imagingCache ?? {})) {
-            if (Array.isArray(v)) seed[k] = v as OpenIResult[]
-          }
-          if (Object.keys(seed).length > 0) setImagingCache(seed)
-          setCaseStarted((cd.nativeDifficulty ?? '') === 'Foundations')
-          setActiveSection('order')
-        } else {
-          setGenerationError('Could not load that case — make sure you are signed in and the id is correct.')
-        }
-      } catch {
-        if (!cancelled) setGenerationError('Failed to load case.')
-      } finally {
-        if (!cancelled) setGenerating(false)
-      }
-    })()
-    return () => { cancelled = true }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   // Gate / tier state
@@ -368,212 +425,161 @@ export default function MedTrainer() {
     return () => { clearTimeout(id); document.removeEventListener('click', dismiss) }
   }, [showRosHint])
 
+  // Image lookup for ordered imaging tests. Selection runs SERVER-side
+  // (/api/session/images) because it depends on the case diagnosis; the client
+  // only routes the returned image into the right panel cache by test name.
   useEffect(() => {
-    if (activeSection !== 'results' || !caseData) return
-    const orderedArr = Array.from(orderedTests)
-    // Exclude ECG — handled by the ECG-specific effect below
-    const imagingTests = orderedArr.filter(t =>
-      findResultKey(t, caseData.imagingResults) !== null && !isECGTest(t)
-    )
-    const toFetch = imagingTests.filter(t => !(t in imagingCache))
-    if (toFetch.length === 0) return
-
-    // Mark newly-ordered imaging as loading before the async fetch resolves.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setImagingCache(prev => {
-      const next = { ...prev }
-      for (const t of toFetch) next[t] = null
-      return next
-    })
-
-    void Promise.all(
-      toFetch.map(async t => {
-        try {
-          const results = await fetchImagingResults({
-            orderedTest: t,
-            caseDiagnosis: caseData.diagnosis,
-            imagingCategory: caseData.imagingCategory,
-          })
-          setImagingCache(prev => ({ ...prev, [t]: results }))
-          // Write-back: persist to Supabase so next load serves from cache
-          if (activeCaseId && results.length > 0) {
-            fetch('/api/cases/cache-imaging', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ id: activeCaseId, testName: t, results }),
-            }).catch(() => {})
-          }
-        } catch {
-          setImagingCache(prev => ({ ...prev, [t]: [] }))
-        }
-      })
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSection, caseData, activeCaseId])
-
-  useEffect(() => {
-    if (activeSection !== 'results' || !caseData) return
-    const orderedArr = Array.from(orderedTests)
-    const ecgTests = orderedArr.filter(t =>
-      findResultKey(t, caseData.imagingResults) !== null && isECGTest(t)
-    )
-    const toFetch = ecgTests.filter(t => !(t in ecgCache))
-    if (toFetch.length === 0) return
-
-    // Mark newly-ordered ECGs as loading before the async fetch resolves.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setEcgCache(prev => {
-      const next = { ...prev }
-      for (const t of toFetch) next[t] = null
-      return next
-    })
-
-    void Promise.all(
-      toFetch.map(async t => {
-        try {
-          const ecgReport = caseData.imagingResults[findResultKey(t, caseData.imagingResults)!] ?? ''
-          const category = getECGCategory(caseData.diagnosis, caseData.ecgFindings ?? ecgReport)
-          const image = await getBestECGImage(category, caseData.ecgFindings ?? ecgReport)
-          setEcgCache(prev => ({ ...prev, [t]: image ?? 'none' }))
-        } catch {
-          setEcgCache(prev => ({ ...prev, [t]: 'none' }))
-        }
-      })
-    )
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSection, caseData])
-
-  useEffect(() => {
-    if (activeSection !== 'results' || !caseData) return
+    if (activeSection !== 'results' || !caseData || !sessionId) return
     const orderedArr = Array.from(orderedTests)
     const cacheMap: Record<SpecialModality, {
       cache: Record<string, SpecialImage | null | 'none'>
       setter: React.Dispatch<React.SetStateAction<Record<string, SpecialImage | null | 'none'>>>
-      findingField: keyof CaseData
     }> = {
-      smear:  { cache: smearCache,     setter: setSmearCache,     findingField: 'hematologyFindings' },
-      biopsy: { cache: biopsyImgCache, setter: setBiopsyImgCache, findingField: 'biopsyFindings'    },
-      fundus: { cache: fundusCache,    setter: setFundusCache,    findingField: 'fundusFindings'     },
-      derm:   { cache: dermCache,      setter: setDermCache,      findingField: 'skinFindings'       },
-      urine:  { cache: urineImgCache,  setter: setUrineImgCache,  findingField: 'urineFindings'      },
+      smear:  { cache: smearCache,     setter: setSmearCache },
+      biopsy: { cache: biopsyImgCache, setter: setBiopsyImgCache },
+      fundus: { cache: fundusCache,    setter: setFundusCache },
+      derm:   { cache: dermCache,      setter: setDermCache },
+      urine:  { cache: urineImgCache,  setter: setUrineImgCache },
     }
-    const specialTests = orderedArr.filter(t => {
-      const m = getSpecialModality(t)
-      if (!m) return false
-      const { cache } = cacheMap[m]
-      return !(t in cache)
-    })
-    if (specialTests.length === 0) return
 
-    for (const t of specialTests) {
-      const modality = getSpecialModality(t)!
-      const { setter } = cacheMap[modality]
-      setter(prev => ({ ...prev, [t]: null }))
+    const imagingTests = orderedArr.filter(t => findResultKey(t, caseData.imagingResults) !== null)
+    const toFetch = imagingTests.filter(t => {
+      if (isECGTest(t)) return !(t in ecgCache)
+      const m = getSpecialModality(t)
+      if (m) return !(t in cacheMap[m].cache)
+      return !(t in imagingCache)
+    })
+    if (toFetch.length === 0) return
+
+    /* eslint-disable react-hooks/set-state-in-effect --
+       mark newly-ordered tests as loading before the async fetch resolves
+       (same pattern as the previous per-modality effects) */
+    for (const t of toFetch) {
+      if (isECGTest(t)) setEcgCache(prev => ({ ...prev, [t]: null }))
+      else {
+        const m = getSpecialModality(t)
+        if (m) cacheMap[m].setter(prev => ({ ...prev, [t]: null }))
+        else setImagingCache(prev => ({ ...prev, [t]: null }))
+      }
     }
+    /* eslint-enable react-hooks/set-state-in-effect */
 
     void Promise.all(
-      specialTests.map(async t => {
-        const modality = getSpecialModality(t)!
-        const { setter, findingField } = cacheMap[modality]
+      toFetch.map(async t => {
         try {
-          const finding = (caseData[findingField] as string | undefined) ?? ''
-          const category = getSpecialCategory(modality, caseData.diagnosis, finding)
-          const image = await getRandomSpecialImage(modality, category)
-          setter(prev => ({ ...prev, [t]: image ?? 'none' }))
+          const data = await postSession<{
+            kind: 'ecg' | 'special' | 'imaging'
+            ecg?: ECGImage | null
+            modality?: SpecialModality
+            special?: SpecialImage | null
+            results?: OpenIResult[]
+          }>('/api/session/images', { sessionId, test: t })
+          if (data.kind === 'ecg') {
+            setEcgCache(prev => ({ ...prev, [t]: data.ecg ?? 'none' }))
+          } else if (data.kind === 'special' && data.modality) {
+            cacheMap[data.modality].setter(prev => ({ ...prev, [t]: data.special ?? 'none' }))
+          } else {
+            setImagingCache(prev => ({ ...prev, [t]: data.results ?? [] }))
+          }
         } catch {
-          setter(prev => ({ ...prev, [t]: 'none' }))
+          if (isECGTest(t)) setEcgCache(prev => ({ ...prev, [t]: 'none' }))
+          else {
+            const m = getSpecialModality(t)
+            if (m) cacheMap[m].setter(prev => ({ ...prev, [t]: 'none' }))
+            else setImagingCache(prev => ({ ...prev, [t]: [] }))
+          }
         }
       })
     )
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [activeSection, caseData])
+  }, [activeSection, caseData, sessionId])
 
-  // On-demand result generation: if a test was ordered but has no pre-generated result,
-  // call Claude to generate one rather than silently dropping it from the results view.
-  useEffect(() => {
-    if (!caseData || orderedTests.size === 0) return
-    const missing = Array.from(orderedTests).filter(t => {
-      if (onDemandQueuedRef.current.has(t)) return false
-      if (findResultKey(t, caseData.labResults) !== null) return false
-      if (findResultKey(t, caseData.imagingResults) !== null) return false
-      if (caseData.procedureResults && findResultKey(t, caseData.procedureResults) !== null) return false
-      if (isPendingTest(t)) return false
-      return true
+  /** Record the token usage entries a session route returns. */
+  const recordUsages = (usages: UsageEntry[] | undefined) => {
+    for (const u of usages ?? []) recordApiCall(u.type as APICallType, u.usage)
+  }
+
+  /** Apply a /api/session/start response to local state. */
+  const applyStartResponse = (data: StartResponse) => {
+    resolvedSystemRef.current = data.system
+    setSessionId(data.sessionId)
+    setActiveCaseId(null)
+    setCaseDifficulty(data.difficulty)
+    setSessionMeta({
+      examGated: data.presentation.examGated,
+      hasReasoningModel: data.presentation.hasReasoningModel,
+      predictionCandidates: data.presentation.predictionCandidates ?? [],
+      caseSearchTests: data.presentation.caseSearchTests,
     })
-    if (missing.length === 0) return
+    setCaseData(presentationToClientCase(data.presentation))
+    setCaseStarted(data.difficulty === 'Foundations')
+    setGateStatus(prev => ({
+      ...prev,
+      tier: data.gate.tier as 'anonymous' | 'free' | 'pro',
+      casesLeft: data.gate.casesLeft ?? prev.casesLeft,
+      firstCaseDone: data.gate.firstCaseDone,
+    }))
+    if (data.usage) recordApiCall('generation', data.usage)
+  }
 
-    for (const testName of missing) {
-      onDemandQueuedRef.current.add(testName)
-      console.error(`[MedTrainer] No pre-generated result for "${testName}" — generating on demand`)
-      setGeneratingOnDemand(prev => new Set([...prev, testName]))
-      ;(async () => {
-        try {
-          const isLikelyImaging = /\b(x.?ray|xray|mri|ct\b|ultrasound|echo|scan|radiograph|pet|mibg|dexa|bone scan|doppler|angiograph|spirometry|pfts|pulmonary function|ecg|ekg|holter|stress test|endoscopy|colonoscopy|bronchoscopy|biopsy|lumbar puncture|paracentesis|thoracentesis|arthrocentesis|nerve conduction|electromyography|emg\b|eeg\b|tilt table)\b/i.test(testName)
-          const prompt = `Case context: ${caseData.patientInfo.age}yo ${caseData.patientInfo.gender}, diagnosis: "${caseData.diagnosis}", comorbidities: "${caseData.pastMedicalHistory?.conditions ?? 'none'}"
+  /** Rehydrate a refreshed page from the server-side event log. */
+  const applyResume = (data: ResumeResponse) => {
+    if (!data.session || !data.presentation) return
+    resolvedSystemRef.current = data.session.system
+    setSessionId(data.session.sessionId)
+    setCaseDifficulty(data.session.difficulty)
+    setSessionMeta({
+      examGated: data.presentation.examGated,
+      hasReasoningModel: data.presentation.hasReasoningModel,
+      predictionCandidates: data.presentation.predictionCandidates ?? [],
+      caseSearchTests: data.presentation.caseSearchTests,
+    })
 
-Generate a realistic result for the ordered test: "${testName}"
-The result should be clinically appropriate for this patient's diagnosis and comorbidities.
-
-Return ONLY valid JSON — no markdown, no explanation:
-{
-  "isImaging": ${isLikelyImaging},
-  "labResult": {
-    "components": [
-      { "name": "<analyte>", "value": "<value>", "unit": "<unit>", "referenceRange": "<range>", "status": "<normal|abnormal|critical>" }
-    ]
-  },
-  "imagingResult": "<2-3 sentence radiology-style report — only include if isImaging is true>"
-}`
-          const text = await callClaude(
-            'You are a medical simulator. Generate realistic, clinically consistent test results. Return ONLY valid JSON.',
-            [{ role: 'user', content: prompt }],
-            400,
-            (u) => recordApiCall('on_demand', u)
-          )
-          const m = text.match(/\{[\s\S]*\}/)
-          if (!m) throw new Error('No JSON in on-demand result response')
-          const data = JSON.parse(m[0])
-          setCaseData(prev => {
-            if (!prev) return prev
-            if (data.isImaging && data.imagingResult) {
-              return { ...prev, imagingResults: { ...prev.imagingResults, [testName]: data.imagingResult } }
-            } else if (data.labResult) {
-              return { ...prev, labResults: { ...prev.labResults, [testName]: data.labResult } }
-            }
-            return prev
-          })
-        } catch (e) {
-          console.error(`[MedTrainer] On-demand generation failed for "${testName}":`, e)
-          setFailedOnDemand(prev => new Set([...prev, testName]))
-        } finally {
-          setGeneratingOnDemand(prev => { const n = new Set(prev); n.delete(testName); return n })
-        }
-      })()
+    let clientCase = presentationToClientCase(data.presentation)
+    for (const r of data.results ?? []) clientCase = mergeOrderResult(clientCase, r)
+    for (const e of data.exams ?? []) {
+      clientCase = { ...clientCase, physicalExam: { ...clientCase.physicalExam, [e.region]: e.finding } }
     }
-  }, [orderedTests, caseData])
+    if (data.reveal) clientCase = mergeReveal(clientCase, data.reveal)
+    setCaseData(clientCase)
+
+    setChatMessages(data.chat ?? [])
+    setRosState(() => {
+      const next = makeInitialROSState()
+      for (const u of data.ros ?? []) {
+        next[u.category] = {
+          status: u.status,
+          finding: data.reveal?.reviewOfSystems?.[u.category] ?? '',
+          derivedFinding: u.derivedFinding,
+        }
+      }
+      return next
+    })
+    setHpiValues(data.hpi ?? {})
+    setRevealedExamRegions(new Set((data.exams ?? []).map(e => e.region)))
+    setOrderedTests(new Set(data.orderedTests ?? []))
+    if (data.prediction) {
+      setPrediction(data.prediction.ranking)
+      setPredictionConfidence(data.prediction.confidence)
+    }
+    if (data.gradingResult) {
+      setGradingResult(data.gradingResult)
+      if (data.submittedDiagnosis) setUserDiagnosis(data.submittedDiagnosis)
+    }
+    // Timer state is not persisted server-side yet — resume unlocked so the
+    // student can continue (the server log still bounds what counts as elicited).
+    setCaseStarted(true)
+    analyticsSessionRef.current = createActiveSession(data.session.system, data.session.difficulty)
+  }
 
   const generateCase = async (overrideSystem?: string, overrideDifficulty?: string, overrideDiagnosis?: string): Promise<CaseData | null> => {
-    let gateTier: string | undefined
-    let gateNextCaseId: string | undefined
-    try {
-      const gateRes = await fetch('/api/gate/check', { method: 'POST', signal: AbortSignal.timeout(5_000) })
-      const gate = await gateRes.json()
-      if (!gate.allowed) {
-        setGateBlocked(true)
-        return null
-      }
-      gateTier = gate.tier
-      gateNextCaseId = gate.nextCaseId
-      setGateStatus(prev => ({ ...prev, tier: gate.tier, casesLeft: gate.casesLeft ?? 0, firstCaseDone: gate.firstCaseDone ?? false, nextCaseId: gate.nextCaseId }))
-    } catch {
-      // Network error — fail open
-    }
-
     setGenerationError(null)
     setGradingError(null)
     setGenerating(true)
     resetTimer()
     setCaseStarted(true)
+    setSessionId(null)
+    setSessionMeta(EMPTY_SESSION_META)
     setCaseData(null)
     setOrderedTests(new Set())
     setSelectedTests(new Set())
@@ -596,7 +602,7 @@ Return ONLY valid JSON — no markdown, no explanation:
     setFailedOnDemand(new Set())
     onDemandQueuedRef.current = new Set()
     setRosState(makeInitialROSState())
-    setHpiUnlocked(makeInitialHPIFieldState())
+    setHpiValues({})
     setImagingCache({})
     setActiveCaseId(null)
     setEcgCache({})
@@ -606,38 +612,7 @@ Return ONLY valid JSON — no markdown, no explanation:
     setDermCache({})
     setUrineImgCache({})
 
-    // ── Anonymous demo path — serve one of the 3 fixed cases from Supabase, no Claude ──
-    if (gateTier === 'anonymous' && gateNextCaseId) {
-      const anonCaseId = gateNextCaseId
-      const found = findCaseInManifest(anonCaseId)
-      resolvedSystemRef.current = found?.system ?? 'Cardiovascular'
-      setCaseDifficulty(found?.difficulty ?? 'Foundations')
-      setNotes({ mode: 'free', content: '', open: false })
-      setActiveCaseId(anonCaseId)
-      try {
-        const lookupRes = await fetch(`/api/cases/lookup?id=${encodeURIComponent(anonCaseId)}`)
-        if (lookupRes.ok) {
-          const { status, caseData: cached, imagingCache: prefetched } = await lookupRes.json()
-          if (status === 'hit' && cached) {
-            setImagingCache(prefetched ?? {})
-            setCaseData(cached as CaseData)
-            setGenerating(false)
-            return cached as CaseData
-          }
-        }
-      } catch { /* fall through to error */ }
-      setGenerationError('Demo case unavailable — please try again or sign up for full access.')
-      setGenerating(false)
-      return null
-    }
-
-    const baseSystem = overrideSystem ?? system
-    const resolvedSystem = baseSystem === 'Any'
-      ? SYSTEMS.filter(s => s !== 'Any')[Math.floor(Math.random() * (SYSTEMS.length - 1))]
-      : baseSystem
-    resolvedSystemRef.current = resolvedSystem
     const resolvedDifficulty = overrideDifficulty ?? difficulty
-
     setCaseDifficulty(resolvedDifficulty)
     setNotes({
       mode: resolvedDifficulty === 'Advanced' ? 'soap' : 'free',
@@ -648,330 +623,42 @@ Return ONLY valid JSON — no markdown, no explanation:
     // Capture pending redo params and clear refs for this generation
     const overrideDx = overrideDiagnosis ?? pendingDiagnosisRef.current
     const capturedRedoOf = pendingRedoOfRef.current
-    const isRedo = !!capturedRedoOf
     pendingDiagnosisRef.current = null
     pendingRedoOfRef.current = null
     activeRedoOfRef.current = capturedRedoOf
-
-    // 40% of the time: try an image-anchored case (skip when redo-ing a specific diagnosis)
-    if (!overrideDx && Math.random() < 0.4) {
-      try {
-        const t0 = performance.now()
-        const imgRes = await fetch(
-          `/api/cases/image-first?system=${encodeURIComponent(resolvedSystem)}&difficulty=${encodeURIComponent(resolvedDifficulty)}`,
-          { signal: AbortSignal.timeout(10_000) }
-        )
-        if (imgRes.ok) {
-          const imgData = await imgRes.json()
-          console.log(`[gen] image-first ${imgData.status} in ${Math.round(performance.now() - t0)}ms`)
-          if (imgData.status === 'hit' && imgData.caseData) {
-            if (imgData.caseData.patientInfo?.name) recordUsedName(imgData.caseData.patientInfo.name)
-            setActiveCaseId(imgData.caseId)
-            setCaseData(jitterCase(imgData.caseData))
-            if (imgData.imagingCache && typeof imgData.imagingCache === 'object') {
-              const seed: Record<string, OpenIResult[] | null> = {}
-              for (const [k, v] of Object.entries(imgData.imagingCache)) {
-                if (Array.isArray(v)) seed[k] = v as OpenIResult[]
-              }
-              if (Object.keys(seed).length > 0) setImagingCache(seed)
-            }
-            setCaseStarted(resolvedDifficulty === 'Foundations')
-            setGenerating(false)
-            return imgData.caseData
-          }
-        }
-      } catch (e) {
-        const name = (e as { name?: string } | null)?.name
-        if (name === 'TimeoutError' || name === 'AbortError') console.warn('[gen] image-first fetch timed out — falling through to manifest')
-        // fall through to manifest
-      }
-    }
-
-    // Pick a specific diagnosis from the manifest so we can use the Supabase cache
-    // When redo-ing, use the override diagnosis and skip the cache lookup
-    const manifestDiagnoses = MANIFEST[resolvedSystem]?.[resolvedDifficulty] ?? []
-    const diagnosis = overrideDx ?? (manifestDiagnoses.length > 0
-      ? manifestDiagnoses[Math.floor(Math.random() * manifestDiagnoses.length)]
-      : null)
-    const caseId = diagnosis && !overrideDx ? makeCaseId(resolvedSystem, resolvedDifficulty, diagnosis, 0) : null
-    setActiveCaseId(caseId)
 
     // If a case was in progress, record it as abandoned before replacing the session
     if (analyticsSessionRef.current !== null) {
       recordAbandonedSession(analyticsSessionRef.current, activeSectionRef.current)
     }
-    analyticsSessionRef.current = createActiveSession(resolvedSystem, resolvedDifficulty)
-
-    const recentNames = getUsedNames()
-    const nationalityPool = [
-      'Nigerian','Brazilian','Filipino','Vietnamese','Pakistani','Ukrainian','Mexican',
-      'Korean','Ghanaian','Indian','Egyptian','Peruvian','Ethiopian','Polish','Somali',
-      'Bangladeshi','Colombian','Haitian','Indonesian','Moroccan','Kenyan','Argentinian',
-      'Cambodian','Senegalese','Romanian','Bolivian','Uzbek','Sudanese','Guatemalan',
-      'Congolese','Thai','Algerian','Salvadoran','Ugandan','Afghan','Nepali','Ecuadorian',
-      'Tanzanian','Mongolian','Serbian','Azerbaijani','Honduran','Rwandan','Belarusian',
-      'Tunisian','Paraguayan','Lithuanian','Zambian','Myanmarese','Jordanian'
-    ]
-    const namesClause = `Pick ONE nationality at random from this list for the patient: ${nationalityPool.join(', ')}. Use a realistic first name and last name that fits that nationality. Every case must use a different nationality — do not repeat. ${recentNames.length > 0 ? `ALREADY USED NAMES (do not reuse): ${recentNames.join(', ')}.` : ''}`
-
-    const claudeSystem = `You are a medical education case generator. Generate realistic, detailed clinical cases.
-Return ONLY valid JSON. No markdown, no code fences, no explanation. Just the raw JSON object.
-Invent a completely unique patient name. ${namesClause} Never reuse first names or last names across cases.`
-
-    const diffCount = resolvedDifficulty === 'Foundations' ? '2-3' : resolvedDifficulty === 'Clinical' ? '3-4' : '4-5'
-    const redoClause = isRedo ? ' Use a fresh patient demographic profile and a different clinical presentation than a typical textbook case for this diagnosis.' : ''
-    const diagnosisLine = diagnosis ? ` for the diagnosis: "${diagnosis}"` : ''
-    const prompt = `Generate a realistic ${resolvedSystem} clinical case${diagnosisLine}.${redoClause} Strictly follow the difficulty rules below.
-
-${DIFFICULTY_RULES[resolvedDifficulty] ?? DIFFICULTY_RULES['Foundations']}
-
-Return this exact JSON structure with all fields populated. For labResults, every panel must list every individual analyte as a separate component (e.g. CBC must expand into WBC, Hemoglobin, Hematocrit, Platelets, etc.). Single-value tests also use a one-item components array.
-CRITICAL: Every lab name listed in availableLabs MUST have a corresponding entry in labResults. Every imaging study in availableImaging MUST have a result in imagingResults (or procedureResults if it is a procedure). Do not list a test without also providing its result. Imaging studies (X-Ray, CT, MRI, Ultrasound, ECG) must ONLY appear in availableImaging and imagingResults — NEVER in availableLabs or labResults.
-CRITICAL: The key in labResults for each test MUST be the EXACT same string as it appears in availableLabs — copy it character-for-character. Do NOT use abbreviations or shortened names as keys. For example if availableLabs contains "Prothrombin Time (PT) / INR", the labResults key must be "Prothrombin Time (PT) / INR" not "PT/INR" or "PT" or "Coagulation Panel".
-CRITICAL: The lab/imaging results must include at least one finding that, when interpreted clinically, points to the correct diagnosis over its closest differential — describe findings objectively (e.g. 'monosodium urate crystals on synovial fluid', 'filling defect in the right pulmonary artery on CT-PA', 'ST elevation in leads II/III/aVF'). Do not name the diagnosis in result text, and do not generate ambiguous results that leave the diagnosis unconfirmable.
-STEMI RULE: When the diagnosis is any form of STEMI (inferior, anterior, lateral, posterior, STEMI equivalent), the ecgFindings field MUST explicitly state the affected leads with millimeter elevation (e.g. "2mm ST elevation in leads II, III, and aVF with reciprocal ST depression in I and aVL, consistent with inferior STEMI"). Never write borderline or possible ST elevation for a STEMI diagnosis — the ECG must be unambiguously diagnostic.
-AIN/DRUG-INDUCED NEPHRITIS RULE: When the diagnosis is Acute Interstitial Nephritis (AIN), drug-induced nephropathy, or similar medication-triggered renal injury, the causative agent (NSAID, antibiotic, PPI, etc.) MUST appear prominently in currentMedications.otc or currentMedications.medications with duration (e.g. "Ibuprofen 600mg TID × 3 weeks"). It must be listed as a recent or current medication, not just mentioned in passing.
-FIBRILLARY GN EXCLUSION: Do NOT generate Fibrillary Glomerulonephritis as a diagnosis at any difficulty. For Advanced Renal cases, choose instead: IgA Nephropathy (Berger's Disease), Focal Segmental Glomerulosclerosis (FSGS), Membranous Nephropathy, ANCA-associated vasculitis, or Thrombotic Microangiopathy.
-WHIPPLE'S BIOPSY RULE: When the diagnosis is Whipple's Disease (Tropheryma whipplei), "Upper Endoscopy (EGD) with Small Bowel Biopsy" MUST be included in availableImaging, and the procedureResults entry for it MUST explicitly describe PAS-positive macrophages with foamy cytoplasm distending the lamina propria — the pathognomonic histological finding without which the diagnosis cannot be confirmed.
-CLL DISCRIMINATOR RULE: When the diagnosis is Chronic Lymphocytic Leukemia (CLL) or CLL with AIHA, "Flow Cytometry (Peripheral Blood)" MUST be included in availableLabs and its labResults MUST show CD5+/CD19+/CD23+ lymphocyte population — the immunophenotype that distinguishes CLL from PNH, lymphoma, and other B-cell malignancies.
-WALDENSTRÖM DISCRIMINATOR RULE: When the diagnosis is Waldenström Macroglobulinemia, "Serum Protein Electrophoresis (SPEP) with Immunofixation" MUST be in availableLabs and its labResults MUST show an IgM monoclonal spike. The hiddenHistory.fullHistory or hiddenSymptoms MUST include at least one hyperviscosity symptom (blurred vision, headache, epistaxis, or neurological changes) to distinguish from Multiple Myeloma (which produces IgG/IgA, not IgM).
-PAST HISTORY CONSISTENCY RULE: The pastMedicalHistory fields shown to the patient (conditions, surgeries, hospitalizations) MUST NOT contradict hiddenHistory.fullHistory. If pastMedicalHistory.surgeries states "None" or "No prior surgeries", then hiddenHistory.fullHistory MUST NOT reveal any surgeries. The patient's visible history and hidden history must be completely consistent — the hidden history may ADD detail, but must never contradict what was already stated.
-PHYSICAL EXAM OBJECTIVITY RULE: Every physicalExam field MUST describe only objective, observable findings (e.g., "dullness to percussion at right base", "pitting edema 2+ bilateral lower extremities", "JVD at 45 degrees"). NEVER include diagnostic interpretations, disease names, or phrases like "consistent with X", "suggesting X", or "findings of X". The exam reports what the clinician sees, hears, and feels — not what it means. Diagnosis is the user's task.
-INTERPRETATION OBJECTIVITY RULE: In imagingResults, procedureResults, hematologyFindings, urineFindings, fundusFindings, skinFindings, biopsyFindings, and relevantTests[].imagingResult — NEVER include phrases like "consistent with [disease]", "suggestive of [disease]", "suggesting [disease]", "indicative of [disease]", "compatible with [disease]", "characteristic of [disease]", "diagnostic of [disease]", "concerning for [disease]", or "findings of [disease]". Do NOT name the diagnosis anywhere in these fields. Describe only what is physically observed: specific morphological features, measurements, signal characteristics, distribution, color, and density. The student infers the diagnosis — the findings must not hand it to them. STEMI EXCEPTION: ecgFindings for STEMI cases must retain "consistent with [anatomic-area] STEMI" as required by the STEMI RULE.
-HPI WORD LIMIT RULE: The hpi field is a HARD MAXIMUM of 40 words for Clinical and 20 words for Advanced — count every word and cut if over. For Clinical: 2-3 sentences stating age, sex, primary symptom(s), and duration only. For Advanced: 1-2 sentences stating age, sex, and one vague complaint only. STRICTLY FORBIDDEN in hpi regardless of difficulty: substance or toxin names, ingestion or exposure details, witness or bystander accounts, symptom progression or timeline, pertinent positives/negatives, characterization, radiation, aggravating/relieving factors, physical findings on arrival. Everything forbidden here belongs in hiddenHistory.fullHistory instead.
-MANAGEMENT TEACHING POINT RULE: At least ONE of the four teachingPoints MUST be a concrete management/treatment point — name a specific first-line agent, dose, threshold, target, or guideline-anchored decision rule (e.g., "Initiate IV labetalol; reduce MAP by no more than 25% in the first hour" | "tPA window is 4.5h from last-known-well; absolute contraindications include BP >185/110, recent surgery <14 days, active bleeding"). A pearl that only describes pathophysiology, epidemiology, or diagnostic criteria does NOT satisfy this rule. Generic statements like "treat the underlying cause" are insufficient.
-KEY QUESTIONS COVERAGE RULE: Every clinically pivotal item in hiddenHistory (predisposing structural lesion, prior TIA or sentinel event, critical precipitant, key exposure, family thrombophilia, prior episode) MUST be elicitable through at least one entry in keyQuestions. Walk through hiddenHistory.fullHistory, familyHistory, medications, and hiddenSymptoms — for any finding that materially changes the diagnosis, risk stratification, or management, write a directed question that would surface it. Generic questions like "Any other symptoms?" do NOT count.
-DANGEROUS MIMIC RULE: At least ONE differential MUST be the single most dangerous "can't-miss" mimic of the primary diagnosis — a condition that, if missed, causes serious immediate harm and shares enough features to plausibly mislead a clinician before the key discriminating test is ordered (e.g., STEMI for Acute Pericarditis; Cauda Equina Syndrome for Lumbar Disc Herniation with Radiculopathy; Pulmonary Embolism for PCP Pneumonia; HHS for DKA). Identify this mimic explicitly in differentialExplanations and name the one finding or test that definitively distinguishes it from the correct diagnosis.
-PMH LEAK RULE: The pastMedicalHistory fields (conditions, surgeries, hospitalizations) MUST NOT leak the diagnosis through negation or denial. NEVER write phrases like "No prior [organ/system] disease", "No history of [organ/system]", "Denies [organ/system] disorders", "Never had [organ/system]", "Negative for [organ/system]", or any similar exclusion where the organ/system overlaps the diagnosis. Negative pertinents belong in reviewOfSystems, NEVER in pastMedicalHistory. If the patient has no chronic conditions, conditions MUST be EXACTLY "None." — no extra text, no negative pertinents, no medication mentions. Field lane enforcement: conditions = chronic diagnoses ONLY (never medications); surgeries = prior procedures ONLY; hospitalizations = prior inpatient stays ONLY. Medications including oral contraceptives, vitamins, and supplements belong in currentMedications.medications or currentMedications.otc, NEVER in pastMedicalHistory.conditions.
-{
-  "patientInfo": {
-    "name": "First Last",
-    "age": <number>,
-    "gender": "Male or Female",
-    "chiefComplaint": "<brief chief complaint>",
-    "height": "<height in feet and inches e.g. 5'9\">",
-    "heightInches": <total height in inches as integer e.g. 69>
-  },
-  "hpi": "<2-3 sentences. HARD MAXIMUM 60 WORDS — count every word and cut if over. State ONLY: the chief complaint, primary symptom(s), and duration. STRICTLY FORBIDDEN: associated symptoms, review of systems positives, family history, social history details, exam findings, and ANY detail that narrows the differential to a single diagnosis (e.g. heat intolerance, exophthalmos, tremor, toxin/substance names, radiation, aggravating/relieving factors). Everything forbidden here belongs in hiddenHistory.fullHistory.>",
-  "clinicalHpi": "<2-3 sentences. HARD MAXIMUM 40 WORDS — count every word and cut if over. State ONLY: age, sex, primary symptom(s), and duration. STRICTLY FORBIDDEN: toxin or substance names, ingestion or exposure details, witness accounts, progression timeline, pertinent positives/negatives, characterization, radiation, aggravating/relieving factors, physical findings on arrival, and comorbidity adjectives (diabetic, hypertensive, obese, asthmatic, cirrhotic, hypothyroid, alcoholic) or chronic disease names — those belong only in pastMedicalHistory.conditions. CORRECT EXAMPLE (32 words): A 34-year-old male presents to the emergency department with a 6-hour history of tinnitus, nausea, vomiting, and confusion. His girlfriend reports he has been increasingly agitated since this afternoon.>",
-  "advancedHpi": "<1 sentence. HARD MAXIMUM 20 WORDS. State age, sex, and ONE vague non-specific complaint (+ optional duration). STRICTLY FORBIDDEN: contextual hooks, recent events, exposures, travel, dental or surgical history, medication names, lab/vital values, family/social context, comorbidity adjectives (diabetic, hypertensive, obese, asthmatic, cirrhotic, hypothyroid, alcoholic), or chronic disease names — every such detail belongs in hiddenHistory.fullHistory. ALWAYS write 'X-year-old', NEVER 'Xyo'. CORRECT EXAMPLE: '52-year-old male with three weeks of fatigue.'>",
-  "vitals": {
-    "bp": "<systolic/diastolic mmHg>",
-    "hr": <beats per minute>,
-    "rr": <breaths per minute>,
-    "temp": <Fahrenheit decimal>,
-    "spo2": <percent integer>,
-    "weight": "<lbs>"
-  },
-  "diagnosis": "<specific primary diagnosis>",
-  "differentials": ["<dx 1>", "<dx 2>", ...GENERATE EXACTLY ${diffCount} DIFFERENTIALS — no more, no fewer],
-  "differentialExplanations": ["<dx 1>: <why it belongs on the differential and the one finding that distinguishes it from the correct diagnosis>", ...one entry per differential matching the differentials array length],
-  "expectedLabs": ["<exact lab name copied character-for-character from availableLabs that a competent physician MUST order>", ...3-7 key labs in clinical priority order],
-  "expectedImaging": ["<exact imaging study name copied from availableImaging that should be ordered>", ...0-3 key studies — use empty array [] if imaging is not standard for this diagnosis],
-  "keyQuestions": [
-    "<directed question that elicits a pivotal hiddenHistory item — see KEY QUESTIONS COVERAGE RULE>",
-    "<directed question that elicits a pivotal hiddenHistory item>",
-    "<directed question>",
-    "<directed question>",
-    "<directed question>"
-  ],
-  "teachingPoints": ["<clinical pearl 1 — diagnosis or pathophysiology>", "<clinical pearl 2>", "<clinical pearl 3>", "<management pearl — concrete first-line agent, dose, threshold, target, or guideline rule. See MANAGEMENT TEACHING POINT RULE>"],
-  "reviewOfSystems": {
-    "Constitutional":          "<explicit findings — state positives first, then denials. e.g. 'Fatigue present. Denies fever, chills, night sweats, weight loss.'>",
-    "HEENT":                   "<explicit findings — state positives first, then denials>",
-    "Cardiovascular":          "<explicit findings — state positives first, then denials>",
-    "Respiratory":             "<explicit findings — state positives first, then denials>",
-    "Gastrointestinal":        "<explicit findings — state positives first, then denials>",
-    "Genitourinary":           "<explicit findings — state positives first, then denials>",
-    "Musculoskeletal":         "<explicit findings — state positives first, then denials>",
-    "Neurological":            "<explicit findings — state positives first, then denials>",
-    "Psychiatric":             "<explicit findings — state positives first, then denials>",
-    "Integumentary":           "<explicit findings — state positives first, then denials>",
-    "Endocrine":               "<explicit findings — state positives first, then denials>",
-    "Hematologic/Lymphatic":   "<explicit findings — state positives first, then denials>",
-    "Allergic/Immunologic":    "<explicit findings — state positives first, then denials>"
-  },
-  "physicalExam": {
-    "General": "<appearance and demeanor>",
-    "HEENT": "<findings>",
-    "Neck": "<findings>",
-    "Cardiovascular": "<auscultation, pulses, JVD, edema>",
-    "Pulmonary": "<auscultation, percussion, work of breathing>",
-    "Abdomen": "<inspection, auscultation, palpation, organomegaly>",
-    "Extremities": "<findings>",
-    "Neurological": "<findings>",
-    "Skin": "<findings>"
-  },
-  "availableLabs": ["<lab name>", "<lab name>", ...include 10-14 relevant and distractor labs],
-  "availableImaging": ["<study name>", ...include 3-5 relevant and distractor studies],
-  CARDIAC TEST RULE: When the case involves cardiovascular pathology, chest pain, dyspnea, or syncope — always include "Electrocardiogram (ECG/EKG)" in availableImaging (NEVER in availableLabs) with a narrative ECG report in imagingResults describing rhythm, rate, PR/QRS/QTc intervals, axis, and any ST or T-wave changes. Also include "Troponin I or T (high sensitivity)" and "BNP / NT-proBNP" in availableLabs with numeric values in labResults.
-  "labGroups": [
-    { "name": "<panel name e.g. Complete Blood Count (CBC)>", "tests": ["<exact lab name from availableLabs>", ...] },
-    ...group every lab from availableLabs into a named panel; standalone tests get their own single-item group
-  ],
-  "labResults": {
-    "<panel name from availableLabs e.g. Complete Blood Count (CBC)>": {
-      "components": [
-        { "name": "<analyte e.g. WBC>", "value": "<numeric value e.g. 7.2>", "unit": "<unit e.g. x10³/µL>", "referenceRange": "<range e.g. 4.5-11.0>", "status": "<normal|abnormal|critical>" },
-        { "name": "<analyte e.g. Hemoglobin>", "value": "...", "unit": "...", "referenceRange": "...", "status": "..." }
-      ]
-    }
-  },
-  "imagingResults": {
-    "<each imaging study from availableImaging e.g. Chest X-Ray, CT Chest, MRI Brain>": "<radiology-style report impression, 2-3 sentences>"
-  },
-  "procedureResults": {
-    "<procedure name exactly as listed in availableImaging e.g. Upper Endoscopy (EGD), Colonoscopy, Bronchoscopy, Lumbar Puncture>": "<narrative procedure report describing visualized findings, 2-4 sentences — include what was seen, any specimens taken, and immediate impression>"
-  },
-  PROCEDURE RULE: For any diagnostic procedure in availableImaging (endoscopy, colonoscopy, bronchoscopy, lumbar puncture, paracentesis, thoracentesis, arthrocentesis), generate a narrative result in procedureResults using the EXACT same procedure name as the key, copied character-for-character from availableImaging. Only include procedures clinically relevant to the diagnosis. Imaging studies (X-ray, CT, MRI, ultrasound, echo) go in imagingResults, NOT procedureResults.
-  "hiddenHistory": {
-    "fullHistory": "${
-      resolvedDifficulty === 'Foundations'
-        ? 'N/A'
-        : resolvedDifficulty === 'Clinical'
-        ? '<Full detailed clinical history withheld from HPI: all associated symptoms, true onset, duration, character, radiation, aggravating/relieving factors, pertinent positives, pertinent negatives. Reveal only when the physician asks directly about each specific finding.>'
-        : '<Complete clinical history withheld from the vague HPI: all associated symptoms including the most pathognomonic finding, B-symptoms if present, any symptom that significantly narrows the differential. Gate the most diagnostic finding — only reveal it if the physician asks about it specifically by name or direct description.>'
-    }",
-    "socialHistory": "<smoking pack-years, alcohol drinks/week, recreational drugs, occupation, living situation, recent travel>",
-    "familyHistory": "<relevant family history with relationships and conditions>",
-    "medications": "<current medications with doses and frequencies>",
-    "hiddenSymptoms": "<1-2 symptoms patient hasn't mentioned but will confirm if asked directly>",
-    "allergies": "<drug allergies with reaction type, or NKDA>"
-  },
-  "imagingCategory": "<1-3 word radiological descriptor of the key imaging finding expected in this case, using radiology terminology — e.g. 'bilateral pleural effusion', 'pneumothorax', 'pulmonary consolidation', 'sigmoid mass', 'renal cortical thinning'. This should reflect what an imaging study would show, not the diagnosis name.>",
-  "ecgFindings": "<1-2 sentence description of what the ECG shows in this case, using standard ECG terminology. Examples: 'Sinus tachycardia at 108 bpm. No ST changes or arrhythmia.' | 'Atrial fibrillation with rapid ventricular response at 130 bpm. No ST changes.' | 'Normal sinus rhythm with ST elevation in leads V2-V5 consistent with anterior STEMI. Reciprocal ST depression in inferior leads.' | 'Sinus bradycardia at 48 bpm. First-degree AV block with PR interval 220ms.' This field drives ECG image selection and display.>",
-  "hematologyFindings": "<If peripheral blood smear is clinically relevant, describe objectively what is seen — e.g. 'Microcytic hypochromic red cells with anisopoikilocytosis, target cells, and central pallor exceeding 50% of cell diameter.' or 'Ring-form intraerythrocytic inclusions present; multiple infected cells visible per field.' Omit or leave blank if not relevant. NEVER name the diagnosis.>",
-  "urineFindings": "<If urinalysis or urine microscopy is clinically relevant, describe objectively what is seen — e.g. 'Pyuria with bacteria visible on microscopy; positive leukocyte esterase and nitrites.' or 'RBC casts and dysmorphic red cells present on microscopy.' Omit or leave blank if not relevant. NEVER name the diagnosis.>",
-  "skinFindings": "<If a skin lesion or biopsy is relevant, describe objectively what is observed — e.g. 'Irregular border, asymmetric pigment distribution, multiple shades of brown and black, regression areas on dermoscopy.' or 'Pearly, translucent papule with rolled border and central ulceration; superficial telangiectasias on dermoscopy.' Omit or leave blank if not relevant. NEVER name the diagnosis.>",
-  "fundusFindings": "<If ophthalmoscopy or fundoscopy is relevant, describe objectively what is seen — e.g. 'Bilateral flame hemorrhages, cotton-wool spots, disc swelling, and AV nicking on dilated funduscopy.' or 'Increased cup-to-disc ratio >0.7 with superior rim thinning and temporal pallor.' Omit or leave blank if not relevant. NEVER name the diagnosis.>",
-  "biopsyFindings": "<If histopathology (H&E biopsy) is relevant, describe objectively what the pathology shows — e.g. 'Dysplastic glandular epithelium with nuclear pleomorphism, increased mitotic figures, and cribriform architecture.' or 'Bridging fibrosis with nodular regeneration and hepatocyte ballooning on H&E.' Omit or leave blank if not relevant. NEVER name the diagnosis.>",
-  "pastMedicalHistory": {
-    "conditions": "<chronic diagnoses ONLY. If none, write exactly 'None.' and nothing else. NEVER negate a disease category ('No prior X disease', 'Denies X'). NEVER include medications — those go in currentMedications. See PMH LEAK RULE>",
-    "surgeries": "<prior surgeries ONLY. If none, write exactly 'None.' and nothing else. NEVER negate a procedure category. See PMH LEAK RULE>",
-    "hospitalizations": "<prior inpatient stays ONLY. If none, write exactly 'None.' and nothing else. NEVER write 'No prior hospitalizations for X'. See PMH LEAK RULE>"
-  },
-  "currentMedications": {
-    "medications": "<prescription medications with doses and frequencies, or 'None'>",
-    "otc": "<OTC drugs, vitamins, and supplements, or 'None'>"
-  },
-  "socialHistory": {
-    "smoking": "<tobacco or vaping use with pack-years if applicable, or 'Never smoker'>",
-    "alcohol": "<alcohol use in drinks per week, or 'Denies'>",
-    "drugs": "<recreational drug use, or 'Denies'>",
-    "occupation": "<current job and work environment>",
-    "living": "<living situation, family members, marital status>",
-    "other": "<relevant travel, exercise habits, diet, chemical exposures>"
-  },
-  "relevantTests": [
-    RELEVANT TESTS RULE: Generate 5-10 tests that are specifically relevant to THIS case's primary diagnosis AND each significant comorbidity. Include both the gold-standard confirmatory test and 1-2 meaningful alternatives. These supplement the standard availableLabs/availableImaging — focus on specialty tests a student might miss (e.g. vWF Antigen + Ristocetin Cofactor + Factor VIII Activity for von Willebrand disease, or X-Ray Knee + MRI Knee for a musculoskeletal knee case, or ESR + CRP + RF + Anti-CCP for a rheumatoid arthritis case). Provide realistic result values appropriate to the diagnosis.
-    {
-      "name": "<exact test name as it would appear on an order — e.g. 'vWF Antigen', 'X-Ray Knee (AP/Lateral)', 'Factor VIII Activity'>",
-      "category": "<one of: Hematology | Metabolic & Chemistry | Urinalysis & Renal | Coagulation | Immunology & Serology | Infectious Disease | Cardiac | Arterial Blood Gas & Respiratory | Toxicology & Drug Levels | Imaging | Procedures & Special Tests>",
-      "isImaging": <true for X-ray, CT, MRI, US, nuclear study, ECG, endoscopy; false for all lab tests>,
-      "labResult": {
-        "components": [
-          { "name": "<analyte name>", "value": "<value>", "unit": "<unit>", "referenceRange": "<range>", "status": "<normal|abnormal|critical>" }
-        ]
-      },
-      "imagingResult": "<radiology or procedure narrative — omit if isImaging is false>"
-    }
-  ]
-}`
 
     try {
-      // Check Supabase cache first — instant if this case slot was already generated
-      if (caseId) {
-        try {
-          const t0 = performance.now()
-          const lookupRes = await fetch(`/api/cases/lookup?id=${encodeURIComponent(caseId)}`, { signal: AbortSignal.timeout(10_000) })
-          if (lookupRes.ok) {
-            const { status, caseData: cached, imagingCache: prefetched } = await lookupRes.json()
-            console.log(`[gen] lookup id=${caseId} status=${status} in ${Math.round(performance.now() - t0)}ms`)
-            if (status === 'hit' && cached) {
-              if (cached.patientInfo?.name) recordUsedName(cached.patientInfo.name)
-              setCaseData(jitterCase(cached))
-              // Pre-populate imagingCache from DB — avoids live Open-i fetch on Results tab
-              if (prefetched && typeof prefetched === 'object') {
-                const seed: Record<string, OpenIResult[] | null> = {}
-                for (const [k, v] of Object.entries(prefetched)) {
-                  if (Array.isArray(v)) seed[k] = v as OpenIResult[]
-                }
-                if (Object.keys(seed).length > 0) setImagingCache(seed)
-              }
-              setCaseStarted(resolvedDifficulty === 'Foundations')
-              setGenerating(false)
-              return cached
-            }
-          }
-        } catch (e) {
-          const name = (e as { name?: string } | null)?.name
-          if (name === 'TimeoutError' || name === 'AbortError') console.warn('[gen] lookup fetch timed out — falling through to Claude')
-          // Supabase unavailable — fall through to Claude
-        }
-      }
-
-      // Cache miss — generate live with Claude
-      console.log(`[gen] cache miss for id=${caseId} diagnosis="${diagnosis}" — falling through to live Claude`)
-      const tClaude = performance.now()
-      const text = await callClaude(claudeSystem, [{ role: 'user', content: prompt }], 12000,
-        (u) => recordApiCall('generation', u))
-      console.log(`[gen] Claude generated in ${Math.round(performance.now() - tClaude)}ms`)
-      const match = text.match(/\{[\s\S]*\}/)
-      if (!match) throw new Error('No JSON in response')
-      const rawParsed = JSON.parse(match[0]) as CaseData
-      const parsed = sanitizePmhLeak(
-        reconcileHistoryConsistency(rawParsed as unknown as Record<string, unknown>)
-      ) as unknown as CaseData
-
-      // Merge relevantTests results into labResults/imagingResults and the available lists
-      // so that ordering them works the same as any other case-generated test.
-      if (Array.isArray(parsed.relevantTests)) {
-        for (const rt of parsed.relevantTests) {
-          if (!rt.name) continue
-          if (rt.isImaging && rt.imagingResult) {
-            parsed.imagingResults[rt.name] = rt.imagingResult
-            if (!parsed.availableImaging.includes(rt.name)) {
-              parsed.availableImaging.push(rt.name)
-            }
-          } else if (!rt.isImaging && rt.labResult) {
-            parsed.labResults[rt.name] = rt.labResult
-            if (!parsed.availableLabs.includes(rt.name)) {
-              parsed.availableLabs.push(rt.name)
-            }
-          }
-        }
-      }
-
-      if (parsed.patientInfo?.name) recordUsedName(parsed.patientInfo.name)
-      const view = jitterCase(parsed)
-      setCaseData(view)
-      setCaseStarted(resolvedDifficulty === 'Foundations')
-
-      // Fire-and-forget save to Supabase so the next request for this slot is instant
-      if (caseId && diagnosis) {
-        fetch('/api/cases/save', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            id: caseId,
-            system: resolvedSystem,
-            difficulty: resolvedDifficulty,
-            diagnosis,
-            variantIndex: 0,
-            caseData: parsed,
-          }),
-        }).catch(() => {})
-      }
-
-      return parsed
+      // Everything else — gate consumption, diagnosis selection, cache lookup,
+      // live generation, prompt construction — happens SERVER-side. The client
+      // receives only the difficulty-stripped presentation slice.
+      const data = await postSession<StartResponse>('/api/session/start', {
+        system: overrideSystem ?? system,
+        difficulty: resolvedDifficulty,
+        ...(overrideDx ? { diagnosis: overrideDx } : {}),
+        ...(capturedRedoOf ? { redo: true } : {}),
+      })
+      applyStartResponse(data)
+      analyticsSessionRef.current = createActiveSession(data.system, data.difficulty)
+      // Presentation slice is intentionally partial — components treat the
+      // merged client view as CaseData with server-only fields absent.
+      return presentationToClientCase(data.presentation)
     } catch (e) {
-      console.error('Case generation failed:', e)
-      const msg = e instanceof Error ? e.message : String(e)
-      setGenerationError(
-        msg.includes('429')
-          ? 'API rate limit reached. Wait a moment and try again.'
-          : `Failed to generate case: ${msg}`
-      )
+      const err = e as Error & { status?: number; data?: { gate?: { tier?: string } } }
+      console.error('Case generation failed:', err)
+      if (err.status === 401) {
+        setGenerationError('Please sign in to start a case — anonymous access is no longer available for live cases.')
+      } else if (err.status === 403 && err.message === 'gate_blocked') {
+        setGateBlocked(true)
+      } else if (err.message?.includes('429')) {
+        setGenerationError('API rate limit reached. Wait a moment and try again.')
+      } else {
+        setGenerationError(`Failed to generate case: ${err.message}`)
+      }
       return null
     } finally {
       setGenerating(false)
@@ -986,19 +673,50 @@ PMH LEAK RULE: The pastMedicalHistory fields (conditions, surgeries, hospitaliza
     })
   }
 
+  /**
+   * Submit test orders to the server session. Results come back from the
+   * server-side case snapshot (which the client never holds in full); missing
+   * results are generated on demand server-side.
+   */
+  const submitOrders = async (tests: string[]) => {
+    if (!sessionId) return
+    const newTests = tests.filter(t => t.trim() && !orderedTests.has(t))
+    if (newTests.length === 0) return
+    setOrderedTests(prev => new Set([...prev, ...newTests]))
+    setGeneratingOnDemand(prev => new Set([...prev, ...newTests]))
+    try {
+      const data = await postSession<OrderResponse>('/api/session/order', { sessionId, tests: newTests })
+      recordUsages(data.usages)
+      setCaseData(prev => {
+        if (!prev) return prev
+        let next = prev
+        for (const r of data.results) next = mergeOrderResult(next, r)
+        return next
+      })
+      const failed = data.results.filter(r => r.kind === 'none').map(r => r.test)
+      if (failed.length) setFailedOnDemand(prev => new Set([...prev, ...failed]))
+    } catch (e) {
+      console.error('[MedTrainer] order failed:', e)
+      setFailedOnDemand(prev => new Set([...prev, ...newTests]))
+    } finally {
+      setGeneratingOnDemand(prev => {
+        const n = new Set(prev)
+        newTests.forEach(t => n.delete(t))
+        return n
+      })
+    }
+  }
+
   const orderTests = () => {
     if (selectedTests.size === 0) return
-    setOrderedTests(prev => {
-      const next = new Set(prev)
-      selectedTests.forEach(t => next.add(t))
-      return next
-    })
+    const toOrder = Array.from(selectedTests)
     setSelectedTests(new Set())
     setActiveSection('results')
+    void submitOrders(toOrder)
   }
 
   const addOrderedTest = (name: string) => {
-    setOrderedTests(prev => new Set([...prev, name]))
+    void submitOrders([name])
   }
 
   const orderCustomTest = () => {
@@ -1010,162 +728,106 @@ PMH LEAK RULE: The pastMedicalHistory fields (conditions, surgeries, hospitaliza
   }
 
   const removeOrderedTest = (name: string) => {
+    // Local view only — the server event log keeps the order on record, so
+    // grading still counts it (you can't un-ring the bell).
     setOrderedTests(prev => { const next = new Set(prev); next.delete(name); return next })
   }
 
+  const examineRegion = async (region: string) => {
+    if (!sessionId) return
+    try {
+      const data = await postSession<{ region: string; finding: string }>('/api/session/exam', { sessionId, region })
+      setCaseData(prev => prev
+        ? { ...prev, physicalExam: { ...prev.physicalExam, [region]: data.finding } }
+        : prev)
+      setRevealedExamRegions(prev => { const next = new Set(prev); next.add(region); return next })
+    } catch (e) {
+      console.error('[MedTrainer] exam failed:', e)
+    }
+  }
+
+  const lockPrediction = (ranking: string[], confidence: number) => {
+    setPrediction(ranking)
+    setPredictionConfidence(confidence)
+    if (sessionId) {
+      postSession('/api/session/predict', { sessionId, ranking, confidence }).catch(() => {})
+    }
+  }
+
+  // Deep link to open a specific existing case by id (server-side lookup only),
+  // e.g. /trainer?caseId=cardiovascular-advanced-acute-pericarditis-0.
+  // Otherwise, try to resume the most recent in-flight server session so a
+  // page refresh never loses a case (the event log is the source of truth).
+  useEffect(() => {
+    const cid = new URLSearchParams(window.location.search).get('caseId')
+    let cancelled = false
+    ;(async () => {
+      if (cid) {
+        setGenerating(true)
+        setGenerationError(null)
+        try {
+          const data = await postSession<StartResponse>('/api/session/start', { caseId: cid })
+          if (cancelled) return
+          applyStartResponse(data)
+          setActiveSection('order')
+        } catch (e) {
+          if (!cancelled) {
+            const status = (e as { status?: number }).status
+            setGenerationError(status === 401
+              ? 'Sign in to open this case.'
+              : 'Could not load that case — make sure you are signed in and the id is correct.')
+          }
+        } finally {
+          if (!cancelled) setGenerating(false)
+        }
+        return
+      }
+
+      // No deep link — attempt session resume.
+      try {
+        const res = await fetch('/api/session/resume')
+        if (!res.ok) return
+        const data = await res.json() as ResumeResponse
+        if (cancelled || !data.session) return
+        applyResume(data)
+      } catch { /* no resumable session */ }
+    })()
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+
   const sendChat = async (overrideMessage?: string): Promise<string | undefined> => {
     const msg = (overrideMessage !== undefined ? overrideMessage : chatInput).trim()
-    if (!msg || !caseData || chatLoading) return
+    if (!msg || !caseData || !sessionId || chatLoading) return
     setChatMessages(prev => [...prev, { role: 'user', content: msg }])
     if (overrideMessage === undefined) setChatInput('')
     setChatLoading(true)
 
-    const isGated = caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced'
-    const fullHistorySection = isGated && caseData.hiddenHistory.fullHistory !== 'N/A'
-      ? `\nYour complete history (only reveal specific details when the physician asks about that finding directly — do NOT volunteer these proactively):\n${caseData.hiddenHistory.fullHistory}`
-      : ''
-
-    const pmh = caseData.pastMedicalHistory
-    const pmhLines = [
-      pmh?.conditions      && `Conditions: ${pmh.conditions}`,
-      pmh?.surgeries       && `Prior surgeries: ${pmh.surgeries}`,
-      pmh?.hospitalizations && `Prior hospitalizations: ${pmh.hospitalizations}`,
-    ].filter(Boolean)
-    const pmhSection = pmhLines.length
-      ? pmhLines.join('\n')
-      : 'No significant past medical history.'
-
-    const isExamGated =
-      (caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') &&
-      (caseData.relevantExamRegions?.length ?? 0) > 0
-    const examEntries = isExamGated
-      ? Object.entries(caseData.physicalExam).filter(([region]) => revealedExamRegions.has(region))
-      : Object.entries(caseData.physicalExam)
-    const examSection = examEntries.map(([region, finding]) => `${region}: ${finding}`).join('\n')
-
-    const behaviorRules = caseDifficulty === 'Advanced'
-      ? `- You have NOT shared most of your symptoms — only mention what's in your presenting story above
-- Answer ONLY the specific question asked; never add related details unprompted
-- Occasionally be hesitant or uncertain: "I'm not sure", "maybe", "I think so" — as a real patient would
-- Sometimes give a slightly incomplete or redirected answer, as patients do when they don't realise something is important
-- Never volunteer information; wait to be asked directly`
-      : caseDifficulty === 'Clinical'
-      ? `- You have only told them your chief complaint so far — do not volunteer anything else
-- Answer ONLY the specific question asked; do not add context, related symptoms, or background unprompted
-- Respond conversationally, not clinically — use lay terms`
-      : `- Be naturally forthcoming; you may mention a related detail if it feels organic`
-
-    const system = `You are roleplaying as a patient named ${caseData.patientInfo.name}, a ${caseData.patientInfo.age}-year-old ${caseData.patientInfo.gender} who came to the clinic/ED with "${caseData.patientInfo.chiefComplaint}".
-
-What you have told them so far: ${selectHpi(caseData, caseDifficulty)}${fullHistorySection}
-
-Your known medical background (share when asked):
-${pmhSection}
-
-What the physical exam would reveal — you know what you FEEL (pain, tenderness, shortness of breath, weakness) but not objective measurements (liver size, percussion notes, exact findings). Respond based on this when asked about physical sensations:
-${examSection}
-
-Other information — only reveal if the physician asks directly about that specific topic:
-- Social history: ${caseData.hiddenHistory.socialHistory}
-- Family history: ${caseData.hiddenHistory.familyHistory}
-- Current medications: ${caseData.hiddenHistory.medications}
-- Allergies: ${caseData.hiddenHistory.allergies}
-- Additional symptoms if asked: ${caseData.hiddenHistory.hiddenSymptoms}
-
-Rules:
-- Respond naturally as a patient, NOT as a medical expert
-- Use lay terms; be slightly anxious or uncertain as a real patient would
-- Keep answers concise (2-4 sentences)
-- Stay in character at all times
-- Answer only what the student directly asks you about. Do not volunteer symptoms or findings from body systems the student has not yet asked about. Never summarize your full symptom list unprompted.
-- For physical exam questions (palpation, auscultation, etc.): report what you feel, not clinical terminology
-${behaviorRules}`
-
-    const history = [...chatMessages, { role: 'user' as const, content: msg }]
-
     try {
-      const reply = await callClaude(system, history, 300, (u) => recordApiCall('chat', u))
-      setChatMessages(prev => [...prev, { role: 'assistant', content: reply }])
+      // The patient-agent prompt (hidden history included) is assembled
+      // SERVER-side from the session snapshot; the client sends only the
+      // student's message. ROS/HPI unlock classification also runs there.
+      const data = await postSession<AskResponse>('/api/session/ask', { sessionId, message: msg })
+      recordUsages(data.usages)
+      setChatMessages(prev => [...prev, { role: 'assistant', content: data.reply }])
       if (analyticsSessionRef.current) analyticsSessionRef.current.questionCount++
 
-      // ROS gating: scan the student's message for body systems
-      // Only student messages are scanned — never patient replies.
-      const unlockROSWithSummary = (categories: ROSCategory[]) => {
-        const toUnlock = categories.filter(cat => rosState[cat]?.status === 'locked')
-        if (!toUnlock.length) return
-
-        // Immediately set status + pre-generated finding (for grading/reveal), derivedFinding undefined = loading
+      if (data.rosUnlocks.length > 0) {
         setRosState(prev => {
           const next = { ...prev }
-          for (const cat of toUnlock) {
-            const finding = caseData.reviewOfSystems[cat] ?? 'No findings documented for this system.'
-            next[cat] = { status: classifyFinding(finding), finding, derivedFinding: undefined }
+          for (const u of data.rosUnlocks) {
+            // Canonical `finding` stays empty until the post-grading reveal.
+            next[u.category] = { status: u.status, finding: '', derivedFinding: u.derivedFinding }
           }
           return next
         })
-
-        // Fire-and-forget: derive each summary from the actual conversation
-        void Promise.all(toUnlock.map(async (cat) => {
-          const summarySystem = `You are a clinical documentation assistant. Write a concise clinical sentence summarizing only what the patient actually reported about a specific body system, based on the interview excerpt provided.
-
-Rules:
-- Only include what the patient explicitly said or confirmed
-- Do NOT include denials of things that were never asked about
-- Do NOT add clinical language or findings not present in the conversation
-- Do NOT infer or assume — only document what was stated
-- If the patient only confirmed one symptom, document only that symptom
-- Format: plain clinical prose, no quotes, no preamble
-- Maximum 2 sentences`
-          const summaryPrompt = `Body system: ${cat}
-Interview excerpt:
-Student: ${msg}
-Patient: ${reply}
-
-Summarize only what the patient reported about ${cat}.`
-          try {
-            const derived = await callClaude(summarySystem, [{ role: 'user', content: summaryPrompt }], 150,
-              (u) => recordApiCall('ros_derived', u))
-            setRosState(prev => ({ ...prev, [cat]: { ...prev[cat], derivedFinding: derived.trim() || `${cat}: finding recorded` } }))
-          } catch {
-            setRosState(prev => ({ ...prev, [cat]: { ...prev[cat], derivedFinding: `${cat}: Finding recorded — review after submission` } }))
-          }
-        }))
+      }
+      if (Object.keys(data.hpiUnlocks).length > 0) {
+        setHpiValues(prev => ({ ...prev, ...data.hpiUnlocks }))
       }
 
-      const keywordMatches = scanMessageForROS(msg)
-      if (keywordMatches.length > 0) {
-        unlockROSWithSummary(keywordMatches)
-      } else if (looksClinical(msg)) {
-        // AI fallback: classify via Claude when keywords don't match
-        try {
-          const classifierPrompt = `You are a clinical NLP classifier for a medical training app.
-Given the following student message from a patient interview, identify which Review of Systems (ROS) categories were addressed. Return ONLY a JSON array of matched categories from this list:
-["Constitutional","HEENT","Cardiovascular","Respiratory","Gastrointestinal","Genitourinary","Musculoskeletal","Neurological","Psychiatric","Integumentary","Endocrine","Hematologic/Lymphatic","Allergic/Immunologic"]
-Rules:
-- Only include a category if the student ASKED about it
-- If no ROS category was addressed, return []
-- Return raw JSON only, no explanation, no markdown
-Student message: "${msg}"`
-          const raw = await callClaude('You are a JSON-only ROS classifier.', [{ role: 'user', content: classifierPrompt }], 100,
-            (u) => recordApiCall('ros_classifier', u))
-          const aiMatches = JSON.parse(raw.trim()) as ROSCategory[]
-          unlockROSWithSummary(aiMatches.filter(c => (ROS_CATEGORIES as readonly string[]).includes(c)))
-        } catch {
-          // classifier failure is non-fatal
-        }
-      }
-
-      // HPI field gating: unlock individual background fields when student asks
-      const hpiFieldMatches = scanMessageForHPIFields(msg)
-      if (hpiFieldMatches.length > 0) {
-        setHpiUnlocked(prev => {
-          const next = { ...prev }
-          for (const field of hpiFieldMatches) next[field] = true
-          return next
-        })
-      }
-
-      return reply
+      return data.reply
     } catch {
       setChatMessages(prev => [...prev, { role: 'assistant', content: "I'm sorry, I'm not feeling well enough to answer right now." }])
       return undefined
@@ -1178,159 +840,36 @@ Student message: "${msg}"`
   const submitDiagnosis = async (overrideDiagnosis?: string, overridePresentation?: string, timedOut = false): Promise<GradingResult | null> => {
     setGradingError(null)
     const diagnosisToGrade = (overrideDiagnosis !== undefined ? overrideDiagnosis : userDiagnosis).trim()
-    if (!diagnosisToGrade || !caseData || gradingLoading) return null
+    if (!diagnosisToGrade || !caseData || !sessionId || gradingLoading) return null
     if (overrideDiagnosis !== undefined) setUserDiagnosis(overrideDiagnosis)
     completeTimer()
     setGradingLoading(true)
 
-    const allOrdered = Array.from(orderedTests)
-    const orderedLabResults = allOrdered
-      .flatMap(t => {
-        const key = findResultKey(t, caseData.labResults)
-        const r = key ? caseData.labResults[key] : null
-        if (!r) return [`${t}: (no result available for this case)`]
-        if (Array.isArray(r?.components) && r.components.length > 0) {
-          return [`${t}:\n` + r.components.map(c => `  ${c.name}: ${c.value} ${c.unit} (ref: ${c.referenceRange}) [${c.status}]`).join('\n')]
-        }
-        const display = r?.value ? `${r.value} ${r.unit ?? ''}`.trim() : (r?.result ?? '')
-        return [`${t}: ${display} (ref: ${r?.referenceRange ?? '—'}) [${r?.status ?? 'unknown'}]`]
-      })
-      .join('\n')
-    const orderedImagingResults = allOrdered
-      .flatMap(t => {
-        const imgKey = findResultKey(t, caseData.imagingResults)
-        if (imgKey) return [`${t}: ${caseData.imagingResults[imgKey]}`]
-        const procKey = caseData.procedureResults ? findResultKey(t, caseData.procedureResults) : null
-        return procKey ? [`${t}: ${caseData.procedureResults![procKey]}`] : []
-      })
-      .join('\n')
-    const chatSummary = chatMessages
-      .map(m => `${m.role === 'user' ? 'Physician' : 'Patient'}: ${m.content}`)
-      .join('\n')
-
-    // Build pre-presented info — these structured fields were visible in the HPI panel
-    // from the start. The grader must not penalize the student for not eliciting them.
-    const prePresentedParts: string[] = []
-    if (caseData.pastMedicalHistory) {
-      const pmh = caseData.pastMedicalHistory
-      if (pmh.conditions) prePresentedParts.push(`Past Medical History: ${pmh.conditions}`)
-      if (pmh.surgeries) prePresentedParts.push(`Surgeries: ${pmh.surgeries}`)
-      if (pmh.hospitalizations) prePresentedParts.push(`Hospitalizations: ${pmh.hospitalizations}`)
-    }
-    if (caseData.currentMedications) {
-      const meds = caseData.currentMedications
-      if (meds.medications) prePresentedParts.push(`Medications: ${meds.medications}`)
-      if (meds.otc) prePresentedParts.push(`OTC/Supplements: ${meds.otc}`)
-    }
-    if (caseData.socialHistory) {
-      const soc = caseData.socialHistory
-      const socParts = [
-        soc.smoking && `Smoking: ${soc.smoking}`,
-        soc.alcohol && `Alcohol: ${soc.alcohol}`,
-        soc.drugs && `Drugs: ${soc.drugs}`,
-        soc.occupation && `Occupation: ${soc.occupation}`,
-        soc.living && `Living: ${soc.living}`,
-        soc.other && `Other: ${soc.other}`,
-      ].filter(Boolean)
-      if (socParts.length) prePresentedParts.push(`Social History: ${socParts.join('; ')}`)
-    }
-    const prePresentedInfo = prePresentedParts.length ? prePresentedParts.join('\n') : undefined
-
-    // Compile ALL available background history so the grader never flags referenced
-    // fields as fabricated. Includes both the structured UI-visible fields and the
-    // hiddenHistory block (what the patient could have revealed during interview).
-    const backgroundParts: string[] = []
-    if (caseData.pastMedicalHistory) {
-      const pmh = caseData.pastMedicalHistory
-      if (pmh.conditions) backgroundParts.push(`Past Medical History: ${pmh.conditions}`)
-      if (pmh.surgeries) backgroundParts.push(`Surgeries: ${pmh.surgeries}`)
-      if (pmh.hospitalizations) backgroundParts.push(`Hospitalizations: ${pmh.hospitalizations}`)
-    }
-    if (caseData.currentMedications) {
-      const meds = caseData.currentMedications
-      if (meds.medications) backgroundParts.push(`Current Medications: ${meds.medications}`)
-      if (meds.otc) backgroundParts.push(`OTC/Supplements: ${meds.otc}`)
-    }
-    if (caseData.socialHistory) {
-      const soc = caseData.socialHistory
-      const socParts = [
-        soc.smoking && `Smoking: ${soc.smoking}`,
-        soc.alcohol && `Alcohol: ${soc.alcohol}`,
-        soc.drugs && `Drugs: ${soc.drugs}`,
-        soc.occupation && `Occupation: ${soc.occupation}`,
-        soc.living && `Living: ${soc.living}`,
-        soc.other && `Other: ${soc.other}`,
-      ].filter(Boolean)
-      if (socParts.length) backgroundParts.push(`Social History: ${socParts.join('; ')}`)
-    }
-    if (caseData.hiddenHistory.familyHistory) backgroundParts.push(`Family History: ${caseData.hiddenHistory.familyHistory}`)
-    if (caseData.hiddenHistory.socialHistory && !caseData.socialHistory) backgroundParts.push(`Social History (hidden): ${caseData.hiddenHistory.socialHistory}`)
-    if (caseData.hiddenHistory.medications && !caseData.currentMedications?.medications) backgroundParts.push(`Medications (hidden): ${caseData.hiddenHistory.medications}`)
-    if (caseData.hiddenHistory.hiddenSymptoms) backgroundParts.push(`Additional Symptoms (available if asked): ${caseData.hiddenHistory.hiddenSymptoms}`)
-    if (caseData.hiddenHistory.allergies) backgroundParts.push(`Allergies: ${caseData.hiddenHistory.allergies}`)
-    if (caseData.hiddenHistory.fullHistory) backgroundParts.push(`Full Background History: ${caseData.hiddenHistory.fullHistory}`)
-
-    // Fix 1a: Vitals — needed to validate student reasoning references and apply the
-    // "do not penalise for questions whose answer was apparent from exam" rubric rule
-    const v = caseData.vitals
-    backgroundParts.push(`Vitals: BP ${v.bp}, HR ${v.hr}, RR ${v.rr}, Temp ${v.temp}°C, SpO2 ${v.spo2}%`)
-
-    // Fix 1b: Physical exam — needed for the ANTI-FABRICATION RULE and the history
-    // interview rubric rule ("do not penalise if info was apparent from physical exam")
-    const examLines = Object.entries(caseData.physicalExam)
-      .map(([region, finding]) => `${region}: ${finding}`)
-      .join('\n')
-    if (examLines) backgroundParts.push(`Physical Exam:\n${examLines}`)
-
-    const backgroundHistory = backgroundParts.length ? backgroundParts.join('\n') : '(none recorded)'
-
     const reasoningText = (overridePresentation !== undefined ? overridePresentation : userPresentation).trim()
 
-    // expectedLabs/expectedImaging = the case-designated MUST-ORDER acute workup (scored against).
-    // supplementaryTests = relevantTests beyond that set (advanced/specialty follow-up —
-    //   shown to grader as teaching context only, not penalized if missing).
-    const expectedLabs    = caseData.expectedLabs?.length    ? caseData.expectedLabs    : undefined
-    const expectedImaging = caseData.expectedImaging?.length ? caseData.expectedImaging : undefined
-    const coreLabs = new Set([...(expectedLabs ?? []), ...(expectedImaging ?? [])])
-    const supplementaryTests = caseData.relevantTests
-      ?.filter(t => !coreLabs.has(t.name))
-      .map(t => t.name)
-
-    const gradingInput: GradingInput = {
-      patientInfo: `${caseData.patientInfo.age}yo ${caseData.patientInfo.gender}, CC: "${caseData.patientInfo.chiefComplaint}"`,
-      hpi: selectHpi(caseData, caseDifficulty),
-      backgroundHistory,
-      difficulty: caseDifficulty,
-      orderedLabResults: orderedLabResults || '(no labs ordered)',
-      orderedImagingResults: orderedImagingResults || '(no imaging ordered)',
-      chatSummary: chatSummary || '(physician did not interview the patient)',
-      reasoningText,
-      submittedDiagnosis: diagnosisToGrade,
-      correctDiagnosis: caseData.diagnosis,
-      keyQuestions: caseData.keyQuestions,
-      teachingPoints: caseData.teachingPoints,
-      differentials: caseData.differentials,
-      prePresentedInfo,
-      timedOut,
-      revealedExamRegions: Array.from(revealedExamRegions),
-      relevantExamRegions: caseData.relevantExamRegions ?? [],
-      ...(expectedLabs?.length        ? { expectedLabs }        : {}),
-      ...(expectedImaging?.length     ? { expectedImaging }     : {}),
-      ...(supplementaryTests?.length  ? { supplementaryTests }  : {}),
-      // Make the board's reasoning model the single source of truth so the grader's
-      // differential discussion can't contradict what the student saw.
-      ...((caseData.differentialPriors?.length ?? 0) > 0
-        ? { differentialAnalysis: formatEvidenceSummary(caseData.differentialPriors!, caseData.testImpacts ?? {}, Array.from(orderedTests)) }
-        : {}),
-      ...(prediction && prediction[0]
-        ? { studentPrediction: `Before ordering any tests, the student committed to a leading diagnosis of "${prediction[0]}"${predictionConfidence != null ? ` at ${Math.round(predictionConfidence * 100)}% confidence` : ''}.` }
-        : {}),
-    }
-
-    const gradingUsageCb: GradingUsageCallback = (type, usage) => recordApiCall(type, usage)
-
     try {
-      const result = await gradeCase(gradingInput, gradingUsageCb)
+      // Grading input is assembled SERVER-side from the session event log +
+      // ground truth — the client contributes only its diagnosis text and
+      // written reasoning, so it cannot inflate what it asked or ordered.
+      const data = await postSession<GradeResponse>('/api/session/grade', {
+        sessionId, diagnosis: diagnosisToGrade, reasoningText, timedOut,
+      })
+      recordUsages(data.usages)
+      const result = data.result
+      const reveal = data.reveal
+
+      // Teaching reveal: fold ground truth into the client case view and the
+      // canonical ROS findings into the unlocked rows.
+      setCaseData(prev => (prev ? mergeReveal(prev, reveal) : prev))
+      setRosState(prev => {
+        const next = { ...prev }
+        for (const cat of ROS_CATEGORIES) {
+          if (next[cat].status !== 'locked') {
+            next[cat] = { ...next[cat], finding: reveal.reviewOfSystems[cat] ?? '' }
+          }
+        }
+        return next
+      })
 
       // Save to history
       try {
@@ -1341,7 +880,7 @@ Student message: "${msg}"`
           system: caseData.patientInfo.chiefComplaint
             ? caseData.patientInfo.chiefComplaint.split(' ').slice(0, 3).join(' ')
             : 'Unknown',
-          diagnosis: caseData.diagnosis,
+          diagnosis: reveal.diagnosis,
           userDiagnosis: diagnosisToGrade,
           correct: result.correct ?? false,
           score: result.score ?? 0,
@@ -1352,7 +891,7 @@ Student message: "${msg}"`
       // Finalize analytics session
       if (analyticsSessionRef.current) {
         const record = finalizeSession(analyticsSessionRef.current, {
-          diagnosis: caseData.diagnosis,
+          diagnosis: reveal.diagnosis,
           userDiagnosis: diagnosisToGrade,
           correct: result.correct ?? false,
           score: result.score ?? 0,
@@ -1366,10 +905,15 @@ Student message: "${msg}"`
         analyticsSessionRef.current = null
       }
 
-      // Update mastery + extract spaced-repetition cards for the retention features
+      // Update mastery + extract spaced-repetition cards from the reveal payload
       try {
         recordCaseOutcome(
-          caseData,
+          {
+            diagnosis: reveal.diagnosis,
+            teachingPoints: reveal.teachingPoints,
+            mechanism: reveal.mechanism,
+            testImpacts: reveal.testImpacts,
+          },
           resolvedSystemRef.current || system,
           caseDifficulty,
           result.score ?? 0,
@@ -1377,12 +921,12 @@ Student message: "${msg}"`
           Date.now(),
         )
         // Record pre-test calibration if the student committed a prediction.
-        if (prediction && prediction[0] && (caseData.differentialPriors?.length ?? 0) > 0) {
-          const beliefs = computeBeliefs(caseData.differentialPriors!, caseData.testImpacts ?? {}, Array.from(orderedTests))
+        if (prediction && prediction[0] && (reveal.differentialPriors?.length ?? 0) > 0) {
+          const beliefs = computeBeliefs(reveal.differentialPriors!, reveal.testImpacts ?? {}, Array.from(orderedTests))
           const ps = scorePrediction(prediction, beliefs)
           // Normalized match: did the student's leading pick equal the actual diagnosis?
           const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
-          const np = norm(prediction[0]), nd = norm(caseData.diagnosis)
+          const np = norm(prediction[0]), nd = norm(reveal.diagnosis)
           const topCorrect = np.length > 1 && (np === nd || nd.includes(np) || np.includes(nd))
           if (caseDifficulty === 'Foundations' && ps.comparedCount > 0) {
             // Ranked mode: rank-agreement + Brier.
@@ -1504,7 +1048,18 @@ Student message: "${msg}"`
 
       case 'ros':
         if (!caseData) addTerminalLines({ type: 'error', content: 'No case loaded.' })
-        else {
+        else if (caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') {
+          // Gated: only systems the student has actually asked about are visible.
+          addTerminalLines({ type: 'info', content: 'REVIEW OF SYSTEMS (asked systems only)' })
+          const unlocked = ROS_CATEGORIES.filter(c => rosState[c].status !== 'locked')
+          if (unlocked.length === 0) {
+            addTerminalLines({ type: 'info', content: '  Nothing reviewed yet — ask the patient about each system.' })
+          } else {
+            unlocked.forEach(c =>
+              addTerminalLines({ type: 'output', content: `  ${c.padEnd(18)} ${rosState[c].derivedFinding ?? '(recorded)'}` })
+            )
+          }
+        } else {
           addTerminalLines({ type: 'info', content: 'REVIEW OF SYSTEMS' })
           Object.entries(caseData.reviewOfSystems).forEach(([s, val]) =>
             addTerminalLines({ type: 'output', content: `  ${s.padEnd(18)} ${val}` })
@@ -1514,10 +1069,7 @@ Student message: "${msg}"`
 
       case 'exam':
         if (!caseData) addTerminalLines({ type: 'error', content: 'No case loaded.' })
-        else if (
-          (caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') &&
-          (caseData.relevantExamRegions?.length ?? 0) > 0
-        ) {
+        else if (sessionMeta.examGated) {
           addTerminalLines({ type: 'info', content: 'PHYSICAL EXAMINATION (revealed regions only)' })
           const revealed = Array.from(revealedExamRegions)
           if (revealed.length === 0) {
@@ -1541,7 +1093,9 @@ Student message: "${msg}"`
 
       case 'labs':
         if (!caseData) addTerminalLines({ type: 'error', content: 'No case loaded.' })
-        else {
+        else if (caseData.availableLabs.length === 0) {
+          addTerminalLines({ type: 'info', content: 'No pre-listed labs at this difficulty — order by name with "order <test>".' })
+        } else {
           addTerminalLines({ type: 'info', content: 'AVAILABLE LABORATORY TESTS' })
           caseData.availableLabs.forEach(lab =>
             addTerminalLines({ type: 'output', content: `  [${orderedTests.has(lab) ? 'ordered' : 'pending'}] ${lab}` })
@@ -1551,7 +1105,9 @@ Student message: "${msg}"`
 
       case 'imaging':
         if (!caseData) addTerminalLines({ type: 'error', content: 'No case loaded.' })
-        else {
+        else if (caseData.availableImaging.length === 0) {
+          addTerminalLines({ type: 'info', content: 'No pre-listed studies at this difficulty — order by name with "order <test>".' })
+        } else {
           addTerminalLines({ type: 'info', content: 'AVAILABLE IMAGING STUDIES' })
           caseData.availableImaging.forEach(img =>
             addTerminalLines({ type: 'output', content: `  [${orderedTests.has(img) ? 'ordered' : 'pending'}] ${img}` })
@@ -1563,13 +1119,11 @@ Student message: "${msg}"`
         if (!caseData) { addTerminalLines({ type: 'error', content: 'No case loaded.' }); break }
         if (!args) { addTerminalLines({ type: 'error', content: 'Usage: order <test name>' }); break }
         const allTests = [...caseData.availableLabs, ...caseData.availableImaging]
-        const match = allTests.find(t => t.toLowerCase().includes(args.toLowerCase()))
-        if (!match) {
-          addTerminalLines({ type: 'error', content: `Not found: "${args}". Use "labs" or "imaging" to list tests.` })
-        } else if (orderedTests.has(match)) {
+        const match = allTests.find(t => t.toLowerCase().includes(args.toLowerCase())) ?? args
+        if (orderedTests.has(match)) {
           addTerminalLines({ type: 'error', content: `Already ordered: ${match}` })
         } else {
-          setOrderedTests(prev => { const n = new Set(prev); n.add(match); return n })
+          void submitOrders([match])
           addTerminalLines({ type: 'success', content: `Ordered: ${match}` })
         }
         break
@@ -1639,7 +1193,7 @@ Student message: "${msg}"`
         return <HPIView
           caseData={caseData}
           caseDifficulty={caseDifficulty}
-          hpiUnlocked={hpiUnlocked}
+          hpiValues={hpiValues}
           caseStarted={caseStarted}
           startTimer={startTimer}
           setCaseStarted={setCaseStarted}
@@ -1656,8 +1210,9 @@ Student message: "${msg}"`
         return <ExamView
           caseData={caseData}
           caseDifficulty={caseDifficulty}
+          examGated={sessionMeta.examGated}
           revealedExamRegions={revealedExamRegions}
-          revealExamRegion={(r) => setRevealedExamRegions(prev => { const next = new Set(prev); next.add(r); return next })}
+          revealExamRegion={(r) => { void examineRegion(r) }}
         />
       case 'order':
         return <OrderView
@@ -1665,7 +1220,10 @@ Student message: "${msg}"`
           caseDifficulty={caseDifficulty}
           prediction={prediction}
           predictionConfidence={predictionConfidence}
-          onLockPrediction={(ranking, confidence) => { setPrediction(ranking); setPredictionConfidence(confidence) }}
+          onLockPrediction={lockPrediction}
+          predictionCandidates={sessionMeta.predictionCandidates}
+          hasReasoningModel={sessionMeta.hasReasoningModel}
+          caseSearchTests={sessionMeta.caseSearchTests}
           orderedTests={orderedTests}
           selectedTests={selectedTests}
           toggleTest={toggleTest}

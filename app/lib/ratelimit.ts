@@ -26,8 +26,11 @@ function makeRatelimit(max: number, window: Duration, prefix: string): SafeRatel
   }
 }
 
-// 20 req/min per IP — prevents a single client from monopolizing Anthropic budget.
-export const claudeRatelimit = makeRatelimit(20, '1 m', 'med-trainer:claude')
+// 30 req/min per user — /api/session/* actions (chat, exam, orders, grading).
+export const sessionRatelimit = makeRatelimit(30, '1 m', 'med-trainer:session')
+
+// 3 case starts/min per user — each start may trigger a full case generation.
+export const sessionStartRatelimit = makeRatelimit(3, '1 m', 'med-trainer:session-start')
 
 // 30 req/min per IP — Open-i proxy; generous because images load in parallel.
 export const imagingRatelimit = makeRatelimit(30, '1 m', 'med-trainer:imaging')

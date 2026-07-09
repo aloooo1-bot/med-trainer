@@ -5,7 +5,8 @@ import { PredictionPanel } from './PredictionPanel'
 import type { CaseData } from '../_lib/types'
 
 export function OrderView({
-  caseData, caseDifficulty, prediction, predictionConfidence, onLockPrediction, orderedTests, selectedTests,
+  caseData, caseDifficulty, prediction, predictionConfidence, onLockPrediction,
+  predictionCandidates, hasReasoningModel, caseSearchTests, orderedTests, selectedTests,
   toggleTest, orderTests, orderCustomTest, removeOrderedTest,
   testSearchQuery, setTestSearchQuery, showSearchDropdown, setShowSearchDropdown,
   customTestInput, setCustomTestInput, locked,
@@ -15,6 +16,12 @@ export function OrderView({
   prediction: string[] | null
   predictionConfidence: number | null
   onLockPrediction: (ranking: string[], confidence: number) => void
+  /** Foundations ranked-mode candidates (empty at gated difficulties — anti-cueing). */
+  predictionCandidates: string[]
+  /** Whether this case has a differential reasoning model (enables prediction UI). */
+  hasReasoningModel: boolean
+  /** Advanced: case-specific test names for the search list (names only). */
+  caseSearchTests?: Array<{ name: string; category: string }>
   orderedTests: Set<string>
   selectedTests: Set<string>
   toggleTest: (name: string) => void
@@ -41,7 +48,7 @@ export function OrderView({
     const allOrdered = (name: string) => orderedTests.has(name)
     return (
       <div className="space-y-4">
-        <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
+        <PredictionPanel candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
         <SectionCard title="Laboratory Studies">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {caseData.availableLabs.map(lab => {
@@ -106,7 +113,9 @@ export function OrderView({
 
     return (
       <div className="space-y-4">
-        <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
+        {hasReasoningModel && (
+          <PredictionPanel candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
+        )}
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
             <svg className="h-4 w-4 text-ink-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -250,7 +259,7 @@ export function OrderView({
   }
 
   // ── ADVANCED: free-text search ──
-  const caseSpecificTests = (caseData.relevantTests ?? [])
+  const caseSpecificTests = (caseSearchTests ?? [])
     .filter(rt => !MASTER_TEST_LIST.some(m => m.name === rt.name))
     .map(rt => ({ name: rt.name, abbreviations: [] as string[], synonyms: [] as string[], category: rt.category }))
   const combinedTestList = [...MASTER_TEST_LIST, ...caseSpecificTests]
@@ -260,7 +269,9 @@ export function OrderView({
 
   return (
     <div className="space-y-4">
-      <PredictionPanel candidates={caseData.differentialPriors?.map(p => p.name) ?? []} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
+      {hasReasoningModel && (
+        <PredictionPanel candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
+      )}
       <div className="rounded-md border border-primary-200 bg-primary-50 px-4 py-3">
         <p className="text-xs text-primary-700">
           <span className="font-semibold">Advanced difficulty:</span> no pre-listed lab panels — search and type test names from memory. Imaging modalities are listed below for reference.

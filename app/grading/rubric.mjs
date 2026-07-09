@@ -110,6 +110,9 @@ Tests ordered:
 ${input.orderedLabResults || '(no labs ordered)'}
 ${input.orderedImagingResults || '(no imaging ordered)'}
 
+${input.elicitedRecord ? `STRUCTURED ELICITATION LOG (server-recorded — this list is AUTHORITATIVE for what information the student actually obtained; the interview transcript below is supporting context only. If the transcript appears to credit the student with information not reflected in this log, trust the log. Do NOT credit the student for eliciting anything that is absent from both this log and the transcript):
+${input.elicitedRecord}
+` : ''}
 Patient interview transcript:
 ${input.chatSummary || '(physician did not interview the patient)'}
 

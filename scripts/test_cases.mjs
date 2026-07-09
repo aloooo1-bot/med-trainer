@@ -3,14 +3,23 @@
 
 const BASE = 'http://localhost:3000';
 
+// /api/claude (the open browser proxy) was removed in the security remediation;
+// scripts call the Anthropic API directly with the key from .env.local.
+const { config } = await import('dotenv');
+config({ path: '.env.local' });
+
 async function claude(system, messages, max_tokens = 10000) {
-  const r = await fetch(`${BASE}/api/claude`, {
+  const r = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ system, messages, max_tokens }),
+    headers: {
+      'x-api-key': process.env.ANTHROPIC_API_KEY,
+      'anthropic-version': '2023-06-01',
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ model: 'claude-sonnet-4-6', system, messages, max_tokens }),
   });
   const d = await r.json();
-  if (!r.ok) throw new Error(d.error ?? r.status);
+  if (!r.ok) throw new Error(d.error?.message ?? r.status);
   return d.content[0].text;
 }
 

@@ -4,17 +4,18 @@ import type { CaseData } from '../_lib/types'
 export function ExamView({
   caseData,
   caseDifficulty,
+  examGated,
   revealedExamRegions,
   revealExamRegion,
 }: {
   caseData: CaseData
   caseDifficulty: string
+  /** Server-decided: whether the exam is click-to-reveal for this case. */
+  examGated: boolean
   revealedExamRegions?: Set<string>
   revealExamRegion?: (region: string) => void
 }) {
-  const isGated =
-    (caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') &&
-    (caseData.relevantExamRegions?.length ?? 0) > 0
+  const isGated = examGated
 
   if (!isGated || !revealedExamRegions || !revealExamRegion) {
     return (

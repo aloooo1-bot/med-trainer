@@ -17,6 +17,12 @@ export interface Database {
           created_at: string
           verified_images: Record<string, unknown> | null
           imaging_cache: Record<string, unknown> | null
+          // Tiered case data (migration 0001) — only presentation_data is
+          // client-readable; the rest are service-role-only columns.
+          presentation_data: Record<string, unknown> | null
+          patient_knowledge: Record<string, unknown> | null
+          clinical_findings: Record<string, unknown> | null
+          ground_truth: Record<string, unknown> | null
         }
         Insert: {
           id: string
@@ -30,8 +36,54 @@ export interface Database {
           created_at?: string
           verified_images?: Record<string, unknown> | null
           imaging_cache?: Record<string, unknown> | null
+          presentation_data?: Record<string, unknown> | null
+          patient_knowledge?: Record<string, unknown> | null
+          clinical_findings?: Record<string, unknown> | null
+          ground_truth?: Record<string, unknown> | null
         }
         Update: Partial<Database['public']['Tables']['cases']['Insert']>
+      }
+      trainer_sessions: {
+        Relationships: []
+        Row: {
+          id: string
+          user_id: string
+          case_id: string | null
+          system: string
+          difficulty: string
+          phase: 'active' | 'presentation' | 'graded'
+          case_snapshot: Record<string, unknown>
+          created_at: string
+        }
+        Insert: {
+          id: string
+          user_id: string
+          case_id?: string | null
+          system: string
+          difficulty: string
+          phase?: 'active' | 'presentation' | 'graded'
+          case_snapshot: Record<string, unknown>
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['trainer_sessions']['Insert']>
+      }
+      session_events: {
+        Relationships: []
+        Row: {
+          id: number
+          session_id: string
+          ts: string
+          type: 'start' | 'ask' | 'exam' | 'order' | 'prediction' | 'enter_presentation' | 'submit'
+          payload: Record<string, unknown>
+        }
+        Insert: {
+          id?: number
+          session_id: string
+          ts?: string
+          type: 'start' | 'ask' | 'exam' | 'order' | 'prediction' | 'enter_presentation' | 'submit'
+          payload?: Record<string, unknown>
+        }
+        Update: Partial<Database['public']['Tables']['session_events']['Insert']>
       }
       profiles: {
         Relationships: []

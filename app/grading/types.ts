@@ -71,6 +71,12 @@ export interface GradingInput {
   orderedLabResults: string
   orderedImagingResults: string
   chatSummary: string
+  /**
+   * Structured, server-logged record of what the student elicited (unlocked ROS
+   * categories + derived findings, unlocked HPI fields, exam regions performed,
+   * tests ordered). AUTHORITATIVE over the free-prose transcript for grading.
+   */
+  elicitedRecord?: string
   reasoningText: string
   submittedDiagnosis: string
   correctDiagnosis: string

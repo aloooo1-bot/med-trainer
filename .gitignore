@@ -78,3 +78,6 @@ Landing Page.html
 
 # Student-audit transcripts — machine-generated source data, not tracked
 scripts/student-audit/artifacts/transcripts/
+
+# Local dev data (file-backed session store + case cache when Supabase is unavailable)
+.data/

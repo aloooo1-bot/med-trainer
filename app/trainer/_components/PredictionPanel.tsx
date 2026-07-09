@@ -33,7 +33,9 @@ export function PredictionPanel({
   const [leadingDx, setLeadingDx] = useState('')
   const [conf, setConf] = useState<number | null>(null)
 
-  if (!candidates || candidates.length < 2) return null
+  // Ranked mode needs a candidate list; open (free-text) mode does not —
+  // gated difficulties deliberately never receive candidates (anti-cueing).
+  if (!open && (!candidates || candidates.length < 2)) return null
 
   // Locked → compact read-only summary.
   if (prediction) {

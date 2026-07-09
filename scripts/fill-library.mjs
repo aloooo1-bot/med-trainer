@@ -347,6 +347,9 @@ async function getGeneratedIds() {
 }
 
 async function saveToSupabase(id, system, difficulty, diagnosis, variantIndex, caseData) {
+  // Write both the legacy blob and the tiered columns (see supabase/migrations/0001).
+  const { splitCase } = await import('../app/lib/server/caseTiers.mjs')
+  const tiers = splitCase(caseData)
   const { error } = await supabase
     .from('cases')
     .upsert({
@@ -356,6 +359,10 @@ async function saveToSupabase(id, system, difficulty, diagnosis, variantIndex, c
       diagnosis,
       variant_index: variantIndex,
       case_data: caseData,
+      presentation_data: tiers.presentation,
+      patient_knowledge: tiers.patientKnowledge,
+      clinical_findings: tiers.clinicalFindings,
+      ground_truth: tiers.groundTruth,
       is_generated: true,
       generated_at: new Date().toISOString(),
     }, { onConflict: 'id' })
