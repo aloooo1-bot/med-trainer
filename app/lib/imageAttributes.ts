@@ -14,6 +14,9 @@
 
 export type Laterality = 'left' | 'right' | 'bilateral' | 'midline' | 'unknown'
 
+/** Runtime list of valid laterality values (for validation in routes/scripts). */
+export const VALID_LATERALITY_VALUES: readonly Laterality[] = ['left', 'right', 'bilateral', 'midline', 'unknown']
+
 /** Per-image attributes, produced by the review pass (scripts/review-images.mjs). */
 export interface ImageAttributes {
   laterality?: Laterality
