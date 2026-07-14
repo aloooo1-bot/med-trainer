@@ -35,7 +35,7 @@ export function SpecialPanel({ modality, report, image, findings, onZoom }: {
       <div className="bg-surface-1 px-4 py-4 space-y-2">
         <p className="text-sm leading-relaxed text-ink-secondary">{displayText}</p>
         <p className="text-xs italic text-ink-tertiary">
-          Reference image for this finding is not yet in our library. Use the report above to guide your reasoning.
+          No image confirmed to match this case is available — use the report above to guide your reasoning.
         </p>
       </div>
     )

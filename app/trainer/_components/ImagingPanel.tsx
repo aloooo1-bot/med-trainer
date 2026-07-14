@@ -37,7 +37,7 @@ export function ImagingPanel({ report, results, diagnosisSubmitted }: {
       <div className="bg-surface-1 px-4 py-4">
         {noImagesFound ? (
           <>
-            <p className="mb-3 text-xs italic text-ink-tertiary">No representative image available in the database for this study.</p>
+            <p className="mb-3 text-xs italic text-ink-tertiary">No image confirmed to match this case&apos;s findings is available for this study — the report below is authoritative.</p>
             <p className="text-sm leading-relaxed text-ink-secondary">{report}</p>
           </>
         ) : (

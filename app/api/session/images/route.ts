@@ -5,8 +5,12 @@ import { replayEvents } from '@/app/lib/server/replay'
 import { pickECGImage, pickSpecialImage } from '@/app/lib/server/imageLookup'
 import { fetchImagingResults, type OpenIResult } from '@/app/lib/imagingSearch'
 import { getSpecialModality } from '@/app/lib/specialImageLookup'
+import { caseLaterality, filterByLaterality, type LateralityPolicy } from '@/app/lib/imageAttributes'
 import { isECGTest } from '@/app/trainer/_lib/testUtils'
 import { createAdminClient } from '@/app/lib/supabase/admin'
+
+const LATERALITY_POLICY: LateralityPolicy =
+  process.env.IMAGE_LATERALITY_POLICY === 'lenient' ? 'lenient' : 'strict'
 
 export const dynamic = 'force-dynamic'
 
@@ -34,8 +38,8 @@ export async function POST(req: NextRequest) {
     const caseData = session.caseData
 
     if (isECGTest(test)) {
-      const image = await pickECGImage(caseData.diagnosis, caseData.ecgFindings)
-      return Response.json({ kind: 'ecg', ecg: image })
+      const { ecg, match } = await pickECGImage(caseData.diagnosis, caseData.ecgFindings)
+      return Response.json({ kind: 'ecg', ecg, match })
     }
 
     const modality = getSpecialModality(test)
@@ -47,37 +51,45 @@ export async function POST(req: NextRequest) {
         derm: caseData.skinFindings,
         urine: caseData.urineFindings,
       }[modality]
-      const image = await pickSpecialImage(modality, caseData.diagnosis, findingField)
-      return Response.json({ kind: 'special', modality, special: image })
+      const { special, match } = await pickSpecialImage(modality, caseData.diagnosis, findingField)
+      return Response.json({ kind: 'special', modality, special, match })
     }
 
     // Radiology imaging — session-level pre-verified cache first, then Open-i.
-    const cached = session.imagingCache?.[test]
+    // Either way, apply the laterality fail-safe against the case's required
+    // side so a "right effusion" case never shows a left-sided film.
+    const required = caseLaterality(caseData.imagingCategory, caseData.imagingResults?.[test])
+    const captionOf = (r: OpenIResult) => `${r.caption} ${r.abstract ?? ''}`
+
+    const cached = session.imagingCache?.[test] as OpenIResult[] | undefined
     if (Array.isArray(cached) && cached.length > 0) {
-      return Response.json({ kind: 'imaging', results: cached })
+      const { items, match } = filterByLaterality(cached, captionOf, required, LATERALITY_POLICY)
+      return Response.json({ kind: 'imaging', results: items, match })
     }
 
-    const results: OpenIResult[] = await fetchImagingResults({
+    const fetched: OpenIResult[] = await fetchImagingResults({
       orderedTest: test,
       caseDiagnosis: caseData.diagnosis,
       imagingCategory: caseData.imagingCategory,
       baseUrl: req.nextUrl.origin,
     })
 
-    // Write-back to the shared case cache (best-effort) so future sessions
-    // of this case are served without an Open-i round trip.
-    if (results.length > 0 && session.caseId && process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    // Write-back the RAW fetch to the shared case cache (best-effort) so future
+    // sessions skip the Open-i round trip; laterality filtering is applied per
+    // request at serve time, not baked into the cache.
+    if (fetched.length > 0 && session.caseId && process.env.SUPABASE_SERVICE_ROLE_KEY) {
       try {
         const db = createAdminClient()
         void db.rpc('cache_imaging_test', {
           p_case_id: session.caseId,
           p_test_name: test,
-          p_results: results as unknown as import('@/app/lib/supabase/types').Json,
+          p_results: fetched as unknown as import('@/app/lib/supabase/types').Json,
         })
       } catch { /* best-effort */ }
     }
 
-    return Response.json({ kind: 'imaging', results })
+    const { items, match } = filterByLaterality(fetched, captionOf, required, LATERALITY_POLICY)
+    return Response.json({ kind: 'imaging', results: items, match })
   } catch (err) {
     Sentry.captureException(err, { extra: { route: '/api/session/images' } })
     const message = err instanceof Error ? err.message : 'Unknown error'
