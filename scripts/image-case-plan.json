@@ -1,0 +1,369 @@
+{
+  "generatedAt": null,
+  "perDiagnosis": 1,
+  "totals": {
+    "distinctCaseTypes": 30,
+    "distinctDiagnoses": 30,
+    "totalImages": 361,
+    "imagesConsumed": 30,
+    "surplusImages": 331,
+    "unmappedCategories": 4,
+    "unmappedImages": 26
+  },
+  "plan": [
+    {
+      "id": "local-smear-malaria_falciparum-0",
+      "modality": "smear",
+      "category": "malaria_falciparum",
+      "diagnosis": "Plasmodium falciparum Malaria",
+      "system": "Infectious",
+      "difficulty": "Clinical",
+      "imagesAvailable": 8,
+      "casesPlanned": 1,
+      "surplusImages": 7
+    },
+    {
+      "id": "local-biopsy-colon_cancer-0",
+      "modality": "biopsy",
+      "category": "colon_cancer",
+      "diagnosis": "Colorectal Adenocarcinoma",
+      "system": "Gastrointestinal",
+      "difficulty": "Clinical",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-biopsy-liver-0",
+      "modality": "biopsy",
+      "category": "liver",
+      "diagnosis": "Alcoholic Liver Cirrhosis",
+      "system": "Gastrointestinal",
+      "difficulty": "Clinical",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-biopsy-gastric-0",
+      "modality": "biopsy",
+      "category": "gastric",
+      "diagnosis": "Helicobacter pylori-Associated Gastric Cancer",
+      "system": "Gastrointestinal",
+      "difficulty": "Advanced",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-biopsy-breast_cancer-0",
+      "modality": "biopsy",
+      "category": "breast_cancer",
+      "diagnosis": "Invasive Ductal Carcinoma of the Breast",
+      "system": "Hematologic / Oncologic",
+      "difficulty": "Clinical",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-fundus-diabetic_retinopathy-0",
+      "modality": "fundus",
+      "category": "diabetic_retinopathy",
+      "diagnosis": "Proliferative Diabetic Retinopathy",
+      "system": "Endocrine / Metabolic",
+      "difficulty": "Clinical",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-fundus-glaucoma-0",
+      "modality": "fundus",
+      "category": "glaucoma",
+      "diagnosis": "Primary Open-Angle Glaucoma",
+      "system": "Neurologic",
+      "difficulty": "Clinical",
+      "imagesAvailable": 3,
+      "casesPlanned": 1,
+      "surplusImages": 2
+    },
+    {
+      "id": "local-fundus-amd-0",
+      "modality": "fundus",
+      "category": "amd",
+      "diagnosis": "Neovascular Age-Related Macular Degeneration",
+      "system": "Neurologic",
+      "difficulty": "Clinical",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-fundus-hypertensive-0",
+      "modality": "fundus",
+      "category": "hypertensive",
+      "diagnosis": "Grade III Hypertensive Retinopathy",
+      "system": "Cardiovascular",
+      "difficulty": "Clinical",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-derm-melanoma-0",
+      "modality": "derm",
+      "category": "melanoma",
+      "diagnosis": "Cutaneous Melanoma",
+      "system": "Hematologic / Oncologic",
+      "difficulty": "Clinical",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-derm-basal_cell-0",
+      "modality": "derm",
+      "category": "basal_cell",
+      "diagnosis": "Basal Cell Carcinoma",
+      "system": "Hematologic / Oncologic",
+      "difficulty": "Foundations",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-derm-squamous_cell-0",
+      "modality": "derm",
+      "category": "squamous_cell",
+      "diagnosis": "Cutaneous Squamous Cell Carcinoma",
+      "system": "Hematologic / Oncologic",
+      "difficulty": "Clinical",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-derm-nevus-0",
+      "modality": "derm",
+      "category": "nevus",
+      "diagnosis": "Dysplastic Melanocytic Nevus",
+      "system": "Hematologic / Oncologic",
+      "difficulty": "Foundations",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-urine-uti-0",
+      "modality": "urine",
+      "category": "uti",
+      "diagnosis": "Acute Uncomplicated Cystitis (UTI)",
+      "system": "Renal",
+      "difficulty": "Foundations",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-urine-nephrotic-0",
+      "modality": "urine",
+      "category": "nephrotic",
+      "diagnosis": "Minimal Change Disease (Nephrotic Syndrome)",
+      "system": "Renal",
+      "difficulty": "Clinical",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-urine-nephritic-0",
+      "modality": "urine",
+      "category": "nephritic",
+      "diagnosis": "IgA Nephropathy (Berger Disease)",
+      "system": "Renal",
+      "difficulty": "Clinical",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-urine-kidney_stone-0",
+      "modality": "urine",
+      "category": "kidney_stone",
+      "diagnosis": "Calcium Oxalate Nephrolithiasis",
+      "system": "Renal",
+      "difficulty": "Foundations",
+      "imagesAvailable": 6,
+      "casesPlanned": 1,
+      "surplusImages": 5
+    },
+    {
+      "id": "local-chest-Atelectasis-0",
+      "modality": "chest",
+      "category": "Atelectasis",
+      "diagnosis": "Post-obstructive Lobar Atelectasis",
+      "system": "Respiratory",
+      "difficulty": "Clinical",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    },
+    {
+      "id": "local-chest-Cardiomegaly-0",
+      "modality": "chest",
+      "category": "Cardiomegaly",
+      "diagnosis": "Congestive Heart Failure",
+      "system": "Cardiovascular",
+      "difficulty": "Clinical",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    },
+    {
+      "id": "local-chest-Consolidation-0",
+      "modality": "chest",
+      "category": "Consolidation",
+      "diagnosis": "Lobar Pneumococcal Pneumonia",
+      "system": "Respiratory",
+      "difficulty": "Foundations",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    },
+    {
+      "id": "local-chest-Edema-0",
+      "modality": "chest",
+      "category": "Edema",
+      "diagnosis": "Cardiogenic Pulmonary Edema",
+      "system": "Cardiovascular",
+      "difficulty": "Clinical",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    },
+    {
+      "id": "local-chest-Effusion-0",
+      "modality": "chest",
+      "category": "Effusion",
+      "diagnosis": "Parapneumonic Pleural Effusion",
+      "system": "Respiratory",
+      "difficulty": "Clinical",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    },
+    {
+      "id": "local-chest-Emphysema-0",
+      "modality": "chest",
+      "category": "Emphysema",
+      "diagnosis": "COPD (Emphysema-predominant)",
+      "system": "Respiratory",
+      "difficulty": "Clinical",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    },
+    {
+      "id": "local-chest-Fibrosis-0",
+      "modality": "chest",
+      "category": "Fibrosis",
+      "diagnosis": "Idiopathic Pulmonary Fibrosis",
+      "system": "Respiratory",
+      "difficulty": "Advanced",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    },
+    {
+      "id": "local-chest-Infiltration-0",
+      "modality": "chest",
+      "category": "Infiltration",
+      "diagnosis": "Atypical (Mycoplasma) Pneumonia",
+      "system": "Respiratory",
+      "difficulty": "Clinical",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    },
+    {
+      "id": "local-chest-Mass-0",
+      "modality": "chest",
+      "category": "Mass",
+      "diagnosis": "Non-Small Cell Lung Cancer",
+      "system": "Hematologic / Oncologic",
+      "difficulty": "Advanced",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    },
+    {
+      "id": "local-chest-Nodule-0",
+      "modality": "chest",
+      "category": "Nodule",
+      "diagnosis": "Pulmonary Granuloma (Histoplasmosis)",
+      "system": "Infectious",
+      "difficulty": "Advanced",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    },
+    {
+      "id": "local-chest-Pleural_Thickening-0",
+      "modality": "chest",
+      "category": "Pleural_Thickening",
+      "diagnosis": "Asbestos-related Pleural Disease",
+      "system": "Respiratory",
+      "difficulty": "Advanced",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    },
+    {
+      "id": "local-chest-Pneumonia-0",
+      "modality": "chest",
+      "category": "Pneumonia",
+      "diagnosis": "Aspiration Pneumonia",
+      "system": "Respiratory",
+      "difficulty": "Clinical",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    },
+    {
+      "id": "local-chest-Pneumothorax-0",
+      "modality": "chest",
+      "category": "Pneumothorax",
+      "diagnosis": "Primary Spontaneous Pneumothorax",
+      "system": "Respiratory",
+      "difficulty": "Clinical",
+      "imagesAvailable": 20,
+      "casesPlanned": 1,
+      "surplusImages": 19
+    }
+  ],
+  "unmapped": [
+    {
+      "modality": "smear",
+      "category": "normal",
+      "imageCount": 8
+    },
+    {
+      "modality": "biopsy",
+      "category": "normal",
+      "imageCount": 6
+    },
+    {
+      "modality": "fundus",
+      "category": "normal",
+      "imageCount": 6
+    },
+    {
+      "modality": "derm",
+      "category": "normal",
+      "imageCount": 6
+    }
+  ],
+  "emptyCombos": [],
+  "duplicateDiagnoses": []
+}
