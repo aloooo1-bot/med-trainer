@@ -36,9 +36,12 @@ const TASK_MODELS: Record<LLMTask, string> = {
   grading_oral: 'claude-sonnet-4-6',
 }
 
+// Keep these under the client's postSession wait (180s) but generous enough for
+// a full 12k-token generation under load — the server must not abort a
+// still-valid generation before the client would give up.
 const TASK_TIMEOUTS_MS: Partial<Record<LLMTask, number>> = {
-  case_generation: 120_000,
-  grading: 90_000,
+  case_generation: 175_000,
+  grading: 120_000,
 }
 
 let _client: Anthropic | null = null
@@ -63,6 +66,8 @@ export async function callModel(
   },
 ): Promise<LLMResult> {
   const timeout = TASK_TIMEOUTS_MS[task] ?? 75_000
+  // Ops log: verifies the task→model tiering (e.g. chat on Haiku, grading on Sonnet).
+  console.log(`[llm] task=${task} model=${TASK_MODELS[task]}`)
   const response = await client().messages.create(
     {
       model: TASK_MODELS[task],

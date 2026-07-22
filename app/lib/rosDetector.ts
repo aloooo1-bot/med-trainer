@@ -114,17 +114,32 @@ export function scanMessageForHPISections(message: string): HPISection[] {
     .map(([section]) => section)
 }
 
+// Negation triggers + the scope terminators that end a denial. A negation
+// covers everything up to the next sentence end, semicolon, or contrastive
+// conjunction — so "denies fever, chills, and weight loss" negates the WHOLE
+// comma list, while "denies X but reports Y" stops the negation at "but".
+const NEG_TRIGGER = '(?:no|not|non|without|denies?|denied|deny|negative\\s+for|none|absent|unremarkable|normal|clear)'
+const NEG_STOP = '(?:\\bbut\\b|\\bhowever\\b|\\bthough\\b|\\balthough\\b|[.!?;])'
+const NEG_CLAUSE = new RegExp(`\\b${NEG_TRIGGER}\\b(?:(?!${NEG_STOP}).)*`, 'gi')
+// Filler left behind after stripping negations — subject, reporting verbs, and
+// connectives that don't themselves constitute a positive finding.
+const FILLER = /\b(the|a|an|patient|pt|client|he|she|they|reports?|states?|notes?|noted|endorses?|complains?|of|with|and|or|but|however|has|had|been|is|are|was|were)\b/g
+
 /**
- * Determine whether a generated ROS finding is positive (has at least one
- * affirmative symptom) or purely negative (all denials).
- * Strips negation clauses and checks if meaningful content remains.
+ * Determine whether a ROS finding is positive (has at least one affirmative
+ * symptom) or purely negative (all denials). Handles both the canonical case
+ * format ("Fatigue present. Denies fever, chills.") and the LLM-derived summary
+ * format ("Patient denies joint pain, swelling, or stiffness.") — the latter
+ * exposed two bugs in the old stripper (the "Patient" subject surviving, and
+ * comma-list denials only stripping the first item).
  */
 export function classifyFinding(finding: string): 'positive' | 'negative' {
   if (!finding) return 'negative'
   const stripped = finding
     .toLowerCase()
-    .replace(/\b(no |denies?\s|without |absent |negative for |none )\b[^,;.]*/g, '')
-    .replace(/[,;.\s]+/g, ' ')
+    .replace(NEG_CLAUSE, ' ')   // drop negated symptoms (full clause, not just first item)
+    .replace(FILLER, ' ')       // drop subject/verb/connective filler
+    .replace(/[^a-z0-9]+/g, ' ')
     .trim()
   return stripped.length > 3 ? 'positive' : 'negative'
 }
