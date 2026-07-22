@@ -25,13 +25,32 @@ const { Client } = pkg
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const ROOT = path.resolve(__dirname, '..')
-config({ path: path.join(ROOT, '.env.local') })
 
 const args = process.argv.slice(2)
 const dryRun = args.includes('--dry-run')
-const filter = args.find(a => !a.startsWith('--'))
+const envIdx = args.indexOf('--env-file')
+const envFile = envIdx !== -1 ? args[envIdx + 1] : null
+const filter = args.find((a, i) => !a.startsWith('--') && args[i - 1] !== '--env-file')
 
-const DB_URL = process.env.SUPABASE_DB_URL || process.env.DATABASE_URL
+// Load an explicit env file first (its values win — dotenv won't override
+// already-set vars), then the local default as fallback.
+if (envFile) config({ path: envFile })
+config({ path: path.join(ROOT, '.env.local') })
+
+// Prefer the named vars; otherwise auto-detect any postgres:// value in the env
+// (so the exact key name doesn't matter). Never a https:// value.
+function findDbUrl() {
+  if (process.env.SUPABASE_DB_URL) return process.env.SUPABASE_DB_URL
+  if (process.env.DATABASE_URL) return process.env.DATABASE_URL
+  for (const [k, v] of Object.entries(process.env)) {
+    if (typeof v === 'string' && /^postgres(ql)?:\/\//.test(v)) {
+      console.log(`Using Postgres connection from ${k}`)
+      return v
+    }
+  }
+  return null
+}
+const DB_URL = findDbUrl()
 if (!DB_URL && !dryRun) {
   console.error(`SUPABASE_DB_URL not set in .env.local.
 
