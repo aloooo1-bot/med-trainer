@@ -7,6 +7,20 @@ lint / tests / build) but **not driven live**. This file is the pickup list.
 > For a Claude Code session: work top-to-bottom. Section 1 is a prerequisite for
 > almost everything else. Nothing here needs new design decisions unless noted.
 
+> **UPDATE 2026-07-22 (credits restored, live verification done):** The full
+> trainer flow was driven end-to-end against the file store — start → ask →
+> exam → order → predict → present (chart-lock) → grade → resume all pass;
+> model tiering confirmed from logs (chat/summaries=Haiku, grading=Sonnet).
+> **Two bugs fixed live** (commit 8b67a6f): `classifyFinding` mis-marked benign
+> ROS answers positive (acceptance #3), and the server generation timeout (120s)
+> was under the client wait (180s) → "Request was aborted". The image tagger +
+> chest generator loop was verified on a 3-film sample (commit 83895b3). So
+> §2 below is now DONE except full-UI click-through; §3 items 1–3 are proven at
+> sample scale and just need the full run. **Remaining truly-blocked item: run
+> migrations 0001/0002 in the Supabase SQL editor** (only the user can) — until
+> then the app uses the file store and can't save generated cases to the DB.
+> Also note: live case generation is currently slow (~3 min/case) — watch this.
+
 ---
 
 ## 1. Restore infrastructure (prerequisite)
