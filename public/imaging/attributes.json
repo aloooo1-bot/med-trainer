@@ -1,0 +1,46 @@
+{
+  "00000011_006.png": {
+    "laterality": "bilateral",
+    "features": [
+      "Bilateral lower lobe atelectasis",
+      "Increased opacity in bilateral lower lung fields",
+      "Elevation of bilateral hemidiaphragms",
+      "Retraction of lower lobes",
+      "Preserved upper and middle lobe aeration",
+      "Clear bilateral apices"
+    ],
+    "severity": "moderate",
+    "confidence": 0.92,
+    "reason": "Bilateral lower lobe atelectasis is clearly visible on both sides of the chest with symmetric findings; no right or left marker is present, but anatomical positioning and symmetry indicate bilateral involvement.",
+    "review": "auto"
+  },
+  "00000030_000.png": {
+    "laterality": "bilateral",
+    "features": [
+      "Bilateral lower lobe atelectasis",
+      "Increased opacification in bilateral lower lung fields",
+      "Loss of normal lung volume in lower lobes",
+      "Elevated diaphragm",
+      "Possible pleural effusion at bases"
+    ],
+    "severity": "moderate",
+    "confidence": 0.85,
+    "reason": "The atelectasis findings are clearly visible and symmetric on both sides of the chest radiograph, with no L/R marker indicating side preference; the bilateral symmetric nature of the opacification in lower lobes indicates bilateral pathology.",
+    "review": "auto"
+  },
+  "00000030_001.png": {
+    "laterality": "bilateral",
+    "features": [
+      "Bilateral lower lobe atelectasis with basilar opacity",
+      "Reduced lung volumes bilaterally",
+      "Bilateral hilar prominence",
+      "Normal cardiac silhouette",
+      "Intact osseous structures",
+      "Small pleural effusion bilaterally"
+    ],
+    "severity": "moderate",
+    "confidence": 0.85,
+    "reason": "Atelectatic changes are clearly visible in both lower lung fields symmetrically, meeting criteria for bilateral findings; no L/R marker visible but anatomical symmetry confirms bilateral involvement.",
+    "review": "auto"
+  }
+}
