@@ -11,6 +11,14 @@ lint / tests / build) but **not driven live**. This file is the pickup list.
 
 ## 1. Restore infrastructure (prerequisite)
 
+> **UPDATE 2026-07-22:** Supabase is BACK (free-tier un-pause again, same
+> project, 375 cases intact) — verified via service-role query. Migrations
+> 0001/0002 are still NOT run. Once they are run and `SESSION_STORE=file` is
+> removed, the 375 cached cases start WITHOUT Anthropic credits (only live
+> generation, patient chat, and grading need the LLM). Upstash still failing
+> (rate limiting fails open). Credits still exhausted — "start case" currently
+> fails with "credit balance is too low" whenever the cache misses.
+
 - [ ] **New/restored Supabase project.** Run, in order, in the SQL editor:
   1. `supabase/schema.sql`
   2. `supabase/migrations/0001_tiered_case_data.sql` (tiered case columns + column GRANTs)
