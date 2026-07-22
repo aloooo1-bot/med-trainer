@@ -37,31 +37,66 @@ function supabaseAvailable(): boolean {
   return !!process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.SESSION_STORE !== 'file'
 }
 
+// Column sets: the tiered columns exist only after migration 0001. Reads try
+// the tiered set first and fall back to legacy case_data so the app works
+// whether or not 0001 has been run.
+const TIERED_COLS = 'id, case_data, presentation_data, patient_knowledge, clinical_findings, ground_truth, imaging_cache, verified_images, is_generated'
+const LEGACY_COLS = 'id, case_data, imaging_cache, verified_images, is_generated'
+const MISSING_COL_RE = /column .* does not exist|could not find the .* column|schema cache/i
+
+// Memoized once per process: whether the tiered columns exist. Avoids a
+// guaranteed-failing tiered query on every pull before migration 0001 is run
+// (that doubling is what made pre-0001 pulls ~5s instead of ~sub-second).
+// Restart the server after running 0001 to re-detect.
+let tieredColumnsExist: boolean | undefined
+
+/**
+ * Run a cases query built with a given column-select string, retrying with the
+ * legacy column set if the tiered columns don't exist yet (pre-migration 0001).
+ */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function queryCasesWithFallback<T = any>(build: (cols: string) => PromiseLike<{ data: T; error: { message?: string } | null }>): Promise<{ data: T | null; error: { message?: string } | null }> {
+  if (tieredColumnsExist === false) {
+    return dbTimeout(build(LEGACY_COLS), 8000)
+  }
+  const res = await dbTimeout(build(TIERED_COLS), 8000)
+  if (res.error && MISSING_COL_RE.test(res.error.message ?? '')) {
+    tieredColumnsExist = false
+    return dbTimeout(build(LEGACY_COLS), 8000)
+  }
+  if (!res.error) tieredColumnsExist = true
+  return res
+}
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function rowToCaseData(row: any): CaseData | null {
+  if (row?.presentation_data) {
+    return joinCase({
+      presentation: row.presentation_data,
+      patientKnowledge: row.patient_knowledge ?? {},
+      clinicalFindings: row.clinical_findings ?? {},
+      groundTruth: row.ground_truth ?? {},
+    })
+  }
+  return (row?.case_data as CaseData | null) ?? null
+}
+
 /** Read a cached case by id — tiered columns preferred, legacy case_data fallback. */
 export async function lookupCachedCase(caseId: string): Promise<AcquiredCase | null> {
   if (supabaseAvailable()) {
     try {
       const db = createAdminClient()
-      const { data, error } = await dbTimeout(
-        db.from('cases')
-          .select('id, case_data, presentation_data, patient_knowledge, clinical_findings, ground_truth, imaging_cache, verified_images, is_generated')
-          .eq('id', caseId).maybeSingle(),
-        8000,
-      )
-      if (!error && data?.is_generated) {
-        const caseData = data.presentation_data
-          ? joinCase({
-              presentation: data.presentation_data,
-              patientKnowledge: data.patient_knowledge ?? {},
-              clinicalFindings: data.clinical_findings ?? {},
-              groundTruth: data.ground_truth ?? {},
-            })
-          : (data.case_data as CaseData | null)
+      const { data, error } = await queryCasesWithFallback(cols =>
+        db.from('cases').select(cols).eq('id', caseId).maybeSingle())
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const row = data as any
+      if (!error && row?.is_generated) {
+        const caseData = rowToCaseData(row)
         if (caseData) {
           return {
             caseId,
             caseData,
-            imagingCache: mergeImagingCache(data.imaging_cache, data.verified_images),
+            imagingCache: mergeImagingCache(row.imaging_cache, row.verified_images),
             generated: false,
           }
         }
@@ -84,24 +119,16 @@ export async function pickImageFirstCase(system: string, difficulty: string): Pr
   if (!supabaseAvailable()) return null
   try {
     const db = createAdminClient()
-    const { data, error } = await dbTimeout(
-      db.from('cases')
-        .select('id, case_data, presentation_data, patient_knowledge, clinical_findings, ground_truth, verified_images')
+    const { data, error } = await queryCasesWithFallback(cols =>
+      db.from('cases').select(cols)
         .eq('system', system).eq('difficulty', difficulty)
         .like('id', 'img-%').not('verified_images', 'is', null)
-        .eq('is_generated', true).limit(20),
-      8000,
-    )
-    if (error || !data?.length) return null
-    const picked = data[Math.floor(Math.random() * data.length)]
-    const caseData = picked.presentation_data
-      ? joinCase({
-          presentation: picked.presentation_data,
-          patientKnowledge: picked.patient_knowledge ?? {},
-          clinicalFindings: picked.clinical_findings ?? {},
-          groundTruth: picked.ground_truth ?? {},
-        })
-      : (picked.case_data as CaseData | null)
+        .eq('is_generated', true).limit(20))
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const rows = data as any[] | null
+    if (error || !rows?.length) return null
+    const picked = rows[Math.floor(Math.random() * rows.length)]
+    const caseData = rowToCaseData(picked)
     if (!caseData) return null
     return {
       caseId: picked.id,

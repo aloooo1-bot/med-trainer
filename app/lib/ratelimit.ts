@@ -15,10 +15,15 @@ function makeRatelimit(max: number, window: Duration, prefix: string): SafeRatel
   return {
     limit: async (id: string) => {
       try {
-        return await r.limit(id)
+        // Hard cap each call so a slow/unreachable Upstash can never add more
+        // than 800ms of latency to a request — fail open past that.
+        return await Promise.race([
+          r.limit(id),
+          new Promise<LimitResult>((_, reject) => setTimeout(() => reject(new Error('ratelimit timeout')), 800)),
+        ])
       } catch {
-        // Redis unavailable — fail open so a misconfigured/missing Upstash
-        // credential doesn't take down the entire route with an HTML 500.
+        // Redis unavailable/slow — fail open so a misconfigured/missing Upstash
+        // credential doesn't take down the route or add latency.
         console.warn(`[ratelimit] Redis error for prefix=${prefix} — allowing request`)
         return fallback
       }
