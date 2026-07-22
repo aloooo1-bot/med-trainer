@@ -31,6 +31,7 @@ export function splitCase(/** @type {AnyCase} */ caseData) {
     labResults, imagingResults, procedureResults,
     imagingCategory, ecgFindings, hematologyFindings, urineFindings,
     skinFindings, fundusFindings, biopsyFindings,
+    localChestImage, localChestCategory,
     // ── ground truth ──
     diagnosis, differentials, differentialExplanations, teachingPoints,
     keyQuestions, expectedLabs, expectedImaging, relevantTests,
@@ -51,6 +52,9 @@ export function splitCase(/** @type {AnyCase} */ caseData) {
       labResults, imagingResults, procedureResults,
       imagingCategory, ecgFindings, hematologyFindings, urineFindings,
       skinFindings, fundusFindings, biopsyFindings,
+      // Image-first binding: the exact local film this case was authored from.
+      // Result-level data — revealed only after the study is ordered.
+      localChestImage, localChestCategory,
     }),
     groundTruth: prune({
       diagnosis, differentials, differentialExplanations, teachingPoints,

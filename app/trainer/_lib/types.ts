@@ -41,6 +41,10 @@ export interface CaseData {
   /** 2-3 sentence pathophysiology for the "Why" layer. */
   mechanism?: string
   imagingCategory?: string
+  /** Image-first binding: exact local chest film (public path) this case was authored from. Server-only tier. */
+  localChestImage?: string
+  /** NIH ChestX-ray14 category of the bound film (e.g. 'Effusion'). Server-only tier. */
+  localChestCategory?: string
   ecgFindings?: string
   hematologyFindings?: string
   urineFindings?: string

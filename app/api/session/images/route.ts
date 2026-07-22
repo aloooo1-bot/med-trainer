@@ -2,7 +2,7 @@ import { NextRequest } from 'next/server'
 import * as Sentry from '@sentry/nextjs'
 import { requireOwnSession } from '@/app/lib/server/sessionAccess'
 import { replayEvents } from '@/app/lib/server/replay'
-import { pickECGImage, pickSpecialImage } from '@/app/lib/server/imageLookup'
+import { pickECGImage, pickSpecialImage, boundChestImage } from '@/app/lib/server/imageLookup'
 import { fetchImagingResults, type OpenIResult } from '@/app/lib/imagingSearch'
 import { getSpecialModality } from '@/app/lib/specialImageLookup'
 import { caseLaterality, filterByLaterality, type LateralityPolicy } from '@/app/lib/imageAttributes'
@@ -11,6 +11,11 @@ import { createAdminClient } from '@/app/lib/supabase/admin'
 
 const LATERALITY_POLICY: LateralityPolicy =
   process.env.IMAGE_LATERALITY_POLICY === 'lenient' ? 'lenient' : 'strict'
+
+const CHEST_RADIOGRAPH_RE = /\b(chest\s*x-?ray|cxr|chest\s*radiograph|chest\s*film|pa\s*(and|&|\/)?\s*lateral)\b/i
+function isChestRadiograph(test: string): boolean {
+  return CHEST_RADIOGRAPH_RE.test(test)
+}
 
 export const dynamic = 'force-dynamic'
 
@@ -53,6 +58,16 @@ export async function POST(req: NextRequest) {
       }[modality]
       const { special, match } = await pickSpecialImage(modality, caseData.diagnosis, findingField)
       return Response.json({ kind: 'special', modality, special, match })
+    }
+
+    // Image-first chest binding: if this case was authored from a specific local
+    // film, serve that exact film for a chest-radiograph order. No laterality
+    // filtering needed — the case IS the image (they can't disagree).
+    if (caseData.localChestImage && isChestRadiograph(test)) {
+      const bound = await boundChestImage(caseData.localChestImage)
+      if (bound) {
+        return Response.json({ kind: 'imaging', results: [bound], match: { required: 'unknown', status: 'confirmed' } })
+      }
     }
 
     // Radiology imaging — session-level pre-verified cache first, then Open-i.

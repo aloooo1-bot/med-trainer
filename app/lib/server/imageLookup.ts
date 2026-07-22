@@ -54,6 +54,46 @@ async function loadBlocklist(datasetDir: string): Promise<Set<string>> {
 export interface PickedECG { ecg: ECGImage | null; match: ImageMatch }
 export interface PickedSpecial { special: SpecialImage | null; match: ImageMatch }
 
+/**
+ * Image-first chest binding: a case generated from a specific local NIH film
+ * carries that film's public path in `localChestImage`. There is no matching to
+ * do — the case was authored FROM this exact image (laterality included), so we
+ * return it directly, marked verified. Returns null if the bound file is absent
+ * (deleted/moved) so the caller falls through to Open-i.
+ */
+export async function boundChestImage(localChestImage: string): Promise<OpenIResultLike | null> {
+  if (!localChestImage.startsWith('/imaging/')) return null
+  const rel = localChestImage.replace(/^\//, '')
+  try {
+    await fs.access(path.join(PUBLIC_DIR, rel))
+  } catch {
+    return null // bound file missing — let the route fall back
+  }
+  return {
+    uid: path.basename(localChestImage).replace(/\.[^.]+$/, ''),
+    imageUrl: localChestImage,
+    thumbnailUrl: localChestImage,
+    caption: 'Chest radiograph (case reference image)',
+    modality: 'X-Ray',
+    agentVerified: true,
+    confidence: 1,
+    verificationReason: 'Case authored from this exact image (image-first)',
+  }
+}
+
+/** Minimal shape shared with OpenIResult so the route can return a uniform list. */
+export interface OpenIResultLike {
+  uid: string
+  imageUrl: string
+  thumbnailUrl: string
+  caption: string
+  modality: string
+  abstract?: string
+  agentVerified?: boolean
+  confidence?: number
+  verificationReason?: string
+}
+
 export async function pickECGImage(diagnosis: string, ecgFindings?: string): Promise<PickedECG> {
   const category = getECGCategory(diagnosis, ecgFindings)
   const index = await readPublicJson<Record<string, string[]>>('ecg/index.json')
