@@ -19,7 +19,15 @@ lint / tests / build) but **not driven live**. This file is the pickup list.
 > sample scale and just need the full run. **Remaining truly-blocked item: run
 > migrations 0001/0002 in the Supabase SQL editor** (only the user can) — until
 > then the app uses the file store and can't save generated cases to the DB.
-> Also note: live case generation is currently slow (~3 min/case) — watch this.
+>
+> **Latency clarification (corrected):** case LOADING is fast — a real Supabase
+> case pull measured at ~210ms, and all 288 manifest slots are already generated
+> (375 total incl. img-* cases), so live generation NEVER fires in normal use
+> (0 cache misses). The ~3 min I saw was only because `SESSION_STORE=file`
+> bypasses Supabase and forces live generation on every start. **Just removing
+> `SESSION_STORE=file` makes pulls fast (~210ms) via the case_data fallback**,
+> even before migration 0001. Live-generation speed only ever matters when
+> creating a brand-new slot, which the complete library never needs.
 
 ---
 
