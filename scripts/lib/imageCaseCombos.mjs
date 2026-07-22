@@ -147,16 +147,23 @@ export const SPECIAL_COMBOS = [
 export const CHEST_COMBOS = [
   { modality: 'chest', category: 'Consolidation',     diagnosis: 'Lobar Pneumococcal Pneumonia',              system: 'Respiratory',              difficulty: 'Foundations', expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'lobar consolidation' },
   { modality: 'chest', category: 'Pneumonia',         diagnosis: 'Aspiration Pneumonia',                       system: 'Respiratory',              difficulty: 'Clinical',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'dependent-segment consolidation' },
+  // Infiltration: moved off a 3rd pneumonia → reactivation TB (distinct, can't-miss).
+  { modality: 'chest', category: 'Infiltration',      diagnosis: 'Reactivation Pulmonary Tuberculosis',        system: 'Infectious',               difficulty: 'Clinical',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'upper-lobe cavitary infiltrate' },
   { modality: 'chest', category: 'Effusion',          diagnosis: 'Parapneumonic Pleural Effusion',             system: 'Respiratory',              difficulty: 'Clinical',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'pleural effusion' },
   { modality: 'chest', category: 'Cardiomegaly',      diagnosis: 'Congestive Heart Failure',                   system: 'Cardiovascular',           difficulty: 'Clinical',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'cardiomegaly' },
-  { modality: 'chest', category: 'Edema',             diagnosis: 'Cardiogenic Pulmonary Edema',                system: 'Cardiovascular',           difficulty: 'Clinical',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'pulmonary edema' },
+  // Edema: split from CHF → non-cardiogenic ARDS. Radiographically similar to
+  // cardiogenic edema — the distinction is clinical, which is the teaching point.
+  { modality: 'chest', category: 'Edema',             diagnosis: 'Acute Respiratory Distress Syndrome (ARDS)', system: 'Respiratory',              difficulty: 'Advanced',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'diffuse bilateral airspace opacities' },
   { modality: 'chest', category: 'Pneumothorax',      diagnosis: 'Primary Spontaneous Pneumothorax',           system: 'Respiratory',              difficulty: 'Clinical',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'pneumothorax' },
   { modality: 'chest', category: 'Emphysema',         diagnosis: 'COPD (Emphysema-predominant)',               system: 'Respiratory',              difficulty: 'Clinical',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'hyperinflation' },
-  { modality: 'chest', category: 'Atelectasis',       diagnosis: 'Post-obstructive Lobar Atelectasis',         system: 'Respiratory',              difficulty: 'Clinical',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'lobar collapse' },
+  // Atelectasis: reframed from "post-obstructive" (implies tumor → overlaps Mass)
+  // to mucus plugging, keeping it distinct from the lung-cancer case.
+  { modality: 'chest', category: 'Atelectasis',       diagnosis: 'Lobar Atelectasis from Mucus Plugging',      system: 'Respiratory',              difficulty: 'Clinical',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'lobar collapse' },
   { modality: 'chest', category: 'Mass',              diagnosis: 'Non-Small Cell Lung Cancer',                 system: 'Hematologic / Oncologic',  difficulty: 'Advanced',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'lung mass' },
-  { modality: 'chest', category: 'Nodule',            diagnosis: 'Pulmonary Granuloma (Histoplasmosis)',       system: 'Infectious',               difficulty: 'Advanced',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'solitary pulmonary nodule' },
+  // Nodule + Mass are the classic benign-vs-malignant SPN dyad; Nodule is a
+  // workup/reassurance case → Clinical, not Advanced.
+  { modality: 'chest', category: 'Nodule',            diagnosis: 'Pulmonary Granuloma (Histoplasmosis)',       system: 'Infectious',               difficulty: 'Clinical',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'solitary pulmonary nodule' },
   { modality: 'chest', category: 'Fibrosis',          diagnosis: 'Idiopathic Pulmonary Fibrosis',              system: 'Respiratory',              difficulty: 'Advanced',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'reticular fibrosis' },
-  { modality: 'chest', category: 'Infiltration',      diagnosis: 'Atypical (Mycoplasma) Pneumonia',            system: 'Respiratory',              difficulty: 'Clinical',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'interstitial infiltrate' },
   { modality: 'chest', category: 'Pleural_Thickening', diagnosis: 'Asbestos-related Pleural Disease',          system: 'Respiratory',              difficulty: 'Advanced',    expectedImagingName: 'Chest X-Ray (PA and Lateral)', imagingCategory: 'pleural thickening' },
 ]
 
