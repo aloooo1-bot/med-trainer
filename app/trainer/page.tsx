@@ -500,7 +500,7 @@ export default function MedTrainer() {
       // merged client view as CaseData with server-only fields absent.
       return presentationToClientCase(data.presentation)
     } catch (e) {
-      const err = e as Error & { status?: number; data?: { gate?: { tier?: string } } }
+      const err = e as Error & { status?: number; data?: { gate?: { tier?: string }; retriable?: boolean } }
       console.error('Case generation failed:', err)
       if (err.status === 401) {
         setGenerationError('Please sign in to start a case — anonymous access is no longer available for live cases.')
@@ -508,6 +508,9 @@ export default function MedTrainer() {
         setGateBlocked(true)
       } else if (err.message?.includes('429')) {
         setGenerationError('API rate limit reached. Wait a moment and try again.')
+      } else if (err.status === 503 || err.data?.retriable || err.name === 'TimeoutError') {
+        // Generation abort/timeout (server or client-side): transient, retriable.
+        setGenerationError('Generating this case is taking longer than usual. Please try again.')
       } else {
         setGenerationError(`Failed to generate case: ${err.message}`)
       }
@@ -729,6 +732,16 @@ export default function MedTrainer() {
 
       // Update mastery + extract spaced-repetition cards from the reveal payload
       try {
+        // At Advanced the SOAP/oral presentation is a required deliverable, so
+        // its communication score folds lightly into the mastery signal (kept
+        // small — the clinical content is already captured by the rubric, which
+        // remains the displayed/stored case score). The headline score stays
+        // equal to the dimension sum so Progress/History invariants hold.
+        const rubricScore = result.score ?? 0
+        const presTotal = result.presentation?.presentationTotal
+        const masteryScore = caseDifficulty === 'Advanced' && typeof presTotal === 'number'
+          ? Math.round(0.85 * rubricScore + 0.15 * presTotal)
+          : rubricScore
         recordCaseOutcome(
           {
             diagnosis: reveal.diagnosis,
@@ -738,7 +751,7 @@ export default function MedTrainer() {
           },
           resolvedSystemRef.current || system,
           caseDifficulty,
-          result.score ?? 0,
+          masteryScore,
           result.correct ?? false,
           Date.now(),
         )

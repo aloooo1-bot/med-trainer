@@ -5,7 +5,7 @@ import { createAdminClient } from '../supabase/admin'
 import { buildCasePrompt, buildCaseSystemPrompt } from '../casePrompt'
 import { reconcileHistoryConsistency, sanitizePmhLeak } from '../generators/shared'
 import { MANIFEST, makeCaseId } from '../caseManifest'
-import { callModel } from './llm'
+import { callModel, extractJson } from './llm'
 import { splitCase, joinCase } from './caseTiers'
 import type { CaseData } from '../../trainer/_lib/types'
 import type { RawUsage } from '../analytics'
@@ -166,9 +166,7 @@ export async function generateCaseLive(
     messages: [{ role: 'user', content: prompt }],
     maxTokens: 12000,
   })
-  const match = text.match(/\{[\s\S]*\}/)
-  if (!match) throw new Error('No JSON in case-generation response')
-  const rawParsed = JSON.parse(match[0]) as CaseData
+  const rawParsed = extractJson<CaseData>(text)
   const parsed = sanitizePmhLeak(
     reconcileHistoryConsistency(rawParsed as unknown as Record<string, unknown>),
   ) as unknown as CaseData

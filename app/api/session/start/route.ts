@@ -3,6 +3,7 @@ import * as Sentry from '@sentry/nextjs'
 import { getSessionUser, unauthorized } from '@/app/lib/server/auth'
 import { consumeCaseQuota } from '@/app/lib/server/gate'
 import { sessionStartRatelimit } from '@/app/lib/ratelimit'
+import { isAbortError } from '@/app/lib/server/llm'
 import {
   lookupCachedCase, pickImageFirstCase, pickManifestDiagnosis,
   generateCaseLive, saveGeneratedCase, type AcquiredCase,
@@ -126,6 +127,15 @@ export async function POST(req: NextRequest) {
     Sentry.captureException(err, { extra: { route: '/api/session/start' } })
     const message = err instanceof Error ? err.message : 'Unknown error'
     console.error('[/api/session/start] error:', message)
+    // A generation abort/timeout is transient (model latency) — surface a
+    // clean, retriable message instead of a raw "Request was aborted." 500 so
+    // the client can offer "try again" rather than a hard failure.
+    if (isAbortError(err)) {
+      return Response.json(
+        { error: 'Generating this case is taking longer than usual. Please try again.', retriable: true },
+        { status: 503 },
+      )
+    }
     return Response.json({ error: message }, { status: 500 })
   }
 }

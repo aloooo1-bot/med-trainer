@@ -461,6 +461,9 @@ export function DiagnosisView({
               <span className="ml-2 font-mono font-normal text-xs text-ink-3">
                 {gradingResult.presentation.presentationTotal ?? 0}/100
               </span>
+              <span className="ml-2 font-normal text-xs text-ink-3" title="A portion of your presentation score folds into your Advanced mastery for this system.">
+                · contributes to mastery
+              </span>
             </h3>
             <div className="grid grid-cols-2 gap-2 mb-3">
               {(

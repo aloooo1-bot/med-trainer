@@ -4,6 +4,7 @@ import { requireOwnSession } from '@/app/lib/server/sessionAccess'
 import { getSessionStore, makeEvent } from '@/app/lib/server/sessionStore'
 import { replayEvents } from '@/app/lib/server/replay'
 import { assembleGradingInput, gradeSession } from '@/app/lib/server/gradeService'
+import { isAbortError } from '@/app/lib/server/llm'
 import { buildReveal } from '@/app/lib/server/caseTiers'
 import type { RawUsage } from '@/app/lib/analytics'
 
@@ -63,6 +64,12 @@ export async function POST(req: NextRequest) {
     Sentry.captureException(err, { extra: { route: '/api/session/grade' } })
     const message = err instanceof Error ? err.message : 'Unknown error'
     console.error('[/api/session/grade] error:', message)
+    if (isAbortError(err)) {
+      return Response.json(
+        { error: 'Grading is taking longer than usual. Please try again.', retriable: true },
+        { status: 503 },
+      )
+    }
     return Response.json({ error: message }, { status: 500 })
   }
 }

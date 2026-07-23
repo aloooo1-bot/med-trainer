@@ -84,11 +84,35 @@ export async function callModel(
   return { text, usage: response.usage as RawUsage }
 }
 
-/** Extract the first JSON object from a model reply, or throw. */
+/**
+ * Extract the first BALANCED JSON object from a model reply. Scans brace depth
+ * (respecting strings/escapes) rather than greedily matching to the last `}`,
+ * so trailing prose is tolerated and a response truncated mid-array (after the
+ * object's own braces balanced) still parses. Throws only on genuine
+ * truncation (object never closes) or no object at all.
+ */
 export function extractJson<T>(text: string): T {
-  const match = text.match(/\{[\s\S]*\}/)
-  if (!match) throw new Error('No JSON object in model response')
-  return JSON.parse(match[0]) as T
+  const start = text.indexOf('{')
+  if (start === -1) throw new Error('No JSON object in model response')
+  let depth = 0, inString = false, escaped = false
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i]
+    if (escaped) { escaped = false; continue }
+    if (ch === '\\') { escaped = true; continue }
+    if (ch === '"') { inString = !inString; continue }
+    if (inString) continue
+    if (ch === '{') depth++
+    else if (ch === '}' && --depth === 0) return JSON.parse(text.slice(start, i + 1)) as T
+  }
+  throw new Error('Model JSON truncated before the object closed')
+}
+
+/** True when an error is an aborted/timed-out model request (retriable). */
+export function isAbortError(err: unknown): boolean {
+  const name = (err as { name?: string })?.name ?? ''
+  const msg = (err as { message?: string })?.message ?? ''
+  return name === 'AbortError' || name === 'TimeoutError' ||
+    /abort|timed? ?out/i.test(msg)
 }
 
 /** Extract the first JSON array from a model reply, or throw. */

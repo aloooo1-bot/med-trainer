@@ -27,6 +27,17 @@ export function buildPatientSystemPrompt(
     ? pmhLines.join('\n')
     : 'No significant past medical history.'
 
+  // Review-of-systems knowledge. The grader treats the canonical reviewOfSystems
+  // as ground truth, so the patient agent must know it too — otherwise a
+  // directly-asked symptom (e.g. "any vomiting?") gets denied even though the
+  // case says it's present, contradicting the grade. Revealed per-system only
+  // when the physician asks about that system (preserves gating / anti-cueing).
+  const rosEntries = Object.entries(caseData.reviewOfSystems ?? {})
+    .filter(([, v]) => typeof v === 'string' && v.trim())
+  const rosSection = rosEntries.length
+    ? `\nYour body-system review (report the relevant part ONLY when the physician asks about that system or symptom — do NOT volunteer these; if a detail is something you would not personally know, e.g. a finding witnessed by others, attribute it to them: "my wife said…" rather than denying it):\n${rosEntries.map(([sys, v]) => `- ${sys}: ${v}`).join('\n')}`
+    : ''
+
   const isExamGated =
     (caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') &&
     (caseData.relevantExamRegions?.length ?? 0) > 0
@@ -63,6 +74,7 @@ Other information — only reveal if the physician asks directly about that spec
 - Current medications: ${caseData.hiddenHistory.medications}
 - Allergies: ${caseData.hiddenHistory.allergies}
 - Additional symptoms if asked: ${caseData.hiddenHistory.hiddenSymptoms}
+${rosSection}
 
 Rules:
 - Respond naturally as a patient, NOT as a medical expert

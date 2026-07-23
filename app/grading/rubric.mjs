@@ -129,9 +129,10 @@ ${weightBlock}
 ${input.timedOut ? '\nNOTE: This case was submitted when time expired. Grade whatever was submitted fairly — partial work should receive partial credit. Do not penalize harshly for incomplete reasoning if it appears the student was mid-sentence. Note in the feedback: "This case was submitted when time expired." Do not reduce scores further beyond what the time expiry already reflects.\n' : ''}
 HISTORY & INTERVIEW (/${hi.max}):
 - ELICITATION TYPES: When evaluating each keyQuestion, classify how the student captured the information:
-    • PROACTIVE: The student's question explicitly names the symptom, system, or history item (e.g., "Any chest pain?" "Family history of stroke?" "Are you on any blood thinners?") and the patient's next turn supplies the answer.
-    • INCIDENTAL: The information appears in the patient's reply but the student's question was broad/open ("Tell me more," "Anything else?," "What else is going on?") OR the patient volunteered the info during a reply to a different topic.
+    • PROACTIVE: The student's question names the specific symptom/history item ("Any chest pain?" "Are you on blood thinners?") OR names the HISTORY DOMAIN the key question lives in — e.g. "Do you have any medical conditions / chronic illnesses?", "What medications do you take?", "Any allergies?", "Any family history of illness?", "Any past surgeries or hospitalizations?". These domain-level questions are standard, high-yield history-taking; when the patient's answer supplies the key fact (e.g. patient names osteoporosis in response to "any medical conditions?"), treat it as a PROACTIVE full hit for every key question answerable within that domain. Do NOT require the student to name the exact condition in advance — a clinician cannot name a diagnosis they are trying to uncover.
+    • INCIDENTAL: The information appears only after a CONTENTLESS prompt ("Tell me more," "Anything else?," "What else is going on?") that names neither a symptom nor a history domain, OR the patient volunteered it while answering an unrelated question.
 - Treat PROACTIVE elicitation as a full hit for the corresponding keyQuestion; treat INCIDENTAL surfacing as a half-hit (worth ~50% of the per-question contribution). The scoring tiers below apply after this proactive/incidental weighting.
+- CORE PRINCIPLE: information the student SUCCESSFULLY OBTAINED (by any question that named the item or its domain) is NOT a missed question and must NOT reduce the score as if it were absent. Only truly un-elicited, un-volunteered facts count against historyInterview.
 - Do not penalize for questions not asked unless they are critical to ruling out a dangerous alternative diagnosis or directly change management
 - A student who asked high-yield targeted questions should score ${hiFloor}-${hiHigh}/${hi.max}; score ${hiLow}-${hi.max} if they also asked about safety-critical differentials (e.g. PE symptoms in a DVT case)
 - ${hiMid}-${hiHigh}: asked most high-yield questions; missed 1 management-relevant area
@@ -267,6 +268,10 @@ MISSED QUESTIONS — only list a question if ALL of the following are true:
 1. The answer was not already available from the physical exam or HPI
 2. Asking it would have meaningfully changed the diagnosis or management (not just completeness)
 3. The trainee genuinely never surfaced the information through any question (including incidental capture via broad prompts — those count as surfaced and belong in historyInterview feedback, not here)
+
+FINAL PRE-RETURN CHECK (do this before writing the JSON — it prevents the most common grading error, penalizing information the student actually obtained):
+- For EACH item you are about to put in missedQuestions, scan the interview transcript AND the "Pre-presented to student" block. If the fact was disclosed by the patient (even in response to a domain-level question like "any medical conditions?"), OR was pre-presented before the case began, REMOVE it from missedQuestions — it was not missed. It is self-contradictory to write "the patient volunteered X" or "X was already shown" while listing X as missed.
+- Then re-check historyInterview: every key question whose fact the student obtained (proactively or via a domain-level question) or that was pre-presented counts as covered. Only genuinely un-obtained key questions may lower the score. If you lowered historyInterview for an item the student actually surfaced or that was pre-presented, raise the score accordingly before returning.
 
 Return:
 {
