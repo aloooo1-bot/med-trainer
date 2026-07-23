@@ -218,21 +218,59 @@ export function assembleGradingInput(
   }
 }
 
+/**
+ * Extract the first balanced JSON object from a model reply. Unlike a greedy
+ * `/\{[\s\S]*\}/`, this scans brace depth (respecting strings/escapes) so a
+ * response with trailing prose — or one truncated mid-array after the object's
+ * braces balanced — still yields parseable JSON. Throws only when the object
+ * never closes (a genuine truncation).
+ */
+function parseGradingObject(text: string): unknown {
+  const start = text.indexOf('{')
+  if (start === -1) throw new Error('No JSON object in grading response')
+  let depth = 0, inString = false, escaped = false
+  for (let i = start; i < text.length; i++) {
+    const ch = text[i]
+    if (escaped) { escaped = false; continue }
+    if (ch === '\\') { escaped = true; continue }
+    if (ch === '"') { inString = !inString; continue }
+    if (inString) continue
+    if (ch === '{') depth++
+    else if (ch === '}') {
+      depth--
+      if (depth === 0) return JSON.parse(text.slice(start, i + 1))
+    }
+  }
+  throw new Error('Grading JSON truncated before the object closed')
+}
+
 export async function gradeSession(
   input: GradingInput,
   onUsage?: GradingUsageCallback,
 ): Promise<GradingResult> {
   const prompt = buildRubricPrompt(input)
-  const { text, usage } = await callModel('grading', {
-    system: GRADING_SYSTEM_PROMPT,
-    messages: [{ role: 'user', content: prompt }],
-    maxTokens: 2000,
-  })
-  onUsage?.('grading_main', usage)
 
-  const match = text.match(/\{[\s\S]*\}/)
-  if (!match) throw new Error('No JSON in grading response')
-  const result = GradingResultSchema.parse(JSON.parse(match[0])) as GradingResult
+  // Grade with one retry: a verbose case can exceed the token budget and
+  // truncate the JSON. Rather than 500 on a completed case, retry once with
+  // more headroom before surfacing the failure.
+  let parsed: unknown | null = null
+  for (const maxTokens of [3000, 4096]) {
+    const { text, usage } = await callModel('grading', {
+      system: GRADING_SYSTEM_PROMPT,
+      messages: [{ role: 'user', content: prompt }],
+      maxTokens,
+    })
+    onUsage?.('grading_main', usage)
+    try {
+      parsed = parseGradingObject(text)
+      break
+    } catch (e) {
+      console.warn(`[grade] parse failed at maxTokens=${maxTokens}: ${(e as Error).message}`)
+    }
+  }
+  if (parsed === null) throw new Error('Grading response could not be parsed after retry')
+
+  const result = GradingResultSchema.parse(parsed) as GradingResult
 
   clampDimensions(result, input.difficulty)
   if (result.dimensions) {
