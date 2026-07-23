@@ -93,23 +93,40 @@ export default function PerformanceBreakdown({ sessions, tier }: { sessions: Ses
       </div>
       <div className="dx-perf-table">
         <div className="dx-perf-header">
-          <span className="dx-perf-th sortable" onClick={() => clickHeader('system')}>System{arrow('system')}</span>
-          <span className="dx-perf-th sortable" onClick={() => clickHeader('count')}>Cases{arrow('count')}</span>
-          <span
-            className="dx-perf-th sortable"
-            onClick={() => clickHeader('avgScore')}
-            title="Mean rubric score across all difficulty levels. Equals Foundations avg when only Foundations cases have been attempted."
-          >Avg{arrow('avgScore')}</span>
-          <span className="dx-perf-th sortable" onClick={() => clickHeader('fAvg')}>Foundations{arrow('fAvg')}</span>
-          <span className="dx-perf-th sortable" onClick={() => clickHeader('cAvg')} title="— indicates no Clinical-level attempts yet">Clinical{arrow('cAvg')}</span>
-          <span className="dx-perf-th sortable" onClick={() => clickHeader('aAvg')} title="— indicates no Advanced-level attempts yet">Advanced{arrow('aAvg')}</span>
+          {([
+            { key: 'system' as SortKey, label: 'System', tip: undefined },
+            { key: 'count' as SortKey, label: 'Cases', tip: undefined },
+            { key: 'avgScore' as SortKey, label: 'Avg', tip: 'Mean rubric score across all difficulty levels. Equals Foundations avg when only Foundations cases have been attempted.' },
+            { key: 'fAvg' as SortKey, label: 'Foundations', tip: undefined },
+            { key: 'cAvg' as SortKey, label: 'Clinical', tip: '— indicates no Clinical-level attempts yet' },
+            { key: 'aAvg' as SortKey, label: 'Advanced', tip: '— indicates no Advanced-level attempts yet' },
+          ]).map(({ key, label, tip }) => (
+            <button
+              key={key}
+              type="button"
+              className="dx-perf-th sortable"
+              style={{ background: 'none', border: 'none', padding: 0, fontFamily: 'inherit' }}
+              onClick={() => clickHeader(key)}
+              title={tip}
+              aria-label={`Sort by ${label}${key === sortKey ? `, currently ${sortDir === 'asc' ? 'ascending' : 'descending'}` : ''}`}
+            >{label}{arrow(key)}</button>
+          ))}
         </div>
         {rows.map(r => (
-          <button
+          <div
             key={r.system}
             className="dx-perf-row"
-            style={{ width: '100%', textAlign: 'left', background: 'none', border: 'none', padding: 0, cursor: 'pointer' }}
+            role="button"
+            tabIndex={0}
+            style={{ cursor: 'pointer' }}
             onClick={() => router.push(`/history?system=${encodeURIComponent(r.system)}`)}
+            onKeyDown={e => {
+              if (e.target !== e.currentTarget) return
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                router.push(`/history?system=${encodeURIComponent(r.system)}`)
+              }
+            }}
             title={`View ${r.system} case history`}
           >
             <span className="dx-perf-system">{r.system}</span>
@@ -126,7 +143,7 @@ export default function PerformanceBreakdown({ sessions, tier }: { sessions: Ses
                 <a href={`/trainer?system=${encodeURIComponent(r.system)}&difficulty=Advanced`} style={{ fontSize: 10, color: 'var(--accent)', textDecoration: 'none' }} onClick={e => e.stopPropagation()}>Try →</a>
               ) : '—'}
             </span>
-          </button>
+          </div>
         ))}
       </div>
     </div>

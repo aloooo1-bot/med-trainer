@@ -19,6 +19,7 @@ import {
   recordAbandonedSession,
 } from '../lib/analytics'
 import { recordCaseOutcome, recordCalibration } from '../lib/reasoning/store'
+import { pushReasoning } from '../lib/reasoning/sync'
 import { computeBeliefs } from '../lib/reasoning/differential'
 import { scorePrediction } from '../lib/reasoning/prediction'
 import { type CaseData, type NotesState, selectHpi, SOAP_TEMPLATE } from './_lib/types'
@@ -757,6 +758,8 @@ export default function MedTrainer() {
             recordCalibration(topCorrect ? 100 : 0, topCorrect, Date.now(), predictionConfidence ?? undefined, topCorrect)
           }
         }
+        // Best-effort account sync of the new mastery/cards (no-op signed out).
+        void pushReasoning()
       } catch {}
 
       // Mark first case done for free users

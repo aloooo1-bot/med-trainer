@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef, useMemo } from 'react'
+import { useEffect, useRef, useMemo, useState } from 'react'
 import {
   Chart, LineController, LineElement, PointElement,
   CategoryScale, LinearScale, Tooltip, Legend,
@@ -8,25 +8,37 @@ import {
 import type { GradingResult } from '@/app/grading/types'
 import { getRubric, type DimensionKey } from '@/app/grading/rubric'
 import { useChartTheme } from '@/app/lib/useChartTheme'
+import { fmtDate, dateTickIndices } from '@/app/lib/chartAxis'
 
 Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend)
 
-type Session = { score: number; completed_at: string; difficulty: string; grading_result: GradingResult | null }
+type Session = { score: number; system: string; completed_at: string; difficulty: string; grading_result: GradingResult | null }
 
 const MIN_CASES = 10
 
 export default function ComponentScoreTrends({ sessions }: { sessions: Session[] }) {
+  const [system, setSystem] = useState('all')
   const chrono = useMemo(
     () => [...sessions].reverse().filter(s => s.grading_result?.dimensions),
     [sessions]
+  )
+  const systems = useMemo(
+    () => [...new Set(chrono.map(s => s.system).filter(Boolean))].sort(),
+    [chrono]
+  )
+  const filtered = useMemo(
+    () => system === 'all' ? chrono : chrono.filter(s => s.system === system),
+    [chrono, system]
   )
   const ref = useRef<HTMLCanvasElement>(null)
   const chartRef = useRef<Chart | null>(null)
   const theme = useChartTheme()
 
   useEffect(() => {
-    if (!ref.current || sessions.length < MIN_CASES || chrono.length === 0) return
+    if (!ref.current || chrono.length < MIN_CASES || filtered.length < 2) return
     chartRef.current?.destroy()
+    const labels = filtered.map(s => fmtDate(s.completed_at))
+    const visibleTicks = dateTickIndices(filtered)
 
     const dimColors: Record<DimensionKey, string> = {
       historyInterview:      theme.primary,
@@ -42,7 +54,7 @@ export default function ComponentScoreTrends({ sessions }: { sessions: Session[]
       const color = dimColors[key]
       return {
         label,
-        data: chrono.map(s => {
+        data: filtered.map(s => {
           const rubric = getRubric(s.difficulty)
           const dimDef = rubric.find(d => d.key === key)
           if (!dimDef) return null
@@ -52,17 +64,18 @@ export default function ComponentScoreTrends({ sessions }: { sessions: Session[]
         }),
         borderColor: color,
         backgroundColor: color + '20',
-        tension: 0.35,
+        cubicInterpolationMode: 'monotone' as const,
         pointRadius: 3,
         borderWidth: 2,
         fill: false,
         spanGaps: true,
+        clip: false,
       }
     })
     chartRef.current = new Chart(ref.current, {
       type: 'line',
       data: {
-        labels: chrono.map((_, i) => `Case ${i + 1}`),
+        labels,
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         datasets: datasets as any,
       },
@@ -70,7 +83,16 @@ export default function ComponentScoreTrends({ sessions }: { sessions: Session[]
         responsive: true,
         maintainAspectRatio: false,
         scales: {
-          x: { ticks: { color: theme.inkTertiary, font: { size: 10 } }, grid: { color: theme.gridLine } },
+          x: {
+            ticks: {
+              color: theme.inkTertiary,
+              font: { size: 10 },
+              autoSkip: false,
+              maxRotation: 0,
+              callback: (_v, i) => visibleTicks.has(i) ? labels[i] : '',
+            },
+            grid: { color: theme.gridLine },
+          },
           y: { min: 0, max: 100, ticks: { color: theme.inkTertiary, stepSize: 25, callback: v => `${v}%` }, grid: { color: theme.gridLine } },
         },
         plugins: {
@@ -85,15 +107,18 @@ export default function ComponentScoreTrends({ sessions }: { sessions: Session[]
       },
     })
     return () => chartRef.current?.destroy()
-  }, [chrono, sessions.length, theme])
+  }, [chrono.length, filtered, theme])
 
-  if (sessions.length < MIN_CASES) {
-    const remaining = MIN_CASES - sessions.length
+  if (chrono.length < MIN_CASES) {
+    const remaining = MIN_CASES - chrono.length
     return (
       <div className="dx-card">
         <div className="dx-card-header">Component Score Trends</div>
         <div className="dx-card-body dx-progress-locked">
-          <p>Complete {remaining} more case{remaining !== 1 ? 's' : ''} to see how each scoring component is trending.</p>
+          <p>
+            Complete {remaining} more case{remaining !== 1 ? 's' : ''} with component grading to see how each scoring component is trending.
+            {sessions.length >= MIN_CASES ? ' Older cases without per-component scores don’t count toward this.' : ''}
+          </p>
         </div>
       </div>
     )
@@ -101,14 +126,37 @@ export default function ComponentScoreTrends({ sessions }: { sessions: Session[]
 
   return (
     <div className="dx-card">
-      <div className="dx-card-header">Component Score Trends</div>
+      <div className="dx-card-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+        <span>Component Score Trends</span>
+        <select
+          value={system}
+          onChange={e => setSystem(e.target.value)}
+          aria-label="Filter by system"
+          style={{
+            fontSize: 11, padding: '2px 4px', borderRadius: 4, border: '1px solid var(--border)',
+            background: 'transparent', color: system === 'all' ? 'var(--muted)' : 'var(--text)',
+            cursor: 'pointer', maxWidth: 150, fontWeight: 400,
+          }}
+        >
+          <option value="all">All systems</option>
+          {systems.map(s => <option key={s} value={s}>{s}</option>)}
+        </select>
+      </div>
       <div className="dx-card-body">
-        <div style={{ position: 'relative', height: 280 }}>
-          <canvas ref={ref} />
-        </div>
-        <p style={{ fontSize: 11, color: 'var(--muted)', margin: '10px 0 0' }}>
-          Click legend items to toggle visibility.
-        </p>
+        {filtered.length < 2 ? (
+          <div className="dx-progress-locked" style={{ height: 280 }}>
+            <p>Not enough {system} cases with component grading — try another system.</p>
+          </div>
+        ) : (
+          <>
+            <div style={{ position: 'relative', height: 280 }}>
+              <canvas ref={ref} />
+            </div>
+            <p style={{ fontSize: 11, color: 'var(--muted)', margin: '10px 0 0' }}>
+              Click legend items to toggle visibility.
+            </p>
+          </>
+        )}
       </div>
     </div>
   )

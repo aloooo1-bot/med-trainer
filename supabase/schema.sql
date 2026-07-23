@@ -195,14 +195,16 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "profiles_own_read"
   ON profiles FOR SELECT USING (auth.uid() = id);
 CREATE POLICY "profiles_own_update"
-  ON profiles FOR UPDATE USING (auth.uid() = id);
+  ON profiles FOR UPDATE USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 
--- Case sessions: users can read/insert their own rows only
+-- Case sessions: users can read/insert/update their own rows only
 ALTER TABLE case_sessions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "sessions_own_read"
   ON case_sessions FOR SELECT USING (auth.uid() = user_id);
 CREATE POLICY "sessions_own_insert"
   ON case_sessions FOR INSERT WITH CHECK (auth.uid() = user_id);
+CREATE POLICY "sessions_own_update"
+  ON case_sessions FOR UPDATE USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
 
 -- Ratings:
 --   • Anyone (incl. anonymous) can insert

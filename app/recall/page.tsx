@@ -4,7 +4,8 @@ import { useState, useEffect, useCallback } from 'react'
 import '@/app/dashboard.css'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import { createClient } from '@/app/lib/supabase/client'
-import { loadReviewItems, gradeReviewItem, recordReviewDay, loadStreak } from '@/app/lib/reasoning/store'
+import { loadReviewItems, gradeReviewItem, restoreReviewItem, recordReviewDay, loadStreak } from '@/app/lib/reasoning/store'
+import { syncReasoning, pushReasoning } from '@/app/lib/reasoning/sync'
 import { dueItems } from '@/app/lib/reasoning/spacedRepetition'
 import type { ReviewItem, ReviewGrade, ReviewTag } from '@/app/lib/reasoning/types'
 import DeckBrowser from './DeckBrowser'
@@ -20,7 +21,7 @@ const GRADES: { grade: ReviewGrade; label: string; color: string; hint: string }
   { grade: 'again', label: 'Again', color: 'var(--red)', hint: 'forgot' },
   { grade: 'hard', label: 'Hard', color: 'var(--amber)', hint: 'barely' },
   { grade: 'good', label: 'Good', color: 'var(--green)', hint: 'got it' },
-  { grade: 'easy', label: 'Easy', color: 'var(--primary, #6366f1)', hint: 'trivial' },
+  { grade: 'easy', label: 'Easy', color: 'var(--accent)', hint: 'trivial' },
 ]
 
 export default function RecallPage() {
@@ -36,6 +37,8 @@ export default function RecallPage() {
   const [showAnswer, setShowAnswer] = useState(false)
   const [reviewedCount, setReviewedCount] = useState(0)
   const [streak, setStreak] = useState(0)
+  // Snapshot of the last graded card, for undoing a mis-tap.
+  const [lastAction, setLastAction] = useState<{ item: ReviewItem; wasAgain: boolean } | null>(null)
 
   useEffect(() => {
     const supabase = createClient()
@@ -46,33 +49,62 @@ export default function RecallPage() {
         setDisplayName(p.display_name ?? user.email?.split('@')[0] ?? 'User')
         setTier(p.tier ?? 'free')
       })
-    })
+    }).catch(() => {})
   }, [])
 
   useEffect(() => {
-    // Mount-only load of review cards + streak from localStorage (unavailable during SSR).
-    const t = Date.now()
-    const items = loadReviewItems()
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setAllItems(items)
-    setNow(t)
-    setQueue(dueItems(items, t))
-    setStreak(loadStreak().streak)
-    setLoaded(true)
+    let cancelled = false
+    // Pull + union-merge the account copy first (quiet no-op signed-out or
+    // offline), then build the session from the merged local state.
+    ;(async () => {
+      await syncReasoning()
+      if (cancelled) return
+      const t = Date.now()
+      const items = loadReviewItems()
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setAllItems(items)
+      setNow(t)
+      setQueue(dueItems(items, t))
+      setStreak(loadStreak().streak)
+      setLoaded(true)
+    })()
+    return () => { cancelled = true }
   }, [])
 
   const current = queue[idx]
 
-  const grade = useCallback((g: ReviewGrade, now: number) => {
+  const grade = useCallback((g: ReviewGrade, nowMs: number) => {
     if (!current) return
-    gradeReviewItem(current.id, g, now)
-    setStreak(recordReviewDay(now).streak)
-    setReviewedCount(c => c + 1)
+    // Snapshot the pre-grade scheduling state so a mis-tap can be undone.
+    setLastAction({ item: { ...current }, wasAgain: g === 'again' })
+    const updated = gradeReviewItem(current.id, g, nowMs)
+    // Keep the deck browser's counts and per-card schedules live.
+    setAllItems(updated)
+    setNow(nowMs)
     setShowAnswer(false)
-    // A lapse re-shows the card later this session.
-    if (g === 'again') setQueue(q => [...q, current])
+    if (g === 'again') {
+      // A lapse re-shows the card later this session; it isn't a completed
+      // review yet, so it doesn't count toward the total or the streak.
+      setQueue(q => [...q, current])
+    } else {
+      setReviewedCount(c => c + 1)
+      setStreak(recordReviewDay(nowMs).streak)
+    }
     setIdx(i => i + 1)
   }, [current])
+
+  const undo = useCallback(() => {
+    if (!lastAction) return
+    // Restore the card's pre-grade scheduling and step back to it. The daily
+    // streak is left as-is (a review did happen today).
+    const restored = restoreReviewItem(lastAction.item)
+    setAllItems(restored)
+    if (lastAction.wasAgain) setQueue(q => q.slice(0, -1))
+    else setReviewedCount(c => Math.max(0, c - 1))
+    setIdx(i => Math.max(0, i - 1))
+    setShowAnswer(false)
+    setLastAction(null)
+  }, [lastAction])
 
   // Keyboard shortcuts: space/enter reveals, 1-4 grade Again/Hard/Good/Easy.
   useEffect(() => {
@@ -96,6 +128,11 @@ export default function RecallPage() {
   const remaining = queue.length - idx
   const done = loaded && (queue.length === 0 || idx >= queue.length)
 
+  // Push the finished session's scheduling state to the account.
+  useEffect(() => {
+    if (done && reviewedCount > 0) void pushReasoning()
+  }, [done, reviewedCount])
+
   return (
     <div className="dx-root">
       <Sidebar displayName={displayName} tier={tier} activePage="recall" />
@@ -105,6 +142,9 @@ export default function RecallPage() {
             <h1 style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)' }}>Recall</h1>
             <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 4 }}>
               Spaced-repetition review of the key concepts from your cases. Cards resurface on a schedule so they stick.
+            </p>
+            <p style={{ fontSize: 11, color: 'var(--muted)', marginTop: 4, opacity: 0.8 }}>
+              Your deck and streak sync to your account when signed in; signed out they live only in this browser.
             </p>
           </div>
 
@@ -123,9 +163,19 @@ export default function RecallPage() {
                     : 'Complete cases in the trainer to build your review deck, then check back as cards come due.'}
                 </p>
                 {streak > 0 && (
-                  <div style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 999, background: 'var(--surface-2, transparent)', border: '1px solid var(--border)' }}>
+                  <div style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 999, background: 'var(--surface2)', border: '1px solid var(--border)' }}>
                     <span style={{ fontSize: 15 }}>🔥</span>
                     <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--text)' }}>{streak}-day review streak</span>
+                  </div>
+                )}
+                {lastAction && reviewedCount > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    <button
+                      onClick={undo}
+                      style={{ fontSize: 12, color: 'var(--muted)', background: 'none', border: '1px solid var(--border)', borderRadius: 6, padding: '4px 12px', cursor: 'pointer' }}
+                    >
+                      ↩ Undo last grade
+                    </button>
                   </div>
                 )}
               </div>
@@ -133,10 +183,21 @@ export default function RecallPage() {
           ) : (
             <>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <span style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'JetBrains Mono, monospace' }}>
-                  {remaining} due{streak > 0 ? `  ·  🔥 ${streak}` : ''}
+                <span style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'JetBrains Mono, monospace' }} title={streak > 0 ? `${streak}-day review streak` : undefined}>
+                  {remaining} due{streak > 0 ? `  ·  🔥 ${streak}-day review streak` : ''}
                 </span>
-                <span style={{ fontSize: 12, color: 'var(--muted)' }}>{TAG_LABEL[current.tag]} · {current.diagnosis}</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                  {lastAction && (
+                    <button
+                      onClick={undo}
+                      title="Undo the last grade"
+                      style={{ fontSize: 11, color: 'var(--muted)', background: 'none', border: '1px solid var(--border)', borderRadius: 5, padding: '2px 8px', cursor: 'pointer' }}
+                    >
+                      ↩ Undo
+                    </button>
+                  )}
+                  <span style={{ fontSize: 12, color: 'var(--muted)' }}>{TAG_LABEL[current.tag]} · {current.diagnosis}</span>
+                </span>
               </div>
 
               <div className="dx-card" role="group" aria-label="Review card">
@@ -153,7 +214,7 @@ export default function RecallPage() {
                   ) : (
                     <button
                       onClick={() => setShowAnswer(true)}
-                      style={{ alignSelf: 'flex-start', marginTop: 'auto', padding: '8px 18px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface-2, transparent)', color: 'var(--text)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+                      style={{ alignSelf: 'flex-start', marginTop: 'auto', padding: '8px 18px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface2)', color: 'var(--text)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
                     >
                       Show answer <span style={{ opacity: 0.5, fontWeight: 400 }}>(space)</span>
                     </button>

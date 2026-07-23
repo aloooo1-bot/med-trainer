@@ -12,6 +12,7 @@ import type { MasteryRecord, ReviewItem, TestImpacts } from './types'
 import { makeReviewItem, scheduleNext } from './spacedRepetition'
 import { updateMastery, masteryKey } from './mastery'
 import type { ReviewGrade } from './types'
+import { localDayKey, localDayKeyOffset } from '@/app/lib/localDay'
 
 const REVIEW_KEY = 'medtrainer_review_items'
 const MASTERY_KEY = 'medtrainer_mastery'
@@ -19,7 +20,6 @@ const STREAK_KEY = 'medtrainer_recall_streak'
 const CALIBRATION_KEY = 'medtrainer_calibration'
 const MAX_REVIEW = 2000
 const MAX_CALIBRATION = 500
-const DAY_MS = 86_400_000
 
 // ── Review-item extraction (pure) ───────────────────────────────────────────
 
@@ -87,7 +87,24 @@ export function buildReviewItems(c: CaseLike, system: string, now: number): Revi
 // ── Review-item persistence ─────────────────────────────────────────────────
 
 export function loadReviewItems(): ReviewItem[] {
-  try { return JSON.parse(localStorage.getItem(REVIEW_KEY) ?? '[]') as ReviewItem[] } catch { return [] }
+  try {
+    const raw = JSON.parse(localStorage.getItem(REVIEW_KEY) ?? '[]') as unknown
+    if (!Array.isArray(raw)) return []
+    // Shape-validate each card: a persisted item from an older schema with a
+    // missing/NaN scheduling field would otherwise produce NaN due dates in
+    // scheduleNext and silently vanish from the due queue forever.
+    return raw.filter((i): i is ReviewItem => {
+      const r = i as Partial<ReviewItem> | null
+      return !!r && typeof r === 'object' &&
+        typeof r.id === 'string' &&
+        typeof r.prompt === 'string' &&
+        typeof r.answer === 'string' &&
+        Number.isFinite(r.ease) &&
+        Number.isFinite(r.intervalDays) &&
+        Number.isFinite(r.dueAt) &&
+        Number.isFinite(r.repetitions)
+    })
+  } catch { return [] }
 }
 
 function saveReviewItems(items: ReviewItem[]): void {
@@ -110,6 +127,20 @@ export function gradeReviewItem(id: string, grade: ReviewGrade, now: number): Re
   if (idx >= 0) items[idx] = scheduleNext(items[idx], grade, now)
   saveReviewItems(items)
   return items
+}
+
+/** Write a snapshot of one item back verbatim (used by undo-last-grade). */
+export function restoreReviewItem(item: ReviewItem): ReviewItem[] {
+  const items = loadReviewItems()
+  const idx = items.findIndex(i => i.id === item.id)
+  if (idx >= 0) items[idx] = item
+  saveReviewItems(items)
+  return items
+}
+
+/** Overwrite the whole deck (used by cloud sync after a union-merge). */
+export function replaceReviewItems(items: ReviewItem[]): void {
+  saveReviewItems(items)
 }
 
 export function clearReviewItems(): void {
@@ -137,6 +168,11 @@ export function recordMastery(system: string, difficulty: string, score: number,
   return records
 }
 
+/** Overwrite all mastery records (used by cloud sync after a union-merge). */
+export function replaceMastery(records: MasteryRecord[]): void {
+  saveMastery(records)
+}
+
 export function clearMastery(): void {
   try { localStorage.removeItem(MASTERY_KEY) } catch {}
 }
@@ -146,11 +182,16 @@ export function clearMastery(): void {
 export interface RecallStreak { lastDay: string; streak: number }
 
 function dayString(ms: number): string {
-  return new Date(ms).toISOString().slice(0, 10) // YYYY-MM-DD (UTC)
+  return localDayKey(ms) // YYYY-MM-DD in the user's local timezone
 }
 
 export function loadStreak(): RecallStreak {
   try { return JSON.parse(localStorage.getItem(STREAK_KEY) ?? '{"lastDay":"","streak":0}') as RecallStreak } catch { return { lastDay: '', streak: 0 } }
+}
+
+/** Overwrite the streak (used by cloud sync after a union-merge). */
+export function replaceStreak(s: RecallStreak): void {
+  try { localStorage.setItem(STREAK_KEY, JSON.stringify(s)) } catch {}
 }
 
 /** Mark a review as done today; extends the streak if yesterday was reviewed, else resets to 1. Idempotent within a day. */
@@ -158,7 +199,7 @@ export function recordReviewDay(now: number): RecallStreak {
   const day = dayString(now)
   const cur = loadStreak()
   if (cur.lastDay === day) return cur
-  const yesterday = dayString(now - DAY_MS)
+  const yesterday = localDayKeyOffset(now, 1)
   const next: RecallStreak = { lastDay: day, streak: cur.lastDay === yesterday ? cur.streak + 1 : 1 }
   try { localStorage.setItem(STREAK_KEY, JSON.stringify(next)) } catch {}
   return next
@@ -198,6 +239,11 @@ export function recordCalibration(
   const capped = entries.slice(-MAX_CALIBRATION)
   try { localStorage.setItem(CALIBRATION_KEY, JSON.stringify(capped)) } catch {}
   return capped
+}
+
+/** Overwrite the calibration history (used by cloud sync after a union-merge). */
+export function replaceCalibration(entries: CalibrationEntry[]): void {
+  try { localStorage.setItem(CALIBRATION_KEY, JSON.stringify(entries.slice(-MAX_CALIBRATION))) } catch {}
 }
 
 export function clearCalibration(): void {

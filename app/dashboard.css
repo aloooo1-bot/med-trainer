@@ -8,6 +8,9 @@
   --border2:  var(--color-surface-4);
   --text:     var(--color-ink-primary);
   --muted:    var(--color-ink-secondary);
+  /* Aliases: several pages reference these names directly */
+  --text-primary:   var(--color-ink-primary);
+  --text-secondary: var(--color-ink-secondary);
   --accent:   var(--color-primary-500);
   --accent2:  var(--color-primary-700);
   --green:    var(--color-confirmed);
@@ -784,9 +787,57 @@
   .dx-grid2 { grid-template-columns: 1fr; }
 }
 
+/* Hidden above 900px; the media query below reveals it */
+.dx-mobile-topbar { display: none; }
+
 @media (max-width: 900px) {
   .dx-stats-row { grid-template-columns: repeat(2, 1fr); }
   .dx-sidebar { display: none; }
+
+  /* Mobile navigation: top bar + slide-over drawer */
+  .dx-root { flex-direction: column; }
+  .dx-mobile-topbar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    padding: 10px 16px;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+  }
+  .dx-sidebar.mobile-open {
+    display: flex;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 50;
+    background: var(--surface);
+    box-shadow: 4px 0 24px rgba(0, 0, 0, 0.25);
+  }
+}
+
+.dx-mobile-menu-btn {
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.dx-mobile-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 49;
 }
 
 /* ── Phase 2 launchpad widgets ───────────────────────────────────── */
@@ -843,35 +894,6 @@
   display: inline-flex;
   align-items: center;
 }
-
-/* Focus areas (WeakestSystems) */
-.dx-weak-list { display: flex; flex-direction: column; gap: 0; }
-
-.dx-weak-row {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 6px;
-  border-bottom: 1px solid var(--border);
-  text-decoration: none;
-  border-radius: 6px;
-  transition: background 0.12s;
-}
-
-.dx-weak-row:last-child { border-bottom: none; }
-.dx-weak-row:hover { background: var(--surface2); }
-
-.dx-weak-pill {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 12.5px;
-  font-weight: 700;
-  padding: 2px 8px;
-  border-radius: 6px;
-  flex-shrink: 0;
-  letter-spacing: -0.01em;
-}
-
-.dx-weak-chevron { color: var(--muted); font-size: 18px; flex-shrink: 0; }
 
 /* Weekly goal */
 .dx-weekly-goal .dx-card-header {

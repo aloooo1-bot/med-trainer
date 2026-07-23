@@ -1,7 +1,9 @@
 'use client'
 
 import { useState, useEffect, useMemo } from 'react'
+import Link from 'next/link'
 import { loadMastery, loadCalibration, type CalibrationEntry } from '@/app/lib/reasoning/store'
+import { syncReasoning } from '@/app/lib/reasoning/sync'
 import { recommendNext, isMastered, masteryKey } from '@/app/lib/reasoning/mastery'
 import { calibrationSummary, reliabilityBuckets, type ReliabilityBucket } from '@/app/lib/reasoning/prediction'
 import type { MasteryRecord } from '@/app/lib/reasoning/types'
@@ -37,7 +39,7 @@ function ReliabilityDiagram({ buckets }: { buckets: ReliabilityBucket[] }) {
         {buckets.length > 1 && (
           <polyline
             points={buckets.map(b => `${px(b.mid)},${py(b.accuracy)}`).join(' ')}
-            fill="none" stroke="var(--primary, #6366f1)" strokeWidth="1.5" opacity="0.7"
+            fill="none" stroke="var(--accent)" strokeWidth="1.5" opacity="0.7"
           />
         )}
         {/* points (radius ~ sample size) */}
@@ -58,20 +60,31 @@ function ReliabilityDiagram({ buckets }: { buckets: ReliabilityBucket[] }) {
   )
 }
 
-export default function ReasoningProgress() {
+export default function ReasoningProgress({ tier = 'free' }: { tier?: string }) {
   const [mastery, setMastery] = useState<MasteryRecord[]>([])
   const [calibration, setCalibration] = useState<CalibrationEntry[]>([])
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
-    // Mount-only load of reasoning data from localStorage (unavailable during SSR).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setMastery(loadMastery())
-    setCalibration(loadCalibration())
-    setLoaded(true)
+    let cancelled = false
+    // Pull + union-merge the account copy first (no-op signed-out/offline),
+    // then read the merged local state.
+    ;(async () => {
+      await syncReasoning()
+      if (cancelled) return
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setMastery(loadMastery())
+      setCalibration(loadCalibration())
+      setLoaded(true)
+    })()
+    return () => { cancelled = true }
   }, [])
 
   const byKey = useMemo(() => new Map(mastery.map(m => [m.key, m])), [mastery])
+  const attemptedSystems = useMemo(
+    () => SYSTEMS.filter(sys => DIFFICULTIES.some(d => byKey.has(masteryKey(sys, d)))),
+    [byKey]
+  )
   const candidates = useMemo(() => SYSTEMS.flatMap(s => DIFFICULTIES.map(d => ({ system: s, difficulty: d }))), [])
   const rec = useMemo(() => (mastery.length ? recommendNext(mastery, candidates) : null), [mastery, candidates])
 
@@ -124,46 +137,67 @@ export default function ReasoningProgress() {
     <div className="dx-card">
       <div className="dx-card-header">
         <div style={{ fontWeight: 700 }}>Reasoning &amp; mastery</div>
-        {rec && (
-          <div style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)', marginTop: 2 }}>
-            Recommended next: <strong style={{ color: 'var(--text)' }}>{rec.system} · {rec.difficulty}</strong> — {rec.reason}
-          </div>
-        )}
+        {rec && (() => {
+          // Free accounts train at Foundations only — recommend what's launchable.
+          const recDifficulty = tier === 'pro' ? rec.difficulty : 'Foundations'
+          return (
+            <div style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)', marginTop: 2 }}>
+              Recommended next: <strong style={{ color: 'var(--text)' }}>{rec.system} · {recDifficulty}</strong> — {rec.reason}{' '}
+              <Link
+                href={`/trainer?system=${encodeURIComponent(rec.system)}&difficulty=${encodeURIComponent(recDifficulty)}`}
+                style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}
+              >
+                Start →
+              </Link>
+            </div>
+          )
+        })()}
       </div>
       <div className="dx-card-body" style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
 
-        {/* Mastery grid */}
+        {/* Mastery grid — only systems with at least one attempt */}
         <div>
           <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--muted)', marginBottom: 8 }}>Mastery by topic</div>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-              <thead>
-                <tr>
-                  <th style={{ textAlign: 'left', padding: '4px 8px', color: 'var(--muted)', fontWeight: 500 }}>System</th>
-                  {DIFFICULTIES.map(d => (
-                    <th key={d} style={{ textAlign: 'center', padding: '4px 8px', color: 'var(--muted)', fontWeight: 500 }}>{d}</th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {SYSTEMS.map(sys => (
-                  <tr key={sys} style={{ borderTop: '1px solid var(--border)' }}>
-                    <td style={{ padding: '6px 8px', color: 'var(--text)', whiteSpace: 'nowrap' }}>{sys}</td>
-                    {DIFFICULTIES.map(d => {
-                      const m = byKey.get(masteryKey(sys, d))
-                      if (!m) return <td key={d} style={{ textAlign: 'center', color: 'var(--muted)' }}>—</td>
-                      return (
-                        <td key={d} style={{ textAlign: 'center', padding: '6px 8px' }}>
-                          <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 600, color: scoreColor(m.score) }}>{m.score}</span>
-                          {isMastered(m) && <span title="Mastered" style={{ marginLeft: 4, color: 'var(--green)' }}>✓</span>}
-                        </td>
-                      )
-                    })}
+          {attemptedSystems.length === 0 ? (
+            <p style={{ fontSize: 12, color: 'var(--muted)', margin: 0 }}>
+              No mastery data yet — complete cases in the trainer to build per-topic mastery.
+            </p>
+          ) : (
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
+                <thead>
+                  <tr>
+                    <th style={{ textAlign: 'left', padding: '4px 8px', color: 'var(--muted)', fontWeight: 500 }}>System</th>
+                    {DIFFICULTIES.map(d => (
+                      <th key={d} style={{ textAlign: 'center', padding: '4px 8px', color: 'var(--muted)', fontWeight: 500 }}>{d}</th>
+                    ))}
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {attemptedSystems.map(sys => (
+                    <tr key={sys} style={{ borderTop: '1px solid var(--border)' }}>
+                      <td style={{ padding: '6px 8px', color: 'var(--text)', whiteSpace: 'nowrap' }}>{sys}</td>
+                      {DIFFICULTIES.map(d => {
+                        const m = byKey.get(masteryKey(sys, d))
+                        if (!m) return <td key={d} style={{ textAlign: 'center', color: 'var(--muted)' }}>—</td>
+                        return (
+                          <td key={d} style={{ textAlign: 'center', padding: '6px 8px' }}>
+                            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 600, color: scoreColor(m.score) }}>{m.score}</span>
+                            {isMastered(m) && <span title="Mastered" style={{ marginLeft: 4, color: 'var(--green)' }}>✓</span>}
+                          </td>
+                        )
+                      })}
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          {attemptedSystems.length > 0 && attemptedSystems.length < SYSTEMS.length && (
+            <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 6 }}>
+              +{SYSTEMS.length - attemptedSystems.length} system{SYSTEMS.length - attemptedSystems.length !== 1 ? 's' : ''} not yet attempted
+            </div>
+          )}
         </div>
 
         {/* Calibration */}
@@ -201,6 +235,10 @@ export default function ReasoningProgress() {
             {buckets.length > 0 && <ReliabilityDiagram buckets={buckets} />}
           </div>
         )}
+
+        <div style={{ fontSize: 10, color: 'var(--muted)' }}>
+          Reasoning data syncs to your account when signed in; signed out it lives only in this browser.
+        </div>
 
       </div>
     </div>

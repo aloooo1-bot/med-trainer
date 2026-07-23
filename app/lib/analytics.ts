@@ -127,38 +127,6 @@ export function recordToSession(session: ActiveSession, record: APICallRecord): 
   session.totalOutputTokens += record.outputTokens
 }
 
-// ── Feedback / ratings ────────────────────────────────────────────────────────
-
-export interface FeedbackRecord {
-  id: string
-  timestamp: number
-  diagnosis: string
-  system: string
-  difficulty: string
-  patientName: string
-  ratings: Record<string, number>   // dim key → 1-5
-  comment: string
-}
-
-const FEEDBACK_KEY = 'medtrainer_feedback'
-const MAX_FEEDBACK = 2000
-
-export function loadFeedbackRecords(): FeedbackRecord[] {
-  try { return JSON.parse(localStorage.getItem(FEEDBACK_KEY) ?? '[]') as FeedbackRecord[] } catch { return [] }
-}
-
-export function saveFeedbackRecord(rec: FeedbackRecord): void {
-  try {
-    const existing = loadFeedbackRecords()
-    existing.push(rec)
-    localStorage.setItem(FEEDBACK_KEY, JSON.stringify(existing.slice(-MAX_FEEDBACK)))
-  } catch {}
-}
-
-export function clearFeedbackRecords(): void {
-  try { localStorage.removeItem(FEEDBACK_KEY) } catch {}
-}
-
 // ── localStorage ──────────────────────────────────────────────────────────────
 
 const ANALYTICS_KEY = 'medtrainer_analytics'
@@ -172,6 +140,21 @@ export function loadSessionRecords(): CaseSessionRecord[] {
 
 export function clearAnalytics(): void {
   try { localStorage.removeItem(ANALYTICS_KEY) } catch {}
+}
+
+/** Patch one locally-stored session record in place (bookmark, notes, …). */
+export function updateSessionRecord(
+  id: string,
+  patch: Partial<Pick<CaseSessionRecord, 'bookmarked' | 'notes'>>,
+): boolean {
+  try {
+    const existing = loadSessionRecords()
+    const idx = existing.findIndex(r => r.id === id)
+    if (idx < 0) return false
+    existing[idx] = { ...existing[idx], ...patch }
+    localStorage.setItem(ANALYTICS_KEY, JSON.stringify(existing))
+    return true
+  } catch { return false }
 }
 
 export function loadAbandonedSessions(): AbandonedSessionRecord[] {

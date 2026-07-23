@@ -95,9 +95,9 @@ export default function HelpPage() {
               <div className="dx-help-section">
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10, marginBottom: 16 }}>
                   {[
-                    { tier: 'Foundations', desc: 'Classic presentations, common diagnoses. All requested tests are returned immediately. No timer. Output: diagnosis + brief rationale.' },
+                    { tier: 'Foundations', desc: 'Classic presentations, common diagnoses. All requested tests are returned immediately. No timer. Output: diagnosis only.' },
                     { tier: 'Clinical', desc: 'Moderate difficulty, 1–2 atypical features. Broad workup available. 22-minute timer. Output: diagnosis + clinical reasoning.' },
-                    { tier: 'Advanced', desc: 'Rare/complex diagnoses, red herrings. Some tests withheld. 15-minute timer simulating rounds time-pressure. Output: diagnosis + full reasoning.' },
+                    { tier: 'Advanced', desc: 'Rare/complex diagnoses, red herrings. Some tests withheld. 15-minute timer simulating rounds time-pressure. Output: SOAP note + oral presentation.' },
                   ].map(d => (
                     <div key={d.tier} style={{ background: 'var(--surface2)', borderRadius: 8, padding: '10px 14px', border: '1px solid var(--border)' }}>
                       <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>{d.tier}</div>

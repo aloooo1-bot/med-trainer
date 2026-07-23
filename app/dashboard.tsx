@@ -1,16 +1,18 @@
 'use client'
 
 import { useMemo, useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import '@/app/dashboard.css'
-import { MOCK_SYSTEMS, type SystemEntry } from '@/app/lib/dashboardData'
+import type { SystemEntry } from '@/app/lib/dashboardData'
+import { localDayKey, localDayKeyOffset } from '@/app/lib/localDay'
 import type { GradingResult } from '@/app/grading/types'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import Topbar from '@/app/components/dashboard/Topbar'
 import NextCaseCard from '@/app/components/dashboard/NextCaseCard'
 import DueReviewCard from '@/app/components/dashboard/DueReviewCard'
-import WeakestSystems from '@/app/components/dashboard/WeakestSystems'
 import RecentActivity from '@/app/components/dashboard/RecentActivity'
 import WeeklyGoal from '@/app/components/dashboard/WeeklyGoal'
+import ActivityCalendar from '@/app/components/progress/ActivityCalendar'
 import OnboardingModal from '@/app/components/dashboard/OnboardingModal'
 
 const ONBOARDING_DISMISSED_KEY = 'medtrainer_onboarding_dismissed'
@@ -34,18 +36,31 @@ function computeSystems(sessions: SessionSummary[]): SystemEntry[] {
 }
 
 export default function Dashboard({
-  displayName, tier, streakDays, sessions, firstCaseDone,
+  displayName, tier, sessions, firstCaseDone,
 }: {
-  displayName: string; tier: string; casesLeft: number | null; streakDays: number
+  displayName: string; tier: string
   sessions: SessionSummary[]; firstCaseDone?: boolean
 }) {
-  const useLive = sessions.length > 0
-  const systems: SystemEntry[] = useMemo(
-    () => useLive ? computeSystems(sessions) : MOCK_SYSTEMS,
-    [sessions, useLive]
-  )
+  const router = useRouter()
+  const systems: SystemEntry[] = useMemo(() => computeSystems(sessions), [sessions])
 
   const [showOnboarding, setShowOnboarding] = useState(false)
+
+  // Streak is computed client-side so "a day" means the user's local calendar
+  // day, matching the activity calendar and weekly goal. Mount-gated to avoid
+  // an SSR/client hydration mismatch around midnight or server-timezone skew.
+  const [streakDays, setStreakDays] = useState(0)
+  useEffect(() => {
+    const days = new Set(sessions.map(s => localDayKey(s.completed_at)))
+    const now = new Date()
+    let streak = 0
+    let offset = days.has(localDayKey(now)) ? 0 : days.has(localDayKeyOffset(now, 1)) ? 1 : -1
+    if (offset >= 0) {
+      while (days.has(localDayKeyOffset(now, offset))) { streak++; offset++ }
+    }
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setStreakDays(streak)
+  }, [sessions])
 
   useEffect(() => {
     if (firstCaseDone || sessions.length > 0) return
@@ -62,13 +77,13 @@ export default function Dashboard({
       <div className="dx-main">
         <Topbar
           streakDays={streakDays}
-          onStartTraining={() => { window.location.href = '/trainer' }}
+          onStartTraining={() => router.push('/trainer')}
         />
         <div className="dx-content">
           <NextCaseCard sessions={sessions} systems={systems} />
           <DueReviewCard />
           <div className="dx-grid2">
-            <WeakestSystems systems={systems} />
+            <ActivityCalendar sessions={sessions} />
             <WeeklyGoal sessions={sessions} />
           </div>
           <RecentActivity sessions={sessions} />

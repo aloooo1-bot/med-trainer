@@ -8,7 +8,12 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { currentPassword, password }: { currentPassword: string; password: string } = await req.json()
+  let currentPassword: string, password: string
+  try {
+    ({ currentPassword, password } = await req.json())
+  } catch {
+    return Response.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
 
   if (!currentPassword) {
     return Response.json({ error: 'Current password is required' }, { status: 400 })

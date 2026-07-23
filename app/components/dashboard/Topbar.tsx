@@ -76,8 +76,8 @@ export default function Topbar({ streakDays, onStartTraining }: { streakDays: nu
       </div>
       <div className="dx-topbar-right">
         {streakDays > 0 && (
-          <div className="dx-streak" title="A streak day = ≥1 completed case">
-            🔥 {streakDays} day{streakDays !== 1 ? 's' : ''} streak
+          <div className="dx-streak" title="Consecutive days with at least one completed case — separate from the recall review streak">
+            🔥 {streakDays}-day study streak
           </div>
         )}
         <button

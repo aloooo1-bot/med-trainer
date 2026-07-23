@@ -2,12 +2,13 @@
 
 import { useState, useEffect, useMemo, useCallback, useRef, Fragment } from 'react'
 import '@/app/dashboard.css'
-import { type CaseSessionRecord, type APICallRecord, loadSessionRecords } from '../lib/analytics'
+import { type CaseSessionRecord, type APICallRecord, loadSessionRecords, updateSessionRecord } from '../lib/analytics'
 import type { GradingResult } from '../grading/types'
 import { getRubric } from '../grading/rubric'
 import { createClient } from '../lib/supabase/client'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import ReportCaseModal from '@/app/components/dashboard/ReportCaseModal'
+import { localDayKey } from '@/app/lib/localDay'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -291,10 +292,30 @@ const SCORE_BUCKETS = ['<60', '60-69', '70-79', '80-89', '90+'] as const
 type DateRange = 'all' | '7d' | '30d' | '90d'
 
 const WAVE11_RUBRIC_CUTOFF_MS = Date.parse('2026-05-17T20:36:25Z')
+const PAGE_SIZE = 50
+
+function csvEscape(v: unknown): string {
+  const s = String(v ?? '')
+  return /[",\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s
+}
+
+function downloadBlob(content: string, filename: string, type: string) {
+  const url = URL.createObjectURL(new Blob([content], { type }))
+  const a = document.createElement('a')
+  a.href = url
+  a.download = filename
+  a.click()
+  URL.revokeObjectURL(url)
+}
+
 
 export default function HistoryPage() {
   const [sessions, setSessions]         = useState<CaseSessionRecord[]>([])
   const [loaded, setLoaded]             = useState(false)
+  const [loadError, setLoadError]       = useState(false)
+  const [hasMore, setHasMore]           = useState(false)
+  const [loadingMore, setLoadingMore]   = useState(false)
+  const localAllRef                     = useRef<CaseSessionRecord[]>([])
   const [expandedId, setExpandedId]     = useState<string | null>(null)
   const [source, setSource]             = useState<'cloud' | 'local'>('local')
   const [isPro, setIsPro]               = useState(false)
@@ -310,40 +331,77 @@ export default function HistoryPage() {
   const [systemFilter, setSystemFilter]   = useState<Set<string>>(new Set())
   const [scoreBuckets, setScoreBuckets]   = useState<Set<string>>(new Set())
   const [dateRange, setDateRange]         = useState<DateRange>('all')
+  // YYYY-MM-DD (local) from the ?date= deep link; scopes the Supabase fetch to that day.
+  const [dayFilter, setDayFilter]         = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null
+    const date = new URLSearchParams(window.location.search).get('date')
+    return date && /^\d{4}-\d{2}-\d{2}$/.test(date) ? date : null
+  })
   const [onlyBookmarked, setOnlyBookmarked] = useState(false)
-  const [lowScoreOnly, setLowScoreOnly]     = useState(false)
   const [wrongDxOnly, setWrongDxOnly]       = useState(false)
 
   useEffect(() => {
     async function load() {
-      const supabase = createClient()
-      const { data: { user } } = await supabase.auth.getUser()
+      let cloudFailed = false
+      try {
+        const supabase = createClient()
+        const { data: { user } } = await supabase.auth.getUser()
 
-      if (user) {
-        const { data: profile } = await supabase.from('profiles').select('tier, display_name').eq('id', user.id).single()
-        setIsPro(profile?.tier === 'pro')
-        setTier(profile?.tier ?? 'free')
-        setDisplayName(profile?.display_name ?? user.email?.split('@')[0] ?? 'User')
+        if (user) {
+          const { data: profile } = await supabase.from('profiles').select('tier, display_name').eq('id', user.id).single()
+          setIsPro(profile?.tier === 'pro')
+          setTier(profile?.tier ?? 'free')
+          setDisplayName(profile?.display_name ?? user.email?.split('@')[0] ?? 'User')
 
-        const { data } = await supabase
-          .from('case_sessions')
-          .select('*')
-          .order('completed_at', { ascending: false })
-          .limit(50)
-        if (data && data.length > 0) {
-          setSessions(data.map(rowToRecord))
-          setSource('cloud')
-          setLoaded(true)
-          return
+          let query = supabase.from('case_sessions').select('*')
+          if (dayFilter) {
+            const dayStart = new Date(`${dayFilter}T00:00:00`)
+            const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000)
+            query = query.gte('completed_at', dayStart.toISOString()).lt('completed_at', dayEnd.toISOString())
+          }
+          const { data, error } = await query
+            .order('completed_at', { ascending: false })
+            .limit(PAGE_SIZE)
+          if (error) {
+            cloudFailed = true
+          } else if (data && (data.length > 0 || dayFilter)) {
+            // With a day-scoped query an empty result is a real answer, not a
+            // reason to fall back to unrelated local records.
+            setSessions(data.map(rowToRecord))
+            setHasMore(data.length === PAGE_SIZE)
+            setSource('cloud')
+            setLoadError(false)
+            setLoaded(true)
+            return
+          }
         }
+      } catch {
+        cloudFailed = true
       }
 
-      const all = loadSessionRecords()
-      setSessions([...all].reverse().slice(0, 50))
+      let records = [...loadSessionRecords()].reverse()
+      if (dayFilter) records = records.filter(r => localDayKey(r.completedAt) === dayFilter)
+      localAllRef.current = records
+      setSessions(records.slice(0, PAGE_SIZE))
+      setHasMore(records.length > PAGE_SIZE)
       setSource('local')
+      // Only surface an error when the cloud fetch failed AND there is no
+      // local data to stand in for it.
+      setLoadError(cloudFailed && records.length === 0)
       setLoaded(true)
     }
+    // Refetch whenever the day scope changes; reset to the loading screen meanwhile.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoaded(false)
     load()
+  }, [dayFilter])
+
+  // Deep-link filter from ?system=<name> (?date= is read in the dayFilter initializer)
+  useEffect(() => {
+    const sys = new URLSearchParams(window.location.search).get('system')
+    // Deep-link filters come from the URL query, only available after mount.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (sys) setSystemFilter(new Set([sys]))
   }, [])
 
   // Deep-link expand from ?expand=<id>
@@ -365,10 +423,12 @@ export default function HistoryPage() {
     return () => clearTimeout(t)
   }, [searchRaw])
 
-  // Systems list for multi-select chips
+  // Systems list for multi-select chips. Includes any active filter values
+  // (e.g. a bad ?system= deep link) so a filter matching zero sessions still
+  // renders a chip the user can click to remove.
   const systemList = useMemo(
-    () => Array.from(new Set(sessions.map(s => s.system))).sort(),
-    [sessions]
+    () => Array.from(new Set([...sessions.map(s => s.system), ...systemFilter])).sort(),
+    [sessions, systemFilter]
   )
 
   const dateCutoff = useMemo(() => {
@@ -387,23 +447,81 @@ export default function HistoryPage() {
       if (systemFilter.size > 0 && !systemFilter.has(s.system)) return false
       if (scoreBuckets.size > 0 && !scoreBuckets.has(scoreBucketFor(s.score))) return false
       if (dateCutoff > 0 && s.completedAt < dateCutoff) return false
+      if (dayFilter && localDayKey(s.completedAt) !== dayFilter) return false
       if (onlyBookmarked && !s.bookmarked) return false
-      if (lowScoreOnly && s.score >= 60) return false
       if (wrongDxOnly && s.correct !== false) return false
       if (q && !(s.userDiagnosis ?? '').toLowerCase().includes(q) && !s.diagnosis.toLowerCase().includes(q) && !(s.notes ?? '').toLowerCase().includes(q)) return false
       return true
     })
-  }, [sessions, diffFilter, systemFilter, scoreBuckets, dateCutoff, onlyBookmarked, searchQuery, lowScoreOnly, wrongDxOnly])
+  }, [sessions, diffFilter, systemFilter, scoreBuckets, dateCutoff, dayFilter, onlyBookmarked, searchQuery, wrongDxOnly])
 
-  const isFiltered = diffFilter !== 'All' || systemFilter.size > 0 || scoreBuckets.size > 0 || dateRange !== 'all' || onlyBookmarked || searchQuery.length > 0 || lowScoreOnly || wrongDxOnly
+  const isFiltered = diffFilter !== 'All' || systemFilter.size > 0 || scoreBuckets.size > 0 || dateRange !== 'all' || dayFilter !== null || onlyBookmarked || searchQuery.length > 0 || wrongDxOnly
+
+  async function loadMore() {
+    if (loadingMore) return
+    setLoadingMore(true)
+    try {
+      if (source === 'cloud') {
+        const supabase = createClient()
+        let query = supabase.from('case_sessions').select('*')
+        if (dayFilter) {
+          const dayStart = new Date(`${dayFilter}T00:00:00`)
+          const dayEnd = new Date(dayStart.getTime() + 24 * 60 * 60 * 1000)
+          query = query.gte('completed_at', dayStart.toISOString()).lt('completed_at', dayEnd.toISOString())
+        }
+        const { data, error } = await query
+          .order('completed_at', { ascending: false })
+          .range(sessions.length, sessions.length + PAGE_SIZE - 1)
+        if (!error && data) {
+          setSessions(prev => [...prev, ...data.map(rowToRecord)])
+          setHasMore(data.length === PAGE_SIZE)
+        }
+      } else {
+        const next = localAllRef.current.slice(sessions.length, sessions.length + PAGE_SIZE)
+        setSessions(prev => [...prev, ...next])
+        setHasMore(localAllRef.current.length > sessions.length + next.length)
+      }
+    } catch {
+      // leave hasMore as-is so the user can retry
+    }
+    setLoadingMore(false)
+  }
+
+  function exportFiltered(format: 'csv' | 'json') {
+    const stamp = localDayKey(Date.now())
+    if (format === 'json') {
+      // apiCalls is internal cost telemetry — not useful in an export.
+      const rows = filtered.map(({ apiCalls: _apiCalls, ...rest }) => rest)
+      downloadBlob(JSON.stringify(rows, null, 2), `medtrainer-history-${stamp}.json`, 'application/json')
+      return
+    }
+    const header = ['completed_at', 'system', 'difficulty', 'score', 'correct', 'your_diagnosis', 'correct_diagnosis', 'elapsed_seconds', 'question_count', 'bookmarked', 'notes']
+    const lines = [
+      header.join(','),
+      ...filtered.map(s => [
+        new Date(s.completedAt).toISOString(),
+        s.system, s.difficulty, s.score, s.correct,
+        s.userDiagnosis, s.diagnosis, s.elapsedSeconds, s.questionCount,
+        s.bookmarked ?? false, s.notes ?? '',
+      ].map(csvEscape).join(',')),
+    ]
+    downloadBlob(lines.join('\n'), `medtrainer-history-${stamp}.csv`, 'text/csv')
+  }
+
+  function clearDayFilter() {
+    setDayFilter(null)
+    const url = new URL(window.location.href)
+    url.searchParams.delete('date')
+    window.history.replaceState(null, '', url)
+  }
 
   function clearAllFilters() {
     setDiffFilter('All')
     setSystemFilter(new Set())
     setScoreBuckets(new Set())
     setDateRange('all')
+    clearDayFilter()
     setOnlyBookmarked(false)
-    setLowScoreOnly(false)
     setWrongDxOnly(false)
     setSearchRaw('')
     setExpandedId(null)
@@ -448,38 +566,63 @@ export default function HistoryPage() {
     return { total: filtered.length, avgScore }
   }, [filtered])
 
-  // Phase 4c: optimistic bookmark toggle
+  // Phase 4c: optimistic bookmark toggle. Local-source sessions persist to
+  // localStorage (the API would 401 without a signed-in user); cloud sessions
+  // POST with an in-flight guard so rapid toggles can't clobber each other.
+  const bookmarkInFlight = useRef<Set<string>>(new Set())
   const toggleBookmark = useCallback((session: CaseSessionRecord) => {
     const next = !session.bookmarked
+    if (source === 'local') {
+      if (updateSessionRecord(session.id, { bookmarked: next })) {
+        setSessions(prev => prev.map(s => s.id === session.id ? { ...s, bookmarked: next } : s))
+      }
+      return
+    }
+    if (bookmarkInFlight.current.has(session.id)) return
+    bookmarkInFlight.current.add(session.id)
     setSessions(prev => prev.map(s => s.id === session.id ? { ...s, bookmarked: next } : s))
+    const revert = () => setSessions(prev => prev.map(s => s.id === session.id ? { ...s, bookmarked: !next } : s))
     fetch('/api/sessions/bookmark', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id: session.id, bookmarked: next }),
     }).then(r => {
-      if (!r.ok) setSessions(prev => prev.map(s => s.id === session.id ? { ...s, bookmarked: !next } : s))
-    }).catch(() => {
-      setSessions(prev => prev.map(s => s.id === session.id ? { ...s, bookmarked: !next } : s))
-    })
-  }, [])
+      if (!r.ok) revert()
+    }).catch(revert)
+      .finally(() => bookmarkInFlight.current.delete(session.id))
+  }, [source])
 
-  // Phase 7e: notes auto-save
+  // Phase 7e: notes auto-save (localStorage for local-source sessions)
   const handleNotesChange = useCallback((id: string, notes: string) => {
     setSessions(prev => prev.map(s => s.id === id ? { ...s, notes } : s))
     setNoteSaveState(prev => ({ ...prev, [id]: 'saving' }))
     clearTimeout(noteSaveTimers.current[id])
+    const markSaved = () => {
+      setNoteSaveState(prev => ({ ...prev, [id]: 'saved' }))
+      noteSaveTimers.current[id] = setTimeout(
+        () => setNoteSaveState(prev => { const { [id]: _, ...rest } = prev; return rest }),
+        2000
+      )
+    }
+    if (source === 'local') {
+      if (updateSessionRecord(id, { notes })) markSaved()
+      else setNoteSaveState(prev => ({ ...prev, [id]: 'error' }))
+      return
+    }
     fetch('/api/sessions/notes', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ id, notes }),
     }).then(r => {
       if (!r.ok) throw new Error()
-      setNoteSaveState(prev => ({ ...prev, [id]: 'saved' }))
-      noteSaveTimers.current[id] = setTimeout(
-        () => setNoteSaveState(prev => { const { [id]: _, ...rest } = prev; return rest }),
-        2000
-      )
+      markSaved()
     }).catch(() => setNoteSaveState(prev => ({ ...prev, [id]: 'error' })))
+  }, [source])
+
+  // Clear any pending "saved ✓" chip timers on unmount.
+  useEffect(() => {
+    const timers = noteSaveTimers.current
+    return () => { Object.values(timers).forEach(clearTimeout) }
   }, [])
 
   // Phase 4d: scroll to parent session
@@ -508,13 +651,33 @@ export default function HistoryPage() {
         <div className="dx-main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <div style={{ textAlign: 'center' }}>
             <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 4px' }}>No completed cases yet.</p>
-            <p style={{ color: 'var(--muted)', fontSize: 12, margin: '0 0 24px' }}>
-              Complete a case to start building your history.
-            </p>
-            <a href="/trainer" style={{ fontSize: 13, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>
-              Start a case →
-            </a>
+            {loadError ? (
+              <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 4px' }}>
+                Couldn&apos;t load your case history. Refresh the page to try again.
+              </p>
+            ) : dayFilter ? (
+              <>
+                <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 4px' }}>
+                  No cases completed on {new Date(`${dayFilter}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.
+                </p>
+                <button
+                  onClick={clearDayFilter}
+                  style={{ fontSize: 13, color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, marginTop: 20 }}
+                >
+                  Show all history →
+                </button>
+              </>
+            ) : (
+              <>
+                <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 4px' }}>No completed cases yet.</p>
+                <p style={{ color: 'var(--muted)', fontSize: 12, margin: '0 0 24px' }}>
+                  Complete a case to start building your history.
+                </p>
+                <a href="/trainer" style={{ fontSize: 13, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>
+                  Start a case →
+                </a>
+              </>
+            )}
           </div>
         </div>
       </div>
@@ -532,7 +695,7 @@ export default function HistoryPage() {
           <div style={{ marginBottom: 24 }}>
             <h1 className="heading-display text-[22px]">Case <span className="heading-accent">history</span></h1>
             <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--muted)' }}>
-              {`Showing ${sessions.length}${sessions.length === 50 ? ' (cap)' : ''} completed case${sessions.length !== 1 ? 's' : ''}`}
+              {`Showing ${sessions.length}${hasMore ? '+' : ''} completed case${sessions.length !== 1 ? 's' : ''}`}
             </p>
           </div>
 
@@ -540,7 +703,7 @@ export default function HistoryPage() {
           {stats && (
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
               <div className="dx-card" style={{ padding: '16px 20px' }}>
-                <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Completed</div>
+                <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{isFiltered ? 'Matching' : 'Completed'}</div>
                 <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'JetBrains Mono, monospace' }}>{stats.total}</div>
               </div>
               <div className="dx-card" style={{ padding: '16px 20px' }}>
@@ -554,8 +717,11 @@ export default function HistoryPage() {
                     —<span style={{ fontSize: 11, marginLeft: 6, fontWeight: 400 }}>(need 10)</span>
                   </div>
                 ) : (
-                  <div style={{ fontSize: 22, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace', color: recentTrend > 0 ? 'var(--green)' : recentTrend < 0 ? 'var(--red)' : 'var(--muted)' }}>
-                    {recentTrend > 0 ? `+${recentTrend}` : recentTrend}%
+                  <div
+                    title="Average score of your last 5 cases minus the 5 before them, in points"
+                    style={{ fontSize: 22, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace', color: recentTrend > 0 ? 'var(--green)' : recentTrend < 0 ? 'var(--red)' : 'var(--muted)' }}
+                  >
+                    {recentTrend > 0 ? `+${recentTrend}` : recentTrend}<span style={{ fontSize: 12, fontWeight: 500 }}> pts</span>
                   </div>
                 )}
               </div>
@@ -579,6 +745,12 @@ export default function HistoryPage() {
                   Clear filters
                 </button>
               )}
+              <button className="dx-chip" onClick={() => exportFiltered('csv')} title="Download the currently filtered cases as CSV">
+                ⬇ CSV
+              </button>
+              <button className="dx-chip" onClick={() => exportFiltered('json')} title="Download the currently filtered cases as JSON">
+                ⬇ JSON
+              </button>
             </div>
 
             {/* Bookmarked + study filter chips */}
@@ -588,13 +760,6 @@ export default function HistoryPage() {
                 onClick={() => { setOnlyBookmarked(v => !v); setExpandedId(null) }}
               >
                 {onlyBookmarked ? '★' : '☆'} Bookmarked
-              </button>
-              <button
-                className={`dx-chip${lowScoreOnly ? ' active' : ''}`}
-                onClick={() => { setLowScoreOnly(v => !v); setExpandedId(null) }}
-                title="Only show cases with rubric score below 60"
-              >
-                Score &lt;60
               </button>
               <button
                 className={`dx-chip${wrongDxOnly ? ' active' : ''}`}
@@ -622,7 +787,7 @@ export default function HistoryPage() {
             </div>
 
             {/* System chips (multi-select) */}
-            {systemList.length > 1 && (
+            {(systemList.length > 1 || systemFilter.size > 0) && (
               <div className="dx-filter-chips">
                 {systemList.map(sys => (
                   <button
@@ -659,6 +824,15 @@ export default function HistoryPage() {
                     {r === 'all' ? 'All time' : `Last ${r}`}
                   </button>
                 ))}
+                {dayFilter && (
+                  <button
+                    className="dx-chip active"
+                    onClick={() => { clearDayFilter(); setExpandedId(null) }}
+                    title="Showing a single day — click to remove this filter"
+                  >
+                    {new Date(`${dayFilter}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} ✕
+                  </button>
+                )}
               </div>
             </div>
           </div>
@@ -703,7 +877,20 @@ export default function HistoryPage() {
                     <div
                       id={`session-${session.id}`}
                       className="dx-table-row"
+                      role="button"
+                      tabIndex={0}
+                      aria-expanded={isExpanded}
                       onClick={() => setExpandedId(isExpanded ? null : session.id)}
+                      onKeyDown={e => {
+                        // Only when the row itself is focused — keydown events
+                        // bubbling from the inner bookmark/redo/expand buttons
+                        // must keep their native activation.
+                        if (e.target !== e.currentTarget) return
+                        if (e.key === 'Enter' || e.key === ' ') {
+                          e.preventDefault()
+                          setExpandedId(isExpanded ? null : session.id)
+                        }
+                      }}
                     >
                       {/* Bookmark star */}
                       <button
@@ -774,6 +961,8 @@ export default function HistoryPage() {
                       <button
                         className={`dx-expand-btn${isExpanded ? ' open' : ''}`}
                         onClick={e => { e.stopPropagation(); setExpandedId(isExpanded ? null : session.id) }}
+                        aria-expanded={isExpanded}
+                        aria-label={isExpanded ? 'Collapse case details' : 'Expand case details'}
                       >
                         {isExpanded ? '▲' : '▼'}
                       </button>
@@ -793,6 +982,19 @@ export default function HistoryPage() {
                   </Fragment>
                 )
               })}
+            </div>
+          )}
+
+          {hasMore && (
+            <div style={{ textAlign: 'center', marginTop: 16 }}>
+              <button
+                className="dx-chip"
+                onClick={loadMore}
+                disabled={loadingMore}
+                style={{ padding: '8px 20px', fontSize: 13 }}
+              >
+                {loadingMore ? 'Loading…' : 'Load older cases'}
+              </button>
             </div>
           )}
 

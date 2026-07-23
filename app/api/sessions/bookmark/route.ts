@@ -8,7 +8,15 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { id, bookmarked }: { id: string; bookmarked: boolean } = await req.json()
+  let id: unknown, bookmarked: unknown
+  try {
+    ({ id, bookmarked } = await req.json())
+  } catch {
+    return Response.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+  if (typeof id !== 'string' || typeof bookmarked !== 'boolean') {
+    return Response.json({ error: 'id must be a string and bookmarked a boolean' }, { status: 400 })
+  }
 
   const { data, error } = await supabase
     .from('case_sessions')

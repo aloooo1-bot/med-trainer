@@ -41,10 +41,14 @@ export default function RecentActivity({ sessions }: { sessions: Session[] }) {
         </div>
       ) : recent.map(s => {
         const loss = biggestLoss(s.grading_result, s.difficulty)
-        const dotColor = s.correct ? 'var(--green)' : s.score >= 60 ? 'var(--amber)' : 'var(--red)'
+        const dotColor = s.correct ? 'var(--green)' : 'var(--red)'
         return (
           <Link key={s.id} href={`/history?expand=${s.id}`} className="dx-recent-row">
-            <span className="dx-recent-dot" style={{ background: dotColor }} />
+            <span
+              className="dx-recent-dot"
+              style={{ background: dotColor }}
+              title={s.correct ? 'Diagnosis correct' : 'Diagnosis incorrect'}
+            />
             <span className="dx-recent-date">
               {new Date(s.completed_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
             </span>
@@ -55,18 +59,12 @@ export default function RecentActivity({ sessions }: { sessions: Session[] }) {
             <span className="dx-recent-score" style={{ color: scoreColor(s.score) }}>
               {s.score}<span className="dx-score-pct">%</span>
             </span>
-            {loss.key ? (
-              <Link
-                href={`/review#dim-${loss.key}`}
-                className={`dx-recent-loss has-loss`}
-                title="Biggest subscore deduction within the weighted total — click to review"
-                onClick={e => e.stopPropagation()}
-              >
-                {loss.label}
-              </Link>
-            ) : (
-              <span className="dx-recent-loss">{loss.label}</span>
-            )}
+            <span
+              className={`dx-recent-loss${loss.key ? ' has-loss' : ''}`}
+              title={loss.key ? 'Biggest subscore deduction within the weighted total' : undefined}
+            >
+              {loss.label}
+            </span>
           </Link>
         )
       })}

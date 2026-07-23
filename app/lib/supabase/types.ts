@@ -241,6 +241,22 @@ export interface Database {
         }
         Update: Partial<Database['public']['Tables']['ratings']['Insert']>
       }
+      reasoning_state: {
+        Relationships: []
+        Row: {
+          user_id: string
+          kind: 'review_items' | 'mastery' | 'calibration' | 'streak'
+          data: Json
+          updated_at: string
+        }
+        Insert: {
+          user_id: string
+          kind: 'review_items' | 'mastery' | 'calibration' | 'streak'
+          data: Json
+          updated_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['reasoning_state']['Insert']>
+      }
       case_regeneration_jobs: {
         Relationships: []
         Row: {

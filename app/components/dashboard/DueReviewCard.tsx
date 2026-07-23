@@ -43,7 +43,7 @@ export default function DueReviewCard() {
           </div>
           <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>
             {hasDue ? `${total} in your deck` : `${total} card${total === 1 ? '' : 's'} scheduled`}
-            {streak > 0 && `  ·  🔥 ${streak}-day streak`}
+            {streak > 0 && `  ·  🔥 ${streak}-day review streak`}
           </div>
         </div>
       </div>

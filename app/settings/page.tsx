@@ -11,6 +11,7 @@ import {
   saveFocusSettings,
 } from '@/app/lib/focusSettings'
 import { getScheme, setScheme, type Scheme } from '@/app/lib/colorScheme'
+import { clearAllLocalData } from '@/app/lib/clearLocalData'
 
 const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
 const DIFF_MIX_OPTIONS: { value: FocusSettings['difficultyMix']; label: string }[] = [
@@ -46,6 +47,10 @@ export default function SettingsPage() {
   const [pwStatus,       setPwStatus]        = useState<SaveStatus>('idle')
   const [deleteStatus,   setDeleteStatus]    = useState<SaveStatus>('idle')
 
+  const [copied, setCopied] = useState(false)
+  const [profileLoaded, setProfileLoaded] = useState(false)
+  const [loadFailed, setLoadFailed] = useState(false)
+
   // Password change
   const [currentPw, setCurrentPw]   = useState('')
   const [newPw, setNewPw]           = useState('')
@@ -54,31 +59,36 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const supabase = createClient()
-    supabase.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
+      if (!user) { setProfileLoaded(true); return }
       setUserId(user.id)
       setEmail(user.email ?? '')
-      supabase
+      const { data: p, error } = await supabase
         .from('profiles')
         .select('display_name,tier,email_case_reminders,email_weekly_summary,rest_days,weekly_volume,difficulty_mix,default_system')
         .eq('id', user.id)
         .single()
-        .then(({ data: p }) => {
-          if (!p) return
-          setDisplayName((p.display_name as string | null) ?? '')
-          setTier((p.tier as string) ?? 'free')
-          setEmailCaseReminders((p.email_case_reminders as boolean) ?? true)
-          setEmailWeeklySummary((p.email_weekly_summary as boolean) ?? true)
+      if (error || !p) {
+        setLoadFailed(true)
+      } else {
+        setDisplayName((p.display_name as string | null) ?? '')
+        setTier((p.tier as string) ?? 'free')
+        setEmailCaseReminders((p.email_case_reminders as boolean) ?? true)
+        setEmailWeeklySummary((p.email_weekly_summary as boolean) ?? true)
 
-          // Merge DB training prefs with localStorage
-          const local = loadFocusSettings()
-          const merged: FocusSettings = {
-            restDays:      (p.rest_days as string[] | null) ?? local.restDays,
-            weeklyVolume:  (p.weekly_volume as number | null) ?? local.weeklyVolume,
-            difficultyMix: ((p.difficulty_mix as FocusSettings['difficultyMix'] | null) ?? local.difficultyMix),
-          }
-          setFocusSettings(merged)
-        })
+        // Merge DB training prefs with localStorage
+        const local = loadFocusSettings()
+        const merged: FocusSettings = {
+          restDays:      (p.rest_days as string[] | null) ?? local.restDays,
+          weeklyVolume:  (p.weekly_volume as number | null) ?? local.weeklyVolume,
+          difficultyMix: ((p.difficulty_mix as FocusSettings['difficultyMix'] | null) ?? local.difficultyMix),
+        }
+        setFocusSettings(merged)
+      }
+      setProfileLoaded(true)
+    }).catch(() => {
+      setLoadFailed(true)
+      setProfileLoaded(true)
     })
     // Mount-only load of locally-persisted settings/scheme (resolved client-side after hydration).
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -89,41 +99,64 @@ export default function SettingsPage() {
   async function saveProfile() {
     if (!userId) return
     setProfileStatus('saving')
-    const res = await fetch('/api/profile', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ display_name: displayName }),
-    })
-    setProfileStatus(res.ok ? 'saved' : 'error')
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ display_name: displayName }),
+      })
+      setProfileStatus(res.ok ? 'saved' : 'error')
+    } catch {
+      setProfileStatus('error')
+    }
     setTimeout(() => setProfileStatus('idle'), 2500)
   }
 
   async function savePrefs() {
     if (!userId) return
     setPrefStatus('saving')
-    saveFocusSettings(focusSettings)
-    const res = await fetch('/api/profile', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        rest_days:      focusSettings.restDays,
-        weekly_volume:  focusSettings.weeklyVolume,
-        difficulty_mix: focusSettings.difficultyMix,
-      }),
-    })
-    setPrefStatus(res.ok ? 'saved' : 'error')
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          rest_days:      focusSettings.restDays,
+          weekly_volume:  focusSettings.weeklyVolume,
+          difficulty_mix: focusSettings.difficultyMix,
+        }),
+      })
+      // Persist locally only once the DB accepted the values, and adopt any
+      // server-side clamp (weekly_volume) so localStorage, state, and the
+      // profile row all hold the same number.
+      if (res.ok) {
+        const body = await res.json().catch(() => null) as { stored?: { weekly_volume?: number } } | null
+        const storedVolume = body?.stored?.weekly_volume
+        const applied: FocusSettings = typeof storedVolume === 'number'
+          ? { ...focusSettings, weeklyVolume: storedVolume }
+          : focusSettings
+        setFocusSettings(applied)
+        saveFocusSettings(applied)
+      }
+      setPrefStatus(res.ok ? 'saved' : 'error')
+    } catch {
+      setPrefStatus('error')
+    }
     setTimeout(() => setPrefStatus('idle'), 2500)
   }
 
   async function saveNotifications() {
     if (!userId) return
     setNotifStatus('saving')
-    const res = await fetch('/api/profile', {
-      method: 'PATCH',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email_case_reminders: emailCaseReminders, email_weekly_summary: emailWeeklySummary }),
-    })
-    setNotifStatus(res.ok ? 'saved' : 'error')
+    try {
+      const res = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email_case_reminders: emailCaseReminders, email_weekly_summary: emailWeeklySummary }),
+      })
+      setNotifStatus(res.ok ? 'saved' : 'error')
+    } catch {
+      setNotifStatus('error')
+    }
     setTimeout(() => setNotifStatus('idle'), 2500)
   }
 
@@ -132,13 +165,17 @@ export default function SettingsPage() {
     if (newPw.length < 8) { setPwStatus('error'); setTimeout(() => setPwStatus('idle'), 3000); return }
     if (newPw !== confirmPw) { setPwStatus('error'); setTimeout(() => setPwStatus('idle'), 3000); return }
     setPwStatus('saving')
-    const res = await fetch('/api/account/password', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ currentPassword: currentPw, password: newPw }),
-    })
-    if (res.ok) { setPwStatus('saved'); setCurrentPw(''); setNewPw(''); setConfirmPw('') }
-    else setPwStatus('error')
+    try {
+      const res = await fetch('/api/account/password', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ currentPassword: currentPw, password: newPw }),
+      })
+      if (res.ok) { setPwStatus('saved'); setCurrentPw(''); setNewPw(''); setConfirmPw('') }
+      else setPwStatus('error')
+    } catch {
+      setPwStatus('error')
+    }
     setTimeout(() => setPwStatus('idle'), 3000)
   }
 
@@ -146,16 +183,24 @@ export default function SettingsPage() {
     if (deleteConfirm !== email) return
     if (!window.confirm('This will permanently delete your account and all your case history. This cannot be undone. Continue?')) return
     setDeleteStatus('saving')
-    const res = await fetch('/api/account/delete', { method: 'POST' })
-    if (res.ok) {
-      window.location.href = '/'
-    } else {
+    try {
+      const res = await fetch('/api/account/delete', { method: 'POST' })
+      if (res.ok) {
+        clearAllLocalData()
+        window.location.href = '/'
+        return
+      }
       setDeleteStatus('error')
-      setTimeout(() => setDeleteStatus('idle'), 3000)
+    } catch {
+      setDeleteStatus('error')
     }
+    setTimeout(() => setDeleteStatus('idle'), 3000)
   }
 
   function signOut() {
+    // Shared-device hygiene: the next user must not inherit this account's
+    // local deck/mastery/history. Cloud copies restore on next sign-in.
+    clearAllLocalData()
     const form = document.createElement('form')
     form.method = 'POST'
     form.action = '/auth/logout'
@@ -164,12 +209,15 @@ export default function SettingsPage() {
   }
 
   function toggleRestDay(day: string) {
-    setFocusSettings(prev => ({
-      ...prev,
-      restDays: prev.restDays.includes(day)
-        ? prev.restDays.filter(d => d !== day)
-        : [...prev.restDays, day],
-    }))
+    setFocusSettings(prev => {
+      if (prev.restDays.includes(day)) {
+        return { ...prev, restDays: prev.restDays.filter(d => d !== day) }
+      }
+      // At least one active day must remain — 7 rest days would make the
+      // weekly-goal cap 0 and the volume input's min exceed its max.
+      if (prev.restDays.length >= 6) return prev
+      return { ...prev, restDays: [...prev.restDays, day] }
+    })
   }
 
   const statusText = (s: SaveStatus, errMsg?: string) =>
@@ -184,9 +232,17 @@ export default function SettingsPage() {
           <div style={{ marginBottom: 24 }}>
             <h1 className="heading-display text-[22px]"><span className="heading-accent">Settings</span></h1>
             <p style={{ margin: '4px 0 0', fontSize: 13, color: 'var(--muted)' }}>
-              Manage your profile and preferences
+              {profileLoaded ? 'Manage your profile and preferences' : 'Loading your profile…'}
             </p>
           </div>
+
+          {loadFailed && (
+            <div className="dx-card" style={{ marginBottom: 16 }}>
+              <div className="dx-card-body" style={{ fontSize: 13, color: 'var(--red)' }}>
+                Couldn&apos;t load your saved settings — the fields below may show defaults. Refresh the page to try again.
+              </div>
+            </div>
+          )}
 
           {/* ── Profile ── */}
           <div className="dx-card">
@@ -252,12 +308,6 @@ export default function SettingsPage() {
                     <a
                       href={`mailto:${SUPPORT_EMAIL}?subject=MedTrainer Pro upgrade`}
                       className="dx-btn-primary"
-                      onClick={e => {
-                        if (!navigator.userAgent.includes('Mobi') && !document.createElement('a').href.startsWith('mailto')) {
-                          e.preventDefault()
-                          navigator.clipboard?.writeText(SUPPORT_EMAIL).catch(() => {})
-                        }
-                      }}
                       style={{ textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, padding: '7px 18px' }}
                     >
                       Upgrade to Pro →
@@ -266,9 +316,16 @@ export default function SettingsPage() {
                       Opens your email app. No email client?{' '}
                       <button
                         className="underline text-ink-secondary bg-transparent border-0 cursor-pointer p-0 text-[inherit]"
-                        onClick={() => navigator.clipboard?.writeText(SUPPORT_EMAIL)}
+                        onClick={() => {
+                          navigator.clipboard?.writeText(SUPPORT_EMAIL)
+                            .then(() => {
+                              setCopied(true)
+                              setTimeout(() => setCopied(false), 2000)
+                            })
+                            .catch(() => {})
+                        }}
                       >
-                        Copy address
+                        {copied ? 'Copied ✓' : 'Copy address'}
                       </button>{' '}
                       ({SUPPORT_EMAIL})
                     </p>

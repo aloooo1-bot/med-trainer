@@ -8,7 +8,18 @@ export async function POST(req: Request) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const { id, notes }: { id: string; notes: string } = await req.json()
+  let id: unknown, notes: unknown
+  try {
+    ({ id, notes } = await req.json())
+  } catch {
+    return Response.json({ error: 'Invalid JSON' }, { status: 400 })
+  }
+  if (typeof id !== 'string' || typeof notes !== 'string') {
+    return Response.json({ error: 'id and notes must be strings' }, { status: 400 })
+  }
+  if (notes.length > 20_000) {
+    return Response.json({ error: 'Notes are limited to 20,000 characters' }, { status: 400 })
+  }
 
   const { data, error } = await supabase
     .from('case_sessions')

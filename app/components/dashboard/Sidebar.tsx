@@ -57,6 +57,7 @@ export default function Sidebar({ displayName, tier, activePage = 'dashboard' }:
 }) {
   const initials = displayName.slice(0, 2).toUpperCase()
   const [recallDue, setRecallDue] = useState(0)
+  const [mobileOpen, setMobileOpen] = useState(false)
 
   useEffect(() => {
     // Mount-only read of the review deck from localStorage (unavailable during SSR).
@@ -64,8 +65,46 @@ export default function Sidebar({ displayName, tier, activePage = 'dashboard' }:
     setRecallDue(dueCount(loadReviewItems(), Date.now()))
   }, [])
 
+  useEffect(() => {
+    if (!mobileOpen) return
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') setMobileOpen(false) }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
+  }, [mobileOpen])
+
   return (
-    <aside className="dx-sidebar">
+    <>
+    {/* Mobile-only top bar (the sidebar is hidden ≤900px) */}
+    <div className="dx-mobile-topbar">
+      <button
+        className="dx-mobile-menu-btn"
+        onClick={() => setMobileOpen(o => !o)}
+        aria-label={mobileOpen ? 'Close navigation menu' : 'Open navigation menu'}
+        aria-expanded={mobileOpen}
+      >
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="18" height="18">
+          <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <span className="dx-logo-text">MedTrainer</span>
+      {recallDue > 0 && (
+        <Link
+          href="/recall"
+          aria-label={`${recallDue} cards due for review`}
+          style={{
+            marginLeft: 'auto', minWidth: 20, height: 20, padding: '0 6px', borderRadius: 10,
+            background: 'var(--red)', color: '#fff', fontSize: 11, fontWeight: 700,
+            display: 'inline-flex', alignItems: 'center', justifyContent: 'center', textDecoration: 'none',
+          }}
+        >
+          {recallDue > 99 ? '99+' : recallDue}
+        </Link>
+      )}
+    </div>
+
+    {mobileOpen && <div className="dx-mobile-backdrop" onClick={() => setMobileOpen(false)} />}
+
+    <aside className={`dx-sidebar${mobileOpen ? ' mobile-open' : ''}`}>
       <div className="dx-logo">
         <span className="dx-logo-text">MedTrainer</span>
       </div>
@@ -76,6 +115,7 @@ export default function Sidebar({ displayName, tier, activePage = 'dashboard' }:
             key={item.label}
             href={item.href}
             className={`dx-nav-item${activePage === item.page ? ' active' : ''}`}
+            onClick={() => setMobileOpen(false)}
           >
             {item.icon}
             {item.label}
@@ -103,5 +143,6 @@ export default function Sidebar({ displayName, tier, activePage = 'dashboard' }:
         </div>
       </div>
     </aside>
+    </>
   )
 }

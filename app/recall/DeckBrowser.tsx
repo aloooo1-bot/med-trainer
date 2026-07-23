@@ -40,7 +40,10 @@ export default function DeckBrowser({ items, now }: { items: ReviewItem[]; now: 
     <div className="dx-card">
       <div className="dx-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8 }}>
         <div style={{ fontWeight: 700 }}>Your deck</div>
-        <div style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)' }}>
+        <div
+          style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)' }}
+          title="Mature = review interval of 3+ weeks, i.e. reliably remembered"
+        >
           {items.length} cards · {dueNow} due · {mature} mature
         </div>
       </div>
@@ -51,7 +54,7 @@ export default function DeckBrowser({ items, now }: { items: ReviewItem[]; now: 
           onChange={e => setQ(e.target.value)}
           placeholder="Search by diagnosis, system, tag, or prompt…"
           aria-label="Search review deck"
-          style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface-0, transparent)', color: 'var(--text)', fontSize: 13 }}
+          style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface2)', color: 'var(--text)', fontSize: 13 }}
         />
         {filtered.length === 0 ? (
           <p style={{ fontSize: 12, color: 'var(--muted)', padding: '8px 0' }}>No cards match “{q}”.</p>
