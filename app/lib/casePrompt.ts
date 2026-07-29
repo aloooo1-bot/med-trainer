@@ -203,21 +203,23 @@ Invent a completely unique patient name. ${clause} Never reuse first names or la
  * @param {string} system
  * @param {string} difficulty - "Foundations" | "Clinical" | "Advanced"
  * @param {string} [diagnosis] - specific diagnosis to force
- * @param {string|null} [variantSeed] - unused (kept for backwards compat)
+ * @param {string|null} [variantSeed] - appended as a VARIANT INSTRUCTION so the
+ *   library filler can generate distinct variants of the same diagnosis
  * @returns {string}
  */
-export function buildCasePrompt(system: string, difficulty: string, diagnosis?: string, _variantSeed?: string | null) {
+export function buildCasePrompt(system: string, difficulty: string, diagnosis?: string, variantSeed?: string | null) {
   const diffRules = DIFFICULTY_RULES[difficulty as keyof typeof DIFFICULTY_RULES] ?? DIFFICULTY_RULES.Foundations
   const diffCount = difficulty === 'Foundations' ? '2-3' : difficulty === 'Clinical' ? '3-4' : '4-5'
   const schema = JSON_SCHEMA.replace('DIFF_COUNT', diffCount)
   const diagnosisLine = diagnosis
     ? `The diagnosis for this case MUST be "${diagnosis}". Do not substitute a different diagnosis. `
     : ''
+  const variantInstruction = variantSeed ? `\nVARIANT INSTRUCTION: ${variantSeed}` : ''
 
   return `Generate a realistic ${system} clinical case. ${diagnosisLine}Strictly follow the difficulty rules below.
 
 ${diffRules}
 
 ${CRITICAL_RULES}
-${schema}`
+${schema}${variantInstruction}`
 }

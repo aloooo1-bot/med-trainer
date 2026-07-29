@@ -33,8 +33,19 @@ function dbTimeout<T>(p: PromiseLike<T>, ms: number): Promise<T> {
   ])
 }
 
+/**
+ * Whether the shared case library (Supabase `cases`) can be read/written.
+ *
+ * Deliberately NOT keyed off SESSION_STORE: that flag selects where *session*
+ * state lives, and conflating the two silently disabled the case cache for
+ * anyone running the local file session store — turning every case start into
+ * a full live generation (~2 min + API cost) even though the library was fully
+ * populated. Every query here is already wrapped in an 8s dbTimeout with a
+ * local file-cache fallback, so an unreachable database degrades safely
+ * without needing an env guard. Set CASE_CACHE=off to opt out explicitly.
+ */
 function supabaseAvailable(): boolean {
-  return !!process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.SESSION_STORE !== 'file'
+  return !!process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.CASE_CACHE !== 'off'
 }
 
 // Column sets: the tiered columns exist only after migration 0001. Reads try

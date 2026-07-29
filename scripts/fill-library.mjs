@@ -24,6 +24,7 @@ import { fileURLToPath } from 'url'
 import Anthropic from '@anthropic-ai/sdk'
 import { createClient } from '@supabase/supabase-js'
 import { MANIFEST, VARIANT_SEEDS } from './case-manifest.mjs'
+import { buildCasePrompt, buildCaseSystemPrompt } from '../app/lib/casePrompt.ts'
 import { config } from 'dotenv'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
@@ -71,182 +72,11 @@ function makeCaseId(system, difficulty, diagnosis, variantIndex) {
   return `${slugify(system)}-${slugify(difficulty)}-${slugify(diagnosis)}-${variantIndex}`
 }
 
-// ── Prompts (must match app/page.tsx generateCase) ────────────────────────────
-const SYSTEM_PROMPT = `You are a medical education case generator. Generate realistic, detailed clinical cases.
-Return ONLY valid JSON. No markdown, no code fences, no explanation. Just the raw JSON object.
-Invent a completely unique patient name. Draw from diverse ethnicities and countries each time (rotate through Eastern European, West African, East Asian, Latin American, Scandinavian, South Asian, Middle Eastern, etc.). Never reuse first names or last names across cases.`
-
-const DIFFICULTY_RULES = {
-  Foundations: `DIFFICULTY — FOUNDATIONS:
-- Common, high-prevalence diagnosis with a classic, unambiguous presentation
-- ONE age-appropriate comorbidity is permitted (e.g. hypertension in a cardiac case, type 2 diabetes in a renal case) but it must not alter the diagnosis, obscure the clinical picture, or introduce lab ambiguity
-- Labs and imaging directly confirm the diagnosis — values are clearly abnormal in the expected direction with no misleading results
-- Physical exam findings are classic and confined to the primary organ system
-- The patient's history, when asked, provides straightforward supporting detail that reinforces the diagnosis
-- 2-3 differentials generated; the correct diagnosis is clearly favored by the combination of history, exam, and objective data`,
-
-  Clinical: `DIFFICULTY — CLINICAL:
-- Common-to-moderate prevalence diagnosis encountered regularly by general internists, hospitalists, or emergency physicians
-- DO NOT generate rare diseases (prevalence <1:10,000), subspecialty-only diagnoses, or conditions requiring fellowship-level expertise
-- ONE atypical feature that actively misleads toward a competing differential — this must be a specific finding (e.g. pleuritic chest pain in a PE case that mimics pericarditis, or fever in a PE case that suggests pneumonia) not just a vague "unusual presentation"
-- ONE comorbidity that meaningfully changes either the expected presentation, the lab interpretation, or the clinical management — it must do clinical work, not just exist as background
-- At least one lab value that cannot be interpreted correctly in isolation — it requires correlation with another finding (history, imaging, or a second lab) to reach the right conclusion
-- Physical exam includes one finding that supports a plausible wrong differential
-- 3-4 genuine differentials, at least one requiring a specific confirmatory test to exclude`,
-
-  Advanced: `DIFFICULTY — ADVANCED:
-- ONE uncommon or rare diagnosis — do NOT stack multiple rare conditions
-- Comorbidities must be common conditions (hypertension, diabetes, COPD, CKD, obesity) — they may complicate interpretation but must not themselves be rare
-- ONE objective red herring in the data: a lab value, vital sign, or physical exam finding that actively supports a wrong diagnosis (e.g. a mildly elevated troponin in an aortic dissection case, or an elevated creatinine that points toward renal failure when the primary diagnosis is something else)
-- Physical exam must include at least one finding that subtly distinguishes the correct diagnosis from its closest mimic — it should not be prominently flagged, but must be present for a careful examiner to notice
-- Lab and imaging findings require synthesis across multiple data points — no single result is diagnostic on its own except the pathognomonic confirmatory test
-- The case MUST include one pathognomonic or definitively discriminating result available in availableLabs or availableImaging that rules in the correct diagnosis when specifically ordered — this finding must not appear in hiddenHistory alone
-- 4-5 differentials with at least two that are strongly supported by early data before the discriminating test is ordered`,
-}
-
-const JSON_SCHEMA = `{
-  "patientInfo": {
-    "name": "First Last",
-    "age": <number>,
-    "gender": "Male or Female",
-    "chiefComplaint": "<brief chief complaint>",
-    "height": "<height in feet and inches e.g. 5'9\\">",
-    "heightInches": <total height in inches as integer e.g. 69>
-  },
-  "hpi": "<2-3 sentences. HARD MAXIMUM 60 WORDS — count every word and cut if over. State ONLY: the chief complaint, primary symptom(s), and duration. STRICTLY FORBIDDEN: associated symptoms, review of systems positives, family history, social history details, exam findings, and ANY detail that narrows the differential to a single diagnosis (e.g. heat intolerance, exophthalmos, tremor, toxin/substance names, radiation, aggravating/relieving factors). Everything forbidden here belongs in hiddenHistory.fullHistory so the patient can reveal it during the clinical interview.>",
-  "clinicalHpi": "<2-3 sentences ONLY. MAXIMUM 40 WORDS TOTAL. State age, sex, primary symptom, and duration. STOP THERE. Do NOT include associated symptoms, characterization, radiation, pertinent positives or negatives — all additional detail belongs in hiddenHistory.fullHistory>",
-  "advancedHpi": "<HARD LIMIT: 20 WORDS MAXIMUM — count every word before writing. Format: [Age]yo [sex] with [vague symptom]. [One misleading/incidental detail]. Nothing else. Example: '52yo male with fatigue. Recently started a new blood pressure medication.'>",
-  "vitals": {
-    "bp": "<systolic/diastolic mmHg>",
-    "hr": <beats per minute>,
-    "rr": <breaths per minute>,
-    "temp": <Fahrenheit decimal>,
-    "spo2": <percent integer>,
-    "weight": "<lbs>"
-  },
-  "diagnosis": "<specific primary diagnosis>",
-  "differentials": ["<dx 1>", "<dx 2>", ...GENERATE EXACTLY DIFF_COUNT DIFFERENTIALS — no more, no fewer],
-  "differentialExplanations": ["<dx 1>: <1 sentence — why it belongs on the differential and the single most important finding that distinguishes it from the correct diagnosis>", ...one entry per differential — MUST match differentials array length],
-  "expectedLabs": ["<exact lab name copied character-for-character from availableLabs that a competent physician MUST order to diagnose or manage this case>", ...list 3-7 key labs in order of clinical priority],
-  "expectedImaging": ["<exact imaging/procedure name copied character-for-character from availableImaging that should be ordered>", ...list 0-3 key studies — RETURN AN EMPTY ARRAY [] if imaging is not part of the standard diagnostic workup for this diagnosis (e.g. ITP, hemophilia, von Willebrand disease, viral URI, simple migraine, hypothyroidism, primary hyperaldosteronism workup, most endocrine and hematologic diagnoses are lab-only). Do NOT invent imaging just to fill the array.],
-  "keyQuestions": [
-    "<important question the physician should have asked the patient>",
-    "<important question>",
-    "<important question>",
-    "<important question>",
-    "<important question>"
-  ],
-  "teachingPoints": ["<clinical pearl 1>", "<clinical pearl 2>", "<clinical pearl 3>", "<clinical pearl 4>"],
-  "reviewOfSystems": {
-    "Constitutional":          "<explicit findings — state positives first, then denials. e.g. 'Fatigue present. Denies fever, chills, night sweats, weight loss.'>",
-    "HEENT":                   "<explicit findings — state positives first, then denials>",
-    "Cardiovascular":          "<explicit findings — state positives first, then denials>",
-    "Respiratory":             "<explicit findings — state positives first, then denials>",
-    "Gastrointestinal":        "<explicit findings — state positives first, then denials>",
-    "Genitourinary":           "<explicit findings — state positives first, then denials>",
-    "Musculoskeletal":         "<explicit findings — state positives first, then denials>",
-    "Neurological":            "<explicit findings — state positives first, then denials>",
-    "Psychiatric":             "<explicit findings — state positives first, then denials>",
-    "Integumentary":           "<explicit findings — state positives first, then denials>",
-    "Endocrine":               "<explicit findings — state positives first, then denials>",
-    "Hematologic/Lymphatic":   "<explicit findings — state positives first, then denials>",
-    "Allergic/Immunologic":    "<explicit findings — state positives first, then denials>"
-  },
-  "physicalExam": {
-    "General": "<appearance and demeanor>",
-    "HEENT": "<findings>",
-    "Neck": "<findings>",
-    "Cardiovascular": "<auscultation, pulses, JVD, edema>",
-    "Pulmonary": "<auscultation, percussion, work of breathing>",
-    "Abdomen": "<inspection, auscultation, palpation, organomegaly>",
-    "Extremities": "<findings>",
-    "Neurological": "<findings>",
-    "Skin": "<findings>"
-  },
-  "availableLabs": ["<lab name>", "<lab name>", ...include 10-14 relevant and distractor labs],
-  "availableImaging": ["<study name>", ...include 3-5 relevant and distractor studies],
-  CARDIAC TEST RULE: When the case involves cardiovascular pathology, chest pain, dyspnea, or syncope — always include "Electrocardiogram (ECG/EKG)" in availableImaging (NEVER in availableLabs) with a narrative ECG report in imagingResults describing rhythm, rate, PR/QRS/QTc intervals, axis, and any ST or T-wave changes. Also include "Troponin I or T (high sensitivity)" and "BNP / NT-proBNP" in availableLabs with numeric values in labResults.
-  "labGroups": [
-    { "name": "<panel name e.g. Complete Blood Count (CBC)>", "tests": ["<exact lab name from availableLabs>", ...] },
-    ...group every lab from availableLabs into a named panel; standalone tests get their own single-item group
-  ],
-  "labResults": {
-    "<panel name from availableLabs e.g. Complete Blood Count (CBC)>": {
-      "components": [
-        { "name": "<analyte e.g. WBC>", "value": "<numeric value e.g. 7.2>", "unit": "<unit e.g. x10³/µL>", "referenceRange": "<range e.g. 4.5-11.0>", "status": "<normal|abnormal|critical>" },
-        { "name": "<analyte e.g. Hemoglobin>", "value": "...", "unit": "...", "referenceRange": "...", "status": "..." }
-      ]
-    }
-  },
-  "imagingResults": {
-    "<each imaging study from availableImaging e.g. Chest X-Ray, CT Chest, MRI Brain>": "<radiology-style report impression, 2-3 sentences>"
-  },
-  "procedureResults": {
-    "<procedure name exactly as listed in availableImaging e.g. Upper Endoscopy (EGD), Colonoscopy, Bronchoscopy, Lumbar Puncture>": "<narrative procedure report describing visualized findings, 2-4 sentences — include what was seen, any specimens taken, and immediate impression>"
-  },
-  PROCEDURE RULE: For any diagnostic procedure in availableImaging (endoscopy, colonoscopy, bronchoscopy, lumbar puncture, paracentesis, thoracentesis, arthrocentesis), generate a narrative result in procedureResults using the EXACT same procedure name as the key, copied character-for-character from availableImaging. Only include procedures clinically relevant to the diagnosis. Imaging studies (X-ray, CT, MRI, ultrasound, echo) go in imagingResults, NOT procedureResults.
-  "hiddenHistory": {
-    "fullHistory": "<Complete clinical history withheld from the HPI: all associated symptoms, true onset, duration, character, radiation, aggravating/relieving factors, pertinent positives, pertinent negatives, and the most pathognomonic finding. Gate the most diagnostic detail — only reveal it if the physician asks about it specifically by name or direct description. Reveal each finding only when the physician directly asks.>",
-    "socialHistory": "<smoking pack-years, alcohol drinks/week, recreational drugs, occupation, living situation, recent travel>",
-    "familyHistory": "<relevant family history with relationships and conditions>",
-    "medications": "<current medications with doses and frequencies>",
-    "hiddenSymptoms": "<1-2 symptoms patient hasn't mentioned but will confirm if asked directly>",
-    "allergies": "<drug allergies with reaction type, or NKDA>"
-  },
-  "imagingCategory": "<1-3 word radiological descriptor of the key imaging finding expected in this case, using radiology terminology — e.g. 'bilateral pleural effusion', 'pneumothorax', 'pulmonary consolidation', 'sigmoid mass', 'renal cortical thinning'. This should reflect what an imaging study would show, not the diagnosis name.>",
-  "ecgFindings": "<1-2 sentence description of what the ECG shows in this case, using standard ECG terminology. Examples: 'Sinus tachycardia at 108 bpm. No ST changes or arrhythmia.' | 'Atrial fibrillation with rapid ventricular response at 130 bpm. No ST changes.' | 'Normal sinus rhythm with ST elevation in leads V2-V5 consistent with anterior STEMI. Reciprocal ST depression in inferior leads.' | 'Sinus bradycardia at 48 bpm. First-degree AV block with PR interval 220ms.' This field drives ECG image selection and display.>",
-  "hematologyFindings": "<If peripheral blood smear is clinically relevant, describe what it shows — e.g. 'Parasitized RBCs with ring forms visible, consistent with Plasmodium falciparum.' or 'Microcytic hypochromic red cells with target cells, consistent with iron deficiency anemia.' Omit or leave blank if not relevant to the case.>",
-  "urineFindings": "<If urinalysis or urine microscopy is clinically relevant, describe the microscopy findings — e.g. 'WBCs and bacteria visible; leukocyte esterase positive. Consistent with UTI.' or 'RBC casts present; dysmorphic RBCs noted. Consistent with glomerulonephritis.' Omit or leave blank if not relevant.>",
-  "skinFindings": "<If a skin lesion or biopsy is relevant, describe the dermoscopic appearance — e.g. 'Irregular border with atypical pigment network and regression areas, concerning for melanoma.' Omit or leave blank if not relevant.>",
-  "fundusFindings": "<If ophthalmoscopy or fundoscopy is relevant, describe fundus findings — e.g. 'Bilateral flame hemorrhages, disc swelling, and AV nicking consistent with hypertensive retinopathy.' or 'Increased cup-to-disc ratio >0.7 with superior rim thinning, suspicious for glaucoma.' Omit or leave blank if not relevant.>",
-  "biopsyFindings": "<If histopathology (H&E biopsy) is relevant, describe what the pathology shows — e.g. 'Dysplastic glandular epithelium with nuclear pleomorphism and cribriform architecture, consistent with adenocarcinoma.' Omit or leave blank if not relevant.>",
-  "pastMedicalHistory": {
-    "conditions": "<chronic diagnoses and health problems — if none, write exactly 'None.' and nothing else; never name the diagnosis or related conditions>",
-    "surgeries": "<prior surgeries and procedures — if none, write exactly 'None.' and nothing else; never name the diagnosis or related procedures>",
-    "hospitalizations": "<prior hospitalizations and ER visits — if none, write exactly 'None.' and nothing else; never name the diagnosis or related events>"
-  },
-  "currentMedications": {
-    "medications": "<prescription medications with doses and frequencies, or 'None'>",
-    "otc": "<OTC drugs, vitamins, and supplements, or 'None'>"
-  },
-  "socialHistory": {
-    "smoking": "<tobacco or vaping use with pack-years if applicable, or 'Never smoker'>",
-    "alcohol": "<alcohol use in drinks per week, or 'Denies'>",
-    "drugs": "<recreational drug use, or 'Denies'>",
-    "occupation": "<current job and work environment>",
-    "living": "<living situation, family members, marital status>",
-    "other": "<relevant travel, exercise habits, diet, chemical exposures>"
-  },
-  "relevantTests": [
-    RELEVANT TESTS RULE: Generate 5-10 tests that are specifically relevant to THIS case's primary diagnosis AND each significant comorbidity. Include both the gold-standard confirmatory test and 1-2 meaningful alternatives. These supplement the standard availableLabs/availableImaging — focus on specialty tests a student might miss (e.g. vWF Antigen + Ristocetin Cofactor + Factor VIII Activity for von Willebrand disease, or X-Ray Knee + MRI Knee for a musculoskeletal knee case, or ESR + CRP + RF + Anti-CCP for a rheumatoid arthritis case). Provide realistic result values appropriate to the diagnosis.
-    {
-      "name": "<exact test name as it would appear on an order — e.g. 'vWF Antigen', 'X-Ray Knee (AP/Lateral)', 'Factor VIII Activity'>",
-      "category": "<one of: Hematology | Metabolic & Chemistry | Urinalysis & Renal | Coagulation | Immunology & Serology | Infectious Disease | Cardiac | Arterial Blood Gas & Respiratory | Toxicology & Drug Levels | Imaging | Procedures & Special Tests>",
-      "isImaging": <true for X-ray, CT, MRI, US, nuclear study, ECG, endoscopy; false for all lab tests>,
-      "labResult": {
-        "components": [
-          { "name": "<analyte name>", "value": "<value>", "unit": "<unit>", "referenceRange": "<range>", "status": "<normal|abnormal|critical>" }
-        ]
-      },
-      "imagingResult": "<radiology or procedure narrative — omit if isImaging is false>"
-    }
-  ]
-}`
-
-const CRITICAL_RULES = `Return this exact JSON structure with all fields populated. For labResults, every panel must list every individual analyte as a separate component (e.g. CBC must expand into WBC, Hemoglobin, Hematocrit, Platelets, etc.). Single-value tests also use a one-item components array.
-CRITICAL: Every lab name listed in availableLabs MUST have a corresponding entry in labResults. Every imaging study in availableImaging MUST have a result in imagingResults (or procedureResults if it is a procedure). Do not list a test without also providing its result. Imaging studies (X-Ray, CT, MRI, Ultrasound, ECG) must ONLY appear in availableImaging and imagingResults — NEVER in availableLabs or labResults.
-CRITICAL: The key in labResults for each test MUST be the EXACT same string as it appears in availableLabs — copy it character-for-character. Do NOT use abbreviations or shortened names as keys. For example if availableLabs contains "Prothrombin Time (PT) / INR", the labResults key must be "Prothrombin Time (PT) / INR" not "PT/INR" or "PT" or "Coagulation Panel".
-CRITICAL: The lab/imaging results must include at least one finding that definitively confirms the correct diagnosis over its closest differential (e.g. for gout: monosodium urate crystals on synovial fluid; for PE: filling defect on CT-PA; for MI: ST elevation + troponin). Do not generate ambiguous results that leave the diagnosis unconfirmable from the data provided.
-STEMI RULE: When the diagnosis is any form of STEMI (inferior, anterior, lateral, posterior, STEMI equivalent), the ecgFindings field MUST explicitly state the affected leads with millimeter elevation (e.g. "2mm ST elevation in leads II, III, and aVF with reciprocal ST depression in I and aVL, consistent with inferior STEMI"). Never write borderline or possible ST elevation for a STEMI diagnosis — the ECG must be unambiguously diagnostic.
-AIN/DRUG-INDUCED NEPHRITIS RULE: When the diagnosis is Acute Interstitial Nephritis (AIN), drug-induced nephropathy, or similar medication-triggered renal injury, the causative agent (NSAID, antibiotic, PPI, etc.) MUST appear prominently in currentMedications.otc or currentMedications.medications with duration (e.g. "Ibuprofen 600mg TID × 3 weeks"). It must be listed as a recent or current medication, not just mentioned in passing.
-FIBRILLARY GN EXCLUSION: Do NOT generate Fibrillary Glomerulonephritis as a diagnosis at any difficulty. For Advanced Renal cases, choose instead: IgA Nephropathy (Berger's Disease), Focal Segmental Glomerulosclerosis (FSGS), Membranous Nephropathy, ANCA-associated vasculitis, or Thrombotic Microangiopathy.
-WHIPPLE'S BIOPSY RULE: When the diagnosis is Whipple's Disease (Tropheryma whipplei), "Upper Endoscopy (EGD) with Small Bowel Biopsy" MUST be included in availableImaging, and the procedureResults entry for it MUST explicitly describe PAS-positive macrophages with foamy cytoplasm distending the lamina propria — the pathognomonic histological finding without which the diagnosis cannot be confirmed.
-CLL DISCRIMINATOR RULE: When the diagnosis is Chronic Lymphocytic Leukemia (CLL) or CLL with AIHA, "Flow Cytometry (Peripheral Blood)" MUST be included in availableLabs and its labResults MUST show CD5+/CD19+/CD23+ lymphocyte population — the immunophenotype that distinguishes CLL from PNH, lymphoma, and other B-cell malignancies.
-WALDENSTRÖM DISCRIMINATOR RULE: When the diagnosis is Waldenström Macroglobulinemia, "Serum Protein Electrophoresis (SPEP) with Immunofixation" MUST be in availableLabs and its labResults MUST show an IgM monoclonal spike. The hiddenHistory.fullHistory or hiddenSymptoms MUST include at least one hyperviscosity symptom (blurred vision, headache, epistaxis, or neurological changes) to distinguish from Multiple Myeloma (which produces IgG/IgA, not IgM).
-PAST HISTORY CONSISTENCY RULE: The pastMedicalHistory fields shown to the patient (conditions, surgeries, hospitalizations) MUST NOT contradict hiddenHistory.fullHistory. If pastMedicalHistory.surgeries states "None" or "No prior surgeries", then hiddenHistory.fullHistory MUST NOT reveal any surgeries. The patient's visible history and hidden history must be completely consistent — the hidden history may ADD detail, but must never contradict what was already stated.
-PHYSICAL EXAM OBJECTIVITY RULE: Every physicalExam field MUST describe only objective, observable findings (e.g., "dullness to percussion at right base", "pitting edema 2+ bilateral lower extremities", "JVD at 45 degrees"). NEVER include diagnostic interpretations, disease names, or phrases like "consistent with X", "suggesting X", or "findings of X". The exam reports what the clinician sees, hears, and feels — not what it means. Diagnosis is the user's task.
-CLINICAL HPI WORD LIMIT RULE: The clinicalHpi field is a HARD MAXIMUM of 40 words. Count every word. If your draft exceeds 40 words, cut it. State only: age, sex, primary symptom, and duration. Do NOT add associated symptoms, characterization, radiation, pertinent positives/negatives, or social context — those belong in hiddenHistory.fullHistory. Two to three sentences only.
-FOUNDATIONS HPI WORD LIMIT RULE: The hpi field is a HARD MAXIMUM of 60 words. Count every word. If your draft exceeds 60 words, cut it. State ONLY: the chief complaint, primary symptom(s), and duration. STRICTLY FORBIDDEN in hpi: associated symptoms, review of systems positives, family history, social history details, exam findings on arrival, and ANY diagnosis-narrowing detail (e.g. heat intolerance, exophthalmos, tremor, radiation, toxin names). Move everything forbidden into hiddenHistory.fullHistory — the patient will reveal these during the clinical interview when asked. The hpi must leave the differential open.`
+// ── Prompts ───────────────────────────────────────────────────────────────────
+// Canonical source: app/lib/casePrompt.ts (imported above). This script used to
+// carry its own copy of SYSTEM_PROMPT / DIFFICULTY_RULES / JSON_SCHEMA /
+// CRITICAL_RULES, which silently drifted out of sync with the live generator and
+// lost 7 quality rules. Never re-inline them here.
 
 // ── History reconciliation ────────────────────────────────────────────────────
 // Detects contradictions between pastMedicalHistory (visible to student) and
@@ -314,16 +144,7 @@ function reconcileHistoryConsistency(caseData) {
 
 function buildPrompt(system, diagnosis, nativeDifficulty, variantIndex) {
   const variantSeed = variantIndex > 0 ? VARIANT_SEEDS[variantIndex] : null
-  const variantInstruction = variantSeed ? `\nVARIANT INSTRUCTION: ${variantSeed}` : ''
-  const diffRules = DIFFICULTY_RULES[nativeDifficulty] ?? DIFFICULTY_RULES.Foundations
-  const diffCount = nativeDifficulty === 'Foundations' ? '2-3' : nativeDifficulty === 'Clinical' ? '3-4' : '4-5'
-  const schema = JSON_SCHEMA.replace('DIFF_COUNT', diffCount)
-  return `Generate a realistic ${system} clinical case. The diagnosis for this case MUST be "${diagnosis}". Do not substitute a different diagnosis. Strictly follow the difficulty rules below.
-
-${diffRules}
-
-${CRITICAL_RULES}
-${schema}${variantInstruction}`
+  return buildCasePrompt(system, nativeDifficulty, diagnosis, variantSeed)
 }
 
 // ── Supabase helpers ──────────────────────────────────────────────────────────
@@ -410,7 +231,7 @@ async function generateCase(system, difficulty, diagnosis, variantIndex) {
       const message = await anthropic.messages.create({
         model: 'claude-sonnet-4-6',
         max_tokens: 12000,
-        system: SYSTEM_PROMPT,
+        system: buildCaseSystemPrompt(null),
         messages: [{ role: 'user', content: prompt }],
       })
 
@@ -486,20 +307,30 @@ async function main() {
     }
   }
 
-  if (dryRun) {
-    console.log(`Dry run — would generate ${work.length} cases:`)
-    for (const { id } of work) console.log(`  ${id}`)
-    return
-  }
-
-  // Filter out already-generated cases
+  // Filter out already-generated cases. This runs BEFORE the dry-run report so
+  // --dry-run shows the true remaining work (and therefore the real API cost),
+  // not every slot in the manifest.
   console.log('Checking Supabase for existing generated cases…')
   let generatedIds
   try {
     generatedIds = await getGeneratedIds()
   } catch (e) {
-    console.error('Failed to query Supabase:', e.message)
-    process.exit(1)
+    if (dryRun) {
+      console.warn(`Could not reach Supabase (${e.message}) — dry run will not filter existing cases.`)
+      generatedIds = new Set()
+    } else {
+      console.error('Failed to query Supabase:', e.message)
+      process.exit(1)
+    }
+  }
+
+  if (dryRun) {
+    const pending = (force ? work : work.filter(w => !generatedIds.has(w.id)))
+      .filter(w => !filterIds || filterIds.has(w.id))
+    console.log(`Dry run — ${work.length} slot(s) in scope, ${work.length - pending.length} already generated.`)
+    console.log(`Would generate ${pending.length} case(s)${pending.length ? ':' : '.'}`)
+    for (const { id } of pending) console.log(`  ${id}`)
+    return
   }
 
   const todo = (force ? work : work.filter(w => !generatedIds.has(w.id)))
