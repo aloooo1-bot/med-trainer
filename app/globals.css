@@ -270,13 +270,37 @@
   transition: stroke-dashoffset 900ms cubic-bezier(.2, .8, .2, 1);
 }
 
+/* A line that draws itself. The caller sets stroke-dasharray AND an initial
+   stroke-dashoffset equal to the path length; this animates the offset to 0. */
+@keyframes draw-in {
+  to { stroke-dashoffset: 0; }
+}
+.animate-draw-in {
+  animation: draw-in 900ms cubic-bezier(.2, .8, .2, 1) forwards;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.animate-fade-in {
+  animation: fade-in 320ms ease-out both;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .animate-result-in,
-  .animate-critical-arrive {
+  .animate-critical-arrive,
+  .animate-fade-in {
     animation: none;
   }
   .score-ring-sweep {
     transition: none;
+  }
+  /* Cancelling draw-in alone would strand the offset at the full path length,
+     leaving the line invisible — force it to its drawn state instead. */
+  .animate-draw-in {
+    animation: none;
+    stroke-dashoffset: 0 !important;
   }
 }
 

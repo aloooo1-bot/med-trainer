@@ -22,40 +22,103 @@ function scoreColor(score: number): string {
   return 'var(--green)'
 }
 
-/** Reliability diagram: confidence (x) vs actual accuracy (y) with the perfect-calibration diagonal. */
-function ReliabilityDiagram({ buckets }: { buckets: ReliabilityBucket[] }) {
-  const W = 200, H = 200, pad = 28
-  const px = (c: number) => pad + (c / 100) * (W - pad - 8)
-  const py = (a: number) => H - pad - (a / 100) * (H - pad - 8)
+/**
+ * Reliability diagram: stated confidence (x) against actual accuracy (y),
+ * with the perfect-calibration diagonal.
+ *
+ * The two failure modes are shaded rather than left to be inferred from which
+ * side of a dashed line a dot sits on — below the diagonal is overconfidence
+ * (the clinically dangerous one: you believed yourself more than the evidence
+ * warranted), above it is underconfidence. The curve draws itself and the
+ * bands land in confidence order, so the shape of the miscalibration reads as
+ * a movement rather than a static scatter.
+ */
+function ReliabilityDiagram({ buckets, verdict }: { buckets: ReliabilityBucket[]; verdict?: string }) {
+  const W = 264, H = 232
+  const padL = 34, padR = 12, padT = 12, padB = 30
+  const px = (c: number) => padL + (c / 100) * (W - padL - padR)
+  const py = (a: number) => H - padB - (a / 100) * (H - padB - padT)
+
+  const pts = buckets.map(b => ({ ...b, x: px(b.mid), y: py(b.accuracy) }))
+  // Path length computed arithmetically (no DOM measurement) so the draw-in
+  // dash offset is correct on first paint, including during SSR hydration.
+  const pathLen = pts.reduce((sum, p, i) =>
+    i === 0 ? 0 : sum + Math.hypot(p.x - pts[i - 1].x, p.y - pts[i - 1].y), 0)
+
+  const summary = buckets.length
+    ? `Reliability diagram. ${buckets.map(b => `${b.lo} to ${b.hi} percent confidence: ${b.accuracy} percent accurate over ${b.n} prediction${b.n === 1 ? '' : 's'}`).join('. ')}.${verdict ? ` Overall ${verdict}.` : ''}`
+    : 'Reliability diagram: no rated predictions yet.'
+
   return (
     <div style={{ marginTop: 14 }}>
-      <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 6 }}>Reliability — on the diagonal = well-calibrated; above = underconfident; below = overconfident</div>
-      <svg viewBox={`0 0 ${W} ${H}`} width={W} height={H} role="img" aria-label="Calibration reliability diagram: confidence versus actual accuracy">
-        {/* axes */}
-        <line x1={pad} y1={H - pad} x2={W - 8} y2={H - pad} stroke="var(--border)" strokeWidth="1" />
-        <line x1={pad} y1={H - pad} x2={pad} y2={8} stroke="var(--border)" strokeWidth="1" />
-        {/* perfect-calibration diagonal */}
-        <line x1={px(0)} y1={py(0)} x2={px(100)} y2={py(100)} stroke="var(--muted)" strokeWidth="1" strokeDasharray="4 3" opacity="0.6" />
-        {/* connecting path */}
-        {buckets.length > 1 && (
+      <div style={{ fontSize: 11, color: 'var(--muted)', marginBottom: 6 }}>
+        Reliability — each dot is a confidence band; dot size is how many predictions it holds.
+      </div>
+      <svg viewBox={`0 0 ${W} ${H}`} width="100%" style={{ maxWidth: W }} role="img" aria-label={summary}>
+        {/* Failure-mode regions, split by the diagonal. */}
+        <polygon
+          points={`${px(0)},${py(0)} ${px(100)},${py(0)} ${px(100)},${py(100)}`}
+          fill="var(--red)" opacity="0.06"
+        />
+        <polygon
+          points={`${px(0)},${py(0)} ${px(0)},${py(100)} ${px(100)},${py(100)}`}
+          fill="var(--amber)" opacity="0.05"
+        />
+        <text x={px(72)} y={py(28)} fontSize="8" fill="var(--red)" opacity="0.75" textAnchor="middle">overconfident</text>
+        <text x={px(28)} y={py(76)} fontSize="8" fill="var(--amber)" opacity="0.8" textAnchor="middle">underconfident</text>
+
+        {/* Ticks */}
+        {[0, 50, 100].map(v => (
+          <g key={v}>
+            <text x={px(v)} y={H - padB + 12} fontSize="8" fill="var(--muted)" textAnchor="middle">{v}</text>
+            <text x={padL - 6} y={py(v) + 3} fontSize="8" fill="var(--muted)" textAnchor="end">{v}</text>
+          </g>
+        ))}
+
+        {/* Axes */}
+        <line x1={padL} y1={H - padB} x2={W - padR} y2={H - padB} stroke="var(--border)" strokeWidth="1" />
+        <line x1={padL} y1={H - padB} x2={padL} y2={padT} stroke="var(--border)" strokeWidth="1" />
+
+        {/* Perfect calibration */}
+        <line
+          x1={px(0)} y1={py(0)} x2={px(100)} y2={py(100)}
+          stroke="var(--muted)" strokeWidth="1" strokeDasharray="4 3" opacity="0.55"
+        />
+
+        {/* The student's curve, drawing itself in confidence order */}
+        {pts.length > 1 && (
           <polyline
-            points={buckets.map(b => `${px(b.mid)},${py(b.accuracy)}`).join(' ')}
-            fill="none" stroke="var(--accent)" strokeWidth="1.5" opacity="0.7"
+            className="animate-draw-in"
+            points={pts.map(p => `${p.x},${p.y}`).join(' ')}
+            fill="none" stroke="var(--accent)" strokeWidth="1.75" opacity="0.75"
+            strokeLinecap="round" strokeLinejoin="round"
+            strokeDasharray={pathLen} strokeDashoffset={pathLen}
           />
         )}
-        {/* points (radius ~ sample size) */}
-        {buckets.map(b => {
-          const calibrated = Math.abs(b.mid - b.accuracy) <= 10
+
+        {/* Bands — radius encodes sample size by area (sqrt), not linearly. */}
+        {pts.map((p, i) => {
+          const calibrated = Math.abs(p.mid - p.accuracy) <= 10
           return (
-            <circle key={b.lo} cx={px(b.mid)} cy={py(b.accuracy)} r={Math.min(7, 3 + b.n)}
-              fill={calibrated ? 'var(--green)' : b.accuracy < b.mid ? 'var(--red)' : 'var(--amber)'} opacity="0.85">
-              <title>{`${b.lo}-${b.hi}% confidence: ${b.accuracy}% accurate (${b.n})`}</title>
+            <circle
+              key={p.lo}
+              className="animate-fade-in"
+              style={{ animationDelay: `${300 + i * 90}ms` }}
+              cx={p.x} cy={p.y} r={3 + Math.min(5, Math.sqrt(p.n) * 1.6)}
+              fill={calibrated ? 'var(--green)' : p.accuracy < p.mid ? 'var(--red)' : 'var(--amber)'}
+              stroke="var(--surface)" strokeWidth="1.25" opacity="0.9"
+            >
+              <title>{`${p.lo}-${p.hi}% confidence → ${p.accuracy}% accurate (${p.n} prediction${p.n === 1 ? '' : 's'})`}</title>
             </circle>
           )
         })}
-        {/* axis labels */}
-        <text x={(W + pad) / 2} y={H - 6} fontSize="9" fill="var(--muted)" textAnchor="middle">Confidence</text>
-        <text x={10} y={(H - pad) / 2} fontSize="9" fill="var(--muted)" textAnchor="middle" transform={`rotate(-90 10 ${(H - pad) / 2})`}>Actual</text>
+
+        {/* Axis labels */}
+        <text x={(W + padL) / 2} y={H - 4} fontSize="9" fill="var(--muted)" textAnchor="middle">Stated confidence</text>
+        <text
+          x={11} y={(H - padB + padT) / 2} fontSize="9" fill="var(--muted)" textAnchor="middle"
+          transform={`rotate(-90 11 ${(H - padB + padT) / 2})`}
+        >Actual accuracy</text>
       </svg>
     </div>
   )
@@ -239,7 +302,7 @@ export default function ReasoningProgress({ tier = 'free' }: { tier?: string }) 
                 {' '}(Brier {confCal.brier}, {confCal.n} rated).
               </p>
             )}
-            {buckets.length > 0 && <ReliabilityDiagram buckets={buckets} />}
+            {buckets.length > 0 && <ReliabilityDiagram buckets={buckets} verdict={confCal?.verdict} />}
           </div>
         )}
 
