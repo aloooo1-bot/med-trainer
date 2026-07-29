@@ -1,30 +1,74 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 
+const SWEEP_MS = 900
+
+function prefersReducedMotion(): boolean {
+  return typeof window !== 'undefined' &&
+    window.matchMedia?.('(prefers-reduced-motion: reduce)').matches === true
+}
+
+/**
+ * The end-of-case verdict. The ring sweeps from empty to the final score and
+ * the number counts up with it, so the result lands as an event rather than
+ * appearing pre-filled — this is the payoff moment of the whole case.
+ *
+ * The accessible name always carries the FINAL score, so assistive tech never
+ * reads a mid-tween value. Reduced motion renders the final state outright.
+ */
 export function ScoreRing({ score }: { score: number }) {
   const r = 68
   const circ = 2 * Math.PI * r
-  const offset = circ * (1 - Math.min(100, score) / 100)
+  const target = Math.max(0, Math.min(100, score))
   const strokeColor = score >= 75 ? 'var(--color-confirmed)' : score >= 60 ? 'var(--color-caution)' : 'var(--color-critical)'
+
+  // Start empty (also the SSR state, so hydration always matches), then sweep
+  // once mounted. Every state update happens inside a timer callback rather
+  // than the effect body, so this never triggers a cascading render.
+  const [swept, setSwept] = useState(false)
+  const [shown, setShown] = useState(0)
+
+  useEffect(() => {
+    const reduce = prefersReducedMotion()
+    const dur = reduce ? 0 : SWEEP_MS
+    // Flip on the next tick so the browser paints the empty ring first and the
+    // CSS transition actually runs.
+    const kick = setTimeout(() => setSwept(true), reduce ? 0 : 30)
+    // Count up alongside the sweep. setInterval (not rAF) so a backgrounded
+    // tab still settles on the final value instead of freezing mid-count.
+    const start = Date.now()
+    const id = setInterval(() => {
+      const t = dur === 0 ? 1 : Math.min(1, (Date.now() - start) / dur)
+      // easeOutCubic — fast start, gentle settle, matching the ring easing
+      setShown(Math.round(target * (1 - Math.pow(1 - t, 3))))
+      if (t >= 1) clearInterval(id)
+    }, 16)
+    return () => { clearTimeout(kick); clearInterval(id) }
+  }, [target])
+
   return (
     <svg width="160" height="160" role="img" aria-label={`Score: ${score} of 100`} className="block">
       <circle cx="80" cy="80" r={r} fill="none" stroke="var(--color-surface-3)" strokeWidth="8" />
       <circle
-        cx="80" cy="80" r={r} fill="none" style={{ stroke: strokeColor }} strokeWidth="8"
-        strokeDasharray={`${circ}`} strokeDashoffset={offset}
+        cx="80" cy="80" r={r} fill="none"
+        className="score-ring-sweep"
+        style={{ stroke: strokeColor }}
+        strokeWidth="8"
+        strokeDasharray={`${circ}`}
+        strokeDashoffset={swept ? circ * (1 - target / 100) : circ}
         strokeLinecap="round" transform="rotate(-90 80 80)"
       />
-      <text x="80" y="86" textAnchor="middle"
+      <text x="80" y="86" textAnchor="middle" aria-hidden="true"
         style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 48, fontWeight: 500, fill: 'var(--color-ink-primary)' }}>
-        {score}
+        {shown}
       </text>
-      <text x="80" y="106" textAnchor="middle"
+      <text x="80" y="106" textAnchor="middle" aria-hidden="true"
         style={{ fontSize: 12, fill: 'var(--color-ink-tertiary)', letterSpacing: '0.05em' }}>/ 100</text>
     </svg>
   )
 }
 
 export function CategoryRow({
-  label, dim, max, pct, expanded, onToggle,
+  label, dim, max, pct, expanded, onToggle, index = 0,
 }: {
   label: string
   dim: { score: number; feedback: string }
@@ -32,12 +76,17 @@ export function CategoryRow({
   pct: number
   expanded: boolean
   onToggle: () => void
+  /** Position in the scorecard — cascades each row in after the ring sweep. */
+  index?: number
 }) {
   const barColor = pct >= 75 ? 'bg-confirmed' : pct >= 60 ? 'bg-caution' : 'bg-critical'
   const scoreColor = pct >= 75 ? 'text-confirmed' : pct >= 60 ? 'text-caution' : 'text-critical'
   const panelId = `sc-panel-${label.replace(/\s+/g, '-').toLowerCase()}`
   return (
-    <div>
+    <div
+      className="animate-result-in"
+      style={{ animationDelay: `${420 + index * 70}ms` }}
+    >
       <button
         onClick={onToggle}
         aria-expanded={expanded}

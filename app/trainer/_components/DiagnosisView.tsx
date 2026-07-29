@@ -339,7 +339,7 @@ export function DiagnosisView({
 
           <div className="flex flex-col">
             <div className="flex flex-col divide-y divide-rule">
-              {gradingResult.dimensions && getRubric(caseDifficulty).map(({ key, label, max }) => {
+              {gradingResult.dimensions && getRubric(caseDifficulty).map(({ key, label, max }, i) => {
                 const dim = gradingResult.dimensions![key]
                 if (!dim) return null
                 const pct = Math.min(100, (dim.score / max) * 100)
@@ -350,6 +350,7 @@ export function DiagnosisView({
                     dim={dim}
                     max={max}
                     pct={pct}
+                    index={i}
                     expanded={expandedCategory === key}
                     onToggle={() => setExpandedCategory(expandedCategory === key ? null : key)}
                   />

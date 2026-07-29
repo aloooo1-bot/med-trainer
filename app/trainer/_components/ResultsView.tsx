@@ -71,6 +71,22 @@ export function ResultsView({
   })
 
   const allResultPanels = [...orderedLabs, ...orderedImaging, ...orderedProcedures]
+
+  /**
+   * Arrival choreography. A CSS animation runs when its element is created, so
+   * simply putting the class on every panel gives exactly the behaviour we
+   * want: React mounts a new node only for a newly-returned result, and
+   * already-rendered panels are preserved across renders and therefore never
+   * re-animate. No seen-set bookkeeping required.
+   *
+   * There is deliberately no stagger delay — Clinical (22min) and Advanced
+   * (15min) are timed, and a delay would withhold readable results while the
+   * student's clock runs. A batch fading in together over 320ms still reads as
+   * an arrival without costing anyone a second.
+   */
+  const arrivalClass = (isCritical = false) =>
+    `animate-result-in${isCritical ? ' animate-critical-arrive' : ''}`
+
   const allCollapsed = allResultPanels.length > 0 && allResultPanels.every(p => collapsedPanels.has(p))
   const toggleAllPanels = () => {
     setCollapsedPanels(allCollapsed ? new Set() : new Set(allResultPanels))
@@ -180,10 +196,14 @@ export function ResultsView({
                       ? [{ name: lab, value: raw.result, unit: '', referenceRange: raw.referenceRange ?? '—', status: raw.status ?? 'normal' }]
                       : []
               const panelAbnormal = components.some(c => c.status === 'abnormal' || c.status === 'critical')
+              const panelCritical = components.some(c => c.status === 'critical')
               const isCollapsed = collapsedPanels.has(lab)
               const summary = getPanelSummary(components)
               return (
-                <div key={lab} className="rounded-md border border-surface-4 overflow-hidden">
+                <div
+                  key={lab}
+                  className={`rounded-md border overflow-hidden ${panelCritical ? 'border-critical/40' : 'border-surface-4'} ${arrivalClass(panelCritical)}`}
+                >
                   <button
                     className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
                     onClick={() => togglePanel(lab)}
@@ -302,7 +322,7 @@ export function ResultsView({
                 const ecgImage = img in ecgCache ? ecgCache[img] : null
                 const ecgSummary = (caseData.ecgFindings ?? report).split(/[.!?]/)[0].trim()
                 return (
-                  <div key={img} className="rounded-md border border-surface-4 overflow-hidden">
+                  <div key={img} className={`rounded-md border border-surface-4 overflow-hidden ${arrivalClass()}`}>
                     <button
                       className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
                       onClick={() => togglePanel(img)}
@@ -334,7 +354,7 @@ export function ResultsView({
                 const firstLine = report.split(/[.\n]/)[0].trim()
                 const isBiopsyGated = specialModality === 'biopsy' && !diagnosisSubmitted
                 return (
-                  <div key={img} className="rounded-md border border-surface-4 overflow-hidden">
+                  <div key={img} className={`rounded-md border border-surface-4 overflow-hidden ${arrivalClass()}`}>
                     <button
                       className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
                       onClick={() => togglePanel(img)}
@@ -372,7 +392,7 @@ export function ResultsView({
               const firstLine = report.split(/[.\n]/)[0].trim()
               const cachedResults = imagingCache[img] ?? null
               return (
-                <div key={img} className="rounded-md border border-surface-4 overflow-hidden">
+                <div key={img} className={`rounded-md border border-surface-4 overflow-hidden ${arrivalClass()}`}>
                   <button
                     className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
                     onClick={() => togglePanel(img)}
@@ -397,7 +417,10 @@ export function ResultsView({
               const isCollapsed = collapsedPanels.has(proc)
               const firstLine = report.split(/[.\n]/)[0].trim()
               return (
-                <div key={proc} className="rounded-md border border-surface-4 overflow-hidden">
+                <div
+                  key={proc}
+                  className={`rounded-md border border-surface-4 overflow-hidden ${arrivalClass()}`}
+                >
                   <button
                     className="w-full flex items-center justify-between px-4 py-2.5 bg-surface-4/60 hover:bg-surface-3 transition-colors text-left"
                     onClick={() => togglePanel(proc)}

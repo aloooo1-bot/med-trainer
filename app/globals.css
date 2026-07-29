@@ -239,6 +239,47 @@
   animation: caution-pulse 3s ease-in-out infinite;
 }
 
+/* ── Arrival choreography ──────────────────────────────────────────────────
+   Results and scorecard rows enter rather than blink into place. Entrances
+   are opacity/transform only (cheap to composite) and are applied ONLY to
+   newly-arrived content — never re-run on already-seen rows.
+
+   Timed cases (Clinical 22min / Advanced 15min) mean motion must never cost
+   the student clock: the markup is in the DOM immediately, the delay merely
+   staggers the fade, and total stagger is capped by the callers. */
+@keyframes result-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.animate-result-in {
+  animation: result-in 320ms cubic-bezier(.2, .8, .2, 1) both;
+}
+
+/* A critical value should announce itself once, then settle. */
+@keyframes critical-arrive {
+  0%   { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-critical) 45%, transparent); }
+  70%  { box-shadow: 0 0 0 6px color-mix(in srgb, var(--color-critical) 0%, transparent); }
+  100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-critical) 0%, transparent); }
+}
+.animate-critical-arrive {
+  animation: critical-arrive 1400ms ease-out 1;
+}
+
+/* The end-of-case score ring fills from empty to the final value. */
+.score-ring-sweep {
+  transition: stroke-dashoffset 900ms cubic-bezier(.2, .8, .2, 1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-result-in,
+  .animate-critical-arrive {
+    animation: none;
+  }
+  .score-ring-sweep {
+    transition: none;
+  }
+}
+
 ::-webkit-scrollbar { width: 8px; height: 8px; }
 ::-webkit-scrollbar-track { background: var(--sb-track); }
 ::-webkit-scrollbar-thumb { background: var(--sb-thumb); border-radius: 4px; }
