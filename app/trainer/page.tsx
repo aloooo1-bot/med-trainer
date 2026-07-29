@@ -21,7 +21,7 @@ import {
 import { recordCaseOutcome, recordCalibration } from '../lib/reasoning/store'
 import { pushReasoning } from '../lib/reasoning/sync'
 import { computeBeliefs } from '../lib/reasoning/differential'
-import { scorePrediction } from '../lib/reasoning/prediction'
+import { scorePrediction, predictionMatchesDiagnosis } from '../lib/reasoning/prediction'
 import { type CaseData, type NotesState, selectHpi, SOAP_TEMPLATE } from './_lib/types'
 import {
   type StartResponse, type AskResponse, type GradeResponse, type ResumeResponse,
@@ -759,10 +759,9 @@ export default function MedTrainer() {
         if (prediction && prediction[0] && (reveal.differentialPriors?.length ?? 0) > 0) {
           const beliefs = computeBeliefs(reveal.differentialPriors!, reveal.testImpacts ?? {}, Array.from(orderedTests))
           const ps = scorePrediction(prediction, beliefs)
-          // Normalized match: did the student's leading pick equal the actual diagnosis?
-          const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
-          const np = norm(prediction[0]), nd = norm(reveal.diagnosis)
-          const topCorrect = np.length > 1 && (np === nd || nd.includes(np) || np.includes(nd))
+          // Shared with the reveal's calibration verdict so the recorded
+          // outcome and the message the student reads can never disagree.
+          const topCorrect = predictionMatchesDiagnosis(prediction[0], reveal.diagnosis)
           if (caseDifficulty === 'Foundations' && ps.comparedCount > 0) {
             // Ranked mode: rank-agreement + Brier.
             recordCalibration(ps.score, ps.topHit, Date.now(), predictionConfidence ?? undefined, topCorrect)

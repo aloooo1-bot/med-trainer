@@ -145,3 +145,30 @@ export function scorePrediction(studentRanking: string[], engineBeliefs: BeliefS
     comparedCount: n,
   }
 }
+
+/**
+ * Did the student's pre-test leading pick name the actual diagnosis?
+ *
+ * Shared so the calibration RECORD and the calibration VERDICT shown at reveal
+ * can never disagree — this logic previously lived inline in the trainer while
+ * the reveal narrated its own conclusion.
+ *
+ * Loose containment on both sides accepts the usual near-misses ("PE" vs
+ * "Pulmonary Embolism", "Bacterial Meningitis" vs "Meningitis"). It is
+ * deliberately generous: this drives self-assessment feedback, not a grade.
+ */
+export function predictionMatchesDiagnosis(pick: string | undefined, diagnosis: string): boolean {
+  const norm = (s: string) => (s || '').toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim()
+  const p = norm(pick ?? ''), d = norm(diagnosis)
+  if (p.length < 2 || !d) return false
+  return p === d || d.includes(p) || p.includes(d)
+}
+
+/** How a commitment landed: the right/wrong x confident/hedged quadrant. */
+export type CommitmentQuadrant = 'confident-right' | 'hedged-right' | 'confident-wrong' | 'hedged-wrong'
+
+export function commitmentQuadrant(correct: boolean, confidence: number | null | undefined): CommitmentQuadrant {
+  const bold = (confidence ?? 0) >= 0.8
+  if (correct) return bold ? 'confident-right' : 'hedged-right'
+  return bold ? 'confident-wrong' : 'hedged-wrong'
+}

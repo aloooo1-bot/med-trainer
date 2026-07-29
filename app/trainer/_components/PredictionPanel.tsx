@@ -2,7 +2,19 @@
 
 import { useState } from 'react'
 
-const CONFIDENCE_PRESETS = [50, 65, 80, 95]
+/**
+ * Confidence presets carry a plain-language gloss. A student asked for a bare
+ * percentage tends to pick a comfortable-looking number; naming what each level
+ * COMMITS them to is the actual calibration training, and it makes the later
+ * "confident and wrong" verdict land as something they chose rather than
+ * something the app decided.
+ */
+const CONFIDENCE_PRESETS: { value: number; gloss: string }[] = [
+  { value: 50, gloss: 'a coin flip' },
+  { value: 65, gloss: 'leaning that way' },
+  { value: 80, gloss: 'fairly sure' },
+  { value: 95, gloss: "I'd be surprised to be wrong" },
+]
 
 /**
  * Pre-test commitment, BEFORE ordering any tests.
@@ -37,11 +49,19 @@ export function PredictionPanel({
   // gated difficulties deliberately never receive candidates (anti-cueing).
   if (!open && (!candidates || candidates.length < 2)) return null
 
-  // Locked → compact read-only summary.
+  // Locked → a sealed record. Deliberately styled as something committed and
+  // no longer editable, rather than a collapsed version of the form: the
+  // commitment only means anything if it visibly cannot be walked back.
   if (prediction) {
     return (
-      <div className="rounded-md border border-surface-4 bg-surface-1 p-3">
-        <div className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-ink-tertiary">Your pre-test read (locked)</div>
+      <div className="animate-result-in rounded-md border-2 border-dashed border-surface-4 bg-surface-1 p-3">
+        <div className="mb-2 flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wide text-ink-tertiary">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" aria-hidden="true">
+            <rect x="4" y="11" width="16" height="10" rx="2" />
+            <path d="M8,11 V7 a4,4 0 0 1 8,0 v4" />
+          </svg>
+          Pre-test read — locked
+        </div>
         {open ? (
           <p className="text-[12px] text-ink-secondary">Leading diagnosis: <span className="font-semibold text-ink-primary">{prediction[0]}</span></p>
         ) : (
@@ -121,17 +141,23 @@ export function PredictionPanel({
           <div className="flex gap-1.5">
             {CONFIDENCE_PRESETS.map(p => (
               <button
-                key={p}
+                key={p.value}
                 type="button"
-                onClick={() => setConf(p)}
-                aria-pressed={conf === p}
+                onClick={() => setConf(p.value)}
+                aria-pressed={conf === p.value}
+                aria-label={`${p.value} percent — ${p.gloss}`}
+                title={p.gloss}
                 className={`flex-1 rounded border px-2 py-1.5 text-[12px] font-semibold transition-colors ${
-                  conf === p ? 'border-primary-500 bg-primary-500 text-ink-inverse' : 'border-surface-3 text-ink-secondary hover:border-surface-4'
+                  conf === p.value ? 'border-primary-500 bg-primary-500 text-ink-inverse' : 'border-surface-3 text-ink-secondary hover:border-surface-4'
                 }`}
               >
-                {p}%
+                {p.value}%
               </button>
             ))}
+          </div>
+          {/* Reserve the row so picking a level doesn't shift the Lock button. */}
+          <div className="mt-1.5 text-[10.5px] italic text-ink-tertiary" style={{ minHeight: 14 }}>
+            {conf != null ? CONFIDENCE_PRESETS.find(p => p.value === conf)?.gloss : ''}
           </div>
         </div>
       )}

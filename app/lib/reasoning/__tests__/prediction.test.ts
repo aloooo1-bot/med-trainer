@@ -1,6 +1,9 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { scorePrediction, brierScore, calibrationSummary, reliabilityBuckets } from '../prediction'
+import {
+  scorePrediction, brierScore, calibrationSummary, reliabilityBuckets,
+  predictionMatchesDiagnosis, commitmentQuadrant,
+} from '../prediction'
 import type { BeliefState } from '../types'
 
 const beliefs = (order: string[]): BeliefState[] =>
@@ -93,4 +96,45 @@ test('reliabilityBuckets groups by confidence band with per-band accuracy', () =
   const lo = buckets.find(b => b.lo === 50)!
   assert.equal(lo.accuracy, 100)
   assert.deepEqual(buckets.map(b => b.lo), [50, 90]) // sorted ascending
+})
+
+// ── Commitment matching + quadrant ──────────────────────────────────────────
+// These decide what the student is TOLD at reveal ("confident and wrong") and
+// what is written to their calibration history, so the two must never diverge.
+
+test('predictionMatchesDiagnosis accepts exact and near-miss phrasings', () => {
+  assert.equal(predictionMatchesDiagnosis('Pulmonary Embolism', 'Pulmonary Embolism'), true)
+  assert.equal(predictionMatchesDiagnosis('pulmonary embolism', 'Pulmonary Embolism'), true)
+  // Student less specific than the answer, and more specific than it.
+  assert.equal(predictionMatchesDiagnosis('Meningitis', 'Bacterial Meningitis'), true)
+  assert.equal(predictionMatchesDiagnosis('Acute Bacterial Meningitis', 'Bacterial Meningitis'), true)
+  // Punctuation and spacing are normalized away.
+  assert.equal(predictionMatchesDiagnosis('Pulmonary-Embolism  (PE)', 'Pulmonary Embolism (PE)'), true)
+})
+
+test('predictionMatchesDiagnosis rejects a genuinely different diagnosis', () => {
+  assert.equal(predictionMatchesDiagnosis('Pneumonia', 'Pulmonary Embolism'), false)
+  assert.equal(predictionMatchesDiagnosis('Aortic Dissection', 'Bacterial Meningitis'), false)
+})
+
+test('predictionMatchesDiagnosis is safe on empty or degenerate input', () => {
+  assert.equal(predictionMatchesDiagnosis(undefined, 'Pulmonary Embolism'), false)
+  assert.equal(predictionMatchesDiagnosis('', 'Pulmonary Embolism'), false)
+  assert.equal(predictionMatchesDiagnosis('   ', 'Pulmonary Embolism'), false)
+  assert.equal(predictionMatchesDiagnosis('Pulmonary Embolism', ''), false)
+  // A single character must not match everything by containment.
+  assert.equal(predictionMatchesDiagnosis('a', 'Aortic Dissection'), false)
+})
+
+test('commitmentQuadrant splits on the 80% confidence boundary', () => {
+  assert.equal(commitmentQuadrant(true, 0.95), 'confident-right')
+  assert.equal(commitmentQuadrant(true, 0.8), 'confident-right')  // inclusive
+  assert.equal(commitmentQuadrant(true, 0.65), 'hedged-right')
+  assert.equal(commitmentQuadrant(false, 0.95), 'confident-wrong')
+  assert.equal(commitmentQuadrant(false, 0.5), 'hedged-wrong')
+})
+
+test('commitmentQuadrant treats a missing confidence as hedged', () => {
+  assert.equal(commitmentQuadrant(true, null), 'hedged-right')
+  assert.equal(commitmentQuadrant(false, undefined), 'hedged-wrong')
 })

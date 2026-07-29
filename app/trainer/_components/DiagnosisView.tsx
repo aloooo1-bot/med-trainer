@@ -6,7 +6,7 @@ import { DiagnosisInput } from './DiagnosisInput'
 import { WhyPanel } from './WhyPanel'
 import { MicButton } from './MicButton'
 import { computeBeliefs } from '@/app/lib/reasoning/differential'
-import { scorePrediction } from '@/app/lib/reasoning/prediction'
+import { scorePrediction, predictionMatchesDiagnosis, commitmentQuadrant } from '@/app/lib/reasoning/prediction'
 import { DifferentialBoard } from './DifferentialBoard'
 import { getRubric, type DimensionKey } from '@/app/grading/rubric'
 import { type GradingResult } from '@/app/grading/types'
@@ -419,16 +419,71 @@ export function DiagnosisView({
           const confPct = predictionConfidence != null ? Math.round(predictionConfidence * 100) : null
           return (
             <div className="border-t border-rule px-5 py-4">
-              <h3 className="font-serif text-sm font-semibold text-ink mb-2">Pre-test calibration</h3>
+              <h3 className="font-serif text-sm font-semibold text-ink mb-3">Pre-test calibration</h3>
+
+              {/* The commitment, paid off. This is the emotional point of
+                  committing before you test — it was previously narrated in a
+                  sentence, which buried the one fact the student most wants. */}
+              {(() => {
+                const hit = predictionMatchesDiagnosis(prediction[0], caseData.diagnosis)
+                const quad = commitmentQuadrant(hit, predictionConfidence)
+                const VERDICT: Record<typeof quad, { label: string; color: string; lesson: string }> = {
+                  'confident-right': {
+                    label: 'Confident and correct', color: 'var(--color-confirmed)',
+                    lesson: 'You backed a strong read and it held — that is what good calibration looks like.',
+                  },
+                  'hedged-right': {
+                    label: 'Right, but hedged', color: 'var(--color-caution)',
+                    lesson: 'You were more right than you gave yourself credit for. Worth trusting that read a little sooner.',
+                  },
+                  'confident-wrong': {
+                    label: 'Confident and wrong', color: 'var(--color-critical)',
+                    lesson: 'The costly quadrant. Before committing this hard, ask what finding would have changed your mind.',
+                  },
+                  'hedged-wrong': {
+                    label: 'Wrong, appropriately unsure', color: 'var(--color-ink-secondary)',
+                    lesson: 'Your uncertainty was honest — the workup was doing real work here, which is exactly its job.',
+                  },
+                }
+                const v = VERDICT[quad]
+                return (
+                  <div
+                    className="rounded-lg border px-4 py-3 mb-3"
+                    style={{ borderColor: v.color, background: `color-mix(in srgb, ${v.color} 7%, transparent)` }}
+                  >
+                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+                      <span style={{ fontSize: 11, color: 'var(--color-ink-tertiary)' }}>You committed to</span>
+                      <strong style={{ fontSize: 13, color: 'var(--color-ink-primary)' }}>{prediction[0]}</strong>
+                      {confPct != null && (
+                        <span style={{
+                          fontFamily: 'JetBrains Mono, monospace', fontSize: 11, fontWeight: 700,
+                          padding: '1px 6px', borderRadius: 4, color: v.color,
+                          background: `color-mix(in srgb, ${v.color} 14%, transparent)`,
+                        }}>{confPct}%</span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1 mt-1">
+                      <span style={{ fontSize: 11, color: 'var(--color-ink-tertiary)' }}>The answer was</span>
+                      <strong style={{ fontSize: 13, color: 'var(--color-ink-primary)' }}>{caseData.diagnosis}</strong>
+                    </div>
+                    <div style={{ marginTop: 8, fontSize: 12, fontWeight: 700, color: v.color }}>
+                      {hit ? '✓ ' : '✕ '}{v.label}
+                    </div>
+                    <p style={{ margin: '3px 0 0', fontSize: 11.5, color: 'var(--color-ink-secondary)', lineHeight: 1.6 }}>
+                      {v.lesson}
+                    </p>
+                  </div>
+                )
+              })()}
+
               {isFoundations && ps.comparedCount > 0 ? (
                 <p style={{ fontSize: 12, color: 'var(--color-ink-secondary)', lineHeight: 1.6 }}>
-                  Your initial read led with <strong>{ps.studentTop}</strong>; after the workup the evidence pointed to <strong>{ps.engineTop}</strong>.
-                  {' '}Ranking agreement: <strong>{ps.score}/100</strong>{ps.topHit ? ' — your top pick was correct ✓' : ' — your top pick shifted with the data.'}
+                  Ranking agreement with the evidence-based order: <strong>{ps.score}/100</strong>
+                  {ps.topHit ? ' — your top pick matched the evidence leader.' : ` — after the workup the evidence pointed to ${ps.engineTop}.`}
                 </p>
               ) : (
                 <p style={{ fontSize: 12, color: 'var(--color-ink-secondary)', lineHeight: 1.6 }}>
-                  Before testing you committed to <strong>{prediction[0]}</strong>{confPct != null ? ` at ${confPct}% confidence` : ''}.
-                  {' '}The correct diagnosis was <strong>{caseData.diagnosis}</strong>; after your workup the evidence-based leader was <strong>{engineTop}</strong>. Here is how the differential actually moved:
+                  After your workup the evidence-based leader was <strong>{engineTop}</strong>. Here is how the differential actually moved:
                 </p>
               )}
               {!isFoundations && (
