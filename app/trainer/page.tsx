@@ -42,6 +42,7 @@ import { ExamView } from './_components/ExamView'
 import { OrderView } from './_components/OrderView'
 import { ResultsView } from './_components/ResultsView'
 import { DiagnosisView } from './_components/DiagnosisView'
+import { CaseLoading } from './_components/CaseLoading'
 
 const SYSTEMS = [
   'Any',
@@ -70,14 +71,6 @@ const NAV = [
   { id: 'results',   label: 'Test Results',               icon: Activity },
   { id: 'diagnosis', label: 'Diagnosis',                  icon: ClipboardCheck },
 ]
-
-const GENERATION_PHASES = [
-  'Selecting clinical scenario…',
-  'Building patient presentation…',
-  'Generating lab and imaging results…',
-  'Writing background history…',
-  'Finalizing case details…',
-] as const
 
 
 
@@ -173,7 +166,6 @@ export default function MedTrainer() {
   const [pendingGenerateWithNotes, setPendingGenerateWithNotes] = useState(false)
   const [helpSection, setHelpSection] = useState<string | null>(null)
   const [generationError, setGenerationError] = useState<string | null>(null)
-  const [generationPhase, setGenerationPhase] = useState(0)
   const [gradingError, setGradingError] = useState<string | null>(null)
   const [feedbackRatings, setFeedbackRatings] = useState<Record<string, number>>({})
   const [feedbackHover, setFeedbackHover] = useState<Record<string, number>>({})
@@ -294,16 +286,6 @@ export default function MedTrainer() {
     window.addEventListener('beforeunload', handler)
     return () => window.removeEventListener('beforeunload', handler)
   }, [])
-
-  useEffect(() => {
-    // Reset/advance the generation phase indicator in response to the generating flag.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (!generating) { setGenerationPhase(0); return }
-    const id = setInterval(() => {
-      setGenerationPhase(p => Math.min(p + 1, GENERATION_PHASES.length - 1))
-    }, 3000)
-    return () => clearInterval(id)
-  }, [generating])
 
   useEffect(() => {
     if (activeSection === 'diagnosis' && notes.content.trim()) {
@@ -1402,26 +1384,7 @@ export default function MedTrainer() {
             {/* Main content */}
             <main className="flex-1 overflow-y-auto py-6 pl-6 pr-4">
             {generating ? (
-              <div className="flex h-full flex-col items-center justify-center gap-6">
-                <div className="h-10 w-10 animate-spin rounded-full border-2 border-surface-4 border-t-primary-400" />
-                <div className="text-center space-y-1.5">
-                  <p className="text-sm font-medium text-ink-primary">
-                    Generating {caseDifficulty ? caseDifficulty.toLowerCase() + ' ' : ''}{system === 'Any' ? '' : system + ' '}case
-                  </p>
-                  <p className="text-[11px] text-primary-400 min-h-[1.2em]">{GENERATION_PHASES[generationPhase]}</p>
-                  <p className="text-[11px] text-ink-tertiary">Typically takes about 15 seconds</p>
-                </div>
-                <div className="flex gap-1.5">
-                  {GENERATION_PHASES.map((_, i) => (
-                    <div
-                      key={i}
-                      className={`h-1 rounded-full transition-all duration-500 ${
-                        i <= generationPhase ? 'bg-primary-500 w-6' : 'bg-surface-4 w-3'
-                      }`}
-                    />
-                  ))}
-                </div>
-              </div>
+              <CaseLoading system={system} difficulty={caseDifficulty} />
             ) : generationError ? (
               <div className="flex h-full flex-col items-center justify-center gap-5 px-8 text-center">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full border border-critical-border bg-critical-bg">
