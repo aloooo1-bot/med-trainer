@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
 import { loadMastery, loadCalibration, type CalibrationEntry } from '@/app/lib/reasoning/store'
 import { syncReasoning } from '@/app/lib/reasoning/sync'
+import { MasteryBodyMap } from './MasteryBodyMap'
 import { recommendNext, isMastered, masteryKey } from '@/app/lib/reasoning/mastery'
 import { calibrationSummary, reliabilityBuckets, type ReliabilityBucket } from '@/app/lib/reasoning/prediction'
 import type { MasteryRecord } from '@/app/lib/reasoning/types'
@@ -72,7 +73,6 @@ export default function ReasoningProgress({ tier = 'free' }: { tier?: string }) 
     ;(async () => {
       await syncReasoning()
       if (cancelled) return
-      // eslint-disable-next-line react-hooks/set-state-in-effect
       setMastery(loadMastery())
       setCalibration(loadCalibration())
       setLoaded(true)
@@ -154,6 +154,13 @@ export default function ReasoningProgress({ tier = 'free' }: { tier?: string }) 
         })()}
       </div>
       <div className="dx-card-body" style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
+
+        {/* Body map — mastery as anatomy. The table below keeps the
+            per-difficulty breakdown the figure can't express. */}
+        <div>
+          <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--muted)', marginBottom: 10 }}>Coverage</div>
+          <MasteryBodyMap records={mastery} tier={tier} />
+        </div>
 
         {/* Mastery grid — only systems with at least one attempt */}
         <div>
