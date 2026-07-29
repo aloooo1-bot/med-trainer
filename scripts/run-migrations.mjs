@@ -67,12 +67,67 @@ let files = fs.readdirSync(MIG_DIR).filter(f => f.endsWith('.sql')).sort()
 if (filter) files = files.filter(f => f.includes(filter))
 if (!files.length) { console.error('No migration files matched.'); process.exit(1) }
 
-// Split a .sql file into individual statements. Our migrations contain no
-// dollar-quoted function bodies (those live in schema.sql, not run here), so a
-// comment-stripped split on ';' is safe.
+/**
+ * Split a .sql file into individual statements.
+ *
+ * A naive split on ';' breaks the moment a migration defines a function: the
+ * body is dollar-quoted and its internal semicolons are not statement
+ * terminators. This scans instead, so `--` comments, single-quoted literals and
+ * dollar-quoted blocks (with or without a tag) are all passed over intact.
+ * Block comments are not used in these migrations and are not special-cased.
+ */
 function splitStatements(sql) {
-  const noComments = sql.replace(/^\s*--.*$/gm, '')
-  return noComments.split(';').map(s => s.trim()).filter(Boolean)
+  const out = []
+  let buf = ''
+  let i = 0
+  while (i < sql.length) {
+    const rest = sql.slice(i)
+
+    // Line comment — drop it, but keep the newline as whitespace.
+    if (rest.startsWith('--')) {
+      const nl = sql.indexOf('\n', i)
+      i = nl === -1 ? sql.length : nl
+      continue
+    }
+
+    // Dollar-quoted block: $$ … $$ or $tag$ … $tag$. Copied verbatim.
+    const dq = /^\$([A-Za-z_]\w*)?\$/.exec(rest)
+    if (dq) {
+      const tag = dq[0]
+      const close = sql.indexOf(tag, i + tag.length)
+      const stop = close === -1 ? sql.length : close + tag.length
+      buf += sql.slice(i, stop)
+      i = stop
+      continue
+    }
+
+    // Single-quoted literal, honouring '' escapes.
+    if (rest[0] === "'") {
+      let j = i + 1
+      while (j < sql.length) {
+        if (sql[j] === "'" && sql[j + 1] === "'") { j += 2; continue }
+        if (sql[j] === "'") { j++; break }
+        j++
+      }
+      buf += sql.slice(i, j)
+      i = j
+      continue
+    }
+
+    if (rest[0] === ';') {
+      const stmt = buf.trim()
+      if (stmt) out.push(stmt)
+      buf = ''
+      i++
+      continue
+    }
+
+    buf += sql[i]
+    i++
+  }
+  const tail = buf.trim()
+  if (tail) out.push(tail)
+  return out
 }
 
 // Postgres "already exists / does not need doing" codes → skip, don't fail.

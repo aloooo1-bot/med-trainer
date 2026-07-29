@@ -1,5 +1,25 @@
 export type Json = string | number | boolean | null | { [key: string]: Json } | Json[]
 
+/** Shape returned by the progress_summary() SQL function (migration 0005). */
+export interface ProgressSummary {
+  overall: {
+    total: number
+    avgScore: number
+    medianScore: number
+    correctRate: number
+    avgSeconds: number
+    medianSeconds: number
+  }
+  bySystem: Array<{
+    system: string
+    count: number
+    avgScore: number
+    fAvg: number | null
+    cAvg: number | null
+    aAvg: number | null
+  }>
+}
+
 export interface Database {
   public: {
     Tables: {
@@ -287,6 +307,11 @@ export interface Database {
       cache_imaging_test: {
         Args: { p_case_id: string; p_test_name: string; p_results: Json }
         Returns: undefined
+      }
+      /** Aggregates for the Progress page, computed in Postgres (migration 0005). */
+      progress_summary: {
+        Args: Record<string, never>
+        Returns: ProgressSummary
       }
     }
   }

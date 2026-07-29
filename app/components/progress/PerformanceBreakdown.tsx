@@ -46,13 +46,24 @@ function cssScore(s: number | null) {
   return s < 60 ? 'var(--red)' : s < 75 ? 'var(--amber)' : 'var(--green)'
 }
 
-export default function PerformanceBreakdown({ sessions, tier }: { sessions: Session[]; tier?: string }) {
+export default function PerformanceBreakdown({
+  sessions, tier, breakdown,
+}: {
+  sessions: Session[]
+  tier?: string
+  /**
+   * Per-system aggregate computed in Postgres over every case. Preferred when
+   * present — the `sessions` prop is a bounded recent window, so recomputing
+   * from it would understate counts and skew averages for a heavy user.
+   */
+  breakdown?: Row[] | null
+}) {
   const router = useRouter()
   const [sortKey, setSortKey] = useState<SortKey>('count')
   const [sortDir, setSortDir] = useState<'asc' | 'desc'>('desc')
 
   const rows = useMemo(() => {
-    const r = computeBreakdown(sessions)
+    const r = breakdown?.length ? [...breakdown] : computeBreakdown(sessions)
     return r.sort((a, b) => {
       const av = a[sortKey]
       const bv = b[sortKey]
@@ -63,7 +74,7 @@ export default function PerformanceBreakdown({ sessions, tier }: { sessions: Ses
       const bn = bv === null ? -Infinity : (bv as number)
       return sortDir === 'asc' ? an - bn : bn - an
     })
-  }, [sessions, sortKey, sortDir])
+  }, [sessions, breakdown, sortKey, sortDir])
 
   function clickHeader(key: SortKey) {
     if (key === sortKey) setSortDir(d => d === 'asc' ? 'desc' : 'asc')

@@ -7,6 +7,15 @@ import Sidebar from '@/app/components/dashboard/Sidebar'
 import { EmptyState } from '@/app/components/EmptyState'
 import { createClient } from '@/app/lib/supabase/client'
 import type { GradingResult } from '@/app/grading/types'
+import type { ProgressSummary } from '@/app/lib/supabase/types'
+
+/**
+ * Row cap for the chart data. The trend charts plot at most a few hundred
+ * points before becoming unreadable, and the activity calendar only looks back
+ * 12 weeks — so this bounds the payload without changing what any chart can
+ * actually show. The stat cards do NOT depend on it.
+ */
+const CHART_ROWS = 400
 
 const ScoreOverTime = dynamic(() => import('@/app/components/progress/ScoreOverTime'), { ssr: false })
 const ComponentScoreTrends = dynamic(() => import('@/app/components/progress/ComponentScoreTrends'), { ssr: false })
@@ -42,6 +51,7 @@ export default function ProgressPage() {
   const [displayName, setDisplayName] = useState('User')
   const [tier, setTier] = useState('free')
   const [sessions, setSessions] = useState<Session[]>([])
+  const [summary, setSummary] = useState<ProgressSummary | null>(null)
   const [loaded, setLoaded] = useState(false)
   const [loadError, setLoadError] = useState(false)
 
@@ -49,18 +59,27 @@ export default function ProgressPage() {
     const supabase = createClient()
     supabase.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) { setLoaded(true); return }
-      const [{ data: p }, { data: rows, error: rowsError }] = await Promise.all([
+      const [{ data: p }, { data: agg }, { data: rows, error: rowsError }] = await Promise.all([
         supabase.from('profiles').select('display_name,tier').eq('id', user.id).single(),
+        // Headline numbers are aggregated in Postgres over EVERY case, so they
+        // stay exact no matter how the row fetch below is bounded.
+        supabase.rpc('progress_summary'),
+        // Rows exist only to draw the charts. Bounded and ordered newest-first:
+        // an unbounded fetch pulled the full grading_result JSONB for every
+        // case ever completed, and PostgREST would silently truncate it past
+        // its db-max-rows cap anyway — which used to corrupt the totals.
         supabase.from('case_sessions')
           .select('id, score, correct, system, difficulty, completed_at, elapsed_seconds, grading_result')
           .eq('user_id', user.id)
-          .order('completed_at', { ascending: false }),
+          .order('completed_at', { ascending: false })
+          .limit(CHART_ROWS),
       ])
       if (p) {
         setDisplayName(p.display_name ?? user.email?.split('@')[0] ?? 'User')
         setTier(p.tier ?? 'free')
       }
       if (rowsError) setLoadError(true)
+      if (agg) setSummary(agg as ProgressSummary)
       setSessions((rows ?? []) as Session[])
       setLoaded(true)
     }).catch(() => {
@@ -69,27 +88,32 @@ export default function ProgressPage() {
     })
   }, [])
 
-  // All header stats are computed over the same population: sessions with a recognized system.
+  // Charts read the fetched rows; the stat cards read the server aggregate.
   const tracked = useMemo(() => sessions.filter(s => s.system), [sessions])
-  const totalCases = tracked.length
 
-  const avgScore = useMemo(() =>
-    totalCases ? Math.round(tracked.reduce((a, s) => a + s.score, 0) / totalCases) : 0,
-  [tracked, totalCases])
-  const medianScore = useMemo(() =>
-    totalCases ? median(tracked.map(s => s.score)) : null,
-  [tracked, totalCases])
-  const correctRate = useMemo(() =>
-    totalCases ? Math.round(tracked.filter(s => s.correct).length / totalCases * 100) : 0,
-  [tracked, totalCases])
-  const avgTimeStr = useMemo(() => {
-    if (!totalCases) return '—'
-    return fmtSeconds(Math.round(tracked.reduce((a, s) => a + s.elapsed_seconds, 0) / totalCases))
-  }, [tracked, totalCases])
-  const medianTimeStr = useMemo(() => {
-    if (!totalCases) return ''
-    return `${Math.floor(median(tracked.map(s => s.elapsed_seconds)) / 60)}m`
-  }, [tracked, totalCases])
+  // Fall back to the fetched rows if the aggregate is unavailable (older
+  // deployment without migration 0005, or a transient RPC failure) so the page
+  // degrades to its previous behaviour rather than showing nothing.
+  const stats = useMemo(() => {
+    if (summary?.overall) return summary.overall
+    const n = tracked.length
+    if (!n) return { total: 0, avgScore: 0, medianScore: 0, correctRate: 0, avgSeconds: 0, medianSeconds: 0 }
+    return {
+      total: n,
+      avgScore: Math.round(tracked.reduce((a, s) => a + s.score, 0) / n),
+      medianScore: median(tracked.map(s => s.score)),
+      correctRate: Math.round(tracked.filter(s => s.correct).length / n * 100),
+      avgSeconds: Math.round(tracked.reduce((a, s) => a + s.elapsed_seconds, 0) / n),
+      medianSeconds: median(tracked.map(s => s.elapsed_seconds)),
+    }
+  }, [summary, tracked])
+
+  const totalCases = stats.total
+  const avgScore = stats.avgScore
+  const medianScore = totalCases ? stats.medianScore : null
+  const correctRate = stats.correctRate
+  const avgTimeStr = totalCases ? fmtSeconds(stats.avgSeconds) : '—'
+  const medianTimeStr = totalCases ? `${Math.floor(stats.medianSeconds / 60)}m` : ''
 
   return (
     <div className="dx-root">
@@ -147,7 +171,7 @@ export default function ProgressPage() {
               </div>
               <ScoreOverTime sessions={tracked} />
               <ComponentScoreTrends sessions={tracked} />
-              <PerformanceBreakdown sessions={tracked} tier={tier} />
+              <PerformanceBreakdown sessions={tracked} tier={tier} breakdown={summary?.bySystem} />
             </>
           )}
 
