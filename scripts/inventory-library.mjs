@@ -84,19 +84,39 @@ function matchDiagQueryKey(diagnosis) {
   return null
 }
 
-// Match a case row against a MANIFEST entry (system, difficulty, diagnosis match approximately)
+// Match a case row against a MANIFEST entry (system, difficulty, diagnosis).
+//
+// Exact matches MUST win before any substring fallback. A first-wins substring
+// scan mis-attributes a row whose diagnosis is contained in a longer sibling —
+// e.g. the "Compartment Syndrome" row matched "Abdominal Compartment Syndrome"
+// (which appears earlier in the Trauma/Advanced list), so the plain
+// "Compartment Syndrome" slot was reported as an empty gap even though its row
+// existed and was fully generated. When no exact match exists, prefer the
+// closest candidate by length rather than the first one encountered.
+const stripParens = s => s.replace(/\s*\(.*?\)\s*/g, ' ').replace(/\s+/g, ' ').trim()
+
 function matchManifest(row) {
   const list = MANIFEST[row.system]?.[row.difficulty]
   if (!list) return null
-  const lc = (row.diagnosis ?? '').toLowerCase()
+  const lc = (row.diagnosis ?? '').toLowerCase().trim()
+  if (!lc) return null
+
+  // 1. Exact, then exact-ignoring-parentheticals.
+  for (const m of list) if (m.toLowerCase() === lc) return m
+  const bare = stripParens(lc)
+  for (const m of list) if (stripParens(m.toLowerCase()) === bare) return m
+
+  // 2. Substring fallback — pick the closest candidate, not the first.
+  let best = null
+  let bestDelta = Infinity
   for (const m of list) {
     const mlc = m.toLowerCase()
-    // exact or substring (manifest names sometimes carry parenthetical detail)
-    if (mlc === lc || mlc.includes(lc) || lc.includes(mlc.replace(/\s*\(.*?\)\s*/g, '').trim())) {
-      return m
+    if (mlc.includes(lc) || lc.includes(stripParens(mlc))) {
+      const delta = Math.abs(mlc.length - lc.length)
+      if (delta < bestDelta) { best = m; bestDelta = delta }
     }
   }
-  return null
+  return best
 }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
