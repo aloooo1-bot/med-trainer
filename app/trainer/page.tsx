@@ -708,7 +708,9 @@ export default function MedTrainer() {
           record.parentSessionId = activeRedoOfRef.current
           activeRedoOfRef.current = null
         }
-        syncSessionToSupabase(record)
+        // Pass the server session so the route can grade-check this record
+        // against its own event log instead of trusting the posted score.
+        syncSessionToSupabase(record, sessionId)
         analyticsSessionRef.current = null
       }
 

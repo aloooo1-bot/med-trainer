@@ -203,12 +203,23 @@ export function finalizeSession(
   return record
 }
 
-export async function syncSessionToSupabase(record: CaseSessionRecord): Promise<void> {
+/**
+ * Persist a completed case to the account.
+ *
+ * `trainerSessionId` is the SERVER session this record came from. The route
+ * uses it to look up the grade the server itself computed, rather than
+ * believing the score in this payload — the client cannot be the authority on
+ * its own marks.
+ */
+export async function syncSessionToSupabase(
+  record: CaseSessionRecord,
+  trainerSessionId?: string | null,
+): Promise<void> {
   try {
     await fetch('/api/sessions/save', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(record),
+      body: JSON.stringify({ ...record, trainerSessionId: trainerSessionId ?? null }),
     })
   } catch {}
 }
