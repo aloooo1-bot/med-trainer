@@ -9,6 +9,7 @@ import { createClient } from '../lib/supabase/client'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import ReportCaseModal from '@/app/components/dashboard/ReportCaseModal'
 import { localDayKey } from '@/app/lib/localDay'
+import { EmptyState } from '@/app/components/EmptyState'
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -649,34 +650,35 @@ export default function HistoryPage() {
       <div className="dx-root">
         <Sidebar displayName={displayName} tier={tier} activePage="case-history" />
         <div className="dx-main" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <div style={{ textAlign: 'center' }}>
-            <div style={{ fontSize: 48, marginBottom: 16 }}>📋</div>
+          <div>
             {loadError ? (
-              <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 4px' }}>
-                Couldn&apos;t load your case history. Refresh the page to try again.
-              </p>
+              <EmptyState
+                variant="no-matches"
+                title="Couldn't load your case history"
+                body="Refresh the page to try again."
+              />
             ) : dayFilter ? (
-              <>
-                <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 4px' }}>
-                  No cases completed on {new Date(`${dayFilter}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.
-                </p>
+              <div style={{ textAlign: 'center' }}>
+                <EmptyState
+                  variant="no-matches"
+                  title={`No cases on ${new Date(`${dayFilter}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}`}
+                  body="You didn't complete any cases that day."
+                />
                 <button
                   onClick={clearDayFilter}
-                  style={{ fontSize: 13, color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, marginTop: 20 }}
+                  style={{ fontSize: 13, color: 'var(--accent)', background: 'none', border: 'none', cursor: 'pointer', fontWeight: 600, marginTop: -8 }}
                 >
                   Show all history →
                 </button>
-              </>
+              </div>
             ) : (
-              <>
-                <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 4px' }}>No completed cases yet.</p>
-                <p style={{ color: 'var(--muted)', fontSize: 12, margin: '0 0 24px' }}>
-                  Complete a case to start building your history.
-                </p>
-                <a href="/trainer" style={{ fontSize: 13, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>
-                  Start a case →
-                </a>
-              </>
+              <EmptyState
+                variant="no-cases"
+                title="No completed cases yet"
+                body="Finish a case and it will appear here with your score, notes, and full result breakdown."
+                actionLabel="Start a case →"
+                actionHref="/trainer"
+              />
             )}
           </div>
         </div>
@@ -839,18 +841,26 @@ export default function HistoryPage() {
 
           {/* Table */}
           {filtered.length === 0 ? (
-            <div className="dx-card" style={{ padding: 32, textAlign: 'center' }}>
-              <p style={{ color: 'var(--text-secondary)', fontSize: 14, margin: '0 0 8px' }}>
-                {isFiltered ? 'No cases match the current filters.' : `No ${diffFilter} cases yet.`}
-              </p>
-              {!isFiltered && (
-                <a href={`/trainer?difficulty=${encodeURIComponent(diffFilter)}`}
-                  style={{ fontSize: 13, color: 'var(--accent)', textDecoration: 'none' }}>
-                  Start a {diffFilter} case →
-                </a>
+            <div className="dx-card" style={{ textAlign: 'center' }}>
+              {isFiltered ? (
+                <EmptyState
+                  variant="no-matches"
+                  title="No cases match these filters"
+                  body="Try widening the difficulty, system, or score range."
+                  compact
+                />
+              ) : (
+                <EmptyState
+                  variant="no-cases"
+                  title={`No ${diffFilter} cases yet`}
+                  body={`Complete a ${diffFilter} case and it will show up here.`}
+                  actionLabel={`Start a ${diffFilter} case →`}
+                  actionHref={`/trainer?difficulty=${encodeURIComponent(diffFilter)}`}
+                  compact
+                />
               )}
               {isFiltered && (
-                <button className="dx-chip" onClick={clearAllFilters} style={{ color: 'var(--accent)' }}>
+                <button className="dx-chip" onClick={clearAllFilters} style={{ color: 'var(--accent)', marginBottom: 20 }}>
                   Clear filters
                 </button>
               )}

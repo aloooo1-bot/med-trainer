@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from 'react'
 import dynamic from 'next/dynamic'
 import '@/app/dashboard.css'
 import Sidebar from '@/app/components/dashboard/Sidebar'
+import { EmptyState } from '@/app/components/EmptyState'
 import { createClient } from '@/app/lib/supabase/client'
 import type { GradingResult } from '@/app/grading/types'
 
@@ -120,12 +121,13 @@ export default function ProgressPage() {
             </div>
           ) : totalCases === 0 ? (
             <div className="dx-card">
-              <div className="dx-card-body dx-progress-locked">
-                <p>Complete your first case to start seeing your progress.</p>
-                <a href="/trainer" style={{ fontSize: 13, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>
-                  Start a case →
-                </a>
-              </div>
+              <EmptyState
+                variant="no-cases"
+                title="No progress to show yet"
+                body="Complete your first case and this page fills in with score trends, per-system breakdowns, and your training activity."
+                actionLabel="Start a case →"
+                actionHref="/trainer"
+              />
             </div>
           ) : (
             <>

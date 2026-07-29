@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from 'react'
 import { useRouter } from 'next/navigation'
+import { EmptyState } from '@/app/components/EmptyState'
 
 type Session = { system: string; difficulty: string; score: number }
 
@@ -78,9 +79,12 @@ export default function PerformanceBreakdown({ sessions, tier }: { sessions: Ses
     return (
       <div className="dx-card">
         <div className="dx-card-header">Performance Breakdown</div>
-        <div className="dx-card-body">
-          <p className="dx-empty-state">Your performance breakdown will appear once you complete a case.</p>
-        </div>
+        <EmptyState
+          variant="no-cases"
+          title="No breakdown yet"
+          body="Once you complete a case, this table compares your average score across every system and difficulty."
+          compact
+        />
       </div>
     )
   }

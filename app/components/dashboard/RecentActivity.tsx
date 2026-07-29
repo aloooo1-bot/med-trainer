@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import type { GradingResult } from '@/app/grading/types'
 import { getRubric } from '@/app/grading/rubric'
+import { EmptyState } from '@/app/components/EmptyState'
 
 type Session = {
   id: string; score: number; correct: boolean; system: string; difficulty: string;
@@ -36,9 +37,12 @@ export default function RecentActivity({ sessions }: { sessions: Session[] }) {
         Recent activity
       </div>
       {recent.length === 0 ? (
-        <div className="dx-card-body">
-          <p className="dx-empty-state">No cases yet — start your first one above.</p>
-        </div>
+        <EmptyState
+          variant="no-cases"
+          title="No cases yet"
+          body="Your completed cases will appear here with scores and where you lost the most points."
+          compact
+        />
       ) : recent.map(s => {
         const loss = biggestLoss(s.grading_result, s.difficulty)
         const dotColor = s.correct ? 'var(--green)' : 'var(--red)'

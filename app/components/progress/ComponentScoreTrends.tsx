@@ -9,6 +9,7 @@ import type { GradingResult } from '@/app/grading/types'
 import { getRubric, type DimensionKey } from '@/app/grading/rubric'
 import { useChartTheme } from '@/app/lib/useChartTheme'
 import { fmtDate, dateTickIndices } from '@/app/lib/chartAxis'
+import { EmptyState } from '@/app/components/EmptyState'
 
 Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearScale, Tooltip, Legend)
 
@@ -114,12 +115,12 @@ export default function ComponentScoreTrends({ sessions }: { sessions: Session[]
     return (
       <div className="dx-card">
         <div className="dx-card-header">Component Score Trends</div>
-        <div className="dx-card-body dx-progress-locked">
-          <p>
-            Complete {remaining} more case{remaining !== 1 ? 's' : ''} with component grading to see how each scoring component is trending.
-            {sessions.length >= MIN_CASES ? ' Older cases without per-component scores don’t count toward this.' : ''}
-          </p>
-        </div>
+        <EmptyState
+          variant="not-enough-data"
+          title={`${remaining} more graded case${remaining !== 1 ? 's' : ''} to unlock`}
+          body={`Component trends need 10 cases with per-component scores.${sessions.length >= MIN_CASES ? ' Older cases graded before component scoring don’t count toward this.' : ''}`}
+          compact
+        />
       </div>
     )
   }

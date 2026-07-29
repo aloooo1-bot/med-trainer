@@ -9,6 +9,7 @@ import { syncReasoning, pushReasoning } from '@/app/lib/reasoning/sync'
 import { dueItems } from '@/app/lib/reasoning/spacedRepetition'
 import type { ReviewItem, ReviewGrade, ReviewTag } from '@/app/lib/reasoning/types'
 import DeckBrowser from './DeckBrowser'
+import { EmptyState } from '@/app/components/EmptyState'
 
 const TAG_LABEL: Record<ReviewTag, string> = {
   discriminator: 'Discriminator',
@@ -152,16 +153,31 @@ export default function RecallPage() {
             <div className="dx-card"><div style={{ padding: 40, textAlign: 'center', color: 'var(--muted)' }}>Loading…</div></div>
           ) : done ? (
             <div className="dx-card">
-              <div style={{ padding: '48px 24px', textAlign: 'center' }}>
-                <div style={{ fontSize: 32, marginBottom: 12 }}>✓</div>
-                <p style={{ fontSize: 16, fontWeight: 600, color: 'var(--text)' }}>
-                  {reviewedCount > 0 ? 'Review complete' : 'No cards due right now'}
-                </p>
-                <p style={{ fontSize: 13, color: 'var(--muted)', marginTop: 6 }}>
-                  {reviewedCount > 0
-                    ? `You reviewed ${reviewedCount} card${reviewedCount === 1 ? '' : 's'}. Come back tomorrow for the next batch.`
-                    : 'Complete cases in the trainer to build your review deck, then check back as cards come due.'}
-                </p>
+              <div style={{ textAlign: 'center' }}>
+                {/* Three distinct situations, previously conflated into one:
+                    finished a session, deck exists but nothing is due, or no
+                    deck has been built yet. */}
+                {reviewedCount > 0 ? (
+                  <EmptyState
+                    variant="caught-up"
+                    title="Review complete"
+                    body={`You reviewed ${reviewedCount} card${reviewedCount === 1 ? '' : 's'}. Come back tomorrow for the next batch.`}
+                  />
+                ) : allItems.length === 0 ? (
+                  <EmptyState
+                    variant="empty-deck"
+                    title="Your review deck is empty"
+                    body="Cards are built automatically from the cases you complete — the mechanism, the management pearl, and the discriminating test."
+                    actionLabel="Start a case →"
+                    actionHref="/trainer"
+                  />
+                ) : (
+                  <EmptyState
+                    variant="caught-up"
+                    title="No cards due right now"
+                    body={`All ${allItems.length} card${allItems.length === 1 ? '' : 's'} in your deck are scheduled for later. Check back as they come due.`}
+                  />
+                )}
                 {streak > 0 && (
                   <div style={{ marginTop: 14, display: 'inline-flex', alignItems: 'center', gap: 6, padding: '6px 14px', borderRadius: 999, background: 'var(--surface2)', border: '1px solid var(--border)' }}>
                     <span style={{ fontSize: 15 }}>🔥</span>

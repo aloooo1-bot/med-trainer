@@ -5,6 +5,7 @@ import '@/app/dashboard.css'
 import { scoreColor } from '@/app/lib/scoreColor'
 import type { SystemEntry } from '@/app/lib/dashboardData'
 import Sidebar from '@/app/components/dashboard/Sidebar'
+import { EmptyState } from '@/app/components/EmptyState'
 import { createClient } from '@/app/lib/supabase/client'
 import type { GradingResult } from '@/app/grading/types'
 import { getRubric, type DimensionKey } from '@/app/grading/rubric'
@@ -233,12 +234,13 @@ export default function FocusAreasPage() {
             </div>
           ) : sessions.length === 0 ? (
             <div className="dx-card">
-              <div className="dx-card-body dx-progress-locked" style={{ flexDirection: 'column', gap: 8 }}>
-                <p>Complete your first case and this page will start recommending what to study next.</p>
-                <a href="/trainer" style={{ fontSize: 13, color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}>
-                  Start a case →
-                </a>
-              </div>
+              <EmptyState
+                variant="not-enough-data"
+                title="Nothing to focus on yet"
+                body="Complete your first case and this page starts ranking your weakest systems, the questions you miss, and what to study next."
+                actionLabel="Start a case →"
+                actionHref="/trainer"
+              />
             </div>
           ) : (
             <>

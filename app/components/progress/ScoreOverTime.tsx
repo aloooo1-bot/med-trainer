@@ -7,6 +7,7 @@ import {
 } from 'chart.js'
 import { useChartTheme } from '@/app/lib/useChartTheme'
 import { fmtDate, dateTickIndices } from '@/app/lib/chartAxis'
+import { EmptyState } from '@/app/components/EmptyState'
 
 Chart.register(LineController, LineElement, PointElement, CategoryScale, LinearScale, Filler, Tooltip)
 
@@ -121,9 +122,12 @@ export default function ScoreOverTime({ sessions }: { sessions: Session[] }) {
     return (
       <div className="dx-card">
         <div className="dx-card-header">Score Over Time</div>
-        <div className="dx-card-body dx-progress-locked">
-          <p>Complete {remaining} more case{remaining !== 1 ? 's' : ''} to unlock trend analysis.</p>
-        </div>
+        <EmptyState
+          variant="not-enough-data"
+          title={`${remaining} more case${remaining !== 1 ? 's' : ''} to unlock trends`}
+          body="A score trend needs at least 10 cases before the line means anything."
+          compact
+        />
       </div>
     )
   }
