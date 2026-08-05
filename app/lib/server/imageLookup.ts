@@ -1,7 +1,7 @@
 import 'server-only'
 import { promises as fs } from 'fs'
 import path from 'path'
-import { getECGCategory, scoreEcgMatch, type ECGImage } from '../ecgImageLookup'
+import { getECGCategory, scoreEcgMatch, contradictsFindings, isInterpretableReport, type ECGImage } from '../ecgImageLookup'
 import { getSpecialCategory, type SpecialModality, type SpecialImage } from '../specialImageLookup'
 import {
   caseLaterality, selectByLaterality,
@@ -94,33 +94,64 @@ export interface OpenIResultLike {
   verificationReason?: string
 }
 
+/**
+ * Choose a tracing that is faithful to the case, or none at all.
+ *
+ * This used to fall back to a RANDOM tracing from the category and label it
+ * "representative" — but nothing downstream distinguishes that from a real
+ * match, so an arbitrary strip was rendered as though it were this patient's.
+ * A wrong ECG is worse than no ECG: the student reads findings off it, and
+ * they are graded against a case that says something else. When no candidate
+ * both matches and fails to contradict, we return null and the panel shows the
+ * machine read instead — honest, and still interpretable.
+ */
 export async function pickECGImage(diagnosis: string, ecgFindings?: string): Promise<PickedECG> {
+  const suppress = (reason: string): PickedECG =>
+    ({ ecg: null, match: { required: 'unknown', status: 'suppressed', reason } })
+
   const category = getECGCategory(diagnosis, ecgFindings)
+  if (!category) return suppress('no tracing category faithfully represents this ECG')
+  if (!ecgFindings) return suppress('case states no ECG findings to match a tracing against')
+
   const index = await readPublicJson<Record<string, string[]>>('ecg/index.json')
   const meta = (await readPublicJson<Record<string, string>>('ecg/metadata.json')) ?? {}
   const blocked = await loadBlocklist('ecg')
   const files = (index?.[category] ?? []).filter(f => !blocked.has(`${category}/${f}`))
-  if (!files.length) return { ecg: null, match: { required: 'unknown', status: 'suppressed', reason: 'no ECG image for this category' } }
+  if (!files.length) return suppress('no ECG image for this category')
 
-  // ECG matching is by lead territory (not laterality); scoreEcgMatch drives it.
-  if (ecgFindings) {
-    let best = files[0]
-    let bestScore = -1
-    for (const file of files) {
-      const s = scoreEcgMatch(meta[`${category}/${file}`] ?? '', ecgFindings)
-      if (s > bestScore) { bestScore = s; best = file }
-    }
-    if (bestScore > 0) {
-      return {
-        ecg: { path: `/ecg/${category}/${best}`, report: meta[`${category}/${best}`] ?? '' },
-        match: { required: 'unknown', status: 'confirmed' },
-      }
-    }
+  // Compatibility is the hard requirement; lexical overlap only ranks. Much of
+  // the PTB-XL corpus is reported in German, so a faithful tracing can score
+  // zero against English findings — refusing those would drop ~12% of cases
+  // for no correctness gain. Category membership already carries the clinical
+  // match, so a non-contradicting candidate is servable even at score zero.
+  //
+  // Iteration order decides ties, NOT Math.random() as before: a case must show
+  // the same tracing every time, or a student who reloads is quietly handed a
+  // different ECG for the same patient.
+  let best: string | null = null
+  let bestScore = -1
+  let conflict: string | null = null
+  for (const file of files) {
+    const report = meta[`${category}/${file}`] ?? ''
+    // A stub report ("trace only requested.") states nothing to check the strip
+    // against, so it can never be shown to be faithful. Unusable, not neutral.
+    if (!isInterpretableReport(report)) continue
+    const c = contradictsFindings(report, ecgFindings)
+    if (c) { conflict ??= c; continue }
+    const s = scoreEcgMatch(report, ecgFindings)
+    if (s > bestScore) { bestScore = s; best = file }
   }
-  const file = files[Math.floor(Math.random() * files.length)]
+  if (!best) {
+    return suppress(conflict
+      ? `every candidate tracing contradicts the case (${conflict})`
+      : 'no usable tracing in this category')
+  }
+
   return {
-    ecg: { path: `/ecg/${category}/${file}`, report: meta[`${category}/${file}`] ?? '' },
-    match: { required: 'unknown', status: 'unconfirmed', reason: 'representative tracing for this rhythm category' },
+    ecg: { path: `/ecg/${category}/${best}`, report: meta[`${category}/${best}`] ?? '' },
+    match: bestScore > 0
+      ? { required: 'unknown', status: 'confirmed' }
+      : { required: 'unknown', status: 'unconfirmed', reason: 'compatible tracing for this rhythm category; no shared descriptive detail' },
   }
 }
 
