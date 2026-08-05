@@ -38,9 +38,11 @@ export function buildPatientSystemPrompt(
     ? `\nYour body-system review (report the relevant part ONLY when the physician asks about that system or symptom — do NOT volunteer these; if a detail is something you would not personally know, e.g. a finding witnessed by others, attribute it to them: "my wife said…" rather than denying it):\n${rosEntries.map(([sys, v]) => `- ${sys}: ${v}`).join('\n')}`
     : ''
 
-  const isExamGated =
-    (caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced') &&
-    (caseData.relevantExamRegions?.length ?? 0) > 0
+  // Must match buildPresentation's rule exactly: difficulty alone. Requiring
+  // relevantExamRegions here meant that for every case lacking it — i.e. all of
+  // them — the patient agent was handed the FULL exam and could describe
+  // findings from regions the student had not examined yet.
+  const isExamGated = caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced'
   const examEntries = isExamGated
     ? Object.entries(caseData.physicalExam).filter(([region]) => revealedExamRegions.has(region))
     : Object.entries(caseData.physicalExam)

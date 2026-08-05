@@ -36,7 +36,15 @@ export function selectHpiForDifficulty(c: CaseData, difficulty: string): string 
  */
 export function buildPresentation(caseData: CaseData, difficulty: string): CasePresentation {
   const foundations = difficulty === 'Foundations'
-  const examGated = !foundations && (caseData.relevantExamRegions?.length ?? 0) > 0
+  // Gating depends on difficulty ALONE. It previously also required
+  // relevantExamRegions to be non-empty, but that field exists to score exam
+  // focus at grading time, not to decide whether findings are withheld — and
+  // no cached case actually carries it (it postdates the library). The result
+  // was the worst of both: findings withheld because this is not Foundations,
+  // yet examGated false, so the client rendered every region heading with a
+  // blank finding and no way to reveal it. A dead section on every Clinical
+  // and Advanced case.
+  const examGated = !foundations
 
   const base: CasePresentation = {
     patientInfo: caseData.patientInfo,
