@@ -62,6 +62,7 @@ export async function POST(req: NextRequest) {
       message,
       reply,
       (t, u) => usages.push({ type: t, usage: u }),
+      session.caseData.patientInfo,
     )
     // ANTI-CUEING: status (row color) is classified from what the patient
     // ACTUALLY reported in this conversation — never from the canonical case

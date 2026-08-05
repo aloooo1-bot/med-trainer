@@ -4,6 +4,7 @@ import { GRADING_SYSTEM_PROMPT, buildRubricPrompt, buildOralPrompt } from '../..
 import { clampDimensions } from '../../grading/clamp'
 import { GradingResultSchema } from '../../grading/schemas'
 import { formatEvidenceSummary } from '../reasoning/differential'
+import { stripStageDirections } from '../transcriptText'
 import { resolveResult } from './orderService'
 import { callModel } from './llm'
 import { selectHpiForDifficulty } from './caseTiers'
@@ -105,8 +106,13 @@ export function assembleGradingInput(
   const caseData = session.caseData
   const caseDifficulty = session.difficulty
 
+  // Roleplay gestures are stripped from the patient's side: they are theatre,
+  // and the grader was reading "*touches chest*" as though it were reported
+  // history. The physician's own words are left untouched.
   const chatSummary = state.chat
-    .map(m => `${m.role === 'user' ? 'Physician' : 'Patient'}: ${m.content}`)
+    .map(m => m.role === 'user'
+      ? `Physician: ${m.content}`
+      : `Patient: ${stripStageDirections(m.content)}`)
     .join('\n')
 
   // Pre-presented info — visible in the HPI panel from the start at Foundations;

@@ -103,15 +103,75 @@ function pick<T>(arr: T[]): T {
   return arr[Math.floor(Math.random() * arr.length)]
 }
 
-function jitterInt(value: number, delta: number, min: number, max = Infinity): number {
-  const offset = Math.round((Math.random() * 2 - 1) * delta)
-  return Math.min(max, Math.max(min, value + offset))
+/**
+ * Clinical decision boundaries a jittered vital must never step across.
+ *
+ * Jitter varies the numbers so repeat encounters do not feel identical, but the
+ * case's prose, teaching points and expected reasoning are FIXED text written
+ * against the authored value. Moving a number over one of these lines silently
+ * rewrites the medicine: SpO₂ 88 → 89 crosses the home-oxygen / cor pulmonale
+ * target the case may be teaching, 100.4°F is the definition of fever, and 100
+ * bpm is the definition of tachycardia the exam text asserts.
+ *
+ * Exported for the consistency validator, which checks prose against vitals.
+ */
+// Each entry is the LOWEST value belonging to the band above it, so a value
+// sitting exactly on a threshold is already in the higher band. Tachycardia is
+// >100, so the boundary is 101 — listing 100 would put a heart rate of 100 in
+// the "tachycardic" band and defeat the check it exists to protect.
+export const VITAL_THRESHOLDS = {
+  hr: [50, 60, 101, 121],
+  rr: [12, 21, 25, 31],
+  temp: [95.0, 96.8, 100.4, 102.2],
+  spo2: [85, 88, 90, 92, 95],
+  sys: [90, 100, 120, 140, 160, 180],
+  dia: [60, 80, 90, 100, 120],
+} as const
+
+/**
+ * The open interval between adjacent thresholds that `value` sits in. Values
+ * exactly ON a threshold get the band starting at it, so an authored 88 stays
+ * ≥ 88 and an authored 87 stays < 88.
+ */
+function bandOf(value: number, thresholds: readonly number[]): [number, number] {
+  let lo = -Infinity
+  let hi = Infinity
+  for (const t of thresholds) {
+    if (t <= value && t > lo) lo = t
+    if (t > value && t < hi) hi = t
+  }
+  return [lo, hi]
 }
 
-function jitterFloat(value: number, delta: number, min: number, decimals: number): number {
+/**
+ * Clamp a jittered value back into the clinical band the authored value
+ * occupied. `step` is the smallest representable increment at the caller's
+ * precision, so backing off from an exclusive upper bound lands on a value that
+ * survives rounding — clamping to 100.39 and then rounding to one decimal would
+ * put it right back on 100.4.
+ */
+function keepBand(original: number, jittered: number, step: number, thresholds?: readonly number[]): number {
+  if (!thresholds) return jittered
+  const [lo, hi] = bandOf(original, thresholds)
+  if (jittered < lo) return lo
+  // hi is exclusive: the next threshold belongs to the band above.
+  if (jittered >= hi) return parseFloat((hi - step).toFixed(6))
+  return jittered
+}
+
+function jitterInt(value: number, delta: number, min: number, max = Infinity, thresholds?: readonly number[]): number {
+  const offset = Math.round((Math.random() * 2 - 1) * delta)
+  const raw = Math.min(max, Math.max(min, value + offset))
+  return Math.round(keepBand(value, raw, 1, thresholds))
+}
+
+function jitterFloat(value: number, delta: number, min: number, decimals: number, thresholds?: readonly number[]): number {
   const offset = (Math.random() * 2 - 1) * delta
-  const result = Math.max(min, value + offset)
-  return parseFloat(result.toFixed(decimals))
+  const step = 10 ** -decimals
+  // Round BEFORE clamping: rounding afterwards can push a clamped value back
+  // over the threshold it was just pulled away from.
+  const raw = parseFloat(Math.max(min, value + offset).toFixed(decimals))
+  return parseFloat(keepBand(value, raw, step, thresholds).toFixed(decimals))
 }
 
 export function randomPatientName(gender: string): string {
@@ -125,8 +185,8 @@ function jitterBP(bp: string): string {
   if (!m) return bp
   let sys = parseInt(m[1], 10)
   let dia = parseInt(m[2], 10)
-  sys = jitterInt(sys, 4, 70)
-  dia = jitterInt(dia, 3, 40)
+  sys = jitterInt(sys, 4, 70, Infinity, VITAL_THRESHOLDS.sys)
+  dia = jitterInt(dia, 3, 40, Infinity, VITAL_THRESHOLDS.dia)
   if (sys - dia < 20) dia = sys - 20
   return `${sys}/${dia}`
 }
@@ -212,10 +272,10 @@ export function jitterCase<T extends {
     vitals: {
       ...rewritten.vitals,
       bp: jitterBP(c.vitals.bp),
-      hr: jitterInt(c.vitals.hr, 3, 30),
-      rr: jitterInt(c.vitals.rr, 1, 8),
-      temp: jitterFloat(c.vitals.temp, 0.3, 94.0, 1),
-      spo2: jitterInt(c.vitals.spo2, 1, 70, 100),
+      hr: jitterInt(c.vitals.hr, 3, 30, Infinity, VITAL_THRESHOLDS.hr),
+      rr: jitterInt(c.vitals.rr, 1, 8, Infinity, VITAL_THRESHOLDS.rr),
+      temp: jitterFloat(c.vitals.temp, 0.3, 94.0, 1, VITAL_THRESHOLDS.temp),
+      spo2: jitterInt(c.vitals.spo2, 1, 70, 100, VITAL_THRESHOLDS.spo2),
       weight: jitterWeight(c.vitals.weight),
     },
   }

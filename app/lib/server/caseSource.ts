@@ -1,7 +1,9 @@
 import 'server-only'
 import { promises as fs } from 'fs'
 import path from 'path'
+import * as Sentry from '@sentry/nextjs'
 import { createAdminClient } from '../supabase/admin'
+import { checkCaseConsistency, type CheckableCase } from '../caseConsistency'
 import { buildCasePrompt, buildCaseSystemPrompt } from '../casePrompt'
 import { reconcileHistoryConsistency, sanitizePmhLeak } from '../generators/shared'
 import { MANIFEST, makeCaseId } from '../caseManifest'
@@ -193,6 +195,27 @@ export async function generateCaseLive(
         parsed.labResults[rt.name] = rt.labResult
         if (!parsed.availableLabs.includes(rt.name)) parsed.availableLabs.push(rt.name)
       }
+    }
+  }
+
+  // Internal-consistency check. Deliberately non-blocking: a pronoun slip or an
+  // undocumented JVP makes a case worse, not unusable, and failing generation
+  // would trade a flawed case for no case at all. Surfacing it is what lets the
+  // library be swept and the prompt be corrected, instead of the defect being
+  // found years later by a student reading the chart carefully.
+  const issues = checkCaseConsistency(parsed as unknown as CheckableCase)
+  if (issues.length > 0) {
+    const errors = issues.filter(i => i.severity === 'error')
+    console.warn(
+      `[caseSource] ${diagnosis ?? system}: ${issues.length} consistency issue(s)` +
+      `${errors.length ? `, ${errors.length} error(s)` : ''}\n` +
+      issues.map(i => `  [${i.severity}] ${i.code} @ ${i.field}: ${i.message}`).join('\n'),
+    )
+    if (errors.length) {
+      Sentry.captureMessage('case consistency errors', {
+        level: 'warning',
+        extra: { diagnosis, system, difficulty, issues: errors },
+      })
     }
   }
 

@@ -2,11 +2,12 @@ import 'server-only'
 import {
   ROS_CATEGORIES,
   type ROSCategory,
-  scanMessageForROS,
+  scanMessageForROSDetailed,
   scanMessageForHPIFields,
   looksClinical,
   type HPIField,
 } from '../rosDetector'
+import { stripStageDirections } from '../transcriptText'
 import { callModel, extractJson, extractJsonArray } from './llm'
 import type { CaseData } from '../../trainer/_lib/types'
 import type { RawUsage } from '../analytics'
@@ -21,6 +22,34 @@ export interface RosUnlockResult {
   derivedFinding: string
 }
 
+/** Minimal identity the documentation prompts need to write correctly. */
+export interface PatientRef {
+  name?: string
+  age?: number
+  gender?: string
+}
+
+/**
+ * Tell the summariser who it is documenting.
+ *
+ * Without this the prompt carried no identity at all, so the model picked a
+ * pronoun at random and wrote "some days he can barely keep his eyes open"
+ * about a 67-year-old woman. Sex is stated, and the safe fallback of avoiding
+ * pronouns entirely is offered for cases that leave gender unspecified.
+ */
+function patientDescriptor(patient?: PatientRef): string {
+  const sex = (patient?.gender ?? '').trim().toLowerCase()
+  const pronouns = sex.startsWith('f') ? 'she/her' : sex.startsWith('m') ? 'he/him' : null
+  const who = [
+    patient?.age ? `${patient.age}-year-old` : null,
+    sex || null,
+  ].filter(Boolean).join(' ')
+  return `
+The patient is ${who || 'of unspecified age and sex'}.
+- Use ${pronouns ? `${pronouns} pronouns` : 'no gendered pronouns — write "the patient"'} for the patient. Never guess a pronoun.
+- The excerpt is speech only; roleplay gestures have been removed. Do not document an action as a clinical finding.`
+}
+
 export interface AskClassification {
   rosUnlocks: RosUnlockResult[]
   hpiUnlocks: Partial<Record<HPIField, string>>
@@ -32,9 +61,16 @@ export async function classifyRosCategories(
   message: string,
   onUsage: (type: 'ros_classifier', usage: RawUsage) => void,
 ): Promise<ROSCategory[]> {
-  const keywordMatches = scanMessageForROS(message)
-  if (keywordMatches.length > 0) return keywordMatches
-  if (!looksClinical(message)) return []
+  // The keyword scan is an accelerator, not an authority. It used to return on
+  // ANY hit, so a single ambiguous word ('sleep', 'headache', 'pain') decided
+  // the routing and the classifier never ran — misfiling the exchange and
+  // leaving the system that was actually asked about to be summarised from
+  // something unrelated. Decisive hits still skip the model call; ambiguous
+  // ones are arbitrated, with the keyword guess kept as the fallback.
+  const scan = scanMessageForROSDetailed(message)
+  const decisive = scan.categories.filter(c => !scan.ambiguous.includes(c))
+  if (scan.categories.length > 0 && !scan.needsClassifier) return scan.categories
+  if (scan.categories.length === 0 && !looksClinical(message)) return []
 
   try {
     const classifierPrompt = `You are a clinical NLP classifier for a medical training app.
@@ -52,10 +88,13 @@ Student message: "${message}"`
     })
     onUsage('ros_classifier', usage)
     const aiMatches = extractJsonArray<string>(text.trim())
-    return aiMatches.filter((c): c is ROSCategory =>
-      (ROS_CATEGORIES as readonly string[]).includes(c))
+      .filter((c): c is ROSCategory => (ROS_CATEGORIES as readonly string[]).includes(c))
+    // Union with any decisive keyword hits so arbitration can only ADD context,
+    // never drop a system the wording named outright.
+    const merged = [...new Set([...decisive, ...aiMatches])]
+    return merged.length > 0 ? merged : scan.categories
   } catch {
-    return [] // classifier failure is non-fatal
+    return scan.categories // classifier failure falls back to the keyword guess
   }
 }
 
@@ -72,9 +111,10 @@ export async function deriveRosSummary(
   patientReply: string,
   onUsage: (type: 'ros_derived', usage: RawUsage) => void,
   previousSummary?: string,
+  patient?: PatientRef,
 ): Promise<string> {
   const summarySystem = `You are a clinical documentation assistant. Write a concise clinical sentence summarizing only what the patient actually reported about a specific body system, based on the interview excerpt provided.
-
+${patientDescriptor(patient)}
 Rules:
 - Only include what the patient explicitly said or confirmed
 - Do NOT include denials of things that were never asked about
@@ -87,7 +127,7 @@ Rules:
 ${previousSummary ? `Previously documented for this system (KEEP everything still accurate from this, and merge in anything new): ${previousSummary}
 ` : ''}Interview excerpt:
 Student: ${studentMessage}
-Patient: ${patientReply}
+Patient: ${stripStageDirections(patientReply)}
 
 ${previousSummary
     ? `Write the updated cumulative summary of everything the patient has reported about ${category} so far.`
@@ -116,15 +156,16 @@ export async function deriveRosSummaries(
   studentMessage: string,
   patientReply: string,
   onUsage: (type: 'ros_derived', usage: RawUsage) => void,
+  patient?: PatientRef,
 ): Promise<Record<string, string>> {
   if (items.length === 0) return {}
   if (items.length === 1) {
     const { category, previousSummary } = items[0]
-    return { [category]: await deriveRosSummary(category, studentMessage, patientReply, onUsage, previousSummary) }
+    return { [category]: await deriveRosSummary(category, studentMessage, patientReply, onUsage, previousSummary, patient) }
   }
 
   const system = `You are a clinical documentation assistant. For EACH body system listed, write a concise clinical summary of only what the patient actually reported, based on the interview excerpt provided.
-
+${patientDescriptor(patient)}
 Rules:
 - Only include what the patient explicitly said or confirmed
 - Do NOT include denials of things that were never asked about
@@ -138,7 +179,7 @@ ${items.map(i => `- ${i.category}${i.previousSummary ? ` (previously documented:
 
 Interview excerpt:
 Student: ${studentMessage}
-Patient: ${patientReply}
+Patient: ${stripStageDirections(patientReply)}
 
 Return the JSON object now.`
 

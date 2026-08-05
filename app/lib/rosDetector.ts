@@ -41,14 +41,57 @@ const KEYWORD_MAP: Record<ROSCategory, string[]> = {
   'Allergic/Immunologic':  ['allergy', 'allergic', 'reaction', 'hives', 'immune'],
 }
 
+/**
+ * Keywords that legitimately belong to more than one system, or are so generic
+ * that a hit says nothing about which system was asked about.
+ *
+ * These exist because the keyword scan SHORT-CIRCUITS the AI classifier: one
+ * match and the classifier never runs. A question about daytime hypersomnolence
+ * hit 'sleep' → Psychiatric, so the morning-headache exchange — the highest-yield
+ * finding in that case — was filed under Psychiatric and HEENT was left to be
+ * summarised from an unrelated exchange, where it came out as "denies HEENT
+ * concerns". The case itself documented the headaches correctly; only the
+ * routing was wrong.
+ */
+const AMBIGUOUS_KEYWORDS = new Set([
+  'sleep', 'headache', 'head', 'pain', 'back', 'weakness', 'vision', 'neck',
+  'swelling', 'breath', 'breathing', 'tired', 'fatigue', 'confusion', 'dizzy',
+  'dizziness', 'heart', 'lung', 'bone',
+])
+
+export interface ROSScan {
+  categories: ROSCategory[]
+  /** Categories matched only via ambiguous keywords — too weak to trust alone. */
+  ambiguous: ROSCategory[]
+  /** True when every match is ambiguous, so the AI classifier should arbitrate. */
+  needsClassifier: boolean
+}
+
+/**
+ * Case-insensitive keyword scan, reporting how much weight each match can bear.
+ * An unambiguous hit is decisive and skips the model call; an ambiguous-only
+ * result is a hint that must be arbitrated rather than acted on.
+ */
+export function scanMessageForROSDetailed(message: string): ROSScan {
+  const lower = message.toLowerCase()
+  const categories: ROSCategory[] = []
+  const ambiguous: ROSCategory[] = []
+  for (const [cat, keywords] of Object.entries(KEYWORD_MAP) as [ROSCategory, string[]][]) {
+    const hits = keywords.filter(kw => lower.includes(kw))
+    if (!hits.length) continue
+    categories.push(cat)
+    if (hits.every(kw => AMBIGUOUS_KEYWORDS.has(kw))) ambiguous.push(cat)
+  }
+  return {
+    categories,
+    ambiguous,
+    needsClassifier: categories.length > 0 && ambiguous.length === categories.length,
+  }
+}
+
 /** Case-insensitive keyword scan. Returns matched ROS categories. */
 export function scanMessageForROS(message: string): ROSCategory[] {
-  const lower = message.toLowerCase()
-  const matched: ROSCategory[] = []
-  for (const [cat, keywords] of Object.entries(KEYWORD_MAP) as [ROSCategory, string[]][]) {
-    if (keywords.some(kw => lower.includes(kw))) matched.push(cat)
-  }
-  return matched
+  return scanMessageForROSDetailed(message).categories
 }
 
 /** Heuristic: is this message long or question-like enough to warrant an AI classifier call? */
