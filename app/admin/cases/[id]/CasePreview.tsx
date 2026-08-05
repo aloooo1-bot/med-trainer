@@ -1,4 +1,5 @@
 ﻿import { ROS_CATEGORIES } from '../../../lib/rosDetector'
+import { readBmi, caseBmiIsInterpretable } from '../../../lib/bmi'
 
 // ──────────────────────────────────────────────────────────────────────────────
 // Local type (mirrors app/trainer/page.tsx:121-172, defensive subset)
@@ -137,14 +138,9 @@ export default function CasePreview({ caseData, difficulty }: {
                 : difficulty === 'Clinical'  ? (d.clinicalHpi ?? d.hpi)
                 : d.hpi
 
-  // BMI helper
-  const bmi = (() => {
-    const h = pi.heightInches
-    const wStr = (v.weight ?? '').replace(/[^\d.]/g, '')
-    const w = parseFloat(wStr)
-    if (h && w && h > 0) return ((w / (h * h)) * 703).toFixed(1)
-    return null
-  })()
+  // A server component with the whole case in hand, so the validity rule can be
+  // evaluated directly — no need for the presentation flag the trainer uses.
+  const bmi = readBmi(pi.heightInches, v.weight, caseBmiIsInterpretable(d))
 
   // Vitals strip data
   const vitalItems: Array<{ label: string; value: string }> = [
@@ -200,7 +196,11 @@ export default function CasePreview({ caseData, difficulty }: {
           <span className="text-ink-secondary">{pi.age != null ? `${pi.age} y/o` : ''} {pi.gender ?? ''}</span>
           {pi.height  && <span className="text-ink-tertiary text-xs">{pi.height}</span>}
           {v.weight   && <span className="text-ink-tertiary text-xs">{v.weight}</span>}
-          {bmi        && <span className="text-ink-tertiary text-xs">BMI {bmi}</span>}
+          {bmi        && (
+            <span className={`text-xs ${bmi.colorClass}`} title={bmi.note ?? undefined}>
+              BMI {bmi.value}{bmi.category ? ` (${bmi.category})` : ' — not interpretable'}
+            </span>
+          )}
         </div>
         {pi.chiefComplaint && (
           <div className="mt-2">

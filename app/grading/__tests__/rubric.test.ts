@@ -26,6 +26,25 @@ test('buildRubricPrompt includes patient info', () => {
   assert.ok(prompt.includes('"chest pain"'))
 })
 
+// A grader justified recommending sputum AFB by calling a patient with no HIV,
+// no steroids, no diabetes and no malignancy an "immunocompromised-risk
+// patient" — inventing a risk factor because the rubric demands a specific
+// concrete justification below 80% of max and never required it to be true.
+
+test('the background history block is declared closed-world', () => {
+  const prompt = buildRubricPrompt(baseInput)
+  assert.ok(prompt.includes('COMPLETE and CLOSED'),
+    'absence from Background History must read as evidence of absence, not missing data')
+  assert.ok(prompt.includes('do not infer unlisted conditions'))
+})
+
+test('the concrete-deduction requirement forbids manufacturing one', () => {
+  const prompt = buildRubricPrompt(baseInput)
+  assert.ok(prompt.includes('never to manufacture one'),
+    'the rule that demands a specific deduction must also forbid inventing it')
+  assert.ok(prompt.includes('never attribute to the patient a risk factor'))
+})
+
 test('buildRubricPrompt omits the differential-consistency block when no analysis is provided', () => {
   const prompt = buildRubricPrompt(baseInput)
   // The actual injected ranking block (not the differentials-output instruction) is absent.

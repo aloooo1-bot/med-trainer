@@ -1,6 +1,7 @@
 import 'server-only'
 import type { CaseData } from '../../trainer/_lib/types'
 import type { CasePresentation, CaseReveal } from '../../trainer/_lib/sessionTypes'
+import { caseBmiIsInterpretable } from '../bmi'
 import { splitCase as _splitCase, joinCase as _joinCase } from './caseTiers.mjs'
 
 export type { CasePresentation, CaseReveal }
@@ -52,6 +53,9 @@ export function buildPresentation(caseData: CaseData, difficulty: string): CaseP
     vitals: caseData.vitals,
     examRegions: Object.keys(caseData.physicalExam ?? {}),
     examGated,
+    // Depends on the diagnosis, which never reaches the client — so the client
+    // cannot decide this for itself and it has to travel with the presentation.
+    bmiInterpretable: caseBmiIsInterpretable(caseData),
     // 5.3: scaffolding tier travels separately from case complexity; today the
     // caller (buildPresentation is invoked with difficulty) keeps them equal.
     scaffoldingLevel: (difficulty as CasePresentation['scaffoldingLevel']),

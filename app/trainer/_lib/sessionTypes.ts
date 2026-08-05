@@ -31,6 +31,15 @@ export interface CasePresentation {
   /** True when the exam is click-to-reveal, i.e. any difficulty above Foundations. */
   examGated: boolean
   /**
+   * False when this patient's habitus makes measured height unreliable
+   * (kyphoscoliosis, amputation, achondroplasia…), so a BMI derived from it is
+   * not a valid nutritional metric and must not be shown with a category.
+   *
+   * Computed server-side because it depends on `diagnosis`, which is withheld
+   * ground truth the client never receives during a case.
+   */
+  bmiInterpretable: boolean
+  /**
    * Interface scaffolding tier (5.3). Drives ordering UI density independently
    * of case complexity; today it equals difficulty. Foundations → curated
    * checklist; Clinical → order sets + common core + search; Advanced → search.

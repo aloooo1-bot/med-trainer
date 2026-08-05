@@ -11,6 +11,7 @@ import {
   classifyFinding,
 } from '../lib/rosDetector'
 import { ANON_CASE_IDS, ANON_CASE_LIMIT } from '../lib/anonymousCases'
+import { readBmi } from '../lib/bmi'
 import { type GradingResult, stripToBasic } from '../grading/types'
 import { type DimensionKey } from '../grading/rubric'
 import {
@@ -96,13 +97,15 @@ interface TerminalLine {
 // slice plus whatever it has earned through /api/session/* calls.
 interface SessionMeta {
   examGated: boolean
+  /** False when habitus makes measured height — and so BMI — uninterpretable. */
+  bmiInterpretable: boolean
   predictionCandidates: string[]
   caseSearchTests?: Array<{ name: string; category: string }>
   /** Interface scaffolding tier (5.3) — drives ordering UI density. */
   scaffoldingLevel: string
 }
 
-const EMPTY_SESSION_META: SessionMeta = { examGated: false, predictionCandidates: [], scaffoldingLevel: 'Foundations' }
+const EMPTY_SESSION_META: SessionMeta = { examGated: false, bmiInterpretable: true, predictionCandidates: [], scaffoldingLevel: 'Foundations' }
 
 // Components extracted to _components/ and hooks/utils to _lib/
 
@@ -339,6 +342,7 @@ export default function MedTrainer() {
     setCaseDifficulty(data.difficulty)
     setSessionMeta({
       examGated: data.presentation.examGated,
+      bmiInterpretable: data.presentation.bmiInterpretable ?? true,
       predictionCandidates: data.presentation.predictionCandidates ?? [],
       caseSearchTests: data.presentation.caseSearchTests,
       scaffoldingLevel: data.presentation.scaffoldingLevel,
@@ -362,6 +366,7 @@ export default function MedTrainer() {
     setCaseDifficulty(data.session.difficulty)
     setSessionMeta({
       examGated: data.presentation.examGated,
+      bmiInterpretable: data.presentation.bmiInterpretable ?? true,
       predictionCandidates: data.presentation.predictionCandidates ?? [],
       caseSearchTests: data.presentation.caseSearchTests,
       scaffoldingLevel: data.presentation.scaffoldingLevel,
@@ -1332,11 +1337,15 @@ export default function MedTrainer() {
           <div className="flex flex-1 flex-col overflow-hidden">
             {/* Patient info header bar */}
             {caseData && (() => {
-              const wLbs = parseFloat(caseData.vitals.weight)
-              const hIn = caseData.patientInfo.heightInches
-              const bmi = hIn && !isNaN(wLbs) && hIn > 0 ? Math.round((wLbs / (hIn * hIn)) * 703 * 10) / 10 : null
-              const bmiLabel = bmi === null ? null : bmi < 18.5 ? 'Underweight' : bmi < 25 ? 'Normal' : bmi < 30 ? 'Overweight' : 'Obese'
-              const bmiColor = bmi === null ? '' : bmi < 18.5 ? 'text-primary-400' : bmi < 25 ? 'text-confirmed' : bmi < 30 ? 'text-caution' : 'text-critical'
+              // Category and colour are withheld when habitus makes measured
+              // height unreliable — the number stays, because height and weight
+              // are on screen beside it and a student could otherwise recompute
+              // a reassuring "normal" with nothing to correct them.
+              const bmi = readBmi(
+                caseData.patientInfo.heightInches,
+                caseData.vitals.weight,
+                sessionMeta.bmiInterpretable,
+              )
               return (
                 <div className="flex flex-shrink-0 items-center gap-3 border-b border-surface-4 bg-surface-1 px-4 py-2.5 overflow-x-auto">
                   <span className="text-[13px] font-semibold text-ink-primary whitespace-nowrap">{caseData.patientInfo.name}</span>
@@ -1350,10 +1359,17 @@ export default function MedTrainer() {
                   )}
                   <span className="text-surface-5 select-none">·</span>
                   <span className="text-[12px] text-ink-secondary whitespace-nowrap">{caseData.vitals.weight}</span>
-                  {bmi !== null && (
+                  {bmi && (
                     <>
                       <span className="text-surface-5 select-none">·</span>
-                      <span className={`text-[12px] whitespace-nowrap ${bmiColor}`}>BMI {bmi} ({bmiLabel})</span>
+                      <span
+                        className={`text-[12px] whitespace-nowrap ${bmi.colorClass}`}
+                        title={bmi.note ?? undefined}
+                      >
+                        BMI {bmi.value}{bmi.category ? ` (${bmi.category})` : ' — not interpretable'}
+                        {!bmi.interpretable && <span aria-hidden="true" className="ml-1">ⓘ</span>}
+                      </span>
+                      {!bmi.interpretable && <span className="sr-only">{bmi.note}</span>}
                     </>
                   )}
                   <span className="ml-auto flex-shrink-0 rounded-full border border-surface-4 bg-surface-2 px-3 py-1 text-[11px] text-ink-secondary whitespace-nowrap">

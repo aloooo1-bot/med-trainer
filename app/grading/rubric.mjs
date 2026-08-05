@@ -103,7 +103,7 @@ CLINICAL REASONING (/${cr.max}):
 HPI: ${input.hpi}
 Difficulty: ${input.difficulty}
 ${input.prePresentedInfo ? `\nPre-presented to student (shown in the structured HPI panel before the case began — the student did NOT need to ask for any of this):\n${input.prePresentedInfo}\n` : ''}
-Background History (full ground-truth — includes all structured history fields and anything the patient could reveal):
+Background History (full ground-truth — includes all structured history fields and anything the patient could reveal. This block is COMPLETE and CLOSED: any comorbidity, medication, exposure, or risk factor not listed here does NOT exist for this patient. Absence from this block is positive evidence of absence, not missing data — do not infer unlisted conditions.):
 ${input.backgroundHistory}
 
 Tests ordered:
@@ -189,6 +189,7 @@ SCORE↔FEEDBACK CONSISTENCY RULE:
 - If a dimension score is below 80% of max, the feedback for that dimension MUST cite a specific, concrete deduction — name the missed question, the omitted test, or the specific reasoning gap. Vague language like "minor deduction" or "slightly incomplete" is insufficient when ≥ 20% of the dimension's points are removed.
 - Never write "minor deduction" or "small reduction" when the deduction is ≥ 4 points on a /24 dimension (or ≥ 4 points on a /20 dimension, or ≥ 6 points on a /30 dimension). Call out the specific gap by name.
 - VERIFY before returning: scan each dimension's feedback text and score. If any dimension uses praise language with a score < 90% of max, revise the score upward or replace the praise text. If any score is < 80% of max without a named concrete deduction in the feedback, add the specific gap before submitting.
+- The requirement to cite a concrete deduction is a requirement to FIND one in the case data — never to manufacture one. If you cannot name a concrete, case-supported gap for a dimension, the score you drafted is too low: raise it into the band you can justify rather than inventing a justification to fit it. A score whose stated reason is not in the case data is a wrong score, not a well-documented one. In particular, never attribute to the patient a risk factor, comorbidity or exposure the case does not state — if a stronger, real justification exists in the case data, cite that one instead.
 - DIMENSION WEIGHT CONSISTENCY: Apply the same rubric thresholds consistently regardless of how many cases you have graded in this session. Do not drift toward leniency or severity across cases — each grading call must be evaluated independently against the fixed band definitions above.
 
 KEY-QUESTION ELICITATION RULE (grader-side):

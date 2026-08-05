@@ -1,4 +1,5 @@
 import { VITAL_THRESHOLDS } from './caseJitter'
+import { caseBmiIsInterpretable } from './bmi'
 
 /**
  * Internal-consistency checks for a generated case.
@@ -26,10 +27,14 @@ export interface ConsistencyIssue {
 
 /** The subset of a case these checks read. Loose so scripts can pass raw JSON. */
 export interface CheckableCase {
-  patientInfo?: { name?: string; age?: number; gender?: string; height?: string }
+  patientInfo?: { name?: string; age?: number; gender?: string; height?: string; heightInches?: number }
   vitals?: { bp?: string; hr?: number; rr?: number; temp?: number; spo2?: number; weight?: string }
   physicalExam?: Record<string, string>
   reviewOfSystems?: Record<string, string>
+  /** Read by the BMI validity gate: the deformity is not always the diagnosis. */
+  pastMedicalHistory?: { conditions?: string }
+  clinicalHpi?: string
+  advancedHpi?: string
   currentMedications?: { medications?: string; otc?: string }
   imagingResults?: Record<string, string>
   diagnosis?: string
@@ -259,10 +264,14 @@ function checkRequiredExam(c: CheckableCase): ConsistencyIssue[] {
 // patients. Reporting a reassuring "normal" is misleading in exactly the
 // population where the metric breaks.
 
-const HEIGHT_INVALIDATING = /kyphoscoliosis|scoliosis|kyphosis|amputat|achondroplasia|dwarfism|osteogenesis imperfecta|contracture|spinal fusion|vertebral collapse|paget/i
-
+/**
+ * Delegates to the shared BMI module so the student-facing header, the admin
+ * preview and this validator can never disagree about which patients the metric
+ * breaks for. Kept as a named export because caseSource.ts and the sweep script
+ * already import it.
+ */
 export function bmiIsValid(c: CheckableCase): boolean {
-  return !HEIGHT_INVALIDATING.test(`${c.diagnosis ?? ''} ${c.hpi ?? ''}`)
+  return caseBmiIsInterpretable(c)
 }
 
 function checkBmi(c: CheckableCase): ConsistencyIssue[] {

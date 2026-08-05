@@ -5,6 +5,7 @@ import { clampDimensions } from '../../grading/clamp'
 import { GradingResultSchema } from '../../grading/schemas'
 import { formatEvidenceSummary } from '../reasoning/differential'
 import { stripStageDirections } from '../transcriptText'
+import { readBmi, caseBmiIsInterpretable } from '../bmi'
 import { resolveResult } from './orderService'
 import { callModel } from './llm'
 import { selectHpiForDifficulty } from './caseTiers'
@@ -175,7 +176,27 @@ export function assembleGradingInput(
   if (caseData.hiddenHistory.fullHistory) backgroundParts.push(`Full Background History: ${caseData.hiddenHistory.fullHistory}`)
 
   const v = caseData.vitals
-  backgroundParts.push(`Vitals: BP ${v.bp}, HR ${v.hr}, RR ${v.rr}, Temp ${v.temp}°C, SpO2 ${v.spo2}%`)
+  // °F, not °C: every temperature in this app is Fahrenheit — the UI labels it
+  // so and getVitalStatus flags >99.5 as febrile. The grader was being told a
+  // 98.5°F reading was Celsius while also being asked to cross-reference it.
+  backgroundParts.push(`Vitals: BP ${v.bp}, HR ${v.hr}, RR ${v.rr}, Temp ${v.temp}°F, SpO2 ${v.spo2}%`)
+
+  // The VITALS CROSS-REFERENCE RULE tells the grader to check weight and BMI
+  // against the case, but neither was in the block it receives — so it was
+  // asked to verify a number it never saw, and free to compute a reassuring one
+  // itself. Where habitus makes height unreliable, say so explicitly: this is
+  // the surface where "nutritionally normal" would otherwise reappear.
+  const bmi = readBmi(caseData.patientInfo.heightInches, v.weight, caseBmiIsInterpretable(caseData))
+  const anthro = [
+    caseData.patientInfo.height ? `height ${caseData.patientInfo.height}` : null,
+    v.weight ? `weight ${v.weight}` : null,
+    bmi
+      ? bmi.interpretable
+        ? `BMI ${bmi.value} (${bmi.category})`
+        : `BMI ${bmi.value} — NOT interpretable in this patient: measured height is not true height, so this is not a valid nutritional metric. Do NOT describe this patient's nutritional status on the basis of BMI.`
+      : null,
+  ].filter(Boolean)
+  if (anthro.length) backgroundParts.push(`Anthropometrics: ${anthro.join(', ')}`)
   const examLines = Object.entries(caseData.physicalExam)
     .map(([region, finding]) => `${region}: ${finding}`)
     .join('\n')
