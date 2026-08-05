@@ -426,7 +426,8 @@ export default function SettingsPage() {
             <div className="dx-card-body">
               <div className="dx-form-section" style={{ paddingTop: 0 }}>
                 <p className="dx-help-text" style={{ marginBottom: 8 }}>
-                  Email sending is coming soon — your preferences are saved and will take effect when enabled.
+                  Email delivery is not switched on yet. Your choices are saved and will be
+                  respected the moment it is — and every email carries a one-click unsubscribe.
                 </p>
                 <label className="dx-checkbox-row">
                   <input
@@ -434,9 +435,11 @@ export default function SettingsPage() {
                     checked={emailCaseReminders}
                     onChange={e => setEmailCaseReminders(e.target.checked)}
                   />
-                  <span className="dx-checkbox-label">Daily case reminders</span>
+                  <span className="dx-checkbox-label">Case reminders</span>
                 </label>
-                <p className="dx-checkbox-desc">A nudge if you haven&apos;t started a case by 8 PM.</p>
+                {/* Copy matches the implementation: buildReminder() fires after
+                    REMINDER_AFTER_DAYS idle days and gives up after 45. */}
+                <p className="dx-checkbox-desc">A nudge after about five days without a case, and never more than one at a time.</p>
                 <label className="dx-checkbox-row" style={{ marginTop: 10 }}>
                   <input
                     type="checkbox"
@@ -445,10 +448,10 @@ export default function SettingsPage() {
                   />
                   <span className="dx-checkbox-label">Weekly performance summary</span>
                 </label>
-                <p className="dx-checkbox-desc">Your scores, streaks, and top weak areas every Monday.</p>
+                <p className="dx-checkbox-desc">Cases completed, your average score, how it compares with last week, and your weakest area.</p>
                 <div className="dx-form-actions">
-                  <button className="dx-btn-primary" style={{ fontSize: 13, padding: '7px 18px' }} onClick={saveNotifications} disabled={notifStatus === 'saving'} title="Preferences will take effect once email sending is enabled">
-                    Save preferences (pending email activation)
+                  <button className="dx-btn-primary" style={{ fontSize: 13, padding: '7px 18px' }} onClick={saveNotifications} disabled={notifStatus === 'saving'}>
+                    Save notification preferences
                   </button>
                   {statusText(notifStatus) && (
                     <span className="dx-save-status" style={{ color: notifStatus === 'error' ? 'var(--red)' : 'var(--muted)' }}>
