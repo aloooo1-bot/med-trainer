@@ -28,10 +28,8 @@ export interface CasePresentation {
   vitals: CaseData['vitals']
   /** Region names only at gated difficulties; full findings at Foundations. */
   examRegions: string[]
-  /** True when the exam is click-to-reveal (Clinical/Advanced with relevant regions). */
+  /** True when the exam is click-to-reveal, i.e. any difficulty above Foundations. */
   examGated: boolean
-  /** True when this case carries a differential reasoning model (priors + impacts). */
-  hasReasoningModel: boolean
   /**
    * Interface scaffolding tier (5.3). Drives ordering UI density independently
    * of case complexity; today it equals difficulty. Foundations → curated

@@ -36,7 +36,7 @@ function TestChip({ name, isOrdered, isSelected, locked, onClick }: {
 
 export function OrderView({
   caseData, caseDifficulty, scaffoldingLevel, prediction, predictionConfidence, onLockPrediction,
-  predictionCandidates, hasReasoningModel, caseSearchTests, orderedTests, selectedTests,
+  predictionCandidates, caseSearchTests, orderedTests, selectedTests,
   toggleTest, orderTests, orderCustomTest, removeOrderedTest,
   testSearchQuery, setTestSearchQuery, showSearchDropdown, setShowSearchDropdown,
   customTestInput, setCustomTestInput, locked,
@@ -48,10 +48,13 @@ export function OrderView({
   prediction: string[] | null
   predictionConfidence: number | null
   onLockPrediction: (ranking: string[], confidence: number) => void
-  /** Foundations ranked-mode candidates (empty at gated difficulties — anti-cueing). */
+  /**
+   * Foundations ranked-mode candidates (empty at gated difficulties — anti-cueing).
+   * PredictionPanel decides for itself whether it can render: ranked mode needs
+   * two or more of these, free-text mode needs nothing. Do not add an outer
+   * condition here — the panel's own rule is the whole rule.
+   */
   predictionCandidates: string[]
-  /** Whether this case has a differential reasoning model (enables prediction UI). */
-  hasReasoningModel: boolean
   /** Advanced: case-specific test names for the search list (names only). */
   caseSearchTests?: Array<{ name: string; category: string }>
   orderedTests: Set<string>
@@ -161,9 +164,7 @@ export function OrderView({
 
     return (
       <div className="space-y-4">
-        {hasReasoningModel && (
-          <PredictionPanel candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
-        )}
+        <PredictionPanel candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
             <svg className="h-4 w-4 text-ink-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -319,9 +320,7 @@ export function OrderView({
 
   return (
     <div className="space-y-4">
-      {hasReasoningModel && (
-        <PredictionPanel candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
-      )}
+      <PredictionPanel candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
       <div className="rounded-md border border-primary-200 bg-primary-50 px-4 py-3">
         <p className="text-xs text-primary-700">
           <span className="font-semibold">Advanced difficulty:</span> no pre-listed lab panels — search and type test names from memory. Imaging modalities are listed below for reference.

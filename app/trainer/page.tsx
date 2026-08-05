@@ -96,14 +96,13 @@ interface TerminalLine {
 // slice plus whatever it has earned through /api/session/* calls.
 interface SessionMeta {
   examGated: boolean
-  hasReasoningModel: boolean
   predictionCandidates: string[]
   caseSearchTests?: Array<{ name: string; category: string }>
   /** Interface scaffolding tier (5.3) — drives ordering UI density. */
   scaffoldingLevel: string
 }
 
-const EMPTY_SESSION_META: SessionMeta = { examGated: false, hasReasoningModel: false, predictionCandidates: [], scaffoldingLevel: 'Foundations' }
+const EMPTY_SESSION_META: SessionMeta = { examGated: false, predictionCandidates: [], scaffoldingLevel: 'Foundations' }
 
 // Components extracted to _components/ and hooks/utils to _lib/
 
@@ -340,7 +339,6 @@ export default function MedTrainer() {
     setCaseDifficulty(data.difficulty)
     setSessionMeta({
       examGated: data.presentation.examGated,
-      hasReasoningModel: data.presentation.hasReasoningModel,
       predictionCandidates: data.presentation.predictionCandidates ?? [],
       caseSearchTests: data.presentation.caseSearchTests,
       scaffoldingLevel: data.presentation.scaffoldingLevel,
@@ -364,7 +362,6 @@ export default function MedTrainer() {
     setCaseDifficulty(data.session.difficulty)
     setSessionMeta({
       examGated: data.presentation.examGated,
-      hasReasoningModel: data.presentation.hasReasoningModel,
       predictionCandidates: data.presentation.predictionCandidates ?? [],
       caseSearchTests: data.presentation.caseSearchTests,
       scaffoldingLevel: data.presentation.scaffoldingLevel,
@@ -740,17 +737,27 @@ export default function MedTrainer() {
           Date.now(),
         )
         // Record pre-test calibration if the student committed a prediction.
-        if (prediction && prediction[0] && (reveal.differentialPriors?.length ?? 0) > 0) {
-          const beliefs = computeBeliefs(reveal.differentialPriors!, reveal.testImpacts ?? {}, Array.from(orderedTests))
-          const ps = scorePrediction(prediction, beliefs)
+        //
+        // Only the ranked (Foundations) branch needs the case's reasoning model,
+        // because rank-agreement is scored against the Bayesian beliefs. Open
+        // mode compares the student's own leading diagnosis to the answer, which
+        // every case has — so requiring priors here silently dropped calibration
+        // on ~90% of Clinical and Advanced cases, starving the reliability curve.
+        if (prediction && prediction[0]) {
           // Shared with the reveal's calibration verdict so the recorded
           // outcome and the message the student reads can never disagree.
           const topCorrect = predictionMatchesDiagnosis(prediction[0], reveal.diagnosis)
-          if (caseDifficulty === 'Foundations' && ps.comparedCount > 0) {
+          const priors = reveal.differentialPriors
+          const ranked = caseDifficulty === 'Foundations' && (priors?.length ?? 0) > 0
+          const ps = ranked
+            ? scorePrediction(prediction, computeBeliefs(priors!, reveal.testImpacts ?? {}, Array.from(orderedTests)))
+            : null
+          if (ps && ps.comparedCount > 0) {
             // Ranked mode: rank-agreement + Brier.
             recordCalibration(ps.score, ps.topHit, Date.now(), predictionConfidence ?? undefined, topCorrect)
           } else {
-            // Open mode (Clinical/Advanced): no candidate ranking — record leading-pick accuracy + Brier.
+            // Open mode (Clinical/Advanced), and ranked cases with nothing
+            // comparable: record leading-pick accuracy + Brier.
             recordCalibration(topCorrect ? 100 : 0, topCorrect, Date.now(), predictionConfidence ?? undefined, topCorrect)
           }
         }
@@ -1043,7 +1050,6 @@ export default function MedTrainer() {
           predictionConfidence={predictionConfidence}
           onLockPrediction={lockPrediction}
           predictionCandidates={sessionMeta.predictionCandidates}
-          hasReasoningModel={sessionMeta.hasReasoningModel}
           caseSearchTests={sessionMeta.caseSearchTests}
           orderedTests={orderedTests}
           selectedTests={selectedTests}
