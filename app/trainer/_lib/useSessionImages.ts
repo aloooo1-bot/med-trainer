@@ -2,9 +2,33 @@ import { useState, useEffect } from 'react'
 import type { CaseData } from './types'
 import { postSession } from './sessionApi'
 import { findResultKey, isECGTest } from './testUtils'
+import { withTimeout } from '../../lib/withTimeout'
 import { getSpecialModality, type SpecialImage, type SpecialModality } from '../../lib/specialImageLookup'
 import type { ECGImage } from '../../lib/ecgImageLookup'
 import type { OpenIResult } from '../../lib/imagingSearch'
+
+/**
+ * One slot in the ECG cache.
+ *
+ * `'unavailable'` and `'failed'` are kept apart because they are different
+ * facts and want different words on screen: the server can legitimately have no
+ * tracing that matches a case without contradicting it (the picker suppresses
+ * rather than showing a wrong strip), which is not the same as a request that
+ * broke. Collapsing both into one value made the panel tell students their
+ * rhythm was missing from the library when the fetch had simply failed.
+ *
+ * `null` means in flight — and ONLY in flight. It must always settle.
+ */
+export type EcgSlot = ECGImage | null | 'unavailable' | 'failed'
+
+/**
+ * How long a single image request may run before it is treated as failed.
+ *
+ * Generous, because these can involve an upstream image search. The point is
+ * not speed, it is that "loading" must be a temporary claim: an unsettled
+ * request left the panel pulsing forever with no machine read to fall back on.
+ */
+const IMAGE_REQUEST_TIMEOUT_MS = 15_000
 
 /**
  * Image caches for ordered tests (5.1 extraction from trainer/page.tsx).
@@ -24,7 +48,7 @@ export function useSessionImages({
   orderedTests: Set<string>
 }) {
   const [imagingCache, setImagingCache] = useState<Record<string, OpenIResult[] | null>>({})
-  const [ecgCache, setEcgCache] = useState<Record<string, ECGImage | null | 'none'>>({})
+  const [ecgCache, setEcgCache] = useState<Record<string, EcgSlot>>({})
   const [smearCache, setSmearCache] = useState<Record<string, SpecialImage | null | 'none'>>({})
   const [biopsyImgCache, setBiopsyImgCache] = useState<Record<string, SpecialImage | null | 'none'>>({})
   const [fundusCache, setFundusCache] = useState<Record<string, SpecialImage | null | 'none'>>({})
@@ -47,7 +71,14 @@ export function useSessionImages({
 
     const imagingTests = orderedArr.filter(t => findResultKey(t, caseData.imagingResults) !== null)
     const toFetch = imagingTests.filter(t => {
-      if (isECGTest(t)) return !(t in ecgCache)
+      if (isECGTest(t)) {
+        const slot = ecgCache[t]
+        // Retry a previous failure when the student returns to this tab
+        // (activeSection is an effect dependency). A deliberate 'unavailable'
+        // is final — refetching it would only produce the same answer — and a
+        // null is already in flight.
+        return slot === undefined || slot === 'failed'
+      }
       const m = getSpecialModality(t)
       if (m) return !(t in cacheMap[m].cache)
       return !(t in imagingCache)
@@ -69,22 +100,33 @@ export function useSessionImages({
     void Promise.all(
       toFetch.map(async t => {
         try {
-          const data = await postSession<{
-            kind: 'ecg' | 'special' | 'imaging'
-            ecg?: ECGImage | null
-            modality?: SpecialModality
-            special?: SpecialImage | null
-            results?: OpenIResult[]
-          }>('/api/session/images', { sessionId, test: t })
+          // Bounded: an unsettled request is indistinguishable from a permanent
+          // one on screen, and the loading state has no fallback content.
+          const data = await withTimeout(
+            postSession<{
+              kind: 'ecg' | 'special' | 'imaging'
+              ecg?: ECGImage | null
+              modality?: SpecialModality
+              special?: SpecialImage | null
+              results?: OpenIResult[]
+            }>('/api/session/images', { sessionId, test: t }),
+            IMAGE_REQUEST_TIMEOUT_MS,
+            `image request for "${t}"`,
+          )
           if (data.kind === 'ecg') {
-            setEcgCache(prev => ({ ...prev, [t]: data.ecg ?? 'none' }))
+            // The server answered. A null image here is a deliberate
+            // suppression — no tracing matches this case without contradicting
+            // it — not a failure, and the panel says so differently.
+            setEcgCache(prev => ({ ...prev, [t]: data.ecg ?? 'unavailable' }))
           } else if (data.kind === 'special' && data.modality) {
             cacheMap[data.modality].setter(prev => ({ ...prev, [t]: data.special ?? 'none' }))
           } else {
             setImagingCache(prev => ({ ...prev, [t]: data.results ?? [] }))
           }
         } catch {
-          if (isECGTest(t)) setEcgCache(prev => ({ ...prev, [t]: 'none' }))
+          // Errored or timed out. Distinct from 'unavailable' so the panel can
+          // offer a retry rather than claiming the library lacks this rhythm.
+          if (isECGTest(t)) setEcgCache(prev => ({ ...prev, [t]: 'failed' }))
           else {
             const m = getSpecialModality(t)
             if (m) cacheMap[m].setter(prev => ({ ...prev, [t]: 'none' }))

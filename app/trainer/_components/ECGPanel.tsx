@@ -1,16 +1,20 @@
 import { useState } from 'react'
-import type { ECGImage } from '@/app/lib/ecgImageLookup'
+import type { EcgSlot } from '../_lib/useSessionImages'
 
 export function ECGPanel({ ecgFindings, aiReport, image, diagnosisSubmitted, onZoom }: {
   ecgFindings?: string
   aiReport: string
-  image: ECGImage | null | 'none'
+  image: EcgSlot
   diagnosisSubmitted: boolean
   onZoom?: (src: string, alt: string) => void
 }) {
   const [sourceOpen, setSourceOpen] = useState(false)
   const machineRead = ecgFindings ?? aiReport
 
+  // In flight. Bounded by the request timeout in useSessionImages — this state
+  // is the one place the panel has nothing to offer, so it must not be reachable
+  // indefinitely. It previously was, and a student who had ordered the ECG was
+  // left staring at a pulsing box with no machine read to fall back on.
   if (image === null) {
     return (
       <div className="bg-surface-1 px-4 py-5">
@@ -22,12 +26,17 @@ export function ECGPanel({ ecgFindings, aiReport, image, diagnosisSubmitted, onZ
     )
   }
 
-  if (image === 'none') {
+  // No image will arrive. Always show the machine read — the student ordered
+  // this test and must get its result, whether or not a tracing exists — and
+  // say honestly which of the two things happened.
+  if (image === 'unavailable' || image === 'failed') {
     return (
       <div className="bg-surface-1 px-4 py-4 space-y-2">
         <p className="text-sm leading-relaxed text-ink-secondary">{machineRead}</p>
         <p className="text-xs italic text-ink-tertiary">
-          Reference ECG image for this rhythm pattern is not yet in our library. Use the interpretation above to guide your reasoning.
+          {image === 'unavailable'
+            ? 'No reference tracing in our library matches this case without contradicting it, so none is shown. Interpret from the machine read above.'
+            : 'The reference tracing could not be loaded. Leave this tab and return to retry, or interpret from the machine read above.'}
         </p>
       </div>
     )

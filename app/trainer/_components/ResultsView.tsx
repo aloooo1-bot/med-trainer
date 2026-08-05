@@ -1,6 +1,6 @@
 import { getSpecialModality, type SpecialImage, type SpecialModality } from '@/app/lib/specialImageLookup'
 import { type OpenIResult } from '@/app/lib/imagingSearch'
-import { type ECGImage } from '@/app/lib/ecgImageLookup'
+import { type EcgSlot } from '../_lib/useSessionImages'
 import { SectionCard } from './SectionCard'
 import { DifferentialBoard } from './DifferentialBoard'
 import { ECGPanel } from './ECGPanel'
@@ -23,7 +23,7 @@ export function ResultsView({
   caseDifficulty: string
   orderedTests: Set<string>
   imagingCache: Record<string, OpenIResult[] | null>
-  ecgCache: Record<string, ECGImage | null | 'none'>
+  ecgCache: Record<string, EcgSlot>
   smearCache: Record<string, SpecialImage | null | 'none'>
   biopsyImgCache: Record<string, SpecialImage | null | 'none'>
   fundusCache: Record<string, SpecialImage | null | 'none'>
