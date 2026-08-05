@@ -140,7 +140,7 @@ function checkVitalsProse(c: CheckableCase): ConsistencyIssue[] {
 // doubt they are reading the right chart. Collateral historians are the reason
 // this cannot be a naive scan: "his wife reports…" legitimately uses both.
 
-const COLLATERAL = /\b(wife|husband|mother|father|daughter|son|sister|brother|partner|spouse|caregiver|friend|neighbou?r|paramedic|nurse|roommate|granddaughter|grandson)\b/i
+const COLLATERAL = /\b(wife|husband|mother|father|daughter|son|sister|brother|partner|girlfriend|boyfriend|fianc(é|e)e?|spouse|caregiver|carer|friend|neighbou?r|paramedic|ems|nurse|teacher|roommate|granddaughter|grandson|grandmother|grandfather|aunt|uncle|guardian)\b/i
 
 function checkPronouns(c: CheckableCase): ConsistencyIssue[] {
   const gender = (c.patientInfo?.gender ?? '').toLowerCase()
@@ -158,19 +158,25 @@ function checkPronouns(c: CheckableCase): ConsistencyIssue[] {
   const out: ConsistencyIssue[] = []
   for (const [field, text] of fields) {
     if (!text) continue
-    // Sentence-level: a mismatched pronoun only counts when no collateral
-    // historian is named in the same sentence to own it.
-    for (const sentence of text.split(/(?<=[.!?])\s+/)) {
-      if (!wrong.test(sentence)) continue
-      if (COLLATERAL.test(sentence)) continue
-      out.push({
-        code: 'prose/pronoun-mismatch',
-        severity: 'error',
-        field,
-        message: `patient is ${c.patientInfo?.gender} but this reads "${sentence.match(wrong)?.[0]}": ${sentence.trim().slice(0, 90)}`,
-      })
-      break // one report per field is enough to act on
-    }
+    // A collateral historian named ANYWHERE in the field licenses the other
+    // pronoun for the whole field. Checking only the same sentence produced
+    // false positives on every case with a witness, because the historian is
+    // introduced in one sentence and referred to in the next:
+    //   "brought by his mother … On the day of presentation, she noted swelling"
+    //   "found unresponsive by his wife. She reports he had taken his insulin"
+    // Both are correct prose. Distinguishing a genuine slip from a historian's
+    // pronoun needs real coreference resolution, so the field is skipped —
+    // a missed error is much cheaper here than rewriting correct clinical text.
+    if (COLLATERAL.test(text)) continue
+    const hit = text.match(wrong)
+    if (!hit) continue
+    const sentence = text.split(/(?<=[.!?])\s+/).find(s => wrong.test(s)) ?? text
+    out.push({
+      code: 'prose/pronoun-mismatch',
+      severity: 'error',
+      field,
+      message: `patient is ${c.patientInfo?.gender} but this reads "${hit[0]}": ${sentence.trim().slice(0, 90)}`,
+    })
   }
   return out
 }
@@ -181,13 +187,29 @@ function checkPronouns(c: CheckableCase): ConsistencyIssue[] {
 // initiative. Low-dose aspirin, naproxen and famotidine were removed after the
 // first sweep — all three are routinely physician-directed, so flagging them
 // produced 51 warnings that were mostly correct entries and drowned the report.
-const OTC_DRUGS = /\b(acetaminophen|paracetamol|tylenol|ibuprofen|advil|motrin|loratadine|cetirizine|diphenhydramine|benadryl|calcium carbonate|vitamin [a-e]\b|multivitamin|melatonin|fish oil|magnesium oxide)\b/i
+// Antihistamines were removed after a sweep: cetirizine sitting beside albuterol
+// and fluticasone is a prescribed allergic-asthma regimen, not self-care.
+const OTC_DRUGS = /\b(acetaminophen|paracetamol|tylenol|ibuprofen|advil|motrin|calcium carbonate|vitamin [a-e]\b|multivitamin|melatonin|fish oil|magnesium oxide)\b/i
+// The entry says who directed it. "Ibuprofen 600mg TID (newly prescribed by
+// PCP)" is a prescription — and in a lithium-toxicity case it is the
+// precipitant the whole case turns on.
+const PHYSICIAN_DIRECTED = /prescrib|per (pcp|physician|doctor)|\brx\b|started (on|by)|directed by/i
+// Prescription-strength ibuprofen: OTC tops out at 400 mg per dose.
+const RX_STRENGTH_NSAID = /\bibuprofen\s*\(?\s*(6\d\d|[89]\d\d|1\d{3})\s*mg/i
+
+// Calcium and vitamin D alongside a glucocorticoid are not self-care — they are
+// prescribed bone protection, and belong under prescriptions.
+const STEROID = /prednis|dexameth|methylprednisolone|hydrocortisone|budesonide|glucocorticoid|alendronate|risedronate|zoledronic|denosumab/i
+const BONE_PROTECTION = /calcium carbonate|vitamin d/i
 
 function checkMedications(c: CheckableCase): ConsistencyIssue[] {
   const rx = c.currentMedications?.medications ?? ''
   if (!rx) return []
   const hit = rx.match(OTC_DRUGS)
   if (!hit) return []
+  if (BONE_PROTECTION.test(hit[0]) && STEROID.test(rx)) return []
+  if (PHYSICIAN_DIRECTED.test(rx)) return []
+  if (RX_STRENGTH_NSAID.test(rx)) return []
   return [{
     code: 'meds/otc-listed-as-prescription',
     severity: 'warning',
@@ -201,16 +223,24 @@ function checkMedications(c: CheckableCase): ConsistencyIssue[] {
 // inpatient study, its report describes monitoring hardware — which contradicts
 // a vignette that presents an ambulatory clinic patient.
 
-const INPATIENT_HARDWARE = /\b(monitoring lead|support equipment|endotracheal tube|central (venous )?line|telemetry lead|nasogastric tube|chest tube|sternotomy wire|pacemaker lead|ecg lead)s?\b/i
-const INPATIENT_SETTING = /\b(intubated|ventilat|icu|intensive care|admitted|inpatient|resuscitat|emergency department|ed |er )\b/i
+// Sternotomy wires are deliberately absent: they are permanent, and a patient
+// walking into clinic years after a CABG still has them. Flagging them told a
+// post-sternotomy case that its defining finding did not belong.
+const INPATIENT_HARDWARE = /\b(monitoring lead|support equipment|endotracheal tube|central (venous )?line|telemetry lead|nasogastric tube|orogastric tube|umbilical (venous |arterial )?catheter|chest tube|pacemaker lead|ecg lead)s?\b/i
+const INPATIENT_SETTING = /\b(intubated|intubation|ventilat|icu|nicu|intensive care|admitted|inpatient|resuscitat|emergency department|\bed\b|\ber\b|trauma bay|code|arrest|unresponsive|obtunded|neonate|newborn)\b/i
+// Conditions whose management IS the hardware — the patient cannot be
+// ambulatory and have this diagnosis at the moment the film was taken.
+const INPATIENT_DIAGNOSIS = /acute respiratory distress syndrome|\bards\b|tension pneumothorax|hemorrhagic shock|septic shock|cardiac arrest|congenital diaphragmatic hernia|overdose|toxidrome|poisoning|respiratory failure|status epilepticus|polytrauma/i
+// A test whose own name says where it was taken.
+const INPATIENT_TEST = /portable|post-?chest[- ]tube|babygram|bedside|\bap\b(?!.*lateral)/i
 
 function checkRadiologySetting(c: CheckableCase): ConsistencyIssue[] {
   const out: ConsistencyIssue[] = []
   const context = `${c.hpi ?? ''} ${c.diagnosis ?? ''}`
-  const looksInpatient = INPATIENT_SETTING.test(context)
+  const looksInpatient = INPATIENT_SETTING.test(context) || INPATIENT_DIAGNOSIS.test(context)
   for (const [test, report] of Object.entries(c.imagingResults ?? {})) {
     const hit = report?.match(INPATIENT_HARDWARE)
-    if (!hit || looksInpatient) continue
+    if (!hit || looksInpatient || INPATIENT_TEST.test(test)) continue
     out.push({
       code: 'imaging/setting-mismatch',
       severity: 'warning',
@@ -245,7 +275,12 @@ const REQUIRED_EXAM: Array<{ code: string; when: RegExp; region: string; expect:
 function checkRequiredExam(c: CheckableCase): ConsistencyIssue[] {
   const context = `${c.diagnosis ?? ''} ${c.mechanism ?? ''} ${c.hpi ?? ''}`
   const out: ConsistencyIssue[] = []
+  // Jugular venous pressure is not assessable in an infant — the neck is too
+  // short and the column cannot be seen — so demanding it of a neonatal case
+  // asks for a finding no clinician would document.
+  const isInfant = typeof c.patientInfo?.age === 'number' && c.patientInfo.age < 1
   for (const rule of REQUIRED_EXAM) {
+    if (rule.code === 'exam/missing-jvp' && isInfant) continue
     if (!rule.when.test(context)) continue
     const text = c.physicalExam?.[rule.region] ?? ''
     if (rule.expect.test(text)) continue
