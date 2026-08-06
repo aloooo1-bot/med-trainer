@@ -10,7 +10,7 @@ import { computeBeliefs } from '@/app/lib/reasoning/differential'
 import { scorePrediction, predictionMatchesDiagnosis, commitmentQuadrant } from '@/app/lib/reasoning/prediction'
 import { DifferentialBoard } from './DifferentialBoard'
 import { getRubric, type DimensionKey } from '@/app/grading/rubric'
-import { type GradingResult } from '@/app/grading/types'
+import { normalizeMissedQuestions, type GradingResult, type DimensionAverage } from '@/app/grading/types'
 import { type TimerState, type NotesState, SOAP_TEMPLATE } from '../_lib/types'
 import type { CaseData } from '../_lib/types'
 
@@ -28,7 +28,7 @@ export function DiagnosisView({
   feedbackSubmitted, setFeedbackSubmitted,
   feedbackSubmitting, setFeedbackSubmitting,
   notes,
-  submitDiagnosis, generateCase, orderedTests,
+  submitDiagnosis, generateCase, orderedTests, dimensionAverages,
 }: {
   caseData: CaseData
   caseDifficulty: string
@@ -64,6 +64,8 @@ export function DiagnosisView({
   submitDiagnosis: (overrideDiagnosis?: string, overridePresentation?: string, timedOut?: boolean) => Promise<GradingResult | null>
   generateCase: (overrideSystem?: string, overrideDifficulty?: string, overrideDiagnosis?: string) => Promise<CaseData | null>
   orderedTests: Set<string>
+  /** This student's own mean per dimension, as fractions of each max. */
+  dimensionAverages?: DimensionAverage[]
 }) {
   // Whether the student has taken control of which dimension is open. Until
   // they do, the scorecard leads with the weakest one.
@@ -391,6 +393,14 @@ export function DiagnosisView({
                     max={max}
                     pct={pct}
                     index={i}
+                    // Rescaled from a stored fraction to THIS case's max, so a
+                    // Foundations history and a Clinical case still compare.
+                    average={(() => {
+                      const a = dimensionAverages?.find(d => d.key === key)
+                      return a && a.n > 0
+                        ? { score: Math.round(a.avgFraction * max * 10) / 10, n: a.n }
+                        : null
+                    })()}
                     expanded={shownCategory === key}
                     onToggle={() => {
                       setCategoryTouched(true)
@@ -423,8 +433,22 @@ export function DiagnosisView({
               if (strengthsAll.length > 0) feedSections.push({
                 title: 'Strengths', items: strengthsAll, tone: 'confirmed', icon: '✓',
               })
-              if ((gradingResult.missedQuestions?.length ?? 0) > 0) feedSections.push({
-                title: 'What you missed', items: gradingResult.missedQuestions!, tone: 'caution', icon: '!',
+              // Each miss carries the nearest thing the student actually said,
+              // so "you should have asked X" is answerable with "…I asked this
+              // instead" rather than leaving them to reconstruct it from memory.
+              const missed = normalizeMissedQuestions(gradingResult.missedQuestions)
+              if (missed.length > 0) feedSections.push({
+                title: 'What you missed',
+                tone: 'caution',
+                icon: '!',
+                items: missed.map((m, i) => (
+                  <span key={i}>
+                    {m.question}
+                    <span style={{ display: 'block', marginTop: 3, fontSize: 12.5, color: 'var(--color-ink-tertiary)', fontStyle: 'italic' }}>
+                      {m.youAsked ? <>you asked: “{m.youAsked}”</> : 'never approached'}
+                    </span>
+                  </span>
+                )),
               })
               if ((gradingResult.teachingPoints?.length ?? 0) > 0) feedSections.push({
                 title: 'Teaching points', items: gradingResult.teachingPoints!, tone: 'insight', icon: '★',

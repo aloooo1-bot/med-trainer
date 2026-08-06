@@ -7,7 +7,7 @@ import type { SystemEntry } from '@/app/lib/dashboardData'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import { EmptyState } from '@/app/components/EmptyState'
 import { createClient } from '@/app/lib/supabase/client'
-import type { GradingResult } from '@/app/grading/types'
+import { normalizeMissedQuestions, type GradingResult } from '@/app/grading/types'
 import { getRubric, type DimensionKey } from '@/app/grading/rubric'
 import {
   DEFAULT_FOCUS_SETTINGS,
@@ -171,9 +171,13 @@ export default function FocusAreasPage() {
   const missedPatterns = useMemo(() => {
     const seen = new Map<string, { question: string; count: number; systems: Set<string> }>()
     for (const s of sessions) {
-      for (const q of s.grading_result?.missedQuestions ?? []) {
-        const key = q.toLowerCase().trim()
-        if (!seen.has(key)) seen.set(key, { question: q, count: 0, systems: new Set() })
+      // Normalised because older grades stored bare strings and newer ones
+      // carry the nearest thing the student asked. Recurrence is keyed on the
+      // question alone — the same gap is the same gap however it was phrased
+      // back to them.
+      for (const { question } of normalizeMissedQuestions(s.grading_result?.missedQuestions)) {
+        const key = question.toLowerCase().trim()
+        if (!seen.has(key)) seen.set(key, { question, count: 0, systems: new Set() })
         const e = seen.get(key)!
         e.count++
         if (s.system) e.systems.add(s.system)

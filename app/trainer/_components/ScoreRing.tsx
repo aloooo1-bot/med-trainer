@@ -68,17 +68,23 @@ export function ScoreRing({ score }: { score: number }) {
 }
 
 export function CategoryRow({
-  label, dim, max, pct, expanded, onToggle, index = 0,
+  label, dim, max, pct, expanded, onToggle, index = 0, average,
 }: {
   label: string
-  dim: { score: number; feedback: string }
+  dim: { score: number; feedback: string; deductions?: Array<{ points: number; reason: string }> }
   max: number
   pct: number
   expanded: boolean
   onToggle: () => void
   /** Position in the scorecard — cascades each row in after the ring sweep. */
   index?: number
+  /** This student's own mean on this dimension, rescaled to `max`. */
+  average?: { score: number; n: number } | null
 }) {
+  // The authoritative gap, from the score itself. Shown even when the model's
+  // itemisation disagrees with it, so the header never misstates the loss.
+  const lost = Math.max(0, max - dim.score)
+  const deductions = dim.deductions ?? []
   const barColor = pct >= 75 ? 'bg-confirmed' : pct >= 60 ? 'bg-caution' : 'bg-critical'
   const scoreColor = pct >= 75 ? 'text-confirmed' : pct >= 60 ? 'text-caution' : 'text-critical'
   const panelId = `sc-panel-${label.replace(/\s+/g, '-').toLowerCase()}`
@@ -102,6 +108,11 @@ export function CategoryRow({
         <span className={`w-16 text-right font-mono text-sm tabular-nums ${scoreColor}`}>
           {dim.score}<span className="text-ink-3 text-xs">/{max}</span>
         </span>
+        {/* Points earned reads as a pass; points lost reads as a deficit.
+            Fixed width so the minus signs line up down the column. */}
+        <span className="w-9 text-right font-mono text-xs tabular-nums text-critical">
+          {lost > 0 ? `−${lost}` : ''}
+        </span>
         <svg
           style={{ transition: 'transform 200ms', transform: expanded ? 'rotate(180deg)' : 'rotate(0deg)' }}
           className="w-4 h-4 text-ink-3 flex-shrink-0"
@@ -114,10 +125,35 @@ export function CategoryRow({
         id={panelId}
         role="region"
         aria-label={`${label} details`}
-        style={{ overflow: 'hidden', maxHeight: expanded ? '500px' : '0', transition: 'max-height 280ms ease' }}
+        // grid-template-rows animates to the CONTENT's height. The previous
+        // maxHeight: 500px was a guess that a feedback sentence, a deduction
+        // list and an average line can exceed — and it clipped silently, with
+        // no scrollbar, hiding the very items this row exists to show.
+        style={{ display: 'grid', gridTemplateRows: expanded ? '1fr' : '0fr', transition: 'grid-template-rows 280ms ease' }}
       >
-        <div style={{ background: 'var(--overlay-tint)', borderRadius: 8, padding: 12, margin: '0 16px 12px' }}>
-          <p className="text-sm text-ink-2 leading-relaxed">{dim.feedback || 'No detailed feedback available.'}</p>
+        <div style={{ overflow: 'hidden', minHeight: 0 }}>
+          <div style={{ background: 'var(--overlay-tint)', borderRadius: 8, padding: 12, margin: '0 16px 12px' }}>
+            <p className="text-sm text-ink-2 leading-relaxed">{dim.feedback || 'No detailed feedback available.'}</p>
+
+            {deductions.length > 0 && (
+              <ul className="mt-3 flex flex-col gap-1.5" style={{ margin: '12px 0 0', padding: 0, listStyle: 'none' }}>
+                {deductions.map((d, i) => (
+                  <li key={i} className="flex items-start gap-3 text-sm text-ink-2 leading-relaxed">
+                    <span className="w-8 shrink-0 text-right font-mono text-xs tabular-nums text-critical" style={{ marginTop: 2 }}>
+                      −{d.points}
+                    </span>
+                    <span>{d.reason}</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+
+            {average && average.n > 0 && (
+              <p className="mt-3 text-xs text-ink-3">
+                your average {average.score}/{max} · {average.n} case{average.n === 1 ? '' : 's'}
+              </p>
+            )}
+          </div>
         </div>
       </div>
     </div>

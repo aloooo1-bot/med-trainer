@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo, useCallback, useRef, Fragment } from 'react'
 import '@/app/dashboard.css'
 import { type CaseSessionRecord, type APICallRecord, loadSessionRecords, updateSessionRecord } from '../lib/analytics'
-import type { GradingResult } from '../grading/types'
+import { normalizeMissedQuestions, type GradingResult } from '../grading/types'
 import { getRubric } from '../grading/rubric'
 import { createClient } from '../lib/supabase/client'
 import Sidebar from '@/app/components/dashboard/Sidebar'
@@ -181,9 +181,17 @@ function ScoreDetail({
           {isPro && (gr.missedQuestions?.length ?? 0) > 0 && (
             <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
               <div style={{ fontSize: 10, fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.08em', color: 'var(--muted)' }}>Missed Questions</div>
-              {gr.missedQuestions.map((q, i) => (
+              {normalizeMissedQuestions(gr.missedQuestions).map((q, i) => (
                 <div key={i} style={{ display: 'flex', gap: 6, fontSize: 12, color: 'var(--amber)' }}>
-                  <span style={{ flexShrink: 0 }}>·</span><span>{q}</span>
+                  <span style={{ flexShrink: 0 }}>·</span>
+                  <span>
+                    {q.question}
+                    {q.youAsked && (
+                      <span style={{ display: 'block', color: 'var(--muted)', fontStyle: 'italic', marginTop: 2 }}>
+                        you asked: “{q.youAsked}”
+                      </span>
+                    )}
+                  </span>
                 </div>
               ))}
             </div>

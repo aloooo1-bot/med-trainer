@@ -313,6 +313,15 @@ export interface Database {
         Args: Record<string, never>
         Returns: ProgressSummary
       }
+      /**
+       * Per-dimension personal means for the scorecard comparison line
+       * (migration 0006). Returns fractions of each dimension's max, because
+       * the max differs by difficulty and raw scores would not be comparable.
+       */
+      dimension_averages: {
+        Args: { exclude_session_id: string | null }
+        Returns: Array<{ key: string; avgFraction: number; n: number }>
+      }
     }
   }
 }

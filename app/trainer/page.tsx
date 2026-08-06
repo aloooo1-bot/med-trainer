@@ -12,7 +12,7 @@ import {
 } from '../lib/rosDetector'
 import { ANON_CASE_IDS, ANON_CASE_LIMIT } from '../lib/anonymousCases'
 import { readBmi } from '../lib/bmi'
-import { type GradingResult, stripToBasic } from '../grading/types'
+import { type GradingResult, type DimensionAverage, stripToBasic } from '../grading/types'
 import { type DimensionKey } from '../grading/rubric'
 import {
   type RawUsage, type APICallType, type ActiveSession,
@@ -125,6 +125,8 @@ export default function MedTrainer() {
   const [prediction, setPrediction] = useState<string[] | null>(null)
   const [predictionConfidence, setPredictionConfidence] = useState<number | null>(null)
   const [expandedCategory, setExpandedCategory] = useState<DimensionKey | null>(null)
+  /** This student's own mean per dimension, for the scorecard comparison line. */
+  const [dimensionAverages, setDimensionAverages] = useState<DimensionAverage[]>([])
   const [gradingLoading, setGradingLoading] = useState(false)
 
   const [caseDifficulty, setCaseDifficulty] = useState<string>('')
@@ -777,6 +779,21 @@ export default function MedTrainer() {
         fetch('/api/gate/mark-first-case', { method: 'POST' }).catch(() => {})
       }
 
+      // The scorecard's "your average" line. Fetched here rather than in an
+      // effect because it is needed exactly once, at exactly this moment, and
+      // only when a grade exists. The current session is excluded server-side
+      // so the student is not compared partly against the case they just sat.
+      void (async () => {
+        try {
+          const qs = sessionId ? `?excludeSessionId=${encodeURIComponent(sessionId)}` : ''
+          const res = await fetch(`/api/progress/dimensions${qs}`)
+          const data = await res.json() as { dimensions?: DimensionAverage[] }
+          setDimensionAverages(data.dimensions ?? [])
+        } catch {
+          // A missing comparison line is cosmetic; the grade is the content.
+        }
+      })()
+
       // Strip result for free/anon users unless it's their first case
       const showFull = gateStatus.tier === 'pro' || isFirstCase
       setGradingResult(showFull ? result : stripToBasic(result))
@@ -1133,6 +1150,7 @@ export default function MedTrainer() {
           submitDiagnosis={submitDiagnosis}
           generateCase={generateCase}
           orderedTests={orderedTests}
+          dimensionAverages={dimensionAverages}
         />
       default:
         return null

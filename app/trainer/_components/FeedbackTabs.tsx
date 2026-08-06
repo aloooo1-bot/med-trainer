@@ -1,8 +1,10 @@
-import { useRef, useState } from 'react'
+import { useRef, useState, type ReactNode } from 'react'
 
 export type FeedbackSection = {
   title: string
-  items: string[]
+  /** Nodes, not strings — a missed question renders as its text plus the
+   *  nearest thing the student actually asked. */
+  items: ReactNode[]
   tone: 'confirmed' | 'caution' | 'insight'
   icon: string
   footer?: string

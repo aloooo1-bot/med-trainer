@@ -96,7 +96,7 @@ CLINICAL REASONING (/${cr.max}):
 ` : ''
 
   const crJsonField = cr
-    ? `    "clinicalReasoning":     { "score": <0-${cr.max}>, "feedback": "<1 sentence on the quality of reasoning or evidence linkage>" }`
+    ? `    "clinicalReasoning":     { "score": <0-${cr.max}>, "feedback": "<1 sentence on the quality of reasoning or evidence linkage>", "deductions": [{ "points": <positive int>, "reason": "<what cost the points>" }] }`
     : ''
 
   return `Case: ${input.patientInfo}
@@ -183,6 +183,14 @@ GENERAL CALIBRATION:
 - Do NOT penalise for any item listed in the "Pre-presented to student" section above — that information was visible before the case began and required no elicitation
 - Do NOT penalise for skipping redundant tests when the diagnosis was already clear
 - Credit any question whose answer conveyed the same clinical information, regardless of exact phrasing
+
+ITEMISED DEDUCTIONS — every dimension must show its arithmetic:
+- For each dimension, "deductions" lists the specific things that cost points: [{ "points": 3, "reason": "did not order CBC" }, { "points": 1, "reason": "did not order TSH" }].
+- The points MUST sum to EXACTLY (max − score) for that dimension. If a dimension scored 15/20, the deductions must total 5. Check the arithmetic before returning.
+- A dimension at full marks returns an empty array. Never invent a deduction for a dimension that lost nothing.
+- "points" is a positive integer. "reason" names the concrete thing — "did not order CBC", "never asked about spinal cord compression symptoms", "no severity context (Cobb angle)". NOT a restatement of the grade: "incomplete workup", "suboptimal history" and "could be better" are all useless to a student.
+- CRITICAL — the list must not drive the score. Itemising creates pressure to invent line items so the arithmetic works out; do not. If you cannot name enough real, case-supported gaps to account for the points you removed, you removed too many points: raise the score until it matches the deductions you can actually justify. An invented line item is worse than a blunt score, because the student will study it.
+- Deductions must agree with the dimension's feedback sentence and with missedQuestions — do not deduct for a question in one place and credit it as asked in another.
 
 SCORE↔FEEDBACK CONSISTENCY RULE:
 - If dimension feedback uses praise language ("strong", "excellent", "thorough", "asked all key questions", "outstanding"), the score for that dimension MUST be ≥ 90% of its max value. Praise language paired with a sub-90% score is internally inconsistent.
@@ -277,6 +285,8 @@ MISSED QUESTIONS — only list a question if ALL of the following are true:
 2. Asking it would have meaningfully changed the diagnosis or management (not just completeness)
 3. The trainee genuinely never surfaced the information through any question (including incidental capture via broad prompts — those count as surfaced and belong in historyInterview feedback, not here)
 
+For EACH missed question, also set "youAsked" — the closest thing the trainee actually said on that topic, so they can see what they asked instead of the question that mattered. Quote it from the transcript or paraphrase it closely. If they never went near the topic at all, "youAsked" is null. Do NOT invent or reconstruct a quote to fill this field: a fabricated "you asked" is a false accusation about words the student never used, and null is the honest answer.
+
 FINAL PRE-RETURN CHECK (do this before writing the JSON — it prevents the most common grading error, penalizing information the student actually obtained):
 - For EACH item you are about to put in missedQuestions, scan the interview transcript AND the "Pre-presented to student" block. If the fact was disclosed by the patient (even in response to a domain-level question like "any medical conditions?"), OR was pre-presented before the case began, REMOVE it from missedQuestions — it was not missed. It is self-contradictory to write "the patient volunteered X" or "X was already shown" while listing X as missed.
 - Then re-check historyInterview: every key question whose fact the student obtained (proactively or via a domain-level question) or that was pre-presented counts as covered. Only genuinely un-obtained key questions may lower the score. If you lowered historyInterview for an item the student actually surfaced or that was pre-presented, raise the score accordingly before returning.
@@ -288,16 +298,16 @@ Return:
   "feedback": "<2-3 sentences of direct, constructive feedback on overall performance>",
   "strengths": ["<specific thing the trainee did well or efficiently>", ...2-4 items],
   "dimensions": {
-    "historyInterview":      { "score": <0-${hi.max}>, "feedback": "<1 sentence: what they did well or missed>" },
-    "testOrdering":          { "score": <0-${to.max}>, "feedback": "<1 sentence>" },
-    "diagnosisAccuracy":     { "score": <0-${da.max}>, "feedback": "<1 sentence>" },
-    "diagnosisCompleteness": { "score": <0-${dc.max}>, "feedback": "<1 sentence>" }${crJsonField ? `,\n    ${crJsonField}` : ''}
+    "historyInterview":      { "score": <0-${hi.max}>, "feedback": "<1 sentence: what they did well or missed>", "deductions": [{ "points": <positive int>, "reason": "<what cost the points>" }] },
+    "testOrdering":          { "score": <0-${to.max}>, "feedback": "<1 sentence>", "deductions": [{ "points": <positive int>, "reason": "<what cost the points>" }] },
+    "diagnosisAccuracy":     { "score": <0-${da.max}>, "feedback": "<1 sentence>", "deductions": [{ "points": <positive int>, "reason": "<what cost the points>" }] },
+    "diagnosisCompleteness": { "score": <0-${dc.max}>, "feedback": "<1 sentence>", "deductions": [{ "points": <positive int>, "reason": "<what cost the points>" }] }${crJsonField ? `,\n    ${crJsonField}` : ''}
   },
   "communication": {
     "summary": "<1-2 sentences on how you responded to what the patient raised, or 'The patient did not raise any personal concerns during this encounter.' — carries NO points>",
     "moments": [{ "concern": "<what the patient asked or feared, in their words>", "acknowledged": <true|false>, "note": "<1 sentence: how you handled it, or what a response might have been>" }, ...omit entirely if the patient raised nothing]
   },
-  "missedQuestions": ["<question that would have meaningfully changed dx or management>", ...omit anything already available],
+  "missedQuestions": [{ "question": "<question that would have meaningfully changed dx or management>", "youAsked": "<the closest thing the trainee actually asked, quoted or closely paraphrased from the transcript — or null if they never went near this topic>" }, ...omit anything already available],
   "teachingPoints": ${JSON.stringify(input.teachingPoints)},
   "differentials": ["<dx>: <1 sentence explanation of why it's on the differential and how to distinguish — when an EVIDENCE-BASED DIFFERENTIAL RANKING is provided above, this discussion MUST be consistent with it: do not describe a differential as still-likely if that ranking marks it excluded, and do not contradict the confirm/exclude effects or the ordering>", ...]
 }`

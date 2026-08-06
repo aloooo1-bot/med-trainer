@@ -1,7 +1,7 @@
 import 'server-only'
 import type { GradingInput, GradingResult } from '../../grading/types'
-import { GRADING_SYSTEM_PROMPT, buildRubricPrompt, buildOralPrompt } from '../../grading/rubric'
-import { clampDimensions } from '../../grading/clamp'
+import { GRADING_SYSTEM_PROMPT, buildRubricPrompt, buildOralPrompt, getRubric } from '../../grading/rubric'
+import { clampDimensions, reconcileDeductions } from '../../grading/clamp'
 import { GradingResultSchema } from '../../grading/schemas'
 import { formatEvidenceSummary } from '../reasoning/differential'
 import { stripStageDirections } from '../transcriptText'
@@ -281,7 +281,10 @@ export async function gradeSession(
   // truncate the JSON. Rather than 500 on a completed case, retry once with
   // more headroom before surfacing the failure.
   let parsed: unknown | null = null
-  for (const maxTokens of [3000, 4096]) {
+  // Raised for the itemised deductions and the missed-question citations, both
+  // of which add output. Truncation here is not a degraded grade — the JSON
+  // fails to parse and a COMPLETED case 500s, losing the student's work.
+  for (const maxTokens of [5000, 6500]) {
     const { text, usage } = await callModel('grading', {
       system: GRADING_SYSTEM_PROMPT,
       messages: [{ role: 'user', content: prompt }],
@@ -300,9 +303,15 @@ export async function gradeSession(
   const result = GradingResultSchema.parse(parsed) as GradingResult
 
   clampDimensions(result, input.difficulty)
+  reconcileDeductions(result, input.difficulty)
   if (result.dimensions) {
-    result.score = Object.values(result.dimensions).reduce(
-      (sum, dim) => sum + (dim?.score ?? 0), 0,
+    // Sum over the RUBRIC, not over whatever keys the model returned. The
+    // schema still admits examinationFocus, which is in neither rubric — via
+    // Object.values it was added to the total while never being clamped to a
+    // max or rendered in any row, inflating a score by an unbounded amount.
+    const dims = result.dimensions
+    result.score = getRubric(input.difficulty).reduce(
+      (sum, { key }) => sum + (dims[key]?.score ?? 0), 0,
     )
   }
 
