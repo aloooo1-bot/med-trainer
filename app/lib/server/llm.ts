@@ -1,5 +1,6 @@
 import 'server-only'
 import Anthropic from '@anthropic-ai/sdk'
+import { SERVER_BUDGET_MS } from '../requestBudget'
 import type { RawUsage } from '../analytics'
 
 /**
@@ -40,15 +41,30 @@ const TASK_MODELS: Record<LLMTask, string> = {
   grading_oral: 'claude-sonnet-4-6',
 }
 
-// Keep these under the client's postSession wait (180s) but generous enough for
-// a full 12k-token generation under load — the server must not abort a
-// still-valid generation before the client would give up.
+/**
+ * Per-attempt budgets. Derived from SERVER_BUDGET_MS rather than hand-picked,
+ * so a task can never be given longer than the request it runs inside — which
+ * is the bug that made every generation slower than 120s impossible.
+ *
+ * These bound ONE attempt. A caller making several calls in sequence must also
+ * respect the request budget itself; gradeService does that by passing what is
+ * left of its deadline down as `timeoutMs`.
+ */
 const TASK_TIMEOUTS_MS: Partial<Record<LLMTask, number>> = {
-  case_generation: 175_000,
+  // Generation is a single call and may legitimately use the whole request.
+  case_generation: SERVER_BUDGET_MS,
+  // Grading runs up to twice and may be followed by the oral call, so no single
+  // attempt may claim the whole budget. gradeService shortens this further as
+  // its deadline approaches.
   grading: 120_000,
   // Sits between generation and the student. It fails open, so a short leash
   // costs a missed audit; a long one would stall a case that is otherwise ready.
   case_audit: 30_000,
+}
+
+/** The per-attempt budget for a task, for callers that must plan around it. */
+export function taskTimeoutMs(task: LLMTask): number {
+  return TASK_TIMEOUTS_MS[task] ?? 75_000
 }
 
 /** Longest budget any task asks for — nothing client-level may undercut it. */
@@ -81,9 +97,15 @@ export async function callModel(
     system: string
     messages: Array<{ role: 'user' | 'assistant'; content: string }>
     maxTokens: number
+    /**
+     * Shorten this attempt to what the caller has left. For a sequence of
+     * calls inside one request, the task budget bounds each attempt but only
+     * the caller knows how much of the request budget is already spent.
+     */
+    timeoutMs?: number
   },
 ): Promise<LLMResult> {
-  const timeout = TASK_TIMEOUTS_MS[task] ?? 75_000
+  const timeout = Math.min(taskTimeoutMs(task), opts.timeoutMs ?? Infinity)
   // A retry restarts generation from zero, so it is only worth having when
   // there is time left to run one. On a long task a timeout has already spent
   // the budget, and retrying just bills a second full generation that the

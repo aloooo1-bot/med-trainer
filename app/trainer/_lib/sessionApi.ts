@@ -1,3 +1,4 @@
+import { CLIENT_REQUEST_TIMEOUT_MS } from '@/app/lib/requestBudget'
 import type { CaseData } from './types'
 import type { CasePresentation, CaseReveal, OrderedTestResult } from './sessionTypes'
 
@@ -12,7 +13,7 @@ export async function postSession<T>(path: string, body: Record<string, unknown>
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
-    signal: AbortSignal.timeout(180_000),
+    signal: AbortSignal.timeout(CLIENT_REQUEST_TIMEOUT_MS),
   })
   const contentType = res.headers.get('content-type') ?? ''
   if (!contentType.includes('application/json')) {

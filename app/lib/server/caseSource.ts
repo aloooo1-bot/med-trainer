@@ -8,7 +8,8 @@ import { auditAuthoringNotes, knownAuthoringNotes } from './caseAudit'
 import { buildCasePrompt, buildCaseSystemPrompt } from '../casePrompt'
 import { reconcileHistoryConsistency, sanitizePmhLeak } from '../generators/shared'
 import { MANIFEST, makeCaseId } from '../caseManifest'
-import { callModel, extractJson } from './llm'
+import { callModel, extractJson, taskTimeoutMs } from './llm'
+import { fitsInBudget } from '../requestBudget'
 import { splitCase, joinCase } from './caseTiers'
 import type { CaseData } from '../../trainer/_lib/types'
 import { sumUsage, type RawUsage } from '../analytics'
@@ -206,11 +207,12 @@ export async function generateCaseLive(
   // anything that directs the actor rather than describing the patient, and the
   // spans it quotes are excised. Fails open: it can only remove text it quoted
   // verbatim, and any failure leaves the case exactly as generated.
-  // The client gives up at 180s and generation alone may run to 175s. A slow
-  // generation must not be finished off by its own audit, so the audit only
-  // runs when there is room for it — skipping is the same outcome as finding
-  // nothing, and the library sweep catches whatever a skipped audit misses.
-  const roomForAudit = Date.now() - startedAt < 140_000
+  // A slow generation must not be finished off by its own audit. Derived from
+  // the request budget and the audit's own timeout rather than a hand-picked
+  // margin, so it stays true if either changes. Skipping is the same outcome
+  // as finding nothing, and the library sweep catches what a skipped audit
+  // misses.
+  const roomForAudit = fitsInBudget(Date.now() - startedAt, taskTimeoutMs('case_audit'))
 
   // Read before the audit: it repairs in place, so there is no intact copy after.
   const knownNotes = knownAuthoringNotes(parsed as unknown as CheckableCase)

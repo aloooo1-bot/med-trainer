@@ -15,6 +15,12 @@ import { MANIFEST, makeCaseId } from '@/app/lib/caseManifest'
 
 export const dynamic = 'force-dynamic'
 
+// The platform kills the function at maxDuration regardless of any budget the
+// code sets, so it must sit ABOVE SERVER_BUDGET_MS in app/lib/requestBudget.ts
+// (165s) plus response overhead. Must be a static literal, so it cannot import
+// that constant — if you raise the budget, raise this too.
+export const maxDuration = 240
+
 const SYSTEMS = Object.keys(MANIFEST)
 const DIFFICULTIES = ['Foundations', 'Clinical', 'Advanced']
 

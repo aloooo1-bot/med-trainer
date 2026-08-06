@@ -6,6 +6,15 @@ import { GradingResultSchema } from '../../grading/schemas'
 import { formatEvidenceSummary } from '../reasoning/differential'
 import { stripStageDirections } from '../transcriptText'
 import { readBmi, caseBmiIsInterpretable } from '../bmi'
+import { remainingBudget } from '../requestBudget'
+
+/**
+ * Floors for the two optional steps. Below these there is not enough of the
+ * request budget left for the call to finish, so starting it would spend the
+ * remainder and still be aborted.
+ */
+const MIN_GRADE_ATTEMPT_MS = 45_000
+const MIN_ORAL_MS = 20_000
 import { resolveResult } from './orderService'
 import { callModel } from './llm'
 import { selectHpiForDifficulty } from './caseTiers'
@@ -277,6 +286,18 @@ export async function gradeSession(
 ): Promise<GradingResult> {
   const prompt = buildRubricPrompt(input)
 
+  // Grading is up to three sequential model calls — two grade attempts and,
+  // on Advanced, the oral presentation — and each was sized on its own. Two
+  // 120s attempts plus a 75s oral call is 315s inside a client that gives up
+  // at 180s, so a slow grade that needed its retry lost the student the very
+  // work the retry exists to protect.
+  //
+  // One deadline for the whole operation. Each call gets the task budget or
+  // what remains, whichever is smaller, and a step with no room to finish is
+  // skipped rather than started and killed partway.
+  const startedAt = Date.now()
+  const left = () => remainingBudget(Date.now() - startedAt)
+
   // Grade with one retry: a verbose case can exceed the token budget and
   // truncate the JSON. Rather than 500 on a completed case, retry once with
   // more headroom before surfacing the failure.
@@ -285,10 +306,18 @@ export async function gradeSession(
   // of which add output. Truncation here is not a degraded grade — the JSON
   // fails to parse and a COMPLETED case 500s, losing the student's work.
   for (const maxTokens of [5000, 6500]) {
+    // A retry with seconds left cannot produce a longer response than the
+    // attempt that just truncated. Stop and report rather than burn the tail
+    // of the budget on a call that will be aborted mid-flight.
+    if (parsed === null && left() < MIN_GRADE_ATTEMPT_MS && maxTokens !== 5000) {
+      console.warn(`[grade] skipped the retry — ${Math.round(left() / 1000)}s left of the request budget`)
+      break
+    }
     const { text, usage } = await callModel('grading', {
       system: GRADING_SYSTEM_PROMPT,
       messages: [{ role: 'user', content: prompt }],
       maxTokens,
+      timeoutMs: left(),
     })
     onUsage?.('grading_main', usage)
     try {
@@ -315,7 +344,10 @@ export async function gradeSession(
     )
   }
 
-  if (input.difficulty === 'Advanced' && input.reasoningText) {
+  // The oral score is an addition to a grade that is already complete. If the
+  // budget has gone, return the grade without it rather than risk the whole
+  // response — a missing presentation section beats a lost case.
+  if (input.difficulty === 'Advanced' && input.reasoningText && left() >= MIN_ORAL_MS) {
     try {
       const oralPrompt = buildOralPrompt(
         input.patientInfo,
@@ -327,6 +359,7 @@ export async function gradeSession(
         system: GRADING_SYSTEM_PROMPT,
         messages: [{ role: 'user', content: oralPrompt }],
         maxTokens: 600,
+        timeoutMs: left(),
       })
       onUsage?.('grading_oral', oUsage)
       const oMatch = oText.match(/\{[\s\S]*\}/)
