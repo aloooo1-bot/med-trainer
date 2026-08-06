@@ -45,6 +45,49 @@ const TACHYPNEIC_RR = 22     // band [21, 25)
 /** Drugs a patient buys and takes on their own initiative, when the entry says so. */
 const SELF_DIRECTED = /\b(acetaminophen|paracetamol|tylenol|ibuprofen|advil|motrin)\b[^.;]*/gi
 
+// A stage direction for the patient agent, printed in the student's chart.
+// Matches the detector in caseConsistency.ts, plus the separator that attaches
+// the note to the clinical text around it — the note has to leave with its
+// punctuation or the field is left reading "Vitiligo (diagnosed age 30, )".
+const NOTE_FRAGMENT =
+  /\s*(?:[,;—–-]+\s*)?\b(?:not|never|does not|do not|don't|won't)\s+(?:be\s+)?(?:volunteer(?:ed)?|disclos(?:e|ed)|reveal(?:ed)?|offer(?:ed)?|mention(?:ed)?|report(?:ed)?)\b[^.;)]{0,25}\b(?:initially|unless asked|until asked|spontaneously|on (?:their|his|her) own|if asked)\b/gi
+
+/** Excise the note and tidy the punctuation it leaves behind. */
+function stripNote(text: string): string {
+  return text
+    .replace(NOTE_FRAGMENT, '')
+    .replace(/\(\s*\)/g, '')            // a parenthetical that was only the note
+    .replace(/\s+([,.;)])/g, '$1')      // space stranded before punctuation
+    .replace(/([(])\s+/g, '$1')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s*([,;—–-])\s*\./g, '.') // a dangling separator before the stop
+    .trim()
+}
+
+/**
+ * Sentences carrying a note in the VIGNETTE go entirely.
+ *
+ * Excising the fragment there would leave the finding without the tell, which
+ * is worse: the Reactive Arthritis case reads "He notes dysuria that began
+ * approximately 1 week ago, which he had not volunteered initially" — trimming
+ * the clause keeps the dysuria in the opening paragraph, where with the
+ * conjunctivitis and post-diarrhoeal arthritis beside it, it completes the
+ * Reiter triad before the student has asked anything. The case's own
+ * hiddenHistory.fullHistory already stages that symptom as one "he was
+ * embarrassed to disclose", so dropping the sentence loses nothing and restores
+ * what the author intended.
+ *
+ * A background field is a list whose entries stand alone, so there the fragment
+ * is excised and the entry kept.
+ */
+function stripNoteSentences(text: string): string {
+  return text
+    .split(/(?<=[.!?])\s+/)
+    .filter(s => { NOTE_FRAGMENT.lastIndex = 0; return !NOTE_FRAGMENT.test(s) })
+    .join(' ')
+    .trim()
+}
+
 type Case = Record<string, any>
 
 /** Apply every applicable repair. Returns the human-readable list of changes. */
@@ -98,6 +141,34 @@ function repair(c: Case): string[] {
     c.currentMedications.medications = remaining || 'None.'
     c.currentMedications.otc = otc && !/^none\.?$/i.test(otc.trim()) ? `${moved}. ${otc}` : `${moved}.`
     changes.push(`moved to OTC: "${moved}"`)
+  }
+
+  // 4. An instruction to the patient agent, printed in the chart. Withheld
+  //    history belongs in hiddenHistory.fullHistory, which the patient prompt
+  //    already gates; in a displayed field it is read by the student instead.
+  const noteFields: Array<[string, () => string | undefined, (v: string) => void]> = [
+    ['hpi', () => c.hpi, v => { c.hpi = v }],
+    ['pastMedicalHistory.conditions', () => c.pastMedicalHistory?.conditions, v => { c.pastMedicalHistory.conditions = v }],
+    ['pastMedicalHistory.surgeries', () => c.pastMedicalHistory?.surgeries, v => { c.pastMedicalHistory.surgeries = v }],
+    ['pastMedicalHistory.hospitalizations', () => c.pastMedicalHistory?.hospitalizations, v => { c.pastMedicalHistory.hospitalizations = v }],
+    ['currentMedications.medications', () => c.currentMedications?.medications, v => { c.currentMedications.medications = v }],
+    ['currentMedications.otc', () => c.currentMedications?.otc, v => { c.currentMedications.otc = v }],
+    ...Object.keys(c.socialHistory ?? {}).map(k =>
+      [`socialHistory.${k}`, () => c.socialHistory[k], (v: string) => { c.socialHistory[k] = v }] as [string, () => string | undefined, (v: string) => void]),
+    ...Object.keys(c.reviewOfSystems ?? {}).map(k =>
+      [`reviewOfSystems.${k}`, () => c.reviewOfSystems[k], (v: string) => { c.reviewOfSystems[k] = v }] as [string, () => string | undefined, (v: string) => void]),
+    ...Object.keys(c.physicalExam ?? {}).map(k =>
+      [`physicalExam.${k}`, () => c.physicalExam[k], (v: string) => { c.physicalExam[k] = v }] as [string, () => string | undefined, (v: string) => void]),
+  ]
+  for (const [name, get, set] of noteFields) {
+    const text = get()
+    if (typeof text !== 'string') continue
+    NOTE_FRAGMENT.lastIndex = 0
+    if (!NOTE_FRAGMENT.test(text)) continue
+    const fixed = name === 'hpi' ? stripNoteSentences(text) : stripNote(text)
+    if (fixed === text) continue
+    set(fixed)
+    changes.push(`${name}: ${name === 'hpi' ? 'dropped the sentence carrying' : 'removed'} the authoring note\n          was: ${text}\n          now: ${fixed}`)
   }
 
   return changes

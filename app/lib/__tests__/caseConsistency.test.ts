@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { checkCaseConsistency, consistencyErrors, bmiIsValid } from '../caseConsistency'
+import { checkCaseConsistency, consistencyErrors, bmiIsValid, type CheckableCase } from '../caseConsistency'
 import { stripStageDirections, isOnlyStageDirections } from '../transcriptText'
 import { scanMessageForROSDetailed } from '../rosDetector'
 
@@ -159,4 +159,70 @@ test('a decisive keyword still skips the classifier', () => {
   const scan = scanMessageForROSDetailed('Any nausea, vomiting, or change in bowel habits?')
   assert.equal(scan.needsClassifier, false)
   assert.ok(scan.categories.includes('Gastrointestinal'))
+})
+
+// ── authoring notes in student-facing prose ──────────────────────────────────
+
+/** The four real instances the library sweep found, verbatim. */
+const REAL_NOTES: Array<[string, Partial<CheckableCase>]> = [
+  ['pastMedicalHistory.conditions', {
+    pastMedicalHistory: { conditions: 'Vitiligo (diagnosed age 30, not volunteered initially). Chronic low back pain.' },
+  }],
+  ['socialHistory.drugs', {
+    socialHistory: { drugs: 'Denies recreational drug use. History of appetite suppressant use (fenfluramine-based, obtained abroad) — not volunteered spontaneously.' },
+  }],
+  ['currentMedications.otc', {
+    currentMedications: { otc: 'Aspirin 81 mg daily (self-discontinued 2 months ago due to GI upset — not disclosed initially).' },
+  }],
+  ['hpi', {
+    hpi: 'He notes dysuria that began approximately 1 week ago, which he had not volunteered initially.',
+  }],
+]
+
+test('a stage direction printed in the chart is an error', () => {
+  for (const [field, c] of REAL_NOTES) {
+    const issues = checkCaseConsistency(c as CheckableCase)
+      .filter(i => i.code === 'content/authoring-note')
+    assert.equal(issues.length, 1, field)
+    assert.equal(issues[0].field, field)
+    assert.equal(issues[0].severity, 'error')
+  }
+})
+
+test('imperative stage directions are caught too', () => {
+  // Not seen in the library yet, but the phrasing a generation is likely to
+  // produce once it stops using the past tense.
+  for (const text of [
+    'Chest pain. Do not volunteer the cocaine use.',
+    'Prior IV drug use — reveal only if asked directly.',
+    'Recent travel to Brazil, disclose unless asked about the rash first.',
+  ]) {
+    const issues = checkCaseConsistency({ pastMedicalHistory: { conditions: text } })
+      .filter(i => i.code === 'content/authoring-note')
+    assert.equal(issues.length, 1, text)
+  }
+})
+
+test('clinical prose that merely sounds like a note is left alone', () => {
+  // 'withhold' is the trap: withholding treatment is real medicine, and an
+  // undocumented history is a legitimate thing for a chart to say.
+  for (const text of [
+    'Metastatic pancreatic cancer; the family elected to withhold resuscitation.',
+    'Decision made to withhold dialysis after goals-of-care discussion.',
+    'Smoking status not documented at the time of the index admission.',
+    'Vitiligo (diagnosed age 30). Chronic low back pain.',
+    'Hypertension, initially treated with amlodipine and later uncontrolled.',
+    'Patient did not report chest pain during the episode.',
+  ]) {
+    const issues = checkCaseConsistency({ pastMedicalHistory: { conditions: text } })
+      .filter(i => i.code === 'content/authoring-note')
+    assert.deepEqual(issues, [], text)
+  }
+})
+
+test('a case with no prose at all raises nothing', () => {
+  assert.deepEqual(
+    checkCaseConsistency({}).filter(i => i.code === 'content/authoring-note'),
+    [],
+  )
 })

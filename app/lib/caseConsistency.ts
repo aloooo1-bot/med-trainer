@@ -32,7 +32,8 @@ export interface CheckableCase {
   physicalExam?: Record<string, string>
   reviewOfSystems?: Record<string, string>
   /** Read by the BMI validity gate: the deformity is not always the diagnosis. */
-  pastMedicalHistory?: { conditions?: string }
+  pastMedicalHistory?: { conditions?: string; surgeries?: string; hospitalizations?: string }
+  socialHistory?: Record<string, string>
   clinicalHpi?: string
   advancedHpi?: string
   currentMedications?: { medications?: string; otc?: string }
@@ -319,6 +320,59 @@ function checkBmi(c: CheckableCase): ConsistencyIssue[] {
   }]
 }
 
+// ── authoring notes in student-facing prose ──────────────────────────────────
+// A stage direction for the patient agent, printed in the chart. Found live:
+// the past-medical-history panel read "Vitiligo (diagnosed age 30, not
+// volunteered initially)" — which is not a fact about the patient, and was
+// self-contradicting because she had just volunteered it.
+//
+// The app already has the mechanism this intent belongs in:
+// hiddenHistory.fullHistory, which patientPrompt.ts wraps in "only reveal
+// specific details when the physician asks — do NOT volunteer these
+// proactively". A note in a displayed field is that instruction written where
+// it gets read by the student instead of obeyed by the patient.
+
+// 'withhold' cannot be matched on its own — "the family elected to withhold
+// resuscitation" is real clinical prose. What marks a stage direction is a
+// non-disclosure verb bound to a marker about the INTERVIEW rather than the
+// illness ("initially", "unless asked"), or a bare imperative to the agent.
+const AUTHORING_NOTE: RegExp[] = [
+  /\b(?:not|never|does not|do not|don't|won't)\s+(?:be\s+)?(?:volunteer(?:ed)?|disclos(?:e|ed)|reveal(?:ed)?|offer(?:ed)?|mention(?:ed)?|report(?:ed)?)\b[^.;)]{0,25}\b(?:initially|unless asked|until asked|spontaneously|on (?:their|his|her) own|if asked)\b/i,
+  /\b(?:only|unless|until)\s+(?:if\s+|when\s+)?(?:directly\s+)?asked\b/i,
+  /\bdo(?:es)? not volunteer\b|\bdon't volunteer\b|\bwithholds? (?:this|that|it)\b/i,
+]
+
+/** Every field a student can read as the patient's record. */
+function studentFacingProse(c: CheckableCase): Array<[string, string | undefined]> {
+  return [
+    ['hpi', c.hpi],
+    ['pastMedicalHistory.conditions', c.pastMedicalHistory?.conditions],
+    ['pastMedicalHistory.surgeries', c.pastMedicalHistory?.surgeries],
+    ['pastMedicalHistory.hospitalizations', c.pastMedicalHistory?.hospitalizations],
+    ['currentMedications.medications', c.currentMedications?.medications],
+    ['currentMedications.otc', c.currentMedications?.otc],
+    ...Object.entries(c.socialHistory ?? {}).map(([k, v]) => [`socialHistory.${k}`, v] as [string, string]),
+    ...Object.entries(c.reviewOfSystems ?? {}).map(([k, v]) => [`reviewOfSystems.${k}`, v] as [string, string]),
+    ...Object.entries(c.physicalExam ?? {}).map(([k, v]) => [`physicalExam.${k}`, v] as [string, string]),
+  ]
+}
+
+function checkAuthoringNotes(c: CheckableCase): ConsistencyIssue[] {
+  const out: ConsistencyIssue[] = []
+  for (const [field, text] of studentFacingProse(c)) {
+    if (typeof text !== 'string') continue
+    const hit = AUTHORING_NOTE.map(re => text.match(re)).find(Boolean)
+    if (!hit) continue
+    out.push({
+      code: 'content/authoring-note',
+      severity: 'error',
+      field,
+      message: `"${hit[0]}" is an instruction to the patient agent, not a fact about the patient, and it is printed in the chart; withheld history belongs in hiddenHistory.fullHistory, which the patient prompt already gates`,
+    })
+  }
+  return out
+}
+
 // ── entry point ──────────────────────────────────────────────────────────────
 
 /** Run every consistency check. Empty array means nothing detectable is wrong. */
@@ -330,6 +384,7 @@ export function checkCaseConsistency(c: CheckableCase): ConsistencyIssue[] {
     ...checkRadiologySetting(c),
     ...checkRequiredExam(c),
     ...checkBmi(c),
+    ...checkAuthoringNotes(c),
   ]
 }
 
