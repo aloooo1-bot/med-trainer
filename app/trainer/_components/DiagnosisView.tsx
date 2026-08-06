@@ -391,6 +391,50 @@ export function DiagnosisView({
           </div>
         )}
 
+        {/* Patient communication — reported, never scored. Labelled as such so
+            it can never read as points the student lost. */}
+        {(() => {
+          const comm = gradingResult.communication
+          if (!comm || (!comm.summary && !(comm.moments?.length > 0))) return null
+          return (
+            <div className="border-t border-rule px-5 py-4">
+              <div className="mb-3 flex items-baseline gap-2">
+                <h3 className="font-serif text-sm font-semibold text-ink">Patient Communication</h3>
+                <span className="text-[10px] uppercase tracking-wide text-ink-tertiary">not scored</span>
+              </div>
+              {comm.summary && (
+                <p style={{ fontSize: 12, color: 'var(--color-ink-secondary)', lineHeight: 1.6, marginBottom: comm.moments?.length ? 10 : 0 }}>
+                  {comm.summary}
+                </p>
+              )}
+              <div className="space-y-2">
+                {(comm.moments ?? []).map((m, i) => (
+                  <div
+                    key={i}
+                    style={{ background: 'var(--color-paper-2)', border: '1px solid var(--color-rule)', borderRadius: 8, padding: '10px 14px' }}
+                  >
+                    <div className="flex items-start gap-2">
+                      <span
+                        aria-hidden="true"
+                        style={{ color: m.acknowledged ? 'var(--color-confirmed)' : 'var(--color-caution)', fontSize: 12, lineHeight: '18px' }}
+                      >
+                        {m.acknowledged ? '✓' : '○'}
+                      </span>
+                      <div style={{ minWidth: 0 }}>
+                        <div style={{ fontSize: 12.5, color: 'var(--color-ink)', fontStyle: 'italic' }}>“{m.concern}”</div>
+                        {m.note && (
+                          <p style={{ fontSize: 12, color: 'var(--color-ink-secondary)', lineHeight: 1.6, marginTop: 3 }}>{m.note}</p>
+                        )}
+                      </div>
+                    </div>
+                    <span className="sr-only">{m.acknowledged ? 'You responded to this.' : 'This went unaddressed.'}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        })()}
+
         {/* Differentials */}
         {gradingResult.differentials?.length > 0 && (
           <div className="border-t border-rule px-5 py-4">

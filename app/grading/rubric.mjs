@@ -203,6 +203,13 @@ PROACTIVE ELICITATION RULE:
 - When historyInterview is reduced because of incidental elicitation, the dimension feedback MUST name at least one specific topic that was captured incidentally and suggest the proactive phrasing (e.g., "You learned about the family history of stroke only after asking 'Anything else?' — next time ask directly: 'Any family history of stroke or early heart disease?'").
 - Do NOT add incidentally-surfaced items to missedQuestions — the student did surface them and should not see them in the "you missed asking about X" panel. The deduction lives only in the score + dimension feedback.
 
+PATIENT COMMUNICATION (REPORTED, NOT SCORED):
+- Scan the interview transcript for moments where the patient expressed worry or fear, asked what is happening to them, or raised a concern about their life — their independence, their work, their family, whether something is seriously wrong. These are the moments a simulation makes easy to walk past.
+- For each one, record what they raised and whether the trainee responded to it before moving on to the next question. Acknowledging a fear briefly and then continuing counts as responding; ignoring it entirely does not.
+- This is FEEDBACK ONLY. It contributes ZERO points. Do NOT let it raise or lower any dimension score, do NOT mention it in any dimension's feedback, and do NOT let it change the total. The dimension scores must still sum to exactly the same number they would have without this block.
+- Only report what is actually in the transcript. If the patient raised no concerns, return an empty moments array and say so plainly in the summary — do not manufacture a concern to have something to report, and do not fault a trainee for failing to address something the patient never raised.
+- Address the trainee directly ("you"), and be brief: one sentence per moment.
+
 GRADING TEXT FIDELITY RULE:
 - The feedback text for testOrdering MUST enumerate ONLY the tests the student actually ordered (as listed in "Tests ordered" above). Do NOT write "you correctly ordered [test]" or "you included [test]" if that test does not appear in the student's ordered set.
 - Do NOT invent or attribute tests the student did not order. If a test appears in the student's ordered set, it may be credited or critiqued. If it does not appear, it must not be mentioned as ordered.
@@ -285,6 +292,10 @@ Return:
     "testOrdering":          { "score": <0-${to.max}>, "feedback": "<1 sentence>" },
     "diagnosisAccuracy":     { "score": <0-${da.max}>, "feedback": "<1 sentence>" },
     "diagnosisCompleteness": { "score": <0-${dc.max}>, "feedback": "<1 sentence>" }${crJsonField ? `,\n    ${crJsonField}` : ''}
+  },
+  "communication": {
+    "summary": "<1-2 sentences on how you responded to what the patient raised, or 'The patient did not raise any personal concerns during this encounter.' — carries NO points>",
+    "moments": [{ "concern": "<what the patient asked or feared, in their words>", "acknowledged": <true|false>, "note": "<1 sentence: how you handled it, or what a response might have been>" }, ...omit entirely if the patient raised nothing]
   },
   "missedQuestions": ["<question that would have meaningfully changed dx or management>", ...omit anything already available],
   "teachingPoints": ${JSON.stringify(input.teachingPoints)},

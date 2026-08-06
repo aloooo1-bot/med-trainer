@@ -10,11 +10,42 @@ export interface PresentationScores {
   safety: number
 }
 
+/**
+ * Patient communication — REPORTED, NEVER SCORED.
+ *
+ * Patients in these cases ask things like "Is there something wrong with my
+ * heart?" and voice fear about losing their independence. Responding to that is
+ * a clinical skill, and one a simulation makes unusually easy to skip, but the
+ * rubric assessed nothing of the kind — a student could ignore every worry and
+ * lose no points.
+ *
+ * Deliberately outside `dimensions` and worth zero points: the five scored
+ * dimensions still sum to exactly 100, so every previously recorded score stays
+ * comparable and Progress trends have no discontinuity. This is feedback that
+ * names a skill, not a new thing to optimise.
+ */
+export interface CommunicationMoment {
+  /** What the patient raised, in their words or a close paraphrase. */
+  concern: string
+  /** Whether the student responded to it before moving on. */
+  acknowledged: boolean
+  /** One sentence on how it was handled, or what a response could have been. */
+  note: string
+}
+
+export interface CommunicationFeedback {
+  moments: CommunicationMoment[]
+  /** One or two sentences; empty when the patient raised nothing. */
+  summary: string
+}
+
 export interface GradingResult {
   score: number
   correct: boolean
   feedback: string
   strengths: string[]
+  /** Not scored — see CommunicationFeedback. */
+  communication?: CommunicationFeedback
   dimensions?: {
     historyInterview: ScoreDimension
     testOrdering: ScoreDimension
@@ -43,6 +74,8 @@ export function stripToBasic(result: GradingResult): GradingResult {
     correct: result.correct,
     feedback: result.feedback,
     strengths: [],
+    // Detailed feedback is Pro, and communication is feedback like any other.
+    communication: undefined,
     missedQuestions: [],
     teachingPoints: [],
     differentials: [],
