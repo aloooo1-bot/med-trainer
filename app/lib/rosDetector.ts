@@ -224,16 +224,61 @@ const WEAK_HPI_KEYWORDS = new Set([
  * can afford to be conservative: the ordinary case is already covered by what
  * the student asked.
  */
+export interface HpiDisclosure {
+  field: HPIField
+  /**
+   * The part of the field the patient actually disclosed, when only part of it
+   * was. Undefined means reveal the whole stored value.
+   */
+  text?: string
+}
+
+/** Entries within one stored field — drugs in a list, problems in a problem list. */
+function clauses(value: string): string[] {
+  return value.split(/[.;]+|,(?=\s)/).map(c => c.trim()).filter(Boolean)
+}
+
+/**
+ * Share of a clause's identifying terms that the reply named. A clause is only
+ * revealed when the patient said most of what it contains — otherwise a disease
+ * mentioned in passing drags in everything recorded alongside it.
+ */
+const CLAUSE_DISCLOSURE_THRESHOLD = 0.5
+
 export function disclosedHpiFields(
   patientReply: string | undefined,
   values: Partial<Record<HPIField, string | undefined>>,
-): HPIField[] {
+): HpiDisclosure[] {
   if (!patientReply?.trim()) return []
   const reply = patientReply.toLowerCase()
-  const out: HPIField[] = []
+  const out: HpiDisclosure[] = []
+
   for (const [field, keywords] of Object.entries(HPI_FIELD_KEYWORD_MAP) as [HPIField, string[]][]) {
-    if (fieldTerms(values[field]).some(t => reply.includes(t))) { out.push(field); continue }
-    if (keywords.some(k => !WEAK_HPI_KEYWORDS.has(k) && reply.includes(k))) out.push(field)
+    const value = values[field]
+
+    // A field is one line, so revealing it whole on a single shared word hands
+    // over everything recorded beside the thing that was actually said: naming
+    // an atrial fibrillation should not also disclose the admission for it, or
+    // the diabetes and hypertension listed next to it. Reveal clause by clause.
+    if (value) {
+      const revealed = clauses(value).filter(c => {
+        const terms = fieldTerms(c)
+        if (!terms.length) return false
+        const hit = terms.filter(t => reply.includes(t)).length
+        return hit / terms.length >= CLAUSE_DISCLOSURE_THRESHOLD
+      })
+      if (revealed.length) {
+        // Whole value disclosed → no need to present a redacted version of it.
+        out.push(revealed.length === clauses(value).length
+          ? { field }
+          : { field, text: revealed.join('. ') })
+        continue
+      }
+    }
+
+    // Content-free values ("None", "Denies alcohol use") share no term with any
+    // honest answer, so the topic signal is the only one available.
+    if (keywords.some(k => !WEAK_HPI_KEYWORDS.has(k) && reply.includes(k))) out.push({ field })
   }
   return out
 }

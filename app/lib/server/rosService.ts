@@ -242,13 +242,15 @@ export function resolveHpiUnlocks(
     soc_other: caseData.socialHistory?.other,
   }
 
-  // What the student asked for, plus anything the patient volunteered while
-  // answering. The second half is why the values are resolved first: the
-  // disclosure check compares the reply against each field's own stored text.
-  const fields = new Set(scanMessageForHPIFields(message))
-  for (const f of disclosedHpiFields(patientReply, values)) fields.add(f)
-
+  // Asking earns the whole field — the student went looking for it. What the
+  // patient volunteers earns only the part they actually said, so naming one
+  // problem does not disclose the rest of the problem list beside it.
   const out: Partial<Record<HPIField, string>> = {}
-  for (const f of fields) out[f] = values[f] ?? 'None documented.'
+  for (const { field, text } of disclosedHpiFields(patientReply, values)) {
+    out[field] = text ?? values[field] ?? 'None documented.'
+  }
+  for (const f of scanMessageForHPIFields(message)) {
+    out[f] = values[f] ?? 'None documented.'
+  }
   return out
 }
