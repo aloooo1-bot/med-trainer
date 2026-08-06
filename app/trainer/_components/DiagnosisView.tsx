@@ -1,7 +1,8 @@
+import { useState } from 'react'
 import Link from 'next/link'
 import { SectionCard } from './SectionCard'
 import { ScoreRing, CategoryRow, ScorecardNotesPanel } from './ScoreRing'
-import { FeedbackCarousel, type FeedbackSection } from './FeedbackCarousel'
+import { FeedbackTabs, type FeedbackSection } from './FeedbackTabs'
 import { DiagnosisInput } from './DiagnosisInput'
 import { WhyPanel } from './WhyPanel'
 import { MicButton } from './MicButton'
@@ -64,6 +65,10 @@ export function DiagnosisView({
   generateCase: (overrideSystem?: string, overrideDifficulty?: string, overrideDiagnosis?: string) => Promise<CaseData | null>
   orderedTests: Set<string>
 }) {
+  // Whether the student has taken control of which dimension is open. Until
+  // they do, the scorecard leads with the weakest one.
+  const [categoryTouched, setCategoryTouched] = useState(false)
+
   if (gradingLoading) {
     return (
       <SectionCard title="Evaluating Diagnosis">
@@ -261,6 +266,31 @@ export function DiagnosisView({
   }
 
   // ── Grading result / scorecard ──
+
+  /**
+   * The weakest dimension opens by default.
+   *
+   * Every row started collapsed, so the per-dimension feedback — the only text
+   * that says WHERE the points went — was invisible until the student thought
+   * to click a small chevron. The one row worth reading first is the one that
+   * cost the most, so it is open on arrival; any click hands control back.
+   */
+  const weakestCategory: DimensionKey | null = (() => {
+    if (!gradingResult?.dimensions) return null
+    let worst: DimensionKey | null = null
+    let worstPct = Infinity
+    for (const { key, max } of getRubric(caseDifficulty)) {
+      const dim = gradingResult.dimensions[key]
+      if (!dim || max <= 0) continue
+      const pct = dim.score / max
+      // Strict <, so ties keep the earlier (higher-weighted) rubric row.
+      if (pct < worstPct) { worstPct = pct; worst = key }
+    }
+    // Nothing to lead with when the student dropped no meaningful points.
+    return worstPct < 1 ? worst : null
+  })()
+  const shownCategory = categoryTouched ? expandedCategory : weakestCategory
+
   const submitFeedback = async () => {
     setFeedbackSubmitting(true)
     try {
@@ -296,29 +326,39 @@ export function DiagnosisView({
 
         {/* A — Header bar */}
         <div style={{ background: 'var(--color-paper-2)', borderBottom: '1px solid var(--color-rule)', padding: '12px 20px' }}>
-          <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16 }}>
-            <div>
-              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ink-3)', marginBottom: 4 }}>
-                {'CASE · ' + (resolvedSystem || 'General') + ' · ' + caseDifficulty}
-              </div>
-              <div style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 20, fontWeight: 600, color: 'var(--color-ink)', lineHeight: 1.2 }}>
-                {(caseData?.patientInfo?.name ?? '') + (caseData?.patientInfo?.name ? ', ' : '') + (caseData?.patientInfo?.age ?? '') + (caseData?.patientInfo?.gender === 'male' ? 'M' : caseData?.patientInfo?.gender === 'female' ? 'F' : (caseData?.patientInfo?.gender?.charAt(0).toUpperCase() ?? ''))}
-              </div>
-            </div>
-            <div style={{ textAlign: 'right', flexShrink: 0 }}>
-              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ink-3)', marginBottom: 4 }}>
-                SUBMITTED DIAGNOSIS
-              </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 8, justifyContent: 'flex-end' }}>
-                <span style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 15, fontWeight: 600, color: 'var(--color-ink)' }}>{userDiagnosis}</span>
-                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 22, height: 22, borderRadius: '50%', background: gradingResult.correct ? 'var(--color-confirmed)' : 'var(--color-critical)', color: 'white', fontSize: 12, fontWeight: 700, flexShrink: 0 }}>
+          {/* Identity, then the two diagnoses side by side beneath it.
+              These used to sit in a right-aligned nowrap column, so a full
+              differential written out in a sentence — which is what a good
+              answer looks like — ran off the card and took the correct
+              diagnosis with it. Comparing the two is the single most useful
+              thing on this screen, so both now wrap and neither can be
+              pushed out of view. */}
+          <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ink-3)', marginBottom: 4 }}>
+            {'CASE · ' + (resolvedSystem || 'General') + ' · ' + caseDifficulty}
+          </div>
+          <div style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 20, fontWeight: 600, color: 'var(--color-ink)', lineHeight: 1.2, marginBottom: 12 }}>
+            {(caseData?.patientInfo?.name ?? '') + (caseData?.patientInfo?.name ? ', ' : '') + (caseData?.patientInfo?.age ?? '') + (caseData?.patientInfo?.gender === 'male' ? 'M' : caseData?.patientInfo?.gender === 'female' ? 'F' : (caseData?.patientInfo?.gender?.charAt(0).toUpperCase() ?? ''))}
+          </div>
+
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            <div style={{ minWidth: 0 }}>
+              <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 4 }}>
+                <span style={{ display: 'inline-flex', alignItems: 'center', justifyContent: 'center', width: 18, height: 18, borderRadius: '50%', background: gradingResult.correct ? 'var(--color-confirmed)' : 'var(--color-critical)', color: 'white', fontSize: 11, fontWeight: 700, flexShrink: 0 }}>
                   {gradingResult.correct ? '✓' : '✗'}
                 </span>
+                <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ink-3)' }}>
+                  Your diagnosis
+                </span>
               </div>
-              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ink-3)', marginTop: 10, marginBottom: 4 }}>
-                CORRECT DIAGNOSIS
+              <div style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 15, fontWeight: 600, color: 'var(--color-ink)', lineHeight: 1.45, overflowWrap: 'anywhere' }}>
+                {userDiagnosis || '—'}
               </div>
-              <div style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 15, fontWeight: 600, color: 'var(--color-ink)' }}>
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <div style={{ fontSize: 11, fontWeight: 600, letterSpacing: '0.12em', textTransform: 'uppercase', color: 'var(--color-ink-3)', marginBottom: 4 }}>
+                Correct diagnosis
+              </div>
+              <div style={{ fontFamily: 'Source Serif 4, Georgia, serif', fontSize: 15, fontWeight: 600, color: 'var(--color-ink)', lineHeight: 1.45, overflowWrap: 'anywhere' }}>
                 {caseData?.diagnosis ?? '—'}
               </div>
             </div>
@@ -351,8 +391,11 @@ export function DiagnosisView({
                     max={max}
                     pct={pct}
                     index={i}
-                    expanded={expandedCategory === key}
-                    onToggle={() => setExpandedCategory(expandedCategory === key ? null : key)}
+                    expanded={shownCategory === key}
+                    onToggle={() => {
+                      setCategoryTouched(true)
+                      setExpandedCategory(shownCategory === key ? null : key)
+                    }}
                   />
                 )
               })}
@@ -386,7 +429,7 @@ export function DiagnosisView({
               if ((gradingResult.teachingPoints?.length ?? 0) > 0) feedSections.push({
                 title: 'Teaching points', items: gradingResult.teachingPoints!, tone: 'insight', icon: '★',
               })
-              return <FeedbackCarousel sections={feedSections} />
+              return <FeedbackTabs sections={feedSections} />
             })()}
           </div>
         )}
