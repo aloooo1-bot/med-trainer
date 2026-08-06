@@ -114,11 +114,25 @@ const HPI_FIELD_KEYWORD_MAP: Record<HPIField, string[]> = {
                          'what are you taking', 'any medications', 'current medications', 'on any medications',
                          'taking any pills', 'treatment', 'pharmacy', 'refill',
                          'nsaids', 'ibuprofen', 'naproxen', 'aspirin', 'acetaminophen', 'tylenol',
-                         'blood pressure medication', 'cholesterol medication', 'diabetes medication', 'antibiotics'],
-  med_otc:              ['supplements', 'vitamins', 'over the counter', 'otc',
+                         'blood pressure medication', 'cholesterol medication', 'diabetes medication', 'antibiotics',
+                         // A blood-thinner question is a medication question, and in a stroke
+                         // or bleeding case it is usually the most important one asked.
+                         'blood thinner', 'blood thinners', 'anticoagulant', 'anticoagulants',
+                         'warfarin', 'coumadin', 'eliquis', 'apixaban', 'xarelto', 'rivaroxaban',
+                         'clopidogrel', 'plavix', 'heparin'],
+  // The drug names are here as well as under med_medications on purpose. They
+  // are the drugs most likely to BE the OTC entry, so a question naming one —
+  // "are you on any blood thinners, like aspirin?" — was revealing the
+  // prescription list while hiding the over-the-counter list the aspirin
+  // actually sat in. In a stroke case that hid a daily antiplatelet from the
+  // chart while the patient was describing it out loud.
+  med_otc:              ['supplements', 'vitamins', 'vitamin', 'over the counter', 'otc',
                          'anything over the counter', 'herbal', 'natural remedies',
                          'antacid', 'antacids', 'anything without a prescription', 'non-prescription',
-                         'anything else you take'],
+                         'anything else you take',
+                         'aspirin', 'ibuprofen', 'acetaminophen', 'tylenol', 'advil', 'motrin',
+                         'naproxen', 'aleve', 'nsaid', 'nsaids', 'blood thinner', 'blood thinners',
+                         'antiplatelet', 'multivitamin', 'fish oil', 'melatonin'],
   soc_smoking:          ['smoke', 'smoking', 'cigarettes', 'tobacco', 'nicotine', 'vape', 'vaping', 'pack', 'quit smoking'],
   soc_alcohol:          ['drink', 'drinking', 'alcohol', 'beer', 'wine', 'liquor', 'spirits', 'alcoholic', 'how much do you drink'],
   soc_drugs:            ['recreational drugs', 'street drugs', 'marijuana', 'cannabis', 'cocaine', 'drug use', 'illicit'],
@@ -133,6 +147,47 @@ export function scanMessageForHPIFields(message: string): HPIField[] {
   return (Object.entries(HPI_FIELD_KEYWORD_MAP) as [HPIField, string[]][])
     .filter(([, keywords]) => keywords.some(kw => lower.includes(kw)))
     .map(([field]) => field)
+}
+
+// Words that carry no identifying power inside a medication string — matching
+// on these would unlock a field the patient never actually mentioned.
+const MED_STOPWORDS = new Set([
+  'daily', 'twice', 'once', 'nightly', 'needed', 'oral', 'orally', 'tablet', 'tablets',
+  'capsule', 'capsules', 'prescribed', 'prescription', 'regularly', 'occasional',
+  'occasionally', 'supplement', 'supplements', 'takes', 'taking', 'self', 'initiated',
+  'about', 'approximately', 'years', 'months', 'weeks', 'other', 'none', 'documented',
+  'morning', 'evening', 'bedtime', 'with', 'meals', 'unit', 'units', 'every',
+])
+
+/** Drug-ish tokens in a stored medication string. Pure + testable. */
+export function medicationTerms(value: string | undefined): string[] {
+  if (!value) return []
+  return [...new Set(
+    value.toLowerCase().match(/[a-z]{5,}/g)?.filter(w => !MED_STOPWORDS.has(w)) ?? [],
+  )]
+}
+
+/**
+ * Which medication fields the patient's own reply actually disclosed.
+ *
+ * The chart must not contradict the transcript. A patient who volunteers "I
+ * take a baby aspirin every day" while the medication panel shows only their
+ * amlodipine is telling the student two different things — and the unlock
+ * record is what grading treats as authoritative for whether they elicited it.
+ *
+ * Matched against the case's OWN stored strings rather than a drug dictionary,
+ * so a match means the patient named the very thing the case documents.
+ */
+export function disclosedMedicationFields(
+  patientReply: string | undefined,
+  meds: { medications?: string; otc?: string } | undefined,
+): Array<'med_medications' | 'med_otc'> {
+  if (!patientReply || !meds) return []
+  const reply = patientReply.toLowerCase()
+  const out: Array<'med_medications' | 'med_otc'> = []
+  if (medicationTerms(meds.medications).some(t => reply.includes(t))) out.push('med_medications')
+  if (medicationTerms(meds.otc).some(t => reply.includes(t))) out.push('med_otc')
+  return out
 }
 
 export function makeInitialHPIFieldState(): Record<HPIField, boolean> {

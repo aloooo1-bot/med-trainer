@@ -4,6 +4,7 @@ import {
   type ROSCategory,
   scanMessageForROSDetailed,
   scanMessageForHPIFields,
+  disclosedMedicationFields,
   looksClinical,
   type HPIField,
 } from '../rosDetector'
@@ -208,13 +209,31 @@ Return the JSON object now.`
   }
 }
 
-/** HPI background fields addressed by this message, with their values resolved. */
+/**
+ * HPI background fields addressed by this exchange, with their values resolved.
+ *
+ * Unlocks are driven by the question AND, for medications, by what the patient
+ * actually said. The chart must never contradict the transcript: a patient who
+ * volunteers "I take a baby aspirin every day" while the medication panel shows
+ * only their amlodipine is telling the student two different things, and the
+ * unlock record is what grading treats as authoritative for whether the student
+ * elicited it — so the omission cost marks for a question they had asked.
+ *
+ * Scoped to medications deliberately. That is where a contradiction is
+ * dangerous rather than untidy: a missed antiplatelet or anticoagulant changes
+ * management in exactly the strokes and bleeds these cases are built around.
+ */
 export function resolveHpiUnlocks(
   message: string,
   caseData: CaseData,
+  patientReply?: string,
 ): Partial<Record<HPIField, string>> {
-  const fields = scanMessageForHPIFields(message)
-  if (!fields.length) return {}
+  const fields = new Set(scanMessageForHPIFields(message))
+  for (const f of disclosedMedicationFields(patientReply, caseData.currentMedications)) {
+    fields.add(f)
+  }
+
+  if (!fields.size) return {}
   const values: Record<HPIField, string | undefined> = {
     pmh_conditions: caseData.pastMedicalHistory?.conditions,
     pmh_surgeries: caseData.pastMedicalHistory?.surgeries,

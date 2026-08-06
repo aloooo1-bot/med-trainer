@@ -75,7 +75,10 @@ export async function POST(req: NextRequest) {
       status: classifyFinding(summaries[cat]),
     }))
 
-    const hpiUnlocks = resolveHpiUnlocks(message, session.caseData)
+    // The reply is passed so a medication the patient names out loud is
+    // recorded as elicited even when the question's wording did not target that
+    // field — the chart and the transcript must not disagree.
+    const hpiUnlocks = resolveHpiUnlocks(message, session.caseData, reply)
 
     const store = await getSessionStore()
     await store.appendEvent(session.id, makeEvent('ask', {
