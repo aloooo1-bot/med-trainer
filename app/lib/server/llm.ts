@@ -51,10 +51,21 @@ const TASK_TIMEOUTS_MS: Partial<Record<LLMTask, number>> = {
   case_audit: 30_000,
 }
 
+/** Longest budget any task asks for — nothing client-level may undercut it. */
+const MAX_TASK_TIMEOUT_MS = Math.max(75_000, ...Object.values(TASK_TIMEOUTS_MS))
+
 let _client: Anthropic | null = null
 function client(): Anthropic {
   if (!_client) {
-    _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: 120_000 })
+    // Derived, never a hand-written constant. A client timeout of 120s sat
+    // under case_generation's 175s budget and quietly made every slow
+    // generation impossible: the SDK aborted at 120s, retried from scratch
+    // (maxRetries defaults to 2, and connection timeouts ARE retried), and the
+    // per-request signal then killed the retry. A Goodpasture case died at
+    // 174s having generated — and paid for — two minutes of tokens it threw
+    // away. Every request below sets its own timeout, so this is only a
+    // backstop; it is derived so the trap cannot come back.
+    _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY, timeout: MAX_TASK_TIMEOUT_MS })
   }
   return _client
 }
@@ -73,6 +84,12 @@ export async function callModel(
   },
 ): Promise<LLMResult> {
   const timeout = TASK_TIMEOUTS_MS[task] ?? 75_000
+  // A retry restarts generation from zero, so it is only worth having when
+  // there is time left to run one. On a long task a timeout has already spent
+  // the budget, and retrying just bills a second full generation that the
+  // caller's own deadline will kill mid-flight. Short tasks keep the SDK's
+  // retries, where they still buy something against a 429 or a 5xx.
+  const maxRetries = timeout > 90_000 ? 0 : 2
   // Ops log: verifies the task→model tiering (e.g. chat on Haiku, grading on Sonnet).
   console.log(`[llm] task=${task} model=${TASK_MODELS[task]}`)
   const response = await client().messages.create(
@@ -82,7 +99,9 @@ export async function callModel(
       system: opts.system,
       messages: opts.messages,
     },
-    { signal: AbortSignal.timeout(timeout) },
+    // The SDK's timeout and the abort signal must agree. Passing only the
+    // signal left the client-level default in charge of when to give up.
+    { timeout, maxRetries, signal: AbortSignal.timeout(timeout) },
   )
   const text = response.content
     .filter((b): b is Anthropic.TextBlock => b.type === 'text')
