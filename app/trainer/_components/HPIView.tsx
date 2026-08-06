@@ -10,7 +10,7 @@ export function HPIView({ caseData, caseDifficulty, hpiValues, caseStarted, star
   caseStarted: boolean
   startTimer: (difficulty: string) => void
   setCaseStarted: React.Dispatch<React.SetStateAction<boolean>>
-  chatInputRef: React.RefObject<HTMLInputElement | null>
+  chatInputRef: React.RefObject<HTMLTextAreaElement | null>
 }) {
   const isGatedHPI = caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced'
 

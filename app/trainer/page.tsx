@@ -12,6 +12,7 @@ import {
 } from '../lib/rosDetector'
 import { ANON_CASE_IDS, ANON_CASE_LIMIT } from '../lib/anonymousCases'
 import { readBmi } from '../lib/bmi'
+import { ChatTranscript } from './_components/ChatTranscript'
 import { type GradingResult, type DimensionAverage, stripToBasic } from '../grading/types'
 import { type DimensionKey } from '../grading/rubric'
 import {
@@ -245,7 +246,7 @@ export default function MedTrainer() {
   const { timerState, startTimer, pauseTimer, resumeTimer, completeTimer, resetTimer } = useTimer(handleTimerExpire)
 
   const chatEndRef = useRef<HTMLDivElement>(null)
-  const chatInputRef = useRef<HTMLInputElement>(null)
+  const chatInputRef = useRef<HTMLTextAreaElement>(null)
   const terminalEndRef = useRef<HTMLDivElement>(null)
   const terminalInputRef = useRef<HTMLInputElement>(null)
   const prevSectionRef = useRef<string>(activeSection)
@@ -1509,42 +1510,41 @@ export default function MedTrainer() {
                   </p>
                 </div>
               )}
-              {chatMessages.map((msg, i) => (
-                <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
-                  <div
-                    className={`max-w-[88%] rounded-lg px-3 py-2 text-[11px] leading-relaxed ${
-                      msg.role === 'user'
-                        ? 'bg-primary-500 text-white'
-                        : 'bg-surface-2 text-ink-primary border border-surface-4'
-                    }`}
-                  >
-                    {msg.content}
-                  </div>
-                </div>
-              ))}
-              {chatLoading && (
-                <div className="flex justify-start">
-                  <div className="rounded-lg bg-surface-2 border border-surface-4 px-3 py-2">
-                    <div className="flex gap-1">
-                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-tertiary" style={{ animationDelay: '0ms' }} />
-                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-tertiary" style={{ animationDelay: '150ms' }} />
-                      <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-ink-tertiary" style={{ animationDelay: '300ms' }} />
-                    </div>
-                  </div>
-                </div>
-              )}
+              <ChatTranscript
+                messages={chatMessages}
+                patientName={caseData?.patientInfo.name}
+                loading={chatLoading}
+              />
               <div ref={chatEndRef} />
             </div>
             {/* Notes */}
             <div className="flex flex-col border-t border-surface-4">
               <div className="flex items-center justify-between border-b border-surface-4 px-4 py-2 flex-shrink-0">
-                <div className="flex items-center gap-2">
+                {/* Collapsed by default so the transcript keeps the height.
+                    notes.open already existed and was already set true when the
+                    student reaches the diagnosis step — nothing had ever read
+                    it, so the auto-open did nothing until now. */}
+                <button
+                  onClick={() => setNotes(prev => ({ ...prev, open: !prev.open }))}
+                  aria-expanded={notes.open}
+                  className="flex items-center gap-2 text-left"
+                >
+                  <svg
+                    className="h-3 w-3 flex-shrink-0 text-ink-tertiary"
+                    style={{ transition: 'transform 200ms', transform: notes.open ? 'rotate(90deg)' : 'rotate(0deg)' }}
+                    fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+                  </svg>
                   <span className="text-[11px] font-semibold uppercase tracking-wider text-ink-secondary">Case Notes</span>
                   {notes.mode === 'soap' && (
                     <span className="rounded bg-surface-3 px-1.5 py-0.5 text-[10px] text-ink-secondary border border-surface-4">SOAP</span>
                   )}
-                </div>
-                <div className="flex items-center gap-2">
+                  {!notes.open && notes.content.trim() && notes.content !== SOAP_TEMPLATE && (
+                    <span className="text-[10px] text-ink-tertiary">· written</span>
+                  )}
+                </button>
+                <div className={`flex items-center gap-2 ${notes.open ? '' : 'hidden'}`}>
                   {notes.mode === 'soap' ? (
                     <button
                       onClick={() => setNotes(prev => ({ ...prev, mode: 'free', content: prev.content === SOAP_TEMPLATE ? '' : prev.content }))}
@@ -1562,31 +1562,35 @@ export default function MedTrainer() {
                   )}
                 </div>
               </div>
-              <textarea
-                value={notes.content}
-                onChange={e => setNotes(prev => ({ ...prev, content: e.target.value }))}
-                placeholder="Your case notes…"
-                className="resize-y min-h-[120px] w-full bg-surface-0 p-4 text-[11px] leading-relaxed text-ink-primary placeholder-ink-tertiary focus:outline-none font-mono"
-                style={{ height: '180px' }}
-              />
-              <div className="border-t border-surface-4 px-4 py-2 flex items-center justify-between flex-shrink-0">
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-ink-tertiary">Notes are private — not graded</span>
-                  <MicButton
-                    onTranscript={text => setNotes(prev => ({ ...prev, content: prev.content ? prev.content + ' ' + text : text }))}
-                    paused={timerState.status === 'paused' || gradingLoading}
-                    className="py-1"
+              {notes.open && (
+                <>
+                  <textarea
+                    value={notes.content}
+                    onChange={e => setNotes(prev => ({ ...prev, content: e.target.value }))}
+                    placeholder="Your case notes…"
+                    className="resize-y min-h-[120px] w-full bg-surface-0 p-4 text-[12px] leading-relaxed text-ink-primary placeholder-ink-tertiary focus:outline-none font-mono"
+                    style={{ height: '180px' }}
                   />
-                </div>
-                {notes.content.trim() && notes.content !== SOAP_TEMPLATE && (
-                  <button
-                    onClick={() => setNotes(prev => ({ ...prev, content: prev.mode === 'soap' ? SOAP_TEMPLATE : '' }))}
-                    className="text-[10px] text-ink-tertiary hover:text-critical transition-colors"
-                  >
-                    Clear
-                  </button>
-                )}
-              </div>
+                  <div className="border-t border-surface-4 px-4 py-2 flex items-center justify-between flex-shrink-0">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] text-ink-tertiary">Notes are private — not graded</span>
+                      <MicButton
+                        onTranscript={text => setNotes(prev => ({ ...prev, content: prev.content ? prev.content + ' ' + text : text }))}
+                        paused={timerState.status === 'paused' || gradingLoading}
+                        className="py-1"
+                      />
+                    </div>
+                    {notes.content.trim() && notes.content !== SOAP_TEMPLATE && (
+                      <button
+                        onClick={() => setNotes(prev => ({ ...prev, content: prev.mode === 'soap' ? SOAP_TEMPLATE : '' }))}
+                        className="text-[10px] text-ink-tertiary hover:text-critical transition-colors"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
             {/* Chat input */}
             <div className="border-t border-surface-4 p-3 flex-shrink-0">
@@ -1598,29 +1602,44 @@ export default function MedTrainer() {
                   Ask the patient about their symptoms in the chat to populate this section.
                 </div>
               )}
-              <div className="flex gap-2">
-                <input
+              {/* items-end so the mic and Ask stay on the bottom edge as the
+                  textarea grows — MicButton has no height of its own and would
+                  otherwise stretch to match it. */}
+              <div className="flex items-end gap-2">
+                <textarea
                   ref={chatInputRef}
-                  type="text"
+                  rows={2}
                   value={chatInput}
                   onChange={e => setChatInput(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && sendChat()}
+                  // Enter sends, Shift+Enter makes a newline. preventDefault is
+                  // required now that this is a textarea, or sending also leaves
+                  // a stray line break in the box.
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault()
+                      void sendChat()
+                    }
+                  }}
                   disabled={!caseData || chatLoading || locked || inPresentation}
                   title={inPresentation ? 'The chart is locked during the write-up phase' : locked ? 'Start the timer to begin the clinical encounter' : undefined}
                   placeholder={inPresentation ? 'Chart locked — you are in the write-up phase' : locked ? 'Start the timer to begin the clinical encounter' : caseData ? 'Ask the patient...' : 'Generate a case first'}
-                  className={`flex-1 rounded-md border px-3 py-2 text-[11px] text-ink-primary placeholder-ink-tertiary focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 transition-all ${showRosHint ? 'border-insight bg-insight-bg animate-pulse' : 'border-surface-4 bg-surface-2 focus:border-primary-400'}`}
+                  // field-sizing grows the box with the question so its opening
+                  // words stay readable; max-h then hands over to scrolling.
+                  // rows={2} carries this on its own where field-sizing is not
+                  // supported, which is already better than one line.
+                  className={`flex-1 resize-none rounded-md border px-3 py-2 text-[13px] leading-relaxed text-ink-primary placeholder-ink-tertiary field-sizing-content max-h-36 overflow-y-auto focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 transition-colors ${showRosHint ? 'border-insight bg-insight-bg' : 'border-surface-4 bg-surface-2 focus:border-primary-400'}`}
                 />
                 {caseData && (
                   <MicButton
                     onTranscript={text => setChatInput(prev => prev ? prev + ' ' + text : text)}
                     paused={timerState.status === 'paused' || gradingLoading || locked}
-                    className="py-2"
+                    className="h-9 flex-shrink-0"
                   />
                 )}
                 <button
-                  onClick={() => sendChat()}
+                  onClick={() => void sendChat()}
                   disabled={!caseData || chatLoading || !chatInput.trim() || locked || inPresentation}
-                  className="rounded-md bg-primary-500 px-3 py-2 text-[11px] font-medium text-ink-inverse hover:bg-primary-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                  className="h-9 flex-shrink-0 rounded-md bg-primary-500 px-3 text-[12px] font-medium text-ink-inverse hover:bg-primary-400 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                 >
                   Ask
                 </button>
