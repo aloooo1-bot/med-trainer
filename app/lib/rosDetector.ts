@@ -36,7 +36,11 @@ const KEYWORD_MAP: Record<ROSCategory, string[]> = {
   Neurological:            ['dizzy', 'dizziness', 'numbness', 'tingling', 'seizure', 'memory', 'coordination', 'balance', 'speech', 'aphasia', 'diplopia', 'vision', 'confusion', 'syncope', 'fainting', 'headache'],
   Psychiatric:             ['anxiety', 'depression', 'mood', 'sleep', 'stress', 'panic', 'suicidal', 'hallucination', 'delusion', 'mania', 'psychosis', 'paranoia'],
   Integumentary:           ['rash', 'skin', 'itch', 'hair', 'nail', 'wound'],
-  Endocrine:               ['thyroid', 'diabetes', 'thirst', 'heat intolerance', 'cold intolerance'],
+  // Salt craving is the cardinal symptom of adrenal insufficiency and was the
+  // one topic this map could not see at all — a student asking the single best
+  // question in an Addison's case got nothing recorded for it.
+  Endocrine:               ['thyroid', 'diabetes', 'thirst', 'heat intolerance', 'cold intolerance',
+                            'salt craving', 'craving salt', 'salty', 'polydipsia'],
   'Hematologic/Lymphatic': ['bruise', 'bleed', 'clot', 'lymph node', 'swollen gland', 'anemia'],
   'Allergic/Immunologic':  ['allergy', 'allergic', 'reaction', 'hives', 'immune'],
 }
@@ -59,11 +63,56 @@ const AMBIGUOUS_KEYWORDS = new Set([
   'dizziness', 'heart', 'lung', 'bone',
 ])
 
+/**
+ * Words that carry the grammar of a question rather than its topic. A clause
+ * built only from these is scaffolding — "at all", "have you noticed anything
+ * else" — and the absence of a keyword in it means nothing.
+ */
+const CLAUSE_SCAFFOLD = new Set([
+  'have', 'has', 'had', 'been', 'being', 'your', 'yours', 'you', 'they', 'their',
+  'about', 'around', 'notice', 'noticed', 'noticing', 'tell', 'told', 'describe',
+  'there', 'these', 'those', 'that', 'this', 'then', 'than', 'what', 'when',
+  'where', 'which', 'while', 'with', 'does', 'doing', 'done', 'also', 'still',
+  'just', 'anything', 'something', 'nothing', 'everything', 'other', 'others',
+  'else', 'more', 'most', 'much', 'many', 'some', 'any', 'ever', 'never',
+  'recently', 'lately', 'currently', 'experience', 'experienced', 'experiencing',
+  'happen', 'happened', 'happening', 'feel', 'feeling', 'felt', 'going',
+  'getting', 'would', 'could', 'should', 'might', 'were', 'was', 'like', 'from',
+  'over', 'into', 'last', 'since', 'before', 'after', 'during', 'symptom',
+  'symptoms', 'problem', 'problems', 'issue', 'issues', 'trouble', 'please',
+  'right', 'left', 'both',
+])
+
+const ALL_KEYWORDS = Object.values(KEYWORD_MAP).flat()
+
+/**
+ * The parts a student packs into one message. Questions are routinely compound
+ * — "any darkening of your skin, and have you been craving salty foods?" — and
+ * each half has to be accounted for separately.
+ */
+function messageClauses(lower: string): string[] {
+  return lower.split(/[,;?!.]+|\s+(?:and|or|also)\s+/).map(c => c.trim()).filter(Boolean)
+}
+
+/** A clause carries a topic only if it has real words left after the grammar. */
+function isSubstantive(clause: string): boolean {
+  const content = clause.match(/[a-z]{4,}/g)?.filter(w => !CLAUSE_SCAFFOLD.has(w)) ?? []
+  // Two rather than one: a trailing fragment ("and does it radiate") leans on
+  // the clause before it, while a genuine second topic ("craving salty foods
+  // at all", "how about your energy levels") stands on its own words.
+  return content.length >= 2
+}
+
 export interface ROSScan {
   categories: ROSCategory[]
   /** Categories matched only via ambiguous keywords — too weak to trust alone. */
   ambiguous: ROSCategory[]
-  /** True when every match is ambiguous, so the AI classifier should arbitrate. */
+  /**
+   * Substantive clauses containing no keyword at all — a topic the scan is
+   * blind to, so acting on the keyword hits alone would discard it.
+   */
+  uncovered: string[]
+  /** True when the keyword result cannot stand alone and the AI must arbitrate. */
   needsClassifier: boolean
 }
 
@@ -71,6 +120,14 @@ export interface ROSScan {
  * Case-insensitive keyword scan, reporting how much weight each match can bear.
  * An unambiguous hit is decisive and skips the model call; an ambiguous-only
  * result is a hint that must be arbitrated rather than acted on.
+ *
+ * A decisive hit is not licence to stop reading the rest of the message. Asking
+ * "any darkening of your skin, and have you been craving salty foods?" matched
+ * 'skin' outright, so the classifier never ran and the salt craving — the
+ * cardinal finding of the Addison's case it was asked in — was recorded
+ * nowhere. Any substantive clause the keywords cannot see now sends the whole
+ * message to the classifier; the caller unions the result with the decisive
+ * hits, so arbitration can only add a system, never drop one.
  */
 export function scanMessageForROSDetailed(message: string): ROSScan {
   const lower = message.toLowerCase()
@@ -82,10 +139,16 @@ export function scanMessageForROSDetailed(message: string): ROSScan {
     categories.push(cat)
     if (hits.every(kw => AMBIGUOUS_KEYWORDS.has(kw))) ambiguous.push(cat)
   }
+  const uncovered = messageClauses(lower)
+    .filter(isSubstantive)
+    .filter(c => !ALL_KEYWORDS.some(kw => c.includes(kw)))
   return {
     categories,
     ambiguous,
-    needsClassifier: categories.length > 0 && ambiguous.length === categories.length,
+    uncovered,
+    needsClassifier:
+      (categories.length > 0 && ambiguous.length === categories.length) ||
+      uncovered.length > 0,
   }
 }
 

@@ -43,17 +43,18 @@ export async function POST(req: NextRequest) {
       new Set(state.exams.map(e => e.region)),
     )
     const history = [...state.chat, { role: 'user' as const, content: message }]
-    const { text: reply, usage } = await callModel('patient_chat', {
-      system,
-      messages: history,
-      maxTokens: 300,
-    })
-    usages.push({ type: 'chat', usage })
 
-    // ROS classification. First hits unlock the category; repeat hits on an
-    // already-unlocked category UPDATE its cumulative derived record so a
-    // better follow-up question is never dropped from what the grader sees.
-    const matched = await classifyRosCategories(message, (t, u) => usages.push({ type: t, usage: u }))
+    // ROS classification reads the QUESTION only — it never needed the reply,
+    // so it has no reason to queue behind it. Run it alongside the patient
+    // turn: the classifier now arbitrates far more often (any compound question
+    // with a topic the keyword map cannot see), and paying for that serially
+    // would have put a second round-trip in front of every answer.
+    const classifierUsages: Array<{ type: string; usage: RawUsage }> = []
+    const [{ text: reply, usage }, matched] = await Promise.all([
+      callModel('patient_chat', { system, messages: history, maxTokens: 300 }),
+      classifyRosCategories(message, (t, u) => classifierUsages.push({ type: t, usage: u })),
+    ])
+    usages.push({ type: 'chat', usage }, ...classifierUsages)
 
     // One batched summarizer call for however many categories this exchange
     // touched (3.2 — previously one call per category).
