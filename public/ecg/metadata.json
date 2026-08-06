@@ -39,46 +39,6 @@
     "report": "sinus arrhythmie sonst normales ekg",
     "sourceId": "ptb-xl:11"
   },
-  "afib/00351.svg": {
-    "report": "atrial fibrillation with rapid ventricular response. non-specific st-t wave changes.",
-    "sourceId": "ptb-xl:351"
-  },
-  "afib/04117.svg": {
-    "report": "slt tachykardes vorhofflimmern sves hohes t in v2-4 pathologisches ekg",
-    "sourceId": "ptb-xl:4117"
-  },
-  "afib/04761.svg": {
-    "report": "tachykardes vorhofflimmern lagetyp normal ves st-senkung in avf,ii,v5-6 t neg in iii",
-    "sourceId": "ptb-xl:4761"
-  },
-  "afib/07221.svg": {
-    "report": "vorhofflimmern/-flattern lagetyp normal periphere niederspannung t abnorm in inferioren ableitungen 4.46                          unbestÄtigter bericht",
-    "sourceId": "ptb-xl:7221"
-  },
-  "afib/07489.svg": {
-    "report": "ventrikulÄre extrasystole(n) tachykardes vorhofflimmern linkstyp qrs(t) abnorm    inferiorer infarkt     mÖgl. akut st & t abnorm, mÖglicherweise neuer    hochlateraler myokard- oder perikardschaden 4.46                          unbestÄtigter bericht",
-    "sourceId": "ptb-xl:7489"
-  },
-  "afib/08215.svg": {
-    "report": "normokardes vorhofflimmern                              linkstyp",
-    "sourceId": "ptb-xl:8215"
-  },
-  "afib/12542.svg": {
-    "report": "vorhofflimmern normokard bis bradykard lagetyp normal pathologisch",
-    "sourceId": "ptb-xl:12542"
-  },
-  "afib/12632.svg": {
-    "report": "atrial fibrillation with rapid ventricular response. low limb lead voltage. otherwise normal ecg.",
-    "sourceId": "ptb-xl:12632"
-  },
-  "afib/12948.svg": {
-    "report": "tachykardes vorhofflimmern lagetyp normal",
-    "sourceId": "ptb-xl:12948"
-  },
-  "afib/13832.svg": {
-    "report": "atrial fibrillation. st segments are depressed in ii, iii, avf, v4,5,6. findings may be due to myocardial.ischaemia and  digitalis effect.",
-    "sourceId": "ptb-xl:13832"
-  },
   "stemi/00181.svg": {
     "report": "ventrikulÄr(a) extrasystoli(er) fÖrmaksflimmer med hÖg kammarfrekvens extrem vÄnster el-axel avvikande qrs(t) fÖrlopp    anterior infarkt     mÖjligen fÄrsk    inferior infarkt     sannolikt Äldre st-t sÄnkning, sÅsom vid    hÖg lateral ischemi eller vÄns",
     "sourceId": "ptb-xl:181"
@@ -127,6 +87,10 @@
     "report": "sinusrhythmus verdacht auf p-sinistrocardiale linkstyp unspezifisches abnormales t qt-verlÄngerung sr unter 3x1 cordichin stabil. novodigal 0.2 1x1 ass 100  1x1 tromcardin 1x2 neu:1/2 tensobon 25 fÜr  rr",
     "sourceId": "ptb-xl:28"
   },
+  "nstemi_ischemia/00135.svg": {
+    "report": "sinustachykardi t-fÖrÄndring, sÅsom vid    anterolateral myokardaffektion ischemifÖrÄndringar som inte fanns pÅ ekg 910218.",
+    "sourceId": "ptb-xl:135"
+  },
   "nstemi_ischemia/00160.svg": {
     "report": "sinusrytm vÄnster el-axel t-fÖrÄndring, sÅsom vid    hÖg lateral myokardaffektion",
     "sourceId": "ptb-xl:160"
@@ -135,29 +99,25 @@
     "report": "sinusrytm extrem vÄnster el-axel ospecifikt skÄnkelblock",
     "sourceId": "ptb-xl:162"
   },
+  "nstemi_ischemia/00164.svg": {
+    "report": "sinustachykardi st-t fÖrÄndring anterolateralt och inferolateralt sÅsom vid ischemi eller vÄnster kammarbelastning. Edit: LVH 100, ISC, (f,26), Sokolow 2,6(ISCAL)",
+    "sourceId": "ptb-xl:164"
+  },
+  "nstemi_ischemia/00167.svg": {
+    "report": "sinusrytm t-fÖrÄndring, sÅsom vid    hÖg lateral myokardaffektion",
+    "sourceId": "ptb-xl:167"
+  },
   "nstemi_ischemia/00170.svg": {
     "report": "ventrikulÄre extrasystole(n) sinusrhythmus linkstyp st & t abnormal, wahrscheinlich    anteriore ischÄmie oder linksbelastung    inferiore ischÄmie oder linksbelastung",
     "sourceId": "ptb-xl:170"
   },
+  "nstemi_ischemia/00171.svg": {
+    "report": "sinusrytm st-t sÄnkning, sÅsom vid    lateral ischemi eller vÄnster belastning Edit: ISCIL, Sokolow 2,7(ISCIL 100)",
+    "sourceId": "ptb-xl:171"
+  },
   "nstemi_ischemia/00173.svg": {
     "report": "sinusrytm p fÖrlÄngd vÄnster el-axel vÄnster kammarhypertrofi",
     "sourceId": "ptb-xl:173"
-  },
-  "nstemi_ischemia/00223.svg": {
-    "report": "sinusrhythmus indiff. typ                                             linkshypertrophie subakuter oder chron. anteriorer infarkt mÖglich dd: vorderwandaneurysma st-senkung in v4-6 fehlende r-progression v2-3",
-    "sourceId": "ptb-xl:223"
-  },
-  "nstemi_ischemia/00271.svg": {
-    "report": "premature atrial contraction(s). sinus rhythm. left atrial enlargement. qs complexes in v2 and tiny r waves in v3. st segments are depressed and t waves inverted in i,    avl, v5,6. consistent with ischaemic heart disease with old anteroseptal myocardial",
-    "sourceId": "ptb-xl:271"
-  },
-  "nstemi_ischemia/00273.svg": {
-    "report": "sinus rhythm. left atrial enlargement. voltages are high in chest leads suggesting lvh. st segments are depressed and t waves inverted in i,    avl, v4,5,6. this may be due to lv strain or ischaemia.",
-    "sourceId": "ptb-xl:273"
-  },
-  "nstemi_ischemia/00274.svg": {
-    "report": "sinus rhythm. possible left atrial enlargement. voltages are high in limb leads suggesting lvh. qs complexes in v2 suggesting old anteroseptal  myocardial infarction. st segments are depressed in i, avl, v5,6. t waves are inverted in i, avl, v3-6. this ma",
-    "sourceId": "ptb-xl:274"
   },
   "lvh/00030.svg": {
     "report": "sinusrhythmus unspezifischer intraventrikulÄrer block linkshypertrophie",
@@ -199,45 +159,85 @@
     "report": "sinus bradycardia with sinus arrhythmia. the cause of the bradycardia is not evident. voltages are high in chest leads suggesting lvh. st segments are depressed in i, ii, avl, v4,5,6. this may be due to lv strain or ischaemia. prolonged qt, this may be du",
     "sourceId": "ptb-xl:284"
   },
-  "afib_flutter/00017.svg": {
-    "report": "vorhof:hf  280 tachykardes vorhofflimmern ueberdrehter linkstyp qrs(t) abnormal    inferiorer infarkt     alter unbest.",
-    "sourceId": "ptb-xl:17"
+  "lbbb/00180.svg": {
+    "report": "sinusrytm vÄnster el-axel vÄnstersidigt skÄnkelblock",
+    "sourceId": "ptb-xl:180"
   },
-  "afib_flutter/00018.svg": {
-    "report": "vorhofflattern 2:1 Überleitung,jetzt nach isoptin 2amp+ 1 amp digitalis teilweise 3:1 .vorhof:ca. hf:265 linkstyp st-senkung ii  iii avf  v4-v6  bei tachycardie",
-    "sourceId": "ptb-xl:18"
+  "lbbb/00256.svg": {
+    "report": "premature ventricular contraction(s), bigeminy. sinus rhythm. left bundle branch block, this is most commonly due to    ischaemic heart disease.",
+    "sourceId": "ptb-xl:256"
   },
-  "afib_flutter/00020.svg": {
-    "report": "supraventrikulÄre ersatzsystole(n) interponierte supraventrikulÄre extrasystole(n) supraventrikulÄre tachykardie linkstyp rechtsschenkelblock qrs(t) abnormal    inferiorer infarkt     alter unbest.",
-    "sourceId": "ptb-xl:20"
+  "lbbb/00279.svg": {
+    "report": "sinus tachycardia. left axis deviation. left bundle branch block, this is most commonly due to    ischaemic heart disease.",
+    "sourceId": "ptb-xl:279"
   },
-  "afib_flutter/00023.svg": {
-    "report": "2:1 Überleitung bei vorhofflattern,jetzt unter 3x1  cordichin + 1x1 novodigal 0,2 etwas langsamer hf von 140 auf 128,sonst unverÄndert.",
-    "sourceId": "ptb-xl:23"
+  "lbbb/00282.svg": {
+    "report": "premature ventricular contraction(s). atrial fibrillation. left axis deviation. left bundle branch block, this is most commonly due to    ischaemic heart disease.",
+    "sourceId": "ptb-xl:282"
   },
-  "afib_flutter/00034.svg": {
-    "report": "erneut vorhofflattern unter 3x1 cordichin ,1x0,2 novod. und neu 1x1/2 tensobon 25 mg (danach anamnestisch  kurzer schweiáausbruch ,langsamer puls--seither wider hoher puls um 125! dh. umgesprungen. q",
-    "sourceId": "ptb-xl:34"
+  "lbbb/00286.svg": {
+    "report": "sinus rhythm. left axis deviation. left bundle branch block, this is most commonly due to    ischaemic heart disease.",
+    "sourceId": "ptb-xl:286"
   },
-  "afib_flutter/00449.svg": {
-    "report": "supraventrikulÄr(a) extrasystoli(er) supraventrikulÄr(a) escape beat(s) interpolerade supraventrikulÄr(a) extrasystoli(er) supraventrikulÄr tachykardi vÄnster el-axel st-t sÄnkning, sÅsom vid    anterior ischemi eller vÄnster belastning    lateral ischemi",
-    "sourceId": "ptb-xl:449"
+  "lbbb/00287.svg": {
+    "report": "premature ventricular contraction(s). sinus rhythm. right bundle branch block.",
+    "sourceId": "ptb-xl:287"
   },
-  "afib_flutter/00858.svg": {
-    "report": "premature ventricular contraction(s). atrial flutter with 2:1 av block. left anterior fascicular block. right bundle branch block. bifascicular block.",
-    "sourceId": "ptb-xl:858"
+  "lbbb/00338.svg": {
+    "report": "sinus rhythm. left bundle branch block, this is most commonly due to    ischaemic heart disease.",
+    "sourceId": "ptb-xl:338"
   },
-  "afib_flutter/01173.svg": {
-    "report": "a rapid, regular supraventricular tachycardia is  present. appearances in inferior leads suggest that this is  atrial flutter. compared with tracings of 9 & 11:9:91, rhythm has  changed. st segment depression in inferolateral leads persists.",
-    "sourceId": "ptb-xl:1173"
+  "lbbb/00346.svg": {
+    "report": "sinus rhythm. left axis deviation. left bundle branch block, this is most commonly due to    ischaemic heart disease.",
+    "sourceId": "ptb-xl:346"
   },
-  "afib_flutter/01773.svg": {
-    "report": "vorhofflattern mit wechselnder Überleitung llt t zeitweise spitz in v2-v4",
-    "sourceId": "ptb-xl:1773"
+  "lbbb/00423.svg": {
+    "report": "trace only requested.",
+    "sourceId": "ptb-xl:423"
   },
-  "afib_flutter/02430.svg": {
-    "report": "bradykardes vorhofflattern seitenlagetyp path. ekg",
-    "sourceId": "ptb-xl:2430"
+  "lbbb/00489.svg": {
+    "report": "sinus rhythm. possible left atrial enlargement. left axis deviation. left bundle branch block, this is most commonly due to    ischaemic heart disease.",
+    "sourceId": "ptb-xl:489"
+  },
+  "rbbb/00045.svg": {
+    "report": "sinusrhythmus unvollstÄndiger rechtsschenkelblock sonst normales ekg",
+    "sourceId": "ptb-xl:45"
+  },
+  "rbbb/00052.svg": {
+    "report": "sinusrhythmus unvollstÄndiger rechtsschenkelblock mÄssige amplitudenkriterien f#r linkshypertrophie",
+    "sourceId": "ptb-xl:52"
+  },
+  "rbbb/00065.svg": {
+    "report": "sinusrhythmus r-s #bergang in v ableitungen nach rechts verschoben unvollstÄndiger rechtsschenkelblock sonst normales ekg",
+    "sourceId": "ptb-xl:65"
+  },
+  "rbbb/00077.svg": {
+    "report": "sinusrhythmus unvollstÄndiger rechtsschenkelblock",
+    "sourceId": "ptb-xl:77"
+  },
+  "rbbb/00087.svg": {
+    "report": "sinusrhythmus unvollstÄndiger rechtsschenkelblock t abnormal, wahrscheinlich    inferiorer myokardschaden Edit: INJIN, IRBBB, (m,19) , (IRBBB, NDT)",
+    "sourceId": "ptb-xl:87"
+  },
+  "rbbb/00154.svg": {
+    "report": "sinusrhythmus normales ekg",
+    "sourceId": "ptb-xl:154"
+  },
+  "rbbb/00169.svg": {
+    "report": "sinusrytm vÄnster el-axel inkomplett hÖgersidigt skÄnkelblock",
+    "sourceId": "ptb-xl:169"
+  },
+  "rbbb/00172.svg": {
+    "report": "sinusrytm svÅrbestÄmmbar el-axel lÅga qrs amplituder i extremitetsavledningarna hÖgersidigt skÄnkelblock",
+    "sourceId": "ptb-xl:172"
+  },
+  "rbbb/00188.svg": {
+    "report": "sinusrytm p fÖrlÄngd extrem vÄnster el-axel hÖgersidigt skÄnkelblock",
+    "sourceId": "ptb-xl:188"
+  },
+  "rbbb/00192.svg": {
+    "report": "sinusrytm hÖgersidigt skÄnkelblock",
+    "sourceId": "ptb-xl:192"
   },
   "heart_block/00102.svg": {
     "report": "sinusrytm a-v block i st-t sÄnkning, sÅsom vid    anterolateral ischemi eller vÄnster belastning",
@@ -279,86 +279,6 @@
     "report": "sinusrytm a-v block i ospecifik st-fÖrÄndring ospecifik t-fÖrÄndring",
     "sourceId": "ptb-xl:522"
   },
-  "bradycardia/00144.svg": {
-    "report": "pacemaker ekg",
-    "sourceId": "ptb-xl:144"
-  },
-  "bradycardia/00190.svg": {
-    "report": "pacemaker ekg",
-    "sourceId": "ptb-xl:190"
-  },
-  "bradycardia/00382.svg": {
-    "report": "pacemaker ekg",
-    "sourceId": "ptb-xl:382"
-  },
-  "bradycardia/00385.svg": {
-    "report": "pacemaker ekg",
-    "sourceId": "ptb-xl:385"
-  },
-  "bradycardia/00498.svg": {
-    "report": "pacemaker ekg",
-    "sourceId": "ptb-xl:498"
-  },
-  "bradycardia/01399.svg": {
-    "report": "pacemaker ekg",
-    "sourceId": "ptb-xl:1399"
-  },
-  "bradycardia/01461.svg": {
-    "report": "pacemaker ekg",
-    "sourceId": "ptb-xl:1461"
-  },
-  "bradycardia/01596.svg": {
-    "report": "steiltyp                                                wandernder schrittmacher                                av- block 1. grades                                     intraventr. leitungsstoerung avl                        st- hebung v2",
-    "sourceId": "ptb-xl:1596"
-  },
-  "bradycardia/01641.svg": {
-    "report": "pacemaker spikes noted. a regular paced rhythm is present. apparently normal pacemaker function. abnormal nature of complexes obscures further    interpretation.",
-    "sourceId": "ptb-xl:1641"
-  },
-  "bradycardia/01674.svg": {
-    "report": "pacemaker spikes noted. a regular paced rhythm is present. apparently normal pacemaker function. abnormal nature of complexes obscures further    interpretation.",
-    "sourceId": "ptb-xl:1674"
-  },
-  "tachycardia/01299.svg": {
-    "report": "supraventrikulÄre tachykardie rechtstyp linksposteriorer hemiblock st & t abnormal, wahrscheinlich    anteriore ischÄmie oder linksbelastung    inferolaterale ischÄmie oder linksbelastung",
-    "sourceId": "ptb-xl:1299"
-  },
-  "tachycardia/01919.svg": {
-    "report": "rapid regular supraventricular tachycardia without evident p waves. non-specific st-t wave changes.",
-    "sourceId": "ptb-xl:1919"
-  },
-  "tachycardia/02051.svg": {
-    "report": "trace only requested.",
-    "sourceId": "ptb-xl:2051"
-  },
-  "tachycardia/03134.svg": {
-    "report": "trace only requested.",
-    "sourceId": "ptb-xl:3134"
-  },
-  "tachycardia/03267.svg": {
-    "report": "rapid, regular supraventricular tachycardia. no p wave found. widespread non-specific st-t wave changes.",
-    "sourceId": "ptb-xl:3267"
-  },
-  "tachycardia/03476.svg": {
-    "report": "a rapid, regular supraventricular tachycardia is present. non-specific st-t wave changes.",
-    "sourceId": "ptb-xl:3476"
-  },
-  "tachycardia/04408.svg": {
-    "report": "frequent premature atrial contraction(s). sinus tachycardia. otherwise no definite pathology.",
-    "sourceId": "ptb-xl:4408"
-  },
-  "tachycardia/07889.svg": {
-    "report": "av-tachykardie (dd:supraventr. tachykardie) linkstyp st-senkung in i,ii,v3-4 t hoch in v2-4",
-    "sourceId": "ptb-xl:7889"
-  },
-  "tachycardia/08461.svg": {
-    "report": "trace only requested.",
-    "sourceId": "ptb-xl:8461"
-  },
-  "tachycardia/09866.svg": {
-    "report": "a rapid regular supraventricular tachycardia is present. minor non-specific st-t wave changes which may be due  to the tachycardia.",
-    "sourceId": "ptb-xl:9866"
-  },
   "wpw/02145.svg": {
     "report": "trace only requested.",
     "sourceId": "ptb-xl:2145"
@@ -398,5 +318,205 @@
   "wpw/10053.svg": {
     "report": "sinus rhythm. pr interval is short and delta waves are present. these features indicate the wolff-parkinson-white syndrome. patients may be prone to bouts of paroxysmal supra- ventricular tachyarrhythmias.",
     "sourceId": "ptb-xl:10053"
+  },
+  "afib/00152.svg": {
+    "report": "fÖrmaksflimmer/-fladder hÖger el-axel lÅga qrs amplituder i extremitetsavledningarna mÅttliga amplitudkrit. fÖr vÄnster kammarkhypertrofi avvikande qrs(t) fÖrlopp    hÖg lateral infarkt bÖr ÖvervÄgas t-fÖrÄndring, sÅsom vid    inferior myokardaffektion",
+    "sourceId": "ptb-xl:152"
+  },
+  "afib/00282.svg": {
+    "report": "premature ventricular contraction(s). atrial fibrillation. left axis deviation. left bundle branch block, this is most commonly due to    ischaemic heart disease.",
+    "sourceId": "ptb-xl:282"
+  },
+  "afib/00307.svg": {
+    "report": "atrial fibrillation. qs complexes in v2 and tiny r waves in v3,4. st segments are depressed in i, ii, avl, v5,6. t waves are inverted in i, avl, v5,6. consistent with ischaemic heart disease with old anteroseptal myocardial infarction. it is difficult to",
+    "sourceId": "ptb-xl:307"
+  },
+  "afib/00318.svg": {
+    "report": "atrial fibrillation. st segments are depressed in ii, iii, avf, v4,5,6. non-specific but consistent with myocardial ischaemia and digitalis effect.",
+    "sourceId": "ptb-xl:318"
+  },
+  "afib/00321.svg": {
+    "report": "atrial fibrillation with rapid ventricular response. low limb lead voltage. minor non-specific st-t wave changes. prolonged qt, this may be due to a drug effect or an  electrolyte disturbance. coarse fibrillation waves accord with mitral valve disease.",
+    "sourceId": "ptb-xl:321"
+  },
+  "afib/00330.svg": {
+    "report": "atrial fibrillation. otherwise no definite pathology.",
+    "sourceId": "ptb-xl:330"
+  },
+  "afib/00337.svg": {
+    "report": "atrial fibrillation. st segments are depressed in i, v5,6. t waves are low or flat in i, v5,6 and inverted in avl. this may be due to lv strain or ischaemia.",
+    "sourceId": "ptb-xl:337"
+  },
+  "afib/00351.svg": {
+    "report": "atrial fibrillation with rapid ventricular response. non-specific st-t wave changes.",
+    "sourceId": "ptb-xl:351"
+  },
+  "afib/00428.svg": {
+    "report": "atrial fibrillation with rapid ventricular response. right superior axis deviation. left anterior fascicular block. right bundle branch block. bifascicular block.",
+    "sourceId": "ptb-xl:428"
+  },
+  "afib/00452.svg": {
+    "report": "ventrikulÄr(a) extrasystoli(er) fÖrmaksflimmer/-fladder vÄnster el-axel ospecifikt inkomplett skÄnkelblock vÄnster kammarhypertrofi",
+    "sourceId": "ptb-xl:452"
+  },
+  "afib_flutter/00017.svg": {
+    "report": "vorhof:hf  280 tachykardes vorhofflimmern ueberdrehter linkstyp qrs(t) abnormal    inferiorer infarkt     alter unbest.",
+    "sourceId": "ptb-xl:17"
+  },
+  "afib_flutter/00018.svg": {
+    "report": "vorhofflattern 2:1 Überleitung,jetzt nach isoptin 2amp+ 1 amp digitalis teilweise 3:1 .vorhof:ca. hf:265 linkstyp st-senkung ii  iii avf  v4-v6  bei tachycardie",
+    "sourceId": "ptb-xl:18"
+  },
+  "afib_flutter/00020.svg": {
+    "report": "supraventrikulÄre ersatzsystole(n) interponierte supraventrikulÄre extrasystole(n) supraventrikulÄre tachykardie linkstyp rechtsschenkelblock qrs(t) abnormal    inferiorer infarkt     alter unbest.",
+    "sourceId": "ptb-xl:20"
+  },
+  "afib_flutter/00023.svg": {
+    "report": "2:1 Überleitung bei vorhofflattern,jetzt unter 3x1  cordichin + 1x1 novodigal 0,2 etwas langsamer hf von 140 auf 128,sonst unverÄndert.",
+    "sourceId": "ptb-xl:23"
+  },
+  "afib_flutter/00034.svg": {
+    "report": "erneut vorhofflattern unter 3x1 cordichin ,1x0,2 novod. und neu 1x1/2 tensobon 25 mg (danach anamnestisch  kurzer schweiáausbruch ,langsamer puls--seither wider hoher puls um 125! dh. umgesprungen. q",
+    "sourceId": "ptb-xl:34"
+  },
+  "afib_flutter/00336.svg": {
+    "report": "premature ventricular contraction(s) a rapid, regular supraventricular tachycardia is present. rhythm is probably atrial flutter with 2:1 av block. left ventricular hypertrophy. non-specific st-t wave changes.",
+    "sourceId": "ptb-xl:336"
+  },
+  "afib_flutter/00347.svg": {
+    "report": "sinus rhythm. prolonged pr interval. left atrial enlargement. compared with tracing of 23:9:91, rhythm was  previously atrial flutter. otherwise it is similar, with non-specific st-t wave changes.",
+    "sourceId": "ptb-xl:347"
+  },
+  "afib_flutter/00449.svg": {
+    "report": "supraventrikulÄr(a) extrasystoli(er) supraventrikulÄr(a) escape beat(s) interpolerade supraventrikulÄr(a) extrasystoli(er) supraventrikulÄr tachykardi vÄnster el-axel st-t sÄnkning, sÅsom vid    anterior ischemi eller vÄnster belastning    lateral ischemi",
+    "sourceId": "ptb-xl:449"
+  },
+  "afib_flutter/00706.svg": {
+    "report": "probable atrial flutter with variable a:v block. low limb lead voltage. qs complexes in v2,3 consistent with old anteroseptal    myocardial infarction.",
+    "sourceId": "ptb-xl:706"
+  },
+  "afib_flutter/00858.svg": {
+    "report": "premature ventricular contraction(s). atrial flutter with 2:1 av block. left anterior fascicular block. right bundle branch block. bifascicular block.",
+    "sourceId": "ptb-xl:858"
+  },
+  "tachycardia/00103.svg": {
+    "report": "sinustachykardie ueberdrehter linkstyp periphere niederspannung qrs(t) abnormal    inferiorer infarkt     wahrscheinlich alt",
+    "sourceId": "ptb-xl:103"
+  },
+  "tachycardia/00108.svg": {
+    "report": "sinustachykardie sonst normales ekg",
+    "sourceId": "ptb-xl:108"
+  },
+  "tachycardia/00263.svg": {
+    "report": "sinus tachycardia. left atrial enlargement. non-specific st-t wave changes in inferolateral leads. findings are likely to be due to ischaemic heart    disease.",
+    "sourceId": "ptb-xl:263"
+  },
+  "tachycardia/00270.svg": {
+    "report": "sinus tachycardia. qs complexes in v2 and tiny r waves in v3 consistent    with old anteroseptal myocardial infarction.",
+    "sourceId": "ptb-xl:270"
+  },
+  "tachycardia/00279.svg": {
+    "report": "sinus tachycardia. left axis deviation. left bundle branch block, this is most commonly due to    ischaemic heart disease.",
+    "sourceId": "ptb-xl:279"
+  },
+  "tachycardia/00336.svg": {
+    "report": "premature ventricular contraction(s) a rapid, regular supraventricular tachycardia is present. rhythm is probably atrial flutter with 2:1 av block. left ventricular hypertrophy. non-specific st-t wave changes.",
+    "sourceId": "ptb-xl:336"
+  },
+  "tachycardia/00622.svg": {
+    "report": "sinus tachycardia. qs complexes in v2,3 consistent with old anteroseptal    myocardial infarction. st segments are depressed in i, ii, v5,6. t waves are flat in i, avl. this may be due to lv strain or ischaemia.",
+    "sourceId": "ptb-xl:622"
+  },
+  "tachycardia/00626.svg": {
+    "report": "sinus tachycardia. right atrial enlargement. incomplete right bundle branch block. non-specific st-t wave changes in inferolateral leads.",
+    "sourceId": "ptb-xl:626"
+  },
+  "tachycardia/00652.svg": {
+    "report": "sinus tachycardia. left atrial enlargement. left axis deviation. qs complexes in v2,3 consistent with anteroseptal  myocardial infarction of uncertain age, probably old. st segments are depressed and t waves inverted in i,    avl, v5,6. this may be due to",
+    "sourceId": "ptb-xl:652"
+  },
+  "tachycardia/00698.svg": {
+    "report": "sinus tachycardia. normal ecg.",
+    "sourceId": "ptb-xl:698"
+  },
+  "bradycardia/00002.svg": {
+    "report": "sinusbradykardie sonst normales ekg",
+    "sourceId": "ptb-xl:2"
+  },
+  "bradycardia/00012.svg": {
+    "report": "sinusbradykardie sonst normales ekg",
+    "sourceId": "ptb-xl:12"
+  },
+  "bradycardia/00069.svg": {
+    "report": "sinusbradykardie unspezifisches abnormales t",
+    "sourceId": "ptb-xl:69"
+  },
+  "bradycardia/00078.svg": {
+    "report": "sinusbradykardie sonst normales ekg",
+    "sourceId": "ptb-xl:78"
+  },
+  "bradycardia/00225.svg": {
+    "report": "sinusbradykardie lagetyp normal schlechte r-progression v1-3 st-hebung in v3 t neg in v2",
+    "sourceId": "ptb-xl:225"
+  },
+  "bradycardia/00235.svg": {
+    "report": "sinusbradykardie                                        ueberdrehter linkstyp r-s #bergang in v ableitungen nach rechts verschoben lahb hohe, spitze t in v2-5",
+    "sourceId": "ptb-xl:235"
+  },
+  "bradycardia/00240.svg": {
+    "report": "sinusbradykardie lagetyp normal qrs(t) abnormal    inferiorer infarkt     wahrscheinlich alt",
+    "sourceId": "ptb-xl:240"
+  },
+  "bradycardia/00284.svg": {
+    "report": "sinus bradycardia with sinus arrhythmia. the cause of the bradycardia is not evident. voltages are high in chest leads suggesting lvh. st segments are depressed in i, ii, avl, v4,5,6. this may be due to lv strain or ischaemia. prolonged qt, this may be du",
+    "sourceId": "ptb-xl:284"
+  },
+  "bradycardia/00289.svg": {
+    "report": "sinus bradycardia. voltages are high in chest leads suggesting lvh. the cause of the bradycardia is not evident.",
+    "sourceId": "ptb-xl:289"
+  },
+  "bradycardia/00543.svg": {
+    "report": "sinusbradykardie sonst normales ekg",
+    "sourceId": "ptb-xl:543"
+  },
+  "paced/00144.svg": {
+    "report": "pacemaker ekg",
+    "sourceId": "ptb-xl:144"
+  },
+  "paced/00190.svg": {
+    "report": "pacemaker ekg",
+    "sourceId": "ptb-xl:190"
+  },
+  "paced/00382.svg": {
+    "report": "pacemaker ekg",
+    "sourceId": "ptb-xl:382"
+  },
+  "paced/00385.svg": {
+    "report": "pacemaker ekg",
+    "sourceId": "ptb-xl:385"
+  },
+  "paced/00498.svg": {
+    "report": "pacemaker ekg",
+    "sourceId": "ptb-xl:498"
+  },
+  "paced/01399.svg": {
+    "report": "pacemaker ekg",
+    "sourceId": "ptb-xl:1399"
+  },
+  "paced/01461.svg": {
+    "report": "pacemaker ekg",
+    "sourceId": "ptb-xl:1461"
+  },
+  "paced/01596.svg": {
+    "report": "steiltyp                                                wandernder schrittmacher                                av- block 1. grades                                     intraventr. leitungsstoerung avl                        st- hebung v2",
+    "sourceId": "ptb-xl:1596"
+  },
+  "paced/01641.svg": {
+    "report": "pacemaker spikes noted. a regular paced rhythm is present. apparently normal pacemaker function. abnormal nature of complexes obscures further    interpretation.",
+    "sourceId": "ptb-xl:1641"
+  },
+  "paced/01674.svg": {
+    "report": "pacemaker spikes noted. a regular paced rhythm is present. apparently normal pacemaker function. abnormal nature of complexes obscures further    interpretation.",
+    "sourceId": "ptb-xl:1674"
   }
 }

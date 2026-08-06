@@ -12,7 +12,12 @@
  * Output:
  *   public/ecg/{category}/{ecg_id}.svg    <- ECG waveform images (~30 KB each)
  *   public/ecg/index.json                 <- { category: ["00001.svg", ...] }
- *   public/ecg/metadata.json              <- { "category/00001.svg": "report" }
+ *   public/ecg/metadata.json              <- { "cat/00001.svg": { report, sourceId } }
+ *
+ * The sourceId is the PTB-XL ecg_id. PTB-XL is CC BY 4.0, which grants use on
+ * condition the source is credited, so each tracing has to carry the record it
+ * came from — a credit nobody can check against the source is not much of one.
+ * The licence itself lives once in public/ecg/provenance.json.
  *
  * Cache (gitignored, safe to delete):
  *   ptbxl_cache/                          <- downloaded CSV + waveform files
@@ -32,20 +37,55 @@ const DELAY_MS        = 400  // be polite to PhysioNet
 
 const LEAD_NAMES = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
 
+// Two things this map originally got wrong, both of which emptied or corrupted
+// categories without anything raising a complaint.
+//
+// 1. THE CODE NAMES. Six codes here did not exist in PTB-XL, so their
+//    membership test could never be true. 'LBBB' and 'RBBB' are not codes —
+//    the dataset separates complete from incomplete block (CLBBB/ILBBB,
+//    CRBBB/IRBBB) — which is why those categories produced exactly zero images
+//    while 2,249 qualifying records sat in the corpus. 'STTC', 'ISCA' and
+//    'ISCI' were likewise invented (the real ones are ISC_, NST_ and the
+//    localized ISCAL/ISCAN/ISCAS/ISCIL/ISCIN/ISCLA), and 'AVB' is a
+//    superclass rather than a statement.
+//
+// 2. THE LIKELIHOOD FILTER. PTB-XL assigns a likelihood only to DIAGNOSTIC
+//    statements. Form and rhythm statements carry 0, meaning "not applicable",
+//    not "0% confident". Requiring >= 80 therefore excluded rhythm categories
+//    almost entirely:
+//
+//        SBRAD  637 records,   0 at >=80        STACH  826 records,  2 at >=80
+//        SVTAC   27 records,   0 at >=80        SR   16748 records,  0 at >=80
+//
+//    So 'bradycardia' (SBRAD + PACE) could only ever draw PACE and contained
+//    no bradycardia at all — every tracing in it was a paced rhythm. The same
+//    filter left 'tachycardia' as almost pure PSVT, which is why an SVT strip
+//    was once served to a sinus-tachycardia case.
+//
+//    Rhythm categories are matched on PRESENCE (`rhythm: true`), diagnostic
+//    ones on confidence. The distinction is the dataset's, not ours.
 const CATEGORIES = {
+  // Diagnostic statements — likelihood is meaningful, so require confidence.
   normal:          { include: ['NORM'],                                          minLk: 80,  exclusive: true },
-  afib:            { include: ['AFIB'],                                          minLk: 80  },
   stemi:           { include: ['AMI','IMI','ALMI','ILMI','IPLMI','IPMI','LMI','PMI'], minLk: 80 },
-  nstemi_ischemia: { include: ['STTC','NST_','ISC_','ISCA','ISCI'],              minLk: 80,
+  nstemi_ischemia: { include: ['NST_','ISC_','ISCAL','ISCAN','ISCAS','ISCIL','ISCIN','ISCLA'], minLk: 80,
                      exclude: ['AMI','IMI','ALMI','ILMI','IPLMI','IPMI','LMI','PMI'] },
   lvh:             { include: ['LVH'],                                           minLk: 80  },
-  lbbb:            { include: ['LBBB'],                                          minLk: 100 },
-  rbbb:            { include: ['RBBB'],                                          minLk: 100 },
-  afib_flutter:    { include: ['AFLT'],                                          minLk: 80  },
-  heart_block:     { include: ['AVB','1AVB','2AVB','3AVB'],                      minLk: 80  },
-  bradycardia:     { include: ['SBRAD','PACE'],                                  minLk: 80  },
-  tachycardia:     { include: ['STACH','SVTAC','PSVT'],                          minLk: 80  },
+  lbbb:            { include: ['CLBBB','ILBBB'],                                 minLk: 80  },
+  rbbb:            { include: ['CRBBB','IRBBB'],                                 minLk: 80  },
+  heart_block:     { include: ['1AVB','2AVB','3AVB'],                            minLk: 80  },
   wpw:             { include: ['WPW'],                                           minLk: 80  },
+
+  // Rhythm statements — recorded at likelihood 0 by design, so match on
+  // presence. Filtering these by confidence is what emptied them.
+  afib:            { include: ['AFIB'],                    rhythm: true, exclude: ['AFLT'] },
+  afib_flutter:    { include: ['AFLT'],                    rhythm: true },
+  tachycardia:     { include: ['STACH','SVTAC','PSVT'],    rhythm: true },
+  // A paced rhythm is not bradycardia. Serving one for the other is exactly the
+  // "a wrong image is worse than no image" failure the selector guards against
+  // elsewhere, so PACE gets its own category and is excluded here.
+  bradycardia:     { include: ['SBRAD'],                   rhythm: true, exclude: ['PACE'] },
+  paced:           { include: ['PACE'],                    rhythm: true },
 }
 
 // ─── HTTP helpers ───────────────────────────────────────────────────────────
@@ -138,10 +178,13 @@ function selectRecords(db) {
   for (const [cat, rules] of Object.entries(CATEGORIES)) {
     const incSet = new Set(rules.include)
     const excSet = new Set(rules.exclude ?? [])
+    // Rhythm statements carry likelihood 0 by design (see the note on
+    // CATEGORIES), so presence is the only signal available for them.
+    const minLk = rules.rhythm ? 0 : (rules.minLk ?? 80)
 
     const matches = db.filter(row => {
       const codes = parseScpCodes(row.scp_codes_raw)
-      if (!rules.include.some(c => (codes[c] ?? 0) >= rules.minLk)) return false
+      if (!rules.include.some(c => c in codes && codes[c] >= minLk)) return false
       if (excSet.size && rules.exclude.some(c => c in codes)) return false
       if (rules.exclusive) {
         if (Object.keys(codes).some(c => !incSet.has(c) && (codes[c] ?? 0) > 0)) return false
@@ -309,7 +352,7 @@ async function main() {
       if (fs.existsSync(svgPath)) {
         console.log(`  ${ecgId}: already exists`)
         index[cat].push(svgName)
-        metadata[`${cat}/${svgName}`] = record.report
+        metadata[`${cat}/${svgName}`] = { report: record.report, sourceId: `ptb-xl:${record.ecg_id}` }
         continue
       }
 
@@ -329,7 +372,7 @@ async function main() {
 
         fs.writeFileSync(svgPath, svg, 'utf8')
         index[cat].push(svgName)
-        metadata[`${cat}/${svgName}`] = record.report
+        metadata[`${cat}/${svgName}`] = { report: record.report, sourceId: `ptb-xl:${record.ecg_id}` }
         console.log(` ✓  (${(svg.length / 1024).toFixed(1)} KB)`)
 
         await sleep(DELAY_MS)
