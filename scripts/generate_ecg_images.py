@@ -44,20 +44,57 @@ DPI = 150
 LEAD_NAMES = ['I', 'II', 'III', 'aVR', 'aVL', 'aVF', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6']
 
 # SCP code → category mapping
+#
+# Two things about PTB-XL that this map originally got wrong, both of which
+# silently emptied or corrupted categories rather than raising anything.
+#
+# 1. THE CODE NAMES. Six codes here did not exist in the dataset, so the
+#    membership test could never be true. 'LBBB' and 'RBBB' are not PTB-XL
+#    codes — the dataset distinguishes complete from incomplete block
+#    (CLBBB/ILBBB, CRBBB/IRBBB) — which is why those two categories came back
+#    with exactly zero images while 2,272 qualifying records sat in the corpus.
+#    'STTC', 'ISCA' and 'ISCI' were likewise invented; the real ischemia codes
+#    are ISC_, NST_ and the localized ISCAL/ISCAN/ISCAS/ISCIL/ISCIN/ISCLA.
+#    'AVB' is a superclass, not a statement.
+#
+# 2. THE LIKELIHOOD FILTER. PTB-XL assigns a likelihood only to DIAGNOSTIC
+#    statements; form and rhythm statements are recorded with likelihood 0,
+#    meaning "not applicable", not "0% confident". Requiring >= 80 therefore
+#    excluded rhythm categories almost entirely:
+#
+#        SBRAD  637 records,   0 at >=80      STACH  826 records,   2 at >=80
+#        SVTAC   27 records,   0 at >=80      SR   16748 records,   0 at >=80
+#
+#    So 'bradycardia' (SBRAD + PACE) could only ever draw PACE, and contained
+#    no bradycardia at all — every tracing in it was a paced rhythm. The same
+#    filter left 'tachycardia' as almost pure PSVT, which is why an SVT strip
+#    was once served to a sinus-tachycardia case.
+#
+#    Rhythm categories are therefore matched on PRESENCE ('rhythm': True) and
+#    diagnostic ones on confidence. That distinction is the dataset's, not ours.
 CATEGORY_CODES = {
+    # Diagnostic statements — likelihood is meaningful, so require confidence.
     'normal':          {'include': {'NORM'}, 'min_likelihood': 80, 'exclude_all_others': True},
-    'afib':            {'include': {'AFIB'}, 'min_likelihood': 80},
     'stemi':           {'include': {'AMI','IMI','ALMI','ILMI','IPLMI','IPMI','LMI','PMI'}, 'min_likelihood': 80},
-    'nstemi_ischemia': {'include': {'STTC','NST_','ISC_','ISCA','ISCI'}, 'min_likelihood': 80,
+    'nstemi_ischemia': {'include': {'NST_','ISC_','ISCAL','ISCAN','ISCAS','ISCIL','ISCIN','ISCLA'},
+                        'min_likelihood': 80,
                         'exclude': {'AMI','IMI','ALMI','ILMI','IPLMI','IPMI','LMI','PMI'}},
     'lvh':             {'include': {'LVH'}, 'min_likelihood': 80},
-    'lbbb':            {'include': {'LBBB'}, 'min_likelihood': 100},
-    'rbbb':            {'include': {'RBBB'}, 'min_likelihood': 100},
-    'afib_flutter':    {'include': {'AFLT'}, 'min_likelihood': 80},
-    'heart_block':     {'include': {'AVB','1AVB','2AVB','3AVB'}, 'min_likelihood': 80},
-    'bradycardia':     {'include': {'SBRAD','PACE'}, 'min_likelihood': 80},
-    'tachycardia':     {'include': {'STACH','SVTAC','PSVT'}, 'min_likelihood': 80},
+    'lbbb':            {'include': {'CLBBB','ILBBB'}, 'min_likelihood': 80},
+    'rbbb':            {'include': {'CRBBB','IRBBB'}, 'min_likelihood': 80},
+    'heart_block':     {'include': {'1AVB','2AVB','3AVB'}, 'min_likelihood': 80},
     'wpw':             {'include': {'WPW'}, 'min_likelihood': 80},
+
+    # Rhythm statements — recorded at likelihood 0 by design, so match on
+    # presence. Filtering these by confidence is what emptied them.
+    'afib':            {'include': {'AFIB'},  'rhythm': True, 'exclude': {'AFLT'}},
+    'afib_flutter':    {'include': {'AFLT'},  'rhythm': True},
+    'tachycardia':     {'include': {'STACH','SVTAC','PSVT'}, 'rhythm': True},
+    # A paced rhythm is not bradycardia. Serving one for the other is exactly
+    # the "wrong image teaches the wrong thing" failure the selector guards
+    # against elsewhere, so PACE gets its own category and is excluded here.
+    'bradycardia':     {'include': {'SBRAD'}, 'rhythm': True, 'exclude': {'PACE'}},
+    'paced':           {'include': {'PACE'},  'rhythm': True},
 }
 
 # ---------------------------------------------------------------------------
@@ -91,7 +128,9 @@ def select_records(db):
     selected = {}
     for category, rules in CATEGORY_CODES.items():
         include_codes = rules['include']
-        min_lk = rules.get('min_likelihood', 80)
+        # Rhythm statements carry likelihood 0 by design (see the note on
+        # CATEGORY_CODES), so presence is the only signal available for them.
+        min_lk = 0 if rules.get('rhythm') else rules.get('min_likelihood', 80)
         exclude_codes = rules.get('exclude', set())
         require_exclusive = rules.get('exclude_all_others', False)
 

@@ -30,6 +30,116 @@ export interface ImageAttributes {
   reason?: string
 }
 
+// ── Provenance ────────────────────────────────────────────────────────────────
+// What licence an image is served under, recorded per image rather than per
+// dataset. A dataset-level claim is not checkable and, for the archives this
+// library draws on, not even true: ISIC licenses each image separately as
+// CC0, CC-BY or CC-BY-NC, and the PMC open-access subset mixes CC BY with
+// NC and ND. "Open access" describes how you may READ something, not what you
+// may then do with it, and this product is sold.
+
+/**
+ * The licence record for one image.
+ *
+ * `sourceId` is what makes the claim auditable — an ISIC ID, a PMC ID, a
+ * PTB-XL ecg_id. Without it "we believe this is CC-BY" cannot be rechecked
+ * later, and several archives require citing the identifier anyway.
+ */
+export interface ImageProvenance {
+  /** Human-readable dataset or archive name. */
+  source: string
+  /** The identifier that makes the licence claim verifiable at the source. */
+  sourceId?: string
+  /** SPDX-style identifier. `unverified` is honest and blocks the image. */
+  license: LicenseId
+  licenseUrl?: string
+  /** The exact credit line to display, where the licence requires one. */
+  attribution?: string
+}
+
+export type LicenseId =
+  | 'CC0-1.0'
+  | 'public-domain'
+  | 'CC-BY-3.0'
+  | 'CC-BY-4.0'
+  | 'CC-BY-SA-4.0'
+  | 'CC-BY-NC-4.0'
+  | 'CC-BY-ND-4.0'
+  | 'CC-BY-NC-ND-4.0'
+  | 'unverified'
+
+/**
+ * Licences that permit use in a product that is sold.
+ *
+ * SA is deliberately absent as well as NC and ND: share-alike would place
+ * conditions on the surrounding work, which is a decision to take knowingly
+ * rather than by leaving an image in a folder.
+ */
+const COMMERCIAL_LICENSES: ReadonlySet<string> = new Set<LicenseId>([
+  'CC0-1.0', 'public-domain', 'CC-BY-3.0', 'CC-BY-4.0',
+])
+
+/** Licences that require the credit line to be shown wherever the image is. */
+const ATTRIBUTION_REQUIRED: ReadonlySet<string> = new Set<LicenseId>([
+  'CC-BY-3.0', 'CC-BY-4.0', 'CC-BY-SA-4.0', 'CC-BY-NC-4.0', 'CC-BY-ND-4.0', 'CC-BY-NC-ND-4.0',
+])
+
+/**
+ * A dataset's licence record: one default, plus overrides for the images that
+ * differ from it.
+ *
+ * Two shapes because the datasets are two kinds. The 261 chest films all come
+ * from one CC0 collection, so 261 identical records would be noise. The ISIC
+ * archive licenses each image separately, so there the per-image record is the
+ * whole point. `default` covers the first, `overrides` the second.
+ */
+export interface DatasetProvenance {
+  default: ImageProvenance
+  overrides?: Record<string, Partial<ImageProvenance>>
+  /** Free-text note for whoever audits this next. */
+  notes?: string
+}
+
+/** The effective provenance for one image: its own record over the default. */
+export function resolveProvenance(
+  dataset: DatasetProvenance | undefined,
+  key: string,
+  inline?: Partial<ImageProvenance>,
+): ImageProvenance | undefined {
+  const base = dataset?.default
+  const over = { ...dataset?.overrides?.[key], ...inline }
+  if (!base && !over.source) return undefined
+  return { ...base, ...over } as ImageProvenance
+}
+
+/** May this image be served by a product that is sold? Unknown means no. */
+export function isCommerciallyUsable(p: ImageProvenance | undefined): boolean {
+  return !!p && COMMERCIAL_LICENSES.has(p.license)
+}
+
+export function requiresAttribution(p: ImageProvenance | undefined): boolean {
+  return !!p && ATTRIBUTION_REQUIRED.has(p.license)
+}
+
+/**
+ * Why this image may not ship, or null if it may.
+ *
+ * A CC-BY image with no credit line is as much a breach as an NC one — the
+ * licence grants use *on condition* the attribution is given — so a missing
+ * attribution is an error here rather than a cosmetic omission.
+ */
+export function licenseProblem(p: ImageProvenance | undefined): string | null {
+  if (!p) return 'no provenance recorded'
+  // A record that names a source but no licence is the original defect, not a
+  // malformed object: knowing where a file came from was mistaken for knowing
+  // what may be done with it.
+  if (!p.license) return `no licence recorded — "${p.source}" says where the file came from, not what may be done with it`
+  if (p.license === 'unverified') return `licence not established for "${p.source}" — "open access" and a dataset name are not a licence`
+  if (!isCommerciallyUsable(p)) return `${p.license} does not permit use in a product that is sold`
+  if (requiresAttribution(p) && !p.attribution?.trim()) return `${p.license} requires attribution but none is recorded`
+  return null
+}
+
 /**
  * strict  — for a lateralized case, serve ONLY images confirmed to match the
  *           side; otherwise suppress (report-only). Default.

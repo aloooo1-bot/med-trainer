@@ -91,17 +91,27 @@ export function ECGPanel({ ecgFindings, aiReport, image, diagnosisSubmitted, onZ
         )}
       </div>
       )}
+      {/*
+        Attribution is read from the image's own provenance record rather than
+        hardcoded. The old block named PTB-XL in the markup, which could not be
+        checked against the data and would have been wrong the moment a tracing
+        from anywhere else was added. It also said "used for educational
+        purposes" — that describes fair use, and fair use is not what permits a
+        product that is sold. CC BY does permit it, on condition the licence is
+        named, so the licence is now stated.
+      */}
       <div className="text-xs text-ink-tertiary border-t border-surface-4 pt-2">
         ECG image from{' '}
         <a
-          href="https://physionet.org/content/ptb-xl/1.0.3/"
+          href={image.provenance?.licenseUrl ?? 'https://physionet.org/content/ptb-xl/1.0.3/'}
           target="_blank"
           rel="noopener noreferrer"
           className="text-ink-tertiary hover:text-ink-secondary transition-colors underline"
         >
-          PTB-XL dataset (PhysioNet)
+          {image.provenance?.source ?? 'PTB-XL dataset (PhysioNet)'}
         </a>
-        . Used for educational purposes.
+        {image.provenance?.sourceId && <> · record {image.provenance.sourceId}</>}
+        {image.provenance?.license && <> · licensed {image.provenance.license}</>}.
       </div>
     </div>
   )

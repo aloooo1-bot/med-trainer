@@ -1,11 +1,55 @@
+import { resolveProvenance, type ImageProvenance, type DatasetProvenance } from './imageAttributes'
+
 export interface ECGImage {
   path: string    // e.g. "/ecg/afib/00012.png"
   report: string  // PTB-XL cardiologist report string
+  /** Where the tracing came from and under what licence. See ECG_METADATA. */
+  provenance?: ImageProvenance
+}
+
+/**
+ * One entry of public/ecg/metadata.json.
+ *
+ * The file was originally `path -> report string`, which left nowhere to
+ * record where a tracing came from. PTB-XL is CC BY 4.0 and that licence is
+ * granted on condition the source is credited, so the string shape made a
+ * condition of the licence impossible to meet. Entries are now objects; the
+ * reader below still accepts the old strings so the code can land before the
+ * regenerated data does.
+ */
+export interface ECGMetadataEntry extends Partial<ImageProvenance> {
+  report: string
+}
+
+/** Read one metadata entry in either the old or new shape. */
+export function readEcgEntry(raw: string | ECGMetadataEntry | undefined): ECGMetadataEntry | null {
+  if (raw == null) return null
+  if (typeof raw === 'string') return { report: raw }
+  return typeof raw.report === 'string' ? raw : null
+}
+
+/**
+ * What this entry says about its OWN provenance, to be layered over the
+ * dataset default from provenance.json.
+ *
+ * A partial, not a whole record: an entry usually carries only the identifier
+ * that distinguishes it (the PTB-XL ecg_id), while the source and licence are
+ * the same for every tracing and live once in the dataset record.
+ */
+export function entryProvenance(entry: ECGMetadataEntry | null): Partial<ImageProvenance> | undefined {
+  if (!entry) return undefined
+  const { source, sourceId, license, licenseUrl, attribution } = entry
+  const over = { source, sourceId, license, licenseUrl, attribution }
+  const present = Object.entries(over).filter(([, v]) => v != null)
+  return present.length ? Object.fromEntries(present) : undefined
 }
 
 // Module-level caches — loaded once per browser session
 let indexCache: Record<string, string[]> | null = null
-let metaCache: Record<string, string> | null = null
+let metaCache: EcgMetadataFile | null = null
+
+/** The on-disk file, which may still hold old-shape string entries. */
+export type EcgMetadataFile = Record<string, string | ECGMetadataEntry>
 
 async function loadIndex(): Promise<Record<string, string[]>> {
   if (indexCache) return indexCache
@@ -19,7 +63,7 @@ async function loadIndex(): Promise<Record<string, string[]>> {
   }
 }
 
-async function loadMeta(): Promise<Record<string, string>> {
+async function loadMeta(): Promise<EcgMetadataFile> {
   if (metaCache) return metaCache
   try {
     const res = await fetch('/ecg/metadata.json')
@@ -29,6 +73,19 @@ async function loadMeta(): Promise<Record<string, string>> {
   } catch {
     return {}
   }
+}
+
+let provCache: DatasetProvenance | null | undefined
+/** Dataset licence record. Source and licence are the same for every tracing. */
+async function loadProv(): Promise<DatasetProvenance | undefined> {
+  if (provCache !== undefined) return provCache ?? undefined
+  try {
+    const res = await fetch('/ecg/provenance.json')
+    provCache = res.ok ? await res.json() : null
+  } catch {
+    provCache = null
+  }
+  return provCache ?? undefined
 }
 
 // ---------------------------------------------------------------------------
@@ -42,6 +99,16 @@ const CATEGORY_RULES: Array<{
   /** Findings containing any of these can never belong to this category. */
   excludeEcgTerms?: string[]
 }> = [
+  {
+    // First, and deliberately. A tracing that is paced looks paced whatever the
+    // diagnosis underneath it is — a complete heart block that has been paced
+    // shows pacing spikes, not Mobitz. Ordering this below heart_block let the
+    // diagnosis outrank what the ECG actually shows, and the finding is the
+    // more specific signal of the two.
+    category: 'paced',
+    diagnosisTerms: ['pacemaker', 'paced rhythm', 'cardiac resynchronization'],
+    ecgTerms: ['paced', 'pacemaker', 'pacing spike', 'ventricular pacing', 'atrial pacing', 'biventricular pacing'],
+  },
   {
     category: 'stemi',
     diagnosisTerms: ['stemi', 'st-elevation myocardial infarction', 'st elevation myocardial infarction', 'acute coronary', 'heart attack'],
@@ -76,9 +143,15 @@ const CATEGORY_RULES: Array<{
     ecgTerms: ['wpw', 'wolff-parkinson-white', 'delta wave', 'pre-excitation', 'short pr'],
   },
   {
+    // 'pacemaker' was listed here, which routed every paced case into the
+    // bradycardia pool. That pool was ALSO built entirely from paced records
+    // (the generator's likelihood filter excluded sinus bradycardia outright),
+    // so the conflation was invisible: a bradycardia case got a paced strip and
+    // nothing disagreed. Both ends are separated now.
     category: 'bradycardia',
     diagnosisTerms: ['sick sinus', 'sinus node dysfunction'],
-    ecgTerms: ['bradycardia', 'sinus brady', 'bradycardic', 'slow rate', 'pacemaker', 'junctional rhythm', 'heart rate 4', 'heart rate 5'],
+    ecgTerms: ['bradycardia', 'sinus brady', 'bradycardic', 'slow rate', 'junctional rhythm', 'heart rate 4', 'heart rate 5'],
+    excludeEcgTerms: ['paced', 'pacemaker', 'pacing spike'],
   },
   {
     // Mostly SUPRAVENTRICULAR tachycardia, which is why a bare 'tachycardia'
@@ -131,13 +204,16 @@ export function getECGCategory(caseDiagnosis: string, ecgFinding?: string): stri
 }
 
 export async function getRandomECGImage(category: string): Promise<ECGImage | null> {
-  const [index, meta] = await Promise.all([loadIndex(), loadMeta()])
+  const [index, meta, prov] = await Promise.all([loadIndex(), loadMeta(), loadProv()])
   const files = index[category]
   if (!files || files.length === 0) return null
   const file = files[Math.floor(Math.random() * files.length)]
+  const key = `${category}/${file}`
+  const entry = readEcgEntry(meta[key])
   return {
-    path: `/ecg/${category}/${file}`,
-    report: meta[`${category}/${file}`] ?? '',
+    path: `/ecg/${key}`,
+    report: entry?.report ?? '',
+    provenance: resolveProvenance(prov, key, entryProvenance(entry)),
   }
 }
 
@@ -318,10 +394,16 @@ export async function getBestECGImage(category: string, ecgFindings?: string): P
   let best = files[0]
   let bestScore = -1
   for (const file of files) {
-    const s = scoreEcgMatch(meta[`${category}/${file}`] ?? '', ecgFindings)
+    const s = scoreEcgMatch(readEcgEntry(meta[`${category}/${file}`])?.report ?? '', ecgFindings)
     if (s > bestScore) { bestScore = s; best = file }
   }
   // No distinctive overlap → keep variety with a random pick.
   if (bestScore <= 0) return getRandomECGImage(category)
-  return { path: `/ecg/${category}/${best}`, report: meta[`${category}/${best}`] ?? '' }
+  const key = `${category}/${best}`
+  const entry = readEcgEntry(meta[key])
+  return {
+    path: `/ecg/${key}`,
+    report: entry?.report ?? '',
+    provenance: resolveProvenance(await loadProv(), key, entryProvenance(entry)),
+  }
 }

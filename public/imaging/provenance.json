@@ -1,0 +1,9 @@
+{
+  "default": {
+    "source": "NIH ChestX-ray14 (NIH Clinical Center)",
+    "license": "CC0-1.0",
+    "licenseUrl": "https://creativecommons.org/publicdomain/zero/1.0/",
+    "attribution": "Chest radiographs from the NIH ChestX-ray14 dataset, NIH Clinical Center. Released under CC0 1.0."
+  },
+  "notes": "Filenames are the dataset's own image indices (e.g. 00000011_006.png), so each file is traceable to the source collection. CC0 imposes no condition — no attribution is legally required and commercial use is unrestricted — but the credit line is displayed anyway, and the record exists so the licence sweep can verify rather than assume."
+}

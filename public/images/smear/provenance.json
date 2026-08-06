@@ -1,0 +1,9 @@
+{
+  "default": {
+    "source": "NIH LHNCBC Malaria Cell Image Dataset",
+    "license": "public-domain",
+    "licenseUrl": "https://lhncbc.nlm.nih.gov/LHC-research/LHC-projects/image-processing/malaria-datasheet.html",
+    "attribution": "Rajaraman S, et al. (2018). Malaria Cell Image Dataset, Lister Hill National Center for Biomedical Communications, U.S. National Library of Medicine. Public domain."
+  },
+  "notes": "A U.S. Government work, so public domain and usable commercially without condition. This is the only special-image dataset whose licence was correctly established at the time it was fetched."
+}

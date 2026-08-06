@@ -65,7 +65,14 @@ export function SpecialPanel({ modality, report, image, findings, onZoom }: {
         )}
         {sourceOpen && image.source && (
           <p className="text-xs leading-relaxed text-ink-tertiary italic border-l-2 border-surface-4 pl-3">
-            {image.source}
+            {/*
+              The licence, not just where the file came from. "NIH Open-i /
+              PubMed Central (open access)" says how it may be READ; the terms
+              of reuse are a separate thing and this product is sold.
+            */}
+            {image.provenance?.attribution ?? image.source}
+            {image.provenance?.sourceId && <> · {image.provenance.sourceId}</>}
+            {image.provenance?.license && <> · licensed {image.provenance.license}</>}
           </p>
         )}
       </div>

@@ -1,11 +1,17 @@
 import 'server-only'
 import { promises as fs } from 'fs'
 import path from 'path'
-import { getECGCategory, scoreEcgMatch, contradictsFindings, isInterpretableReport, type ECGImage } from '../ecgImageLookup'
-import { getSpecialCategory, type SpecialModality, type SpecialImage } from '../specialImageLookup'
 import {
-  caseLaterality, selectByLaterality,
-  type ImageAttributes, type ImageMatch, type LateralityPolicy,
+  getECGCategory, scoreEcgMatch, contradictsFindings, isInterpretableReport,
+  readEcgEntry, entryProvenance, type ECGImage, type EcgMetadataFile,
+} from '../ecgImageLookup'
+import {
+  getSpecialCategory, specialProvenance,
+  type SpecialModality, type SpecialImage, type SpecialMetadataEntry,
+} from '../specialImageLookup'
+import {
+  caseLaterality, selectByLaterality, resolveProvenance,
+  type ImageAttributes, type ImageMatch, type LateralityPolicy, type DatasetProvenance,
 } from '../imageAttributes'
 
 /**
@@ -43,6 +49,11 @@ async function readPublicJson<T>(relPath: string): Promise<T | null> {
 /** Per-image attributes ({ "category/file": ImageAttributes }); {} if unreviewed. */
 async function loadAttributes(datasetDir: string): Promise<Record<string, ImageAttributes>> {
   return (await readPublicJson<Record<string, ImageAttributes>>(`${datasetDir}/attributes.json`)) ?? {}
+}
+
+/** The dataset's licence record — one default plus any per-image overrides. */
+async function loadProvenance(datasetDir: string): Promise<DatasetProvenance | undefined> {
+  return (await readPublicJson<DatasetProvenance>(`${datasetDir}/provenance.json`)) ?? undefined
 }
 
 /** Reviewer-rejected keys ("category/file"); [] if none. */
@@ -114,7 +125,9 @@ export async function pickECGImage(diagnosis: string, ecgFindings?: string): Pro
   if (!ecgFindings) return suppress('case states no ECG findings to match a tracing against')
 
   const index = await readPublicJson<Record<string, string[]>>('ecg/index.json')
-  const meta = (await readPublicJson<Record<string, string>>('ecg/metadata.json')) ?? {}
+  const meta = (await readPublicJson<EcgMetadataFile>('ecg/metadata.json')) ?? {}
+  const reportOf = (key: string) => readEcgEntry(meta[key])?.report ?? ''
+  const datasetProv = await loadProvenance('ecg')
   const blocked = await loadBlocklist('ecg')
   const files = (index?.[category] ?? []).filter(f => !blocked.has(`${category}/${f}`))
   if (!files.length) return suppress('no ECG image for this category')
@@ -132,7 +145,7 @@ export async function pickECGImage(diagnosis: string, ecgFindings?: string): Pro
   let bestScore = -1
   let conflict: string | null = null
   for (const file of files) {
-    const report = meta[`${category}/${file}`] ?? ''
+    const report = reportOf(`${category}/${file}`)
     // A stub report ("trace only requested.") states nothing to check the strip
     // against, so it can never be shown to be faithful. Unusable, not neutral.
     if (!isInterpretableReport(report)) continue
@@ -147,8 +160,16 @@ export async function pickECGImage(diagnosis: string, ecgFindings?: string): Pro
       : 'no usable tracing in this category')
   }
 
+  const chosenKey = `${category}/${best}`
+  const chosenEntry = readEcgEntry(meta[chosenKey])
   return {
-    ecg: { path: `/ecg/${category}/${best}`, report: meta[`${category}/${best}`] ?? '' },
+    ecg: {
+      path: `/ecg/${chosenKey}`,
+      report: chosenEntry?.report ?? '',
+      // Dataset default, with whatever this record states for itself on top —
+      // for PTB-XL that is the ecg_id, which is what makes the claim checkable.
+      provenance: resolveProvenance(datasetProv, chosenKey, entryProvenance(chosenEntry)),
+    },
     match: bestScore > 0
       ? { required: 'unknown', status: 'confirmed' }
       : { required: 'unknown', status: 'unconfirmed', reason: 'compatible tracing for this rhythm category; no shared descriptive detail' },
@@ -163,8 +184,9 @@ export async function pickSpecialImage(
   const dataset = `images/${modality}`
   const category = getSpecialCategory(modality, diagnosis, finding)
   const index = await readPublicJson<Record<string, string[]>>(`${dataset}/index.json`)
-  const meta = (await readPublicJson<Record<string, { label: string; source: string }>>(`${dataset}/metadata.json`)) ?? {}
+  const meta = (await readPublicJson<Record<string, SpecialMetadataEntry>>(`${dataset}/metadata.json`)) ?? {}
   const attrs = await loadAttributes(dataset)
+  const datasetProv = await loadProvenance(dataset)
   const blocked = await loadBlocklist(dataset)
 
   const files = (index?.[category] ?? []).filter(f => !blocked.has(`${category}/${f}`))
@@ -179,6 +201,7 @@ export async function pickSpecialImage(
         path: `/images/${modality}/${key}`,
         label: meta[key]?.label ?? '',
         source: meta[key]?.source ?? '',
+        provenance: resolveProvenance(datasetProv, key, specialProvenance(meta[key])),
       } satisfies SpecialImage,
       laterality: attrs[key]?.laterality,
     }

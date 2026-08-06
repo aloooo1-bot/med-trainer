@@ -101,6 +101,14 @@ async function searchOpenI(query, maxResults) {
       .map(item => ({
         imageUrl: `${OPENI}${item.imgLarge}`,
         caption:  (item.caption || '').replace(/\s+/g, ' ').trim().slice(0, 200),
+        // The article this image belongs to. Open-i indexes the PMC open-access
+        // subset, which mixes CC BY with CC BY-NC and CC BY-ND — only the first
+        // permits a product that is sold. Keeping just the image URL and caption
+        // meant the licence could not be established afterwards, and could not
+        // even be looked up, because nothing recorded WHICH paper it came from.
+        pmcid:      item.pmcid || item.uid || null,
+        articleUrl: item.detailedQueryURL || item.articleURL || null,
+        rawLicense: item.license || item.licenseType || null,
       }))
   }
   return []

@@ -1,0 +1,9 @@
+{
+  "default": {
+    "source": "PTB-XL (PhysioNet)",
+    "license": "CC-BY-4.0",
+    "licenseUrl": "https://physionet.org/content/ptb-xl/1.0.3/",
+    "attribution": "Wagner P, Strodthoff N, Bousseljot R-D, Samek W, Schaeffter T. PTB-XL, a large publicly available ECG dataset. PhysioNet. Licensed CC BY 4.0."
+  },
+  "notes": "Every tracing is rendered from a PTB-XL record; the filename stem is that record's ecg_id (e.g. afib/00351.svg is ecg_id 351), which is what makes each claim checkable at the source. CC BY 4.0 permits commercial use on condition the attribution above is displayed wherever the image is — ECGPanel renders it from this record rather than from hardcoded markup."
+}

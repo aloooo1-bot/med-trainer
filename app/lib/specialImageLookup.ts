@@ -1,14 +1,44 @@
+import { resolveProvenance, type ImageProvenance, type DatasetProvenance } from './imageAttributes'
+
 export interface SpecialImage {
   path: string    // e.g. "/images/smear/00001.png"
   label: string   // display label (e.g. "Plasmodium falciparum ring forms")
   source: string  // attribution string
+  /** Licence record. See SpecialMetadataEntry for why `source` alone is not one. */
+  provenance?: ImageProvenance
+}
+
+/**
+ * One entry of an images/<modality>/metadata.json.
+ *
+ * `source` was a free-text line like "NIH Open-i / PubMed Central (open
+ * access)". That names where a file was found, not what may be done with it —
+ * the PMC open-access subset mixes CC BY with NC and ND — so it cannot support
+ * a commercial claim. The provenance fields carry the licence itself.
+ */
+export interface SpecialMetadataEntry extends Partial<ImageProvenance> {
+  label?: string
+  source?: string
+}
+
+/** The provenance half of an entry, when it carries a licence. */
+export function specialProvenance(entry: SpecialMetadataEntry | undefined): ImageProvenance | undefined {
+  if (!entry?.source || !entry.license) return undefined
+  return {
+    source: entry.source,
+    sourceId: entry.sourceId,
+    license: entry.license,
+    licenseUrl: entry.licenseUrl,
+    attribution: entry.attribution,
+  }
 }
 
 export type SpecialModality = 'smear' | 'biopsy' | 'fundus' | 'derm' | 'urine'
 
 // Module-level caches — loaded once per browser session
 const indexCaches: Partial<Record<SpecialModality, Record<string, string[]> | null>> = {}
-const metaCaches: Partial<Record<SpecialModality, Record<string, { label: string; source: string }> | null>> = {}
+const metaCaches: Partial<Record<SpecialModality, Record<string, SpecialMetadataEntry> | null>> = {}
+const provCaches: Partial<Record<SpecialModality, DatasetProvenance | null>> = {}
 
 async function loadIndex(modality: SpecialModality): Promise<Record<string, string[]>> {
   if (indexCaches[modality]) return indexCaches[modality]!
@@ -22,7 +52,7 @@ async function loadIndex(modality: SpecialModality): Promise<Record<string, stri
   }
 }
 
-async function loadMeta(modality: SpecialModality): Promise<Record<string, { label: string; source: string }>> {
+async function loadMeta(modality: SpecialModality): Promise<Record<string, SpecialMetadataEntry>> {
   if (metaCaches[modality]) return metaCaches[modality]!
   try {
     const res = await fetch(`/images/${modality}/metadata.json`)
@@ -32,6 +62,18 @@ async function loadMeta(modality: SpecialModality): Promise<Record<string, { lab
   } catch {
     return {}
   }
+}
+
+/** The dataset's licence record; undefined when the dataset has none yet. */
+async function loadProv(modality: SpecialModality): Promise<DatasetProvenance | undefined> {
+  if (provCaches[modality] !== undefined) return provCaches[modality] ?? undefined
+  try {
+    const res = await fetch(`/images/${modality}/provenance.json`)
+    provCaches[modality] = res.ok ? await res.json() : null
+  } catch {
+    provCaches[modality] = null
+  }
+  return provCaches[modality] ?? undefined
 }
 
 // ---------------------------------------------------------------------------
@@ -151,7 +193,9 @@ export async function getRandomSpecialImage(
   modality: SpecialModality,
   category: string,
 ): Promise<SpecialImage | null> {
-  const [index, meta] = await Promise.all([loadIndex(modality), loadMeta(modality)])
+  const [index, meta, prov] = await Promise.all([
+    loadIndex(modality), loadMeta(modality), loadProv(modality),
+  ])
   const files = index[category]
   const chosen = (arr: string[]) => arr[Math.floor(Math.random() * arr.length)]
 
@@ -163,5 +207,6 @@ export async function getRandomSpecialImage(
     path: `/images/${modality}/${category}/${file}`,
     label: meta[key]?.label ?? '',
     source: meta[key]?.source ?? '',
+    provenance: resolveProvenance(prov, key, specialProvenance(meta[key])),
   }
 }

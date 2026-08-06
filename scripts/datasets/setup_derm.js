@@ -111,7 +111,26 @@ async function searchISIC(diagnosis, limit) {
     .map(item => ({
       imageUrl: item.files.full.url,
       diagnosis: item.metadata?.diagnosis || diagnosis,
+      // ISIC licenses EACH IMAGE separately — CC0, CC-BY or CC-BY-NC — and
+      // returns which in the response. The first version of this script mapped
+      // those fields away and wrote one hardcoded "CC-BY license" line for
+      // every file, so 30 images shipped with a licence nobody had checked and
+      // no isic_id to check it against later. Only CC-BY-NC actually forbids
+      // selling access, but without these fields there was no way to know which
+      // images were which.
+      isicId: item.isic_id ?? null,
+      license: item.copyright_license ?? null,
+      attribution: item.attribution ?? null,
     }))
+}
+
+/** ISIC's licence names -> the SPDX-ish ids app/lib/imageAttributes.ts knows. */
+function normalizeLicense(raw) {
+  const s = (raw ?? '').trim().toUpperCase()
+  if (s === 'CC-0' || s === 'CC0') return 'CC0-1.0'
+  if (s === 'CC-BY') return 'CC-BY-4.0'
+  if (s === 'CC-BY-NC') return 'CC-BY-NC-4.0'
+  return 'unverified'   // an unrecognised name is not permission
 }
 
 // ---------------------------------------------------------------------------
@@ -136,6 +155,14 @@ async function main() {
     const saved = []
     for (const r of results) {
       if (saved.length >= IMAGES_PER_CAT) break
+      // Skip anything we could not sell access to, rather than downloading it
+      // and discovering later. This app is a paid product; a CC-BY-NC image in
+      // it is a breach whether or not anyone noticed.
+      const license = normalizeLicense(r.license)
+      if (license === 'CC-BY-NC-4.0' || license === 'unverified') {
+        process.stdout.write('n')
+        continue
+      }
       const urlObj = new URL(r.imageUrl)
       const ext = path.extname(urlObj.pathname).replace('.', '') || 'jpg'
       const dest = path.join(outDir, `${cat.id}_${String(saved.length).padStart(3, '0')}.${ext}`)
@@ -143,7 +170,16 @@ async function main() {
         await downloadFile(r.imageUrl, dest)
         const fname = path.basename(dest)
         saved.push(fname)
-        metadata[`${cat.id}/${fname}`] = { label: cat.label, source: cat.source }
+        metadata[`${cat.id}/${fname}`] = {
+          label: cat.label,
+          source: cat.source,
+          // ISIC requires citing the image's own id, so it is recorded rather
+          // than derived — the local filename is sequential and says nothing.
+          sourceId: r.isicId ?? undefined,
+          license,
+          licenseUrl: 'https://www.isic-archive.com/blank-1',
+          attribution: r.attribution ?? `ISIC Archive image ${r.isicId ?? '(id unknown)'}, licensed ${license}.`,
+        }
         process.stdout.write('.')
       } catch (e) { process.stdout.write('x') }
     }

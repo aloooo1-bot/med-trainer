@@ -1,0 +1,8 @@
+{
+  "default": {
+    "source": "NIH Open-i / PubMed Central",
+    "license": "unverified",
+    "licenseUrl": "https://openi.nlm.nih.gov/faq"
+  },
+  "notes": "UNVERIFIED. The recorded source was 'NIH Open-i / PubMed Central (open access)', which is not a licence — it describes how the article may be READ. The PMC Open Access Subset mixes CC BY (commercial use permitted) with CC BY-NC and CC BY-ND (it is not), and Open-i indexes all of them. scripts/datasets/setup_biopsy.js kept only imgLarge and caption from the API response and discarded the article identifiers, so no image here can be traced to the paper it came from: resolving this means re-running the fetch capturing pmcid and licence, not looking something up. Until then these must be treated as not cleared for a product that is sold."
+}

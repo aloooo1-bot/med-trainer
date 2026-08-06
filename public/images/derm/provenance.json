@@ -1,0 +1,8 @@
+{
+  "default": {
+    "source": "ISIC Archive (International Skin Imaging Collaboration)",
+    "license": "unverified",
+    "licenseUrl": "https://www.isic-archive.com/blank-1"
+  },
+  "notes": "UNVERIFIED, and not because nobody looked — because the fetch discarded the answer. ISIC licenses each image separately as CC0, CC-BY or CC-BY-NC, and its API returns `isic_id`, `copyright_license` and `attribution` per image. scripts/datasets/setup_derm.js read none of them and wrote one hardcoded 'CC-BY license' line for all 30 files. Since no isic_id was stored and the local filenames are sequential (melanoma_000.jpg), these images cannot be traced back to their records: resolving this means re-running the fetch, not looking something up. Any CC-BY-NC image among them may not be used in a product that is sold, and ISIC additionally requires citing the isic_id."
+}
