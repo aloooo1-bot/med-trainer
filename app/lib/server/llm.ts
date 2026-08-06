@@ -10,6 +10,7 @@ import type { RawUsage } from '../analytics'
 
 export type LLMTask =
   | 'case_generation'
+  | 'case_audit'
   | 'patient_chat'
   | 'ros_classifier'
   | 'derived_summary'
@@ -28,6 +29,9 @@ export type LLMTask =
  */
 const TASK_MODELS: Record<LLMTask, string> = {
   case_generation: 'claude-sonnet-4-6',
+  // Judges whether displayed prose is a fact or a stage direction, and a wrong
+  // call deletes clinical text from a case. Same accuracy burden as generation.
+  case_audit: 'claude-sonnet-4-6',
   patient_chat: 'claude-haiku-4-5-20251001',
   ros_classifier: 'claude-haiku-4-5-20251001',
   derived_summary: 'claude-haiku-4-5-20251001',
@@ -42,6 +46,9 @@ const TASK_MODELS: Record<LLMTask, string> = {
 const TASK_TIMEOUTS_MS: Partial<Record<LLMTask, number>> = {
   case_generation: 175_000,
   grading: 120_000,
+  // Sits between generation and the student. It fails open, so a short leash
+  // costs a missed audit; a long one would stall a case that is otherwise ready.
+  case_audit: 30_000,
 }
 
 let _client: Anthropic | null = null

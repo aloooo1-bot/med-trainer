@@ -26,6 +26,24 @@ export interface RawUsage {
   cache_read_input_tokens?: number
 }
 
+/**
+ * Combine two calls into one usage figure.
+ *
+ * For work that is one logical operation but several model calls — generating a
+ * case and then auditing it before a student sees it — reporting only the first
+ * would understate what the operation cost.
+ */
+export function sumUsage(a?: RawUsage, b?: RawUsage): RawUsage | undefined {
+  if (!a) return b
+  if (!b) return a
+  return {
+    input_tokens: (a.input_tokens ?? 0) + (b.input_tokens ?? 0),
+    output_tokens: (a.output_tokens ?? 0) + (b.output_tokens ?? 0),
+    cache_creation_input_tokens: (a.cache_creation_input_tokens ?? 0) + (b.cache_creation_input_tokens ?? 0),
+    cache_read_input_tokens: (a.cache_read_input_tokens ?? 0) + (b.cache_read_input_tokens ?? 0),
+  }
+}
+
 export interface APICallRecord {
   type: APICallType
   inputTokens: number

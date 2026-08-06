@@ -28,7 +28,7 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 config({ path: path.join(ROOT, '.env.local') })
 
 const { joinCase, splitCase } = await import('../app/lib/server/caseTiers.mjs')
-const { checkCaseConsistency } = await import('../app/lib/caseConsistency')
+const { checkCaseConsistency, findAuthoringNote, stripAuthoringNote } = await import('../app/lib/caseConsistency')
 
 const dryRun = process.argv.includes('--dry-run')
 
@@ -45,48 +45,9 @@ const TACHYPNEIC_RR = 22     // band [21, 25)
 /** Drugs a patient buys and takes on their own initiative, when the entry says so. */
 const SELF_DIRECTED = /\b(acetaminophen|paracetamol|tylenol|ibuprofen|advil|motrin)\b[^.;]*/gi
 
-// A stage direction for the patient agent, printed in the student's chart.
-// Matches the detector in caseConsistency.ts, plus the separator that attaches
-// the note to the clinical text around it — the note has to leave with its
-// punctuation or the field is left reading "Vitiligo (diagnosed age 30, )".
-const NOTE_FRAGMENT =
-  /\s*(?:[,;—–-]+\s*)?\b(?:not|never|does not|do not|don't|won't)\s+(?:be\s+)?(?:volunteer(?:ed)?|disclos(?:e|ed)|reveal(?:ed)?|offer(?:ed)?|mention(?:ed)?|report(?:ed)?)\b[^.;)]{0,25}\b(?:initially|unless asked|until asked|spontaneously|on (?:their|his|her) own|if asked)\b/gi
-
-/** Excise the note and tidy the punctuation it leaves behind. */
-function stripNote(text: string): string {
-  return text
-    .replace(NOTE_FRAGMENT, '')
-    .replace(/\(\s*\)/g, '')            // a parenthetical that was only the note
-    .replace(/\s+([,.;)])/g, '$1')      // space stranded before punctuation
-    .replace(/([(])\s+/g, '$1')
-    .replace(/\s{2,}/g, ' ')
-    .replace(/\s*([,;—–-])\s*\./g, '.') // a dangling separator before the stop
-    .trim()
-}
-
-/**
- * Sentences carrying a note in the VIGNETTE go entirely.
- *
- * Excising the fragment there would leave the finding without the tell, which
- * is worse: the Reactive Arthritis case reads "He notes dysuria that began
- * approximately 1 week ago, which he had not volunteered initially" — trimming
- * the clause keeps the dysuria in the opening paragraph, where with the
- * conjunctivitis and post-diarrhoeal arthritis beside it, it completes the
- * Reiter triad before the student has asked anything. The case's own
- * hiddenHistory.fullHistory already stages that symptom as one "he was
- * embarrassed to disclose", so dropping the sentence loses nothing and restores
- * what the author intended.
- *
- * A background field is a list whose entries stand alone, so there the fragment
- * is excised and the entry kept.
- */
-function stripNoteSentences(text: string): string {
-  return text
-    .split(/(?<=[.!?])\s+/)
-    .filter(s => { NOTE_FRAGMENT.lastIndex = 0; return !NOTE_FRAGMENT.test(s) })
-    .join(' ')
-    .trim()
-}
+// The detector and the removal both live in caseConsistency.ts, so this script
+// and the generation-time audit can never disagree about what a repaired field
+// should look like.
 
 type Case = Record<string, any>
 
@@ -162,10 +123,8 @@ function repair(c: Case): string[] {
   ]
   for (const [name, get, set] of noteFields) {
     const text = get()
-    if (typeof text !== 'string') continue
-    NOTE_FRAGMENT.lastIndex = 0
-    if (!NOTE_FRAGMENT.test(text)) continue
-    const fixed = name === 'hpi' ? stripNoteSentences(text) : stripNote(text)
+    if (typeof text !== 'string' || !findAuthoringNote(text)) continue
+    const fixed = stripAuthoringNote(name, text)
     if (fixed === text) continue
     set(fixed)
     changes.push(`${name}: ${name === 'hpi' ? 'dropped the sentence carrying' : 'removed'} the authoring note\n          was: ${text}\n          now: ${fixed}`)

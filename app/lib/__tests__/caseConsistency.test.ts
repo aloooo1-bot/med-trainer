@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { checkCaseConsistency, consistencyErrors, bmiIsValid, type CheckableCase } from '../caseConsistency'
+import { checkCaseConsistency, consistencyErrors, bmiIsValid, findAuthoringNote, stripAuthoringNote, studentFacingProse, applyAuthoringNoteFindings, type CheckableCase } from '../caseConsistency'
 import { stripStageDirections, isOnlyStageDirections } from '../transcriptText'
 import { scanMessageForROSDetailed } from '../rosDetector'
 
@@ -225,4 +225,164 @@ test('a case with no prose at all raises nothing', () => {
     checkCaseConsistency({}).filter(i => i.code === 'content/authoring-note'),
     [],
   )
+})
+
+// ── removing a note ──────────────────────────────────────────────────────────
+
+test('a background field keeps its clinical content', () => {
+  // Losing "Vitiligo (diagnosed age 30)" to save a parenthetical would throw
+  // away the autoimmune diagnosis that points at the answer.
+  assert.equal(
+    stripAuthoringNote('pastMedicalHistory.conditions',
+      'Vitiligo (diagnosed age 30, not volunteered initially). Chronic low back pain.'),
+    'Vitiligo (diagnosed age 30). Chronic low back pain.',
+  )
+  assert.equal(
+    stripAuthoringNote('socialHistory.drugs',
+      'History of appetite suppressant use (fenfluramine-based) — not volunteered spontaneously.'),
+    'History of appetite suppressant use (fenfluramine-based).',
+  )
+  assert.equal(
+    stripAuthoringNote('currentMedications.otc',
+      'Aspirin 81 mg daily (self-discontinued 2 months ago due to GI upset — not disclosed initially). Occasional ibuprofen.'),
+    'Aspirin 81 mg daily (self-discontinued 2 months ago due to GI upset). Occasional ibuprofen.',
+  )
+})
+
+test('the vignette loses the whole sentence, not just the tell', () => {
+  // Excising the clause would leave the dysuria in the opening paragraph —
+  // the leak without the tell, which is worse than the note.
+  const hpi = 'He denies prior episodes of joint swelling. He notes dysuria that began approximately 1 week ago, which he had not volunteered initially.'
+  const fixed = stripAuthoringNote('hpi', hpi)
+  assert.equal(fixed, 'He denies prior episodes of joint swelling.')
+  assert.equal(/dysuria/.test(fixed), false, 'the staged finding must not survive in the vignette')
+})
+
+test('a clean field is returned untouched', () => {
+  const clean = 'Vitiligo (diagnosed age 30). Chronic low back pain.'
+  assert.equal(stripAuthoringNote('pastMedicalHistory.conditions', clean), clean)
+})
+
+test('an explicit span removes a phrasing no pattern describes', () => {
+  // What the model-driven audit contributes: the wording is not in the pattern
+  // family, but the span it quoted is excised with the same punctuation care.
+  assert.equal(
+    stripAuthoringNote(
+      'pastMedicalHistory.conditions',
+      'Chronic hepatitis C (keep this back until the student asks about risk factors). Hypertension.',
+      'keep this back until the student asks about risk factors',
+    ),
+    'Chronic hepatitis C. Hypertension.',
+  )
+})
+
+test('a note removal repairs what the detector flags', () => {
+  // The two halves must agree: anything checkAuthoringNotes reports must be
+  // something stripAuthoringNote can actually clear.
+  for (const [field, text] of REAL_NOTES.flatMap(([f, c]) =>
+    studentFacingProse(c as CheckableCase).filter(([k]) => k === f) as Array<[string, string]>)) {
+    const fixed = stripAuthoringNote(field, text)
+    assert.notEqual(fixed, text, field)
+    assert.equal(findAuthoringNote(fixed), null, `${field} still reads as an instruction`)
+    assert.ok(fixed.length > 0, field)
+  }
+})
+
+// ── applying what a model reviewer found ─────────────────────────────────────
+// The model may only POINT. Every guard here exists because a false positive
+// deletes clinical text from a case a student is about to be graded on.
+
+const auditable = (): CheckableCase => ({
+  hpi: 'He denies prior joint swelling. He notes dysuria for 1 week, which he keeps back until asked.',
+  pastMedicalHistory: { conditions: 'Chronic hepatitis C (hold this back unless the student asks about risk factors). Hypertension.' },
+  socialHistory: { alcohol: 'Drinks two glasses of wine weekly.' },
+})
+
+test('a verbatim span is removed and the field kept', () => {
+  const c = auditable()
+  const removed = applyAuthoringNoteFindings(c, [
+    { field: 'pastMedicalHistory.conditions', span: 'hold this back unless the student asks about risk factors' },
+  ])
+  assert.equal(removed.length, 1)
+  assert.equal(c.pastMedicalHistory!.conditions, 'Chronic hepatitis C. Hypertension.')
+})
+
+test('a paraphrased span is refused', () => {
+  // The model reworded rather than quoting. Applying it would mean guessing
+  // which characters it meant.
+  const c = auditable()
+  const before = c.pastMedicalHistory!.conditions
+  assert.deepEqual(applyAuthoringNoteFindings(c, [
+    { field: 'pastMedicalHistory.conditions', span: 'hold this back until the student asks' },
+  ]), [])
+  assert.equal(c.pastMedicalHistory!.conditions, before)
+})
+
+test('a span for a field that does not exist is refused', () => {
+  const c = auditable()
+  assert.deepEqual(applyAuthoringNoteFindings(c, [
+    { field: 'pastMedicalHistory.surgeries', span: 'anything' },
+    { field: 'imagingResults.CXR', span: 'do not volunteer' },
+  ]), [])
+})
+
+test('a span covering most of its field is refused', () => {
+  // A "note" that is nearly the whole entry is a misread, and honouring it
+  // would delete the clinical content rather than a stage direction.
+  const c: CheckableCase = { socialHistory: { alcohol: 'Do not volunteer the drinking.' } }
+  assert.deepEqual(applyAuthoringNoteFindings(c, [
+    { field: 'socialHistory.alcohol', span: 'Do not volunteer the drinking' },
+  ]), [])
+  assert.equal(c.socialHistory!.alcohol, 'Do not volunteer the drinking.')
+})
+
+test('malformed reviewer output changes nothing', () => {
+  const c = auditable()
+  const snapshot = JSON.stringify(c)
+  for (const bad of [null, undefined, 'findings', 42, {}, [null], [{ field: 1, span: 2 }], [{ field: 'hpi' }]]) {
+    assert.deepEqual(applyAuthoringNoteFindings(c, bad), [], JSON.stringify(bad))
+  }
+  assert.equal(JSON.stringify(c), snapshot)
+})
+
+test('the vignette rule still applies to a model-found span', () => {
+  const c = auditable()
+  const removed = applyAuthoringNoteFindings(c, [
+    { field: 'hpi', span: 'which he keeps back until asked' },
+  ])
+  assert.equal(removed.length, 1)
+  assert.equal(c.hpi, 'He denies prior joint swelling.')
+  assert.equal(/dysuria/.test(c.hpi!), false, 'a staged finding must not survive in the vignette')
+})
+
+test('several findings across fields all apply', () => {
+  const c = auditable()
+  const removed = applyAuthoringNoteFindings(c, [
+    { field: 'hpi', span: 'which he keeps back until asked' },
+    { field: 'pastMedicalHistory.conditions', span: 'hold this back unless the student asks about risk factors' },
+  ])
+  assert.equal(removed.length, 2)
+  assert.equal(c.hpi, 'He denies prior joint swelling.')
+  assert.equal(c.pastMedicalHistory!.conditions, 'Chronic hepatitis C. Hypertension.')
+  assert.equal(c.socialHistory!.alcohol, 'Drinks two glasses of wine weekly.', 'untouched fields stay untouched')
+})
+
+test('a repaired field is left as readable prose', () => {
+  // These are displayed, so a note taking the sentence's full stop with it must
+  // not leave a bare clause behind. Observed against the real reviewer.
+  assert.equal(
+    stripAuthoringNote('socialHistory.drugs',
+      'Occasional cocaine use on weekends; the patient should deny this on first questioning.',
+      'the patient should deny this on first questioning.'),
+    'Occasional cocaine use on weekends.',
+  )
+  for (const [field, text, span] of [
+    ['pastMedicalHistory.conditions', 'Vitiligo (diagnosed age 30, not volunteered initially). Chronic low back pain.', undefined],
+    ['currentMedications.otc', 'Aspirin 81 mg (self-discontinued — not disclosed initially). Occasional ibuprofen.', undefined],
+    ['pastMedicalHistory.conditions', 'Chronic hepatitis C — hold this back until the student asks. Hypertension.', 'hold this back until the student asks'],
+  ] as Array<[string, string, string | undefined]>) {
+    const fixed = stripAuthoringNote(field, text, span)
+    assert.match(fixed, /[.!?]$/, `${field} should end as a sentence: ${fixed}`)
+    assert.equal(/\s[,.;]|\(\s|\s\)|  /.test(fixed), false, `stray punctuation in: ${fixed}`)
+  }
 })

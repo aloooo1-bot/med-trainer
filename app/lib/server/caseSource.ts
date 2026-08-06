@@ -4,13 +4,14 @@ import path from 'path'
 import * as Sentry from '@sentry/nextjs'
 import { createAdminClient } from '../supabase/admin'
 import { checkCaseConsistency, type CheckableCase } from '../caseConsistency'
+import { auditAuthoringNotes, knownAuthoringNotes } from './caseAudit'
 import { buildCasePrompt, buildCaseSystemPrompt } from '../casePrompt'
 import { reconcileHistoryConsistency, sanitizePmhLeak } from '../generators/shared'
 import { MANIFEST, makeCaseId } from '../caseManifest'
 import { callModel, extractJson } from './llm'
 import { splitCase, joinCase } from './caseTiers'
 import type { CaseData } from '../../trainer/_lib/types'
-import type { RawUsage } from '../analytics'
+import { sumUsage, type RawUsage } from '../analytics'
 
 /**
  * Server-side case acquisition: Supabase cache → live generation.
@@ -174,6 +175,7 @@ export async function generateCaseLive(
     prompt += '\nUse a fresh patient demographic profile and a different clinical presentation than a typical textbook case for this diagnosis.'
   }
 
+  const startedAt = Date.now()
   const { text, usage } = await callModel('case_generation', {
     system: systemPrompt,
     messages: [{ role: 'user', content: prompt }],
@@ -195,6 +197,42 @@ export async function generateCaseLive(
         parsed.labResults[rt.name] = rt.labResult
         if (!parsed.availableLabs.includes(rt.name)) parsed.availableLabs.push(rt.name)
       }
+    }
+  }
+
+  // Stage directions in displayed prose. The regex family below only knows the
+  // phrasings that have been found before, and this is the last moment the case
+  // is in hand before a student reads it — so a model is asked to point at
+  // anything that directs the actor rather than describing the patient, and the
+  // spans it quotes are excised. Fails open: it can only remove text it quoted
+  // verbatim, and any failure leaves the case exactly as generated.
+  // The client gives up at 180s and generation alone may run to 175s. A slow
+  // generation must not be finished off by its own audit, so the audit only
+  // runs when there is room for it — skipping is the same outcome as finding
+  // nothing, and the library sweep catches whatever a skipped audit misses.
+  const roomForAudit = Date.now() - startedAt < 140_000
+
+  // Read before the audit: it repairs in place, so there is no intact copy after.
+  const knownNotes = knownAuthoringNotes(parsed as unknown as CheckableCase)
+  const audit = roomForAudit
+    ? await auditAuthoringNotes(parsed as unknown as CheckableCase)
+    : { removed: [] as string[], usage: undefined }
+  if (!roomForAudit) {
+    console.warn(`[caseSource] ${diagnosis ?? system}: authoring-note audit skipped, generation took ${Math.round((Date.now() - startedAt) / 1000)}s`)
+  }
+  if (audit.removed.length) {
+    const novel = audit.removed.filter(r => !knownNotes.some(k => r.includes(k)))
+    console.warn(
+      `[caseSource] ${diagnosis ?? system}: removed ${audit.removed.length} authoring note(s)\n` +
+      audit.removed.map(r => `  ${r}`).join('\n'),
+    )
+    // A phrasing the pattern family missed is the reason this check exists.
+    // Report it so it becomes a new pattern rather than a silent repair.
+    if (novel.length) {
+      Sentry.captureMessage('authoring note missed by pattern family', {
+        level: 'warning',
+        extra: { diagnosis, system, difficulty, novel },
+      })
     }
   }
 
@@ -220,7 +258,9 @@ export async function generateCaseLive(
   }
 
   const caseId = diagnosis ? makeCaseId(system, difficulty, diagnosis, 0) : null
-  return { caseId, caseData: parsed, generated: true, usage }
+  // The audit is part of producing this case, so its tokens belong in what the
+  // case is reported to have cost.
+  return { caseId, caseData: parsed, generated: true, usage: sumUsage(usage, audit.usage) }
 }
 
 /** Persist a freshly generated case (tiered columns; dev file cache fallback). */

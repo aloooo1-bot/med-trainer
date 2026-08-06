@@ -342,8 +342,13 @@ const AUTHORING_NOTE: RegExp[] = [
   /\bdo(?:es)? not volunteer\b|\bdon't volunteer\b|\bwithholds? (?:this|that|it)\b/i,
 ]
 
+/** The offending text, or null. Exported so the model-driven audit agrees. */
+export function findAuthoringNote(text: string): string | null {
+  return AUTHORING_NOTE.map(re => text.match(re)).find(Boolean)?.[0] ?? null
+}
+
 /** Every field a student can read as the patient's record. */
-function studentFacingProse(c: CheckableCase): Array<[string, string | undefined]> {
+export function studentFacingProse(c: CheckableCase): Array<[string, string | undefined]> {
   return [
     ['hpi', c.hpi],
     ['pastMedicalHistory.conditions', c.pastMedicalHistory?.conditions],
@@ -361,16 +366,134 @@ function checkAuthoringNotes(c: CheckableCase): ConsistencyIssue[] {
   const out: ConsistencyIssue[] = []
   for (const [field, text] of studentFacingProse(c)) {
     if (typeof text !== 'string') continue
-    const hit = AUTHORING_NOTE.map(re => text.match(re)).find(Boolean)
+    const hit = findAuthoringNote(text)
     if (!hit) continue
     out.push({
       code: 'content/authoring-note',
       severity: 'error',
       field,
-      message: `"${hit[0]}" is an instruction to the patient agent, not a fact about the patient, and it is printed in the chart; withheld history belongs in hiddenHistory.fullHistory, which the patient prompt already gates`,
+      message: `"${hit}" is an instruction to the patient agent, not a fact about the patient, and it is printed in the chart; withheld history belongs in hiddenHistory.fullHistory, which the patient prompt already gates`,
     })
   }
   return out
+}
+
+// ── removing a note ──────────────────────────────────────────────────────────
+// Shared by the library repair script and the generation-time audit, so the two
+// can never disagree about what a repaired field should look like.
+
+const SEPARATOR = String.raw`\s*(?:[,;—–-]+\s*)?`
+/** A note plus the punctuation binding it to the text around it. */
+const NOTE_FRAGMENT = new RegExp(
+  AUTHORING_NOTE.map(re => `${SEPARATOR}(?:${re.source})`).join('|'), 'gi',
+)
+
+const escape = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+
+/** Excise the note and tidy the punctuation it leaves behind. */
+function excise(text: string, pattern: RegExp): string {
+  const out = text
+    .replace(pattern, '')
+    .replace(/\(\s*\)/g, '')            // a parenthetical that was only the note
+    .replace(/\s+([,.;)])/g, '$1')      // space stranded before punctuation
+    .replace(/([(])\s+/g, '$1')
+    .replace(/\s{2,}/g, ' ')
+    .replace(/\s*([,;—–-])\s*\./g, '.') // a dangling separator before the stop
+    .replace(/[\s,;—–-]+$/, '')         // a separator left dangling at the end
+    .trim()
+  // The note can take the sentence's full stop with it when it sat last. These
+  // fields are displayed, so give it back rather than leaving a bare clause.
+  return out && /[.!?]$/.test(text.trim()) && !/[.!?)]$/.test(out) ? `${out}.` : out
+}
+
+/**
+ * Remove an authoring note from one field.
+ *
+ * The field decides the surgery. A background field is a list whose entries
+ * stand alone, so the note is excised and the entry kept — losing "Vitiligo
+ * (diagnosed age 30)" to save a parenthetical would throw away an autoimmune
+ * diagnosis that points at the answer.
+ *
+ * The vignette is narrative, and there the whole sentence goes. Excising the
+ * clause from "He notes dysuria that began approximately 1 week ago, which he
+ * had not volunteered initially" leaves the finding without the tell — the
+ * dysuria stays in the opening paragraph, where beside the conjunctivitis and
+ * the post-diarrhoeal arthritis it completes the Reiter triad before the
+ * student has asked anything. The case stages that symptom as withheld, so the
+ * sentence has no business being there at all.
+ *
+ * `span` lets the model-driven audit remove a note the regex cannot describe.
+ */
+export function stripAuthoringNote(field: string, text: string, span?: string): string {
+  const pattern = span
+    ? new RegExp(`${SEPARATOR}${escape(span)}`, 'gi')
+    : NOTE_FRAGMENT
+  if (field !== 'hpi') return excise(text, pattern)
+  const kept = text
+    .split(/(?<=[.!?])\s+/)
+    .filter(s => { pattern.lastIndex = 0; return !pattern.test(s) })
+    .join(' ')
+    .trim()
+  // A one-sentence vignette carrying a note would be deleted outright. An
+  // empty HPI is worse than a trimmed one, so fall back to excising.
+  return kept || excise(text, pattern)
+}
+
+/** One instruction a reviewer found, quoted verbatim from a named field. */
+export interface NoteFinding {
+  field: string
+  span: string
+}
+
+/**
+ * Apply spans a model quoted, and refuse the ones it did not.
+ *
+ * Everything here is a guard against the reviewer being wrong, because the
+ * cost of a false positive is deleted clinical text. The model may only point;
+ * it never supplies replacement prose. A span that is not literally present —
+ * paraphrased, reformatted, or attached to a field that does not exist — is
+ * discarded rather than approximated, and a span covering most of its field is
+ * treated as a misread rather than a stage direction.
+ *
+ * Pure, so the guards can be tested without a model call.
+ */
+export function applyAuthoringNoteFindings(
+  c: CheckableCase,
+  findings: unknown,
+): string[] {
+  if (!Array.isArray(findings)) return []
+  const fields = new Map(
+    studentFacingProse(c).filter((f): f is [string, string] => typeof f[1] === 'string'),
+  )
+  const removed: string[] = []
+
+  for (const f of findings as NoteFinding[]) {
+    if (!f || typeof f.field !== 'string' || typeof f.span !== 'string') continue
+    const span = f.span.trim()
+    const current = fields.get(f.field)
+    if (!current || !span || !current.includes(span)) continue
+    // Backstop against a reviewer that quoted the whole entry rather than the
+    // instruction inside it — that would delete the clinical fact along with
+    // the note. Deliberately loose: a long instruction in a short field is
+    // ordinary, and the verbatim requirement is what does the real work here.
+    if (span.length > current.length * 0.8) continue
+
+    const fixed = stripAuthoringNote(f.field, current, span)
+    // Nothing left means the span was the field. Refuse rather than blank it.
+    if (!fixed || fixed === current) continue
+
+    const [head, tail] = f.field.split('.')
+    if (tail) {
+      const parent = (c as unknown as Record<string, Record<string, string>>)[head]
+      if (!parent || typeof parent !== 'object') continue
+      parent[tail] = fixed
+    } else {
+      (c as unknown as Record<string, unknown>)[head] = fixed
+    }
+    fields.set(f.field, fixed)
+    removed.push(`${f.field}: removed "${span}"`)
+  }
+  return removed
 }
 
 // ── entry point ──────────────────────────────────────────────────────────────
