@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { scanMessageForHPIFields, disclosedMedicationFields, medicationTerms } from '../rosDetector'
+import { scanMessageForHPIFields, disclosedHpiFields, fieldTerms } from '../rosDetector'
 
 /**
  * Reported from a played stroke case. The student asked about blood thinners
@@ -57,43 +57,101 @@ test('unrelated questions unlock no medication field', () => {
 
 // ── what the patient actually said ───────────────────────────────────────────
 
-const STROKE_MEDS = {
-  medications: 'Amlodipine 10mg oral daily',
-  otc: 'Aspirin 81mg oral daily (self-initiated). Multivitamin once daily.',
+// Values shaped like the real library: some compound, some content-free.
+const VALUES = {
+  pmh_conditions: 'Hypertension (diagnosed approximately 12 years ago). Hyperlipidemia.',
+  pmh_surgeries: 'Appendectomy at age 34. No other surgeries.',
+  pmh_hospitalizations: 'None',
+  med_medications: 'Amlodipine 10mg oral daily',
+  med_otc: 'Aspirin 81mg oral daily (self-initiated). Multivitamin once daily.',
+  soc_smoking: 'Never smoker',
+  soc_alcohol: 'Denies alcohol use.',
+  soc_occupation: 'Retired civil engineer',
+  soc_living: 'Lives alone in an apartment',
 }
 const REPLY = "No warfarin or those other ones you mentioned. But I... I take a baby aspirin every day — been doing that for a few years on my own. My doctor never really said I needed it."
 
 test('a drug the patient names out loud counts as elicited', () => {
-  // Even if the question had missed the field entirely, the chart cannot show a
-  // medication list that omits what the patient just described.
-  assert.deepEqual(disclosedMedicationFields(REPLY, STROKE_MEDS), ['med_otc'])
+  // Even though the question never used the words "over the counter", the chart
+  // cannot show a medication list that omits what the patient just described.
+  assert.ok(disclosedHpiFields(REPLY, VALUES).includes('med_otc'))
 })
 
-test('a reply that names nothing unlocks nothing', () => {
-  assert.deepEqual(
-    disclosedMedicationFields('No, I am not on anything like that at all.', STROKE_MEDS),
-    [],
-  )
+test('the same rule now covers the other background fields', () => {
+  assert.ok(disclosedHpiFields('I worked as a civil engineer until I retired.', VALUES).includes('soc_occupation'))
+  assert.ok(disclosedHpiFields('I live alone in a small apartment downtown.', VALUES).includes('soc_living'))
+  assert.ok(disclosedHpiFields('They told me I had hypertension years back.', VALUES).includes('pmh_conditions'))
+  assert.ok(disclosedHpiFields('I had an appendectomy when I was younger.', VALUES).includes('pmh_surgeries'))
 })
 
-test('both fields unlock when the patient lists both', () => {
-  const both = 'I take amlodipine for my pressure, and a baby aspirin on my own.'
-  assert.deepEqual(disclosedMedicationFields(both, STROKE_MEDS).sort(), ['med_medications', 'med_otc'])
+test('a content-free value still unlocks from an unambiguous topic word', () => {
+  // "None" shares no term with any honest answer, so the topic signal is the
+  // only one available.
+  assert.ok(disclosedHpiFields('No, I have never been hospitalized for anything.', VALUES).includes('pmh_hospitalizations'))
+  assert.ok(disclosedHpiFields('I do not drink alcohol at all.', VALUES).includes('soc_alcohol'))
+  assert.ok(disclosedHpiFields('I have never smoked cigarettes in my life.', VALUES).includes('soc_smoking'))
 })
 
-test('medicationTerms keeps drug names and drops the scaffolding', () => {
-  const terms = medicationTerms(STROKE_MEDS.otc)
+test('generic words do NOT hand over a field the patient never discussed', () => {
+  // The over-unlock this rule is designed to avoid: mentioning "home" is not a
+  // living situation, and being "at work" is not an occupational history.
+  const atHome = disclosedHpiFields('I was at home having breakfast when it happened.', VALUES)
+  assert.equal(atHome.includes('soc_living'), false)
+  const atWork = disclosedHpiFields('The pain started while I was at work that morning.', VALUES)
+  assert.equal(atWork.includes('soc_occupation'), false)
+})
+
+test('"never" alone does not disclose a smoking history', () => {
+  // 'never' appears in "Never smoker" but also in half of all denials.
+  const fields = disclosedHpiFields('No, I never had any problems like that before.', VALUES)
+  assert.equal(fields.includes('soc_smoking'), false)
+})
+
+// Both of these were observed live before the stopword list was widened.
+const FALL_REPLY = "Well, about six weeks ago I tripped on a rug at home and hit my head on the kitchen counter. It was on the right side. I got a bit of a spinning sensation for a few minutes. I have had a couple of other falls over the past year or so, but those didn't involve my head."
+const SUBDURAL = {
+  pmh_conditions: 'Atrial fibrillation (on anticoagulation), Type 2 Diabetes Mellitus, Hypertension, Hyperlipidemia. Falls: two in the past year.',
+  pmh_surgeries: 'Right knee arthroscopy (2009), Appendectomy (1978)',
+}
+
+test('describing which side you hit does not disclose a surgical history', () => {
+  // "It was on the right side" matched "Right knee arthroscopy" and handed over
+  // the whole surgical history of a patient who had only described a fall.
+  assert.equal(disclosedHpiFields(FALL_REPLY, SUBDURAL).includes('pmh_surgeries'), false)
+})
+
+test('describing a fall does not disclose the whole problem list', () => {
+  // The worst version of this: 'falls' matched a problem list whose first entry
+  // was atrial fibrillation, giving away the answer to a subdural case from a
+  // question about tripping on a rug.
+  assert.equal(disclosedHpiFields(FALL_REPLY, SUBDURAL).includes('pmh_conditions'), false)
+})
+
+test('a reply that discloses nothing unlocks nothing', () => {
+  assert.deepEqual(disclosedHpiFields('I am not sure what you mean by that.', VALUES), [])
+})
+
+test('fieldTerms keeps identifying words and drops the scaffolding', () => {
+  const terms = fieldTerms(VALUES.med_otc)
   assert.ok(terms.includes('aspirin'))
   assert.ok(terms.includes('multivitamin'))
-  // Dosing and frequency words are shared by every medication string and would
-  // unlock a field the patient never mentioned.
   for (const noise of ['daily', 'once', 'oral', 'initiated']) {
     assert.equal(terms.includes(noise), false, noise)
   }
+  // The words shared by every history string carry no signal.
+  assert.deepEqual(fieldTerms('None'), [])
+  assert.equal(fieldTerms('Denies alcohol use.').includes('denies'), false)
 })
 
 test('disclosure matching tolerates missing inputs', () => {
-  assert.deepEqual(disclosedMedicationFields(undefined, STROKE_MEDS), [])
-  assert.deepEqual(disclosedMedicationFields(REPLY, undefined), [])
-  assert.deepEqual(disclosedMedicationFields(REPLY, {}), [])
+  assert.deepEqual(disclosedHpiFields(undefined, VALUES), [])
+  assert.deepEqual(disclosedHpiFields('   ', VALUES), [])
+  assert.deepEqual(disclosedHpiFields('I am not sure what you mean.', {}), [])
+})
+
+test('a case with no stored value still records the topic as addressed', () => {
+  // The term signal cannot fire without a value, but the patient did talk about
+  // their medications — the field is marked reviewed and renders as documented
+  // absence rather than staying blank as though it had never come up.
+  assert.deepEqual(disclosedHpiFields(REPLY, {}).sort(), ['med_medications', 'med_otc'])
 })

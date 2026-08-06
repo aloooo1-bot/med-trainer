@@ -149,44 +149,92 @@ export function scanMessageForHPIFields(message: string): HPIField[] {
     .map(([field]) => field)
 }
 
-// Words that carry no identifying power inside a medication string — matching
-// on these would unlock a field the patient never actually mentioned.
-const MED_STOPWORDS = new Set([
+// Words that appear in background-history prose everywhere and identify
+// nothing. Matching on these would unlock a field the patient never mentioned:
+// "never" alone would hand over a smoking history, "diagnosed" a problem list.
+const FIELD_STOPWORDS = new Set([
   'daily', 'twice', 'once', 'nightly', 'needed', 'oral', 'orally', 'tablet', 'tablets',
   'capsule', 'capsules', 'prescribed', 'prescription', 'regularly', 'occasional',
   'occasionally', 'supplement', 'supplements', 'takes', 'taking', 'self', 'initiated',
-  'about', 'approximately', 'years', 'months', 'weeks', 'other', 'none', 'documented',
-  'morning', 'evening', 'bedtime', 'with', 'meals', 'unit', 'units', 'every',
+  'about', 'approximately', 'years', 'month', 'months', 'weeks', 'other', 'none',
+  'documented', 'morning', 'evening', 'bedtime', 'meals', 'unit', 'units', 'every',
+  'never', 'denies', 'denied', 'reports', 'history', 'prior', 'patient', 'currently',
+  'current', 'recent', 'recently', 'since', 'active', 'treated', 'resolved', 'managed',
+  'diagnosed', 'times', 'week', 'approximate', 'noted', 'notes', 'without', 'their',
+  'there', 'these', 'those', 'which', 'while', 'after', 'before', 'agent', 'unknown',
+  // Laterality and anatomy. "It was on the right side" is not a disclosure of
+  // "Right knee arthroscopy", but it matched one and handed over the surgical
+  // history of a patient who had only described hitting their head.
+  'right', 'left', 'upper', 'lower', 'lateral', 'medial', 'anterior', 'posterior',
+  'bilateral', 'sided', 'distal', 'proximal', 'central',
+  // Words that carry the narrative of almost any answer. 'falls' is here for a
+  // sharper reason: a patient describing a fall matched a problem list whose
+  // first entry was atrial fibrillation, handing over the diagnosis of a
+  // subdural case from a question about tripping on a rug.
+  'falls', 'fallen', 'injury', 'injuries', 'started', 'starting', 'began', 'around',
+  'couple', 'several', 'first', 'later', 'still', 'quite', 'really', 'thing', 'things',
+  'going', 'getting', 'something', 'anything', 'nothing', 'others', 'today',
+  'yesterday', 'night', 'nights', 'hours', 'minutes', 'during', 'feeling', 'noticed',
+  'notice', 'think', 'thought', 'seemed', 'seems', 'maybe', 'probably', 'usually',
+  'sometimes', 'always', 'often', 'ongoing', 'moderate', 'severe', 'small', 'large',
 ])
 
-/** Drug-ish tokens in a stored medication string. Pure + testable. */
-export function medicationTerms(value: string | undefined): string[] {
+/**
+ * Identifying tokens in a stored background-history value — the words that
+ * would only appear in a reply if the patient had actually disclosed this.
+ * Pure + testable.
+ */
+export function fieldTerms(value: string | undefined): string[] {
   if (!value) return []
   return [...new Set(
-    value.toLowerCase().match(/[a-z]{5,}/g)?.filter(w => !MED_STOPWORDS.has(w)) ?? [],
+    value.toLowerCase().match(/[a-z]{5,}/g)?.filter(w => !FIELD_STOPWORDS.has(w)) ?? [],
   )]
 }
 
 /**
- * Which medication fields the patient's own reply actually disclosed.
- *
- * The chart must not contradict the transcript. A patient who volunteers "I
- * take a baby aspirin every day" while the medication panel shows only their
- * amlodipine is telling the student two different things — and the unlock
- * record is what grading treats as authoritative for whether they elicited it.
- *
- * Matched against the case's OWN stored strings rather than a drug dictionary,
- * so a match means the patient named the very thing the case documents.
+ * Keywords too generic to prove a reply was about that topic. A patient saying
+ * "I felt fine at home" has not disclosed that they live alone in an apartment,
+ * and "it hurt while I was at work" is not an occupational history.
  */
-export function disclosedMedicationFields(
+const WEAK_HPI_KEYWORDS = new Set([
+  'home', 'work', 'live', 'living', 'house', 'family', 'alone', 'children',
+  'married', 'pain', 'treatment', 'removed', 'procedure', 'conditions', 'chronic',
+  'drink', 'pack', 'office', 'labor', 'diseases', 'disorders', 'partner',
+])
+
+/**
+ * Which background fields the patient's own reply actually disclosed.
+ *
+ * The chart must not contradict the transcript. A patient who volunteers "I take
+ * a baby aspirin every day" while the medication panel shows only their
+ * amlodipine is telling the student two different things — and the unlock record
+ * is what grading treats as authoritative for whether they elicited it, so the
+ * omission also costs marks for a history they did take.
+ *
+ * Two signals, either of which is enough:
+ *
+ *  - the reply names an identifying term from the field's own stored text, so a
+ *    match means the patient said the very thing the case documents. This is
+ *    what catches a drug named without the word "medication" anywhere near it.
+ *  - failing that, the reply contains an unambiguous keyword for that topic.
+ *    Needed because many values are content-free ("None", "Denies alcohol use")
+ *    and share no term with any honest answer to them.
+ *
+ * This supplements the question-driven unlock rather than replacing it, so it
+ * can afford to be conservative: the ordinary case is already covered by what
+ * the student asked.
+ */
+export function disclosedHpiFields(
   patientReply: string | undefined,
-  meds: { medications?: string; otc?: string } | undefined,
-): Array<'med_medications' | 'med_otc'> {
-  if (!patientReply || !meds) return []
+  values: Partial<Record<HPIField, string | undefined>>,
+): HPIField[] {
+  if (!patientReply?.trim()) return []
   const reply = patientReply.toLowerCase()
-  const out: Array<'med_medications' | 'med_otc'> = []
-  if (medicationTerms(meds.medications).some(t => reply.includes(t))) out.push('med_medications')
-  if (medicationTerms(meds.otc).some(t => reply.includes(t))) out.push('med_otc')
+  const out: HPIField[] = []
+  for (const [field, keywords] of Object.entries(HPI_FIELD_KEYWORD_MAP) as [HPIField, string[]][]) {
+    if (fieldTerms(values[field]).some(t => reply.includes(t))) { out.push(field); continue }
+    if (keywords.some(k => !WEAK_HPI_KEYWORDS.has(k) && reply.includes(k))) out.push(field)
+  }
   return out
 }
 

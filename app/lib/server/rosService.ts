@@ -4,7 +4,7 @@ import {
   type ROSCategory,
   scanMessageForROSDetailed,
   scanMessageForHPIFields,
-  disclosedMedicationFields,
+  disclosedHpiFields,
   looksClinical,
   type HPIField,
 } from '../rosDetector'
@@ -228,12 +228,6 @@ export function resolveHpiUnlocks(
   caseData: CaseData,
   patientReply?: string,
 ): Partial<Record<HPIField, string>> {
-  const fields = new Set(scanMessageForHPIFields(message))
-  for (const f of disclosedMedicationFields(patientReply, caseData.currentMedications)) {
-    fields.add(f)
-  }
-
-  if (!fields.size) return {}
   const values: Record<HPIField, string | undefined> = {
     pmh_conditions: caseData.pastMedicalHistory?.conditions,
     pmh_surgeries: caseData.pastMedicalHistory?.surgeries,
@@ -247,6 +241,13 @@ export function resolveHpiUnlocks(
     soc_living: caseData.socialHistory?.living,
     soc_other: caseData.socialHistory?.other,
   }
+
+  // What the student asked for, plus anything the patient volunteered while
+  // answering. The second half is why the values are resolved first: the
+  // disclosure check compares the reply against each field's own stored text.
+  const fields = new Set(scanMessageForHPIFields(message))
+  for (const f of disclosedHpiFields(patientReply, values)) fields.add(f)
+
   const out: Partial<Record<HPIField, string>> = {}
   for (const f of fields) out[f] = values[f] ?? 'None documented.'
   return out
