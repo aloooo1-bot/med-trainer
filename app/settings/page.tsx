@@ -43,6 +43,11 @@ export default function SettingsPage() {
   const [copied, setCopied] = useState(false)
   const [profileLoaded, setProfileLoaded] = useState(false)
   const [loadFailed, setLoadFailed] = useState(false)
+  const [cleared, setCleared] = useState(false)
+
+  // Last-synced values, so blur-autosave only fires when something changed.
+  const [savedName, setSavedName] = useState('')
+  const [savedVolume, setSavedVolume] = useState(DEFAULT_FOCUS_SETTINGS.weeklyVolume)
 
   // Password change
   const [currentPw, setCurrentPw]   = useState('')
@@ -58,23 +63,24 @@ export default function SettingsPage() {
       setEmail(user.email ?? '')
       const { data: p, error } = await supabase
         .from('profiles')
-        .select('display_name,tier,email_case_reminders,email_weekly_summary,weekly_volume,default_system')
+        .select('display_name,tier,email_case_reminders,email_weekly_summary,weekly_volume')
         .eq('id', user.id)
         .single()
       if (error || !p) {
         setLoadFailed(true)
       } else {
-        setDisplayName((p.display_name as string | null) ?? '')
+        const name = (p.display_name as string | null) ?? ''
+        setDisplayName(name)
+        setSavedName(name)
         setTier((p.tier as string) ?? 'free')
         setEmailCaseReminders((p.email_case_reminders as boolean) ?? true)
         setEmailWeeklySummary((p.email_weekly_summary as boolean) ?? true)
 
         // Merge DB training prefs with localStorage
         const local = loadFocusSettings()
-        const merged: FocusSettings = {
-          weeklyVolume: (p.weekly_volume as number | null) ?? local.weeklyVolume,
-        }
-        setFocusSettings(merged)
+        const volume = (p.weekly_volume as number | null) ?? local.weeklyVolume
+        setFocusSettings({ weeklyVolume: volume })
+        setSavedVolume(volume)
       }
       setProfileLoaded(true)
     }).catch(() => {
@@ -87,8 +93,13 @@ export default function SettingsPage() {
     setColorScheme(getScheme())
   }, [])
 
-  async function saveProfile() {
-    if (!userId) return
+  // ── Autosave handlers ──────────────────────────────────────────────────────
+  // No Save buttons: display name saves on blur, the weekly goal on
+  // blur/Enter, and the notification toggles on change — matching how the rest
+  // of the app already behaves (theme, case notes, the dashboard goal editor).
+
+  async function autosaveName() {
+    if (!userId || displayName === savedName) return
     setProfileStatus('saving')
     try {
       const res = await fetch('/api/profile', {
@@ -96,6 +107,7 @@ export default function SettingsPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ display_name: displayName }),
       })
+      if (res.ok) setSavedName(displayName)
       setProfileStatus(res.ok ? 'saved' : 'error')
     } catch {
       setProfileStatus('error')
@@ -103,28 +115,31 @@ export default function SettingsPage() {
     setTimeout(() => setProfileStatus('idle'), 2500)
   }
 
-  async function savePrefs() {
+  async function autosaveVolume() {
+    const volume = focusSettings.weeklyVolume
+    if (volume === savedVolume) return
+    // Local persistence works signed-out too — the dashboard goal editor and
+    // Focus pace counter read the same value from localStorage.
+    saveFocusSettings({ weeklyVolume: volume })
+    setSavedVolume(volume)
     if (!userId) return
     setPrefStatus('saving')
     try {
       const res = await fetch('/api/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          weekly_volume: focusSettings.weeklyVolume,
-        }),
+        body: JSON.stringify({ weekly_volume: volume }),
       })
-      // Persist locally only once the DB accepted the values, and adopt any
-      // server-side clamp (weekly_volume) so localStorage, state, and the
-      // profile row all hold the same number.
+      // Adopt any server-side clamp (free-tier cap) so localStorage, state,
+      // and the profile row all hold the same number.
       if (res.ok) {
         const body = await res.json().catch(() => null) as { stored?: { weekly_volume?: number } } | null
-        const storedVolume = body?.stored?.weekly_volume
-        const applied: FocusSettings = typeof storedVolume === 'number'
-          ? { ...focusSettings, weeklyVolume: storedVolume }
-          : focusSettings
-        setFocusSettings(applied)
-        saveFocusSettings(applied)
+        const stored = body?.stored?.weekly_volume
+        if (typeof stored === 'number' && stored !== volume) {
+          setFocusSettings({ weeklyVolume: stored })
+          setSavedVolume(stored)
+          saveFocusSettings({ weeklyVolume: stored })
+        }
       }
       setPrefStatus(res.ok ? 'saved' : 'error')
     } catch {
@@ -133,20 +148,32 @@ export default function SettingsPage() {
     setTimeout(() => setPrefStatus('idle'), 2500)
   }
 
-  async function saveNotifications() {
+  async function autosaveNotifications(next: { reminders: boolean; weekly: boolean }) {
+    setEmailCaseReminders(next.reminders)
+    setEmailWeeklySummary(next.weekly)
     if (!userId) return
     setNotifStatus('saving')
     try {
       const res = await fetch('/api/profile', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email_case_reminders: emailCaseReminders, email_weekly_summary: emailWeeklySummary }),
+        body: JSON.stringify({ email_case_reminders: next.reminders, email_weekly_summary: next.weekly }),
       })
       setNotifStatus(res.ok ? 'saved' : 'error')
     } catch {
       setNotifStatus('error')
     }
     setTimeout(() => setNotifStatus('idle'), 2500)
+  }
+
+  function clearLocalData() {
+    if (!window.confirm(
+      'Clear all MedTrainer data stored in this browser — recall deck, mastery, calibration, local case history, and preferences? '
+      + (userId ? 'Your account copies are unaffected and will restore on the next sync.' : 'Signed out, this data has no cloud copy and cannot be recovered.')
+    )) return
+    clearAllLocalData()
+    setCleared(true)
+    setTimeout(() => window.location.reload(), 600)
   }
 
   async function changePassword() {
@@ -227,17 +254,26 @@ export default function SettingsPage() {
             <div className="dx-card-body">
               <div className="dx-form-section">
                 <div className="dx-field">
-                  <label className="dx-label">Display name</label>
+                  <label className="dx-label">
+                    Display name
+                    {statusText(profileStatus) && (
+                      <span className="dx-save-status" style={{ marginLeft: 8, color: profileStatus === 'error' ? 'var(--red)' : 'var(--muted)' }}>
+                        {statusText(profileStatus)}
+                      </span>
+                    )}
+                  </label>
                   <input
                     className="dx-input"
                     type="text"
                     value={displayName}
                     onChange={e => setDisplayName(e.target.value)}
+                    onBlur={autosaveName}
+                    onKeyDown={e => { if (e.key === 'Enter') autosaveName() }}
                     maxLength={60}
                     placeholder="Your name"
                     style={{ maxWidth: 320 }}
                   />
-                  <p className="dx-help-text" style={{ margin: '4px 0 0' }}>{displayName.length}/60 characters</p>
+                  <p className="dx-help-text" style={{ margin: '4px 0 0' }}>{displayName.length}/60 characters · saves when you click away</p>
                 </div>
                 <div className="dx-field">
                   <label className="dx-label">Email</label>
@@ -250,16 +286,6 @@ export default function SettingsPage() {
                     style={{ maxWidth: 320, cursor: 'default', background: 'var(--surface2)', color: 'var(--text-secondary)' }}
                   />
                   <p className="dx-help-text">Email cannot be changed here. Contact support to update it.</p>
-                </div>
-                <div className="dx-form-actions">
-                  <button className="dx-btn-primary" style={{ fontSize: 13, padding: '7px 18px' }} onClick={saveProfile} disabled={profileStatus === 'saving'}>
-                    Save profile
-                  </button>
-                  {statusText(profileStatus) && (
-                    <span className="dx-save-status" style={{ color: profileStatus === 'error' ? 'var(--red)' : 'var(--muted)' }}>
-                      {statusText(profileStatus)}
-                    </span>
-                  )}
                 </div>
               </div>
             </div>
@@ -325,8 +351,15 @@ export default function SettingsPage() {
             <div className="dx-card-header" style={{ fontWeight: 700 }}>Training preferences</div>
             <div className="dx-card-body">
 
-              <div className="dx-form-section">
-                <p className="dx-form-section-title" style={{ fontSize: 13, fontWeight: 600 }}>Weekly case goal</p>
+              <div className="dx-form-section" style={{ borderBottom: 'none' }}>
+                <p className="dx-form-section-title" style={{ fontSize: 13, fontWeight: 600 }}>
+                  Weekly case goal
+                  {statusText(prefStatus) && (
+                    <span className="dx-save-status" style={{ marginLeft: 8, fontWeight: 400, color: prefStatus === 'error' ? 'var(--red)' : 'var(--muted)' }}>
+                      {statusText(prefStatus)}
+                    </span>
+                  )}
+                </p>
                 {(() => {
                   const effectiveCap = tier === 'free' ? 14 : 49
                   return (
@@ -337,7 +370,9 @@ export default function SettingsPage() {
                         min={1}
                         max={effectiveCap}
                         value={focusSettings.weeklyVolume}
-                        onChange={e => setFocusSettings(prev => ({ ...prev, weeklyVolume: Math.max(1, Math.min(effectiveCap, parseInt(e.target.value, 10) || 1)) }))}
+                        onChange={e => setFocusSettings({ weeklyVolume: Math.max(1, Math.min(effectiveCap, parseInt(e.target.value, 10) || 1)) })}
+                        onBlur={autosaveVolume}
+                        onKeyDown={e => { if (e.key === 'Enter') autosaveVolume() }}
                         style={{ maxWidth: 80 }}
                       />
                       <p className="dx-help-text">
@@ -347,17 +382,6 @@ export default function SettingsPage() {
                     </>
                   )
                 })()}
-              </div>
-
-              <div className="dx-form-actions">
-                <button className="dx-btn-primary" style={{ fontSize: 13, padding: '7px 18px' }} onClick={savePrefs} disabled={prefStatus === 'saving'}>
-                  Save training preferences
-                </button>
-                {statusText(prefStatus) && (
-                  <span className="dx-save-status" style={{ color: prefStatus === 'error' ? 'var(--red)' : 'var(--muted)' }}>
-                    {statusText(prefStatus)}
-                  </span>
-                )}
               </div>
             </div>
           </div>
@@ -375,7 +399,7 @@ export default function SettingsPage() {
                   <input
                     type="checkbox"
                     checked={emailCaseReminders}
-                    onChange={e => setEmailCaseReminders(e.target.checked)}
+                    onChange={e => autosaveNotifications({ reminders: e.target.checked, weekly: emailWeeklySummary })}
                   />
                   <span className="dx-checkbox-label">Case reminders</span>
                 </label>
@@ -386,21 +410,18 @@ export default function SettingsPage() {
                   <input
                     type="checkbox"
                     checked={emailWeeklySummary}
-                    onChange={e => setEmailWeeklySummary(e.target.checked)}
+                    onChange={e => autosaveNotifications({ reminders: emailCaseReminders, weekly: e.target.checked })}
                   />
                   <span className="dx-checkbox-label">Weekly performance summary</span>
                 </label>
-                <p className="dx-checkbox-desc">Cases completed, your average score, how it compares with last week, and your weakest area.</p>
-                <div className="dx-form-actions">
-                  <button className="dx-btn-primary" style={{ fontSize: 13, padding: '7px 18px' }} onClick={saveNotifications} disabled={notifStatus === 'saving'}>
-                    Save notification preferences
-                  </button>
+                <p className="dx-checkbox-desc">
+                  Cases completed, your average score, how it compares with last week, and your weakest area.
                   {statusText(notifStatus) && (
-                    <span className="dx-save-status" style={{ color: notifStatus === 'error' ? 'var(--red)' : 'var(--muted)' }}>
+                    <span className="dx-save-status" style={{ marginLeft: 8, color: notifStatus === 'error' ? 'var(--red)' : 'var(--muted)' }}>
                       {statusText(notifStatus)}
                     </span>
                   )}
-                </div>
+                </p>
               </div>
             </div>
           </div>
@@ -429,6 +450,32 @@ export default function SettingsPage() {
                   ))}
                 </div>
                 <p className="dx-help-text">Auto follows your operating system&apos;s dark/light preference.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Data on this device ── */}
+          <div className="dx-card">
+            <div className="dx-card-header" style={{ fontWeight: 700 }}>Data on this device</div>
+            <div className="dx-card-body">
+              <div className="dx-form-section" style={{ paddingTop: 0, borderBottom: 'none' }}>
+                <p className="dx-help-text" style={{ marginBottom: 10 }}>
+                  Your recall deck, mastery, calibration, and local case history live in this browser
+                  {userId ? ' and sync to your account.' : '. Signed out, this browser is their only copy.'}
+                  {' '}Export from{' '}
+                  <a href="/history" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Case History</a> (CSV/JSON) or{' '}
+                  <a href="/recall" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Recall</a> (Anki deck).
+                </p>
+                <div className="dx-form-actions">
+                  <button className="dx-btn-secondary" onClick={clearLocalData} disabled={cleared}>
+                    {cleared ? 'Cleared ✓' : 'Clear local data'}
+                  </button>
+                  <p className="dx-help-text" style={{ margin: 0 }}>
+                    {userId
+                      ? 'Account copies are unaffected and restore on the next sync.'
+                      : 'Cannot be undone while signed out.'}
+                  </p>
+                </div>
               </div>
             </div>
           </div>
