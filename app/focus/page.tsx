@@ -13,15 +13,17 @@ import {
   DEFAULT_FOCUS_SETTINGS,
   type FocusSettings,
   type FocusSkips,
-  estimateMinutes,
-  generateWeekPlan,
   isSkipped,
   loadFocusSettings,
   loadFocusSkips,
   saveFocusSkip,
 } from '@/app/lib/focusSettings'
+import { loadReviewItems } from '@/app/lib/reasoning/store'
+import { dueItems } from '@/app/lib/reasoning/spacedRepetition'
+import type { ReviewItem } from '@/app/lib/reasoning/types'
 import { useChartTheme } from '@/app/lib/useChartTheme'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 
 type Session = {
   id: string
@@ -45,8 +47,6 @@ const DIM_DESCRIPTION: Record<DimensionKey, string> = {
   examinationFocus:      'Examining the body regions the presentation actually points to',
 }
 
-const DAY_INDEX: Record<string, number> = { Sun: 0, Mon: 1, Tue: 2, Wed: 3, Thu: 4, Fri: 5, Sat: 6 }
-
 function computeSystems(sessions: Session[]): SystemEntry[] {
   const map: Record<string, { scoreSum: number; count: number }> = {}
   for (const s of sessions) {
@@ -63,11 +63,6 @@ function computeSystems(sessions: Session[]): SystemEntry[] {
 export default function FocusAreasPage() {
   const router = useRouter()
   const theme = useChartTheme()
-  const LEVEL_COLOR: Record<string, string> = {
-    Foundations: theme.primary,
-    Clinical: theme.caution,
-    Advanced: theme.purple,
-  }
   const [displayName, setDisplayName] = useState('User')
   const [tier, setTier] = useState('free')
   const [settings, setSettings] = useState<FocusSettings>(DEFAULT_FOCUS_SETTINGS)
@@ -76,6 +71,7 @@ export default function FocusAreasPage() {
   const [loaded, setLoaded] = useState(false)
   const [loadError, setLoadError] = useState(false)
   const [confirmSkip, setConfirmSkip] = useState<string | null>(null)
+  const [dueCards, setDueCards] = useState<ReviewItem[]>([])
 
   useEffect(() => {
     const supabase = createClient()
@@ -102,10 +98,11 @@ export default function FocusAreasPage() {
   }, [])
 
   useEffect(() => {
-    // Mount-only load of focus settings/skips from localStorage (unavailable during SSR).
+    // Mount-only load of focus settings/skips/due cards from localStorage (unavailable during SSR).
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSettings(loadFocusSettings())
     setSkips(loadFocusSkips())
+    setDueCards(dueItems(loadReviewItems(), Date.now()))
   }, [])
 
   const systems = useMemo(() => computeSystems(sessions), [sessions])
@@ -124,17 +121,25 @@ export default function FocusAreasPage() {
 
   const isPro = tier === 'pro'
 
-  // Free accounts train at Foundations only (the trainer enforces this), so
-  // recommendations must not point at levels the user can't actually launch.
-  const weekPlan = useMemo(() => {
-    const plan = generateWeekPlan(prioritized, settings)
-    return isPro ? plan : plan.map(d => ({ ...d, level: d.level ? 'Foundations' : d.level }))
-  }, [prioritized, settings, isPro])
+  // Cases completed since the start of the current week (Monday), for the
+  // Up-next pace counter — same week boundary as the dashboard WeeklyGoal.
+  const completedThisWeek = useMemo(() => {
+    const now = new Date()
+    const monday = new Date(now)
+    monday.setDate(now.getDate() - ((now.getDay() + 6) % 7))
+    monday.setHours(0, 0, 0, 0)
+    return sessions.filter(s => new Date(s.completed_at).getTime() >= monday.getTime()).length
+  }, [sessions])
 
-  const sessionsForEstimate = useMemo(
-    () => sessions.map(s => ({ system: s.system, durationMinutes: s.elapsed_seconds / 60 })),
-    [sessions]
-  )
+  // Due recall cards grouped by system, weak-queue systems first so the
+  // breakdown leads with what this page already says needs work.
+  const dueBySystem = useMemo(() => {
+    const counts = new Map<string, number>()
+    for (const c of dueCards) counts.set(c.system, (counts.get(c.system) ?? 0) + 1)
+    const queueRank = new Map(prioritized.map((s, i) => [s.name, i]))
+    return [...counts.entries()]
+      .sort((a, b) => (queueRank.get(a[0]) ?? 99) - (queueRank.get(b[0]) ?? 99) || b[1] - a[1])
+  }, [dueCards, prioritized])
 
   function handleSkip(systemName: string) {
     if (confirmSkip !== systemName) {
@@ -208,8 +213,6 @@ export default function FocusAreasPage() {
     return out
   }, [sessions])
 
-  const todayDay = new Date().getDay() // 0=Sun
-
   return (
     <div className="dx-root">
       <Sidebar displayName={displayName} tier={tier} activePage="focus-areas" />
@@ -248,6 +251,46 @@ export default function FocusAreasPage() {
             </div>
           ) : (
             <>
+          {/* Up next — single most actionable recommendation + weekly pace */}
+          {prioritized.length > 0 && (() => {
+            const top = prioritized[0]
+            const recLevel = !isPro ? 'Foundations' : top.score < 60 ? 'Foundations' : top.score < 80 ? 'Clinical' : 'Advanced'
+            return (
+              <div className="dx-card">
+                <div className="dx-card-body" style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
+                  <div style={{ flex: 1, minWidth: 200 }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 4 }}>
+                      Up next
+                    </div>
+                    <div style={{ fontSize: 14, fontWeight: 700, color: 'var(--text)' }}>
+                      {top.name} · {recLevel}
+                    </div>
+                    <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2 }}>
+                      Weakest system — avg {top.score}/100 over {top.count} case{top.count !== 1 ? 's' : ''}
+                    </div>
+                  </div>
+                  <span
+                    title="Cases completed since Monday vs your weekly goal (set in Settings)"
+                    style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: 12, color: 'var(--muted)', flexShrink: 0 }}
+                  >
+                    {completedThisWeek} of {settings.weeklyVolume} cases this week
+                  </span>
+                  <button
+                    onClick={() => router.push(`/trainer?system=${encodeURIComponent(top.name)}&difficulty=${encodeURIComponent(recLevel)}`)}
+                    style={{
+                      fontSize: 13, fontWeight: 600, color: 'var(--accent)',
+                      background: 'rgba(79,156,249,0.1)', border: '1px solid rgba(79,156,249,0.2)',
+                      borderRadius: 6, padding: '7px 16px', cursor: 'pointer', flexShrink: 0,
+                      fontFamily: 'Inter, sans-serif',
+                    }}
+                  >
+                    Start Case →
+                  </button>
+                </div>
+              </div>
+            )
+          })()}
+
           {/* Priority Queue */}
           <div className="dx-card">
             <div className="dx-card-header">
@@ -261,13 +304,7 @@ export default function FocusAreasPage() {
             </div>
             <div style={{ padding: '4px 0' }}>
               {prioritized.map((s, i) => {
-                const urgency = s.urgency > 50 ? 'HIGH' : s.urgency > 25 ? 'MED' : 'LOW'
-                const urgencyLabel = urgency === 'LOW' ? 'STRONG' : urgency
-                const urgencyColor = urgency === 'HIGH' ? 'var(--red)' : urgency === 'MED' ? 'var(--amber)' : 'var(--green)'
-                const urgencyBg   = urgency === 'HIGH' ? 'var(--critical-bg)' : urgency === 'MED' ? 'var(--caution-bg)' : 'var(--confirmed-bg)'
                 const recLevel = !isPro ? 'Foundations' : s.score < 60 ? 'Foundations' : s.score < 80 ? 'Clinical' : 'Advanced'
-                const recCases = Math.min(3, Math.max(1, Math.ceil(s.urgency / 30)))
-                const recMinutes = estimateMinutes(s.name, recCases, sessionsForEstimate)
                 const isConfirming = confirmSkip === s.name
                 return (
                   <div key={s.name} style={{
@@ -282,22 +319,14 @@ export default function FocusAreasPage() {
                         {s.name}
                       </div>
                       <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 2, fontFamily: 'JetBrains Mono, monospace' }}>
-                        ~{recCases} {recCases === 1 ? 'case' : 'cases'}{recMinutes > 0 ? `, ~${recMinutes} min` : ''} · {s.count} completed
+                        {s.count} completed
                       </div>
                     </div>
                     <span
-                      title="Average rubric score in this system"
+                      title={`Average rubric score in this system — ${s.urgency > 50 ? 'high priority' : s.urgency > 25 ? 'medium priority' : 'strong; minimal practice need'}`}
                       style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 700, fontSize: 13, color: scoreColor(s.score), flexShrink: 0 }}
                     >
                       {s.score}
-                    </span>
-                    <span
-                      title={urgency === 'HIGH' ? 'Urgency > 50 — high priority' : urgency === 'MED' ? 'Urgency 25–50 — medium priority' : 'Urgency ≤ 25 — strong; minimal practice need'}
-                      style={{
-                        fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 4,
-                        color: urgencyColor, background: urgencyBg, flexShrink: 0,
-                      }}>
-                      {urgencyLabel}
                     </span>
                     <span style={{
                       fontSize: 10, fontWeight: 600, padding: '2px 7px', borderRadius: 4,
@@ -340,6 +369,37 @@ export default function FocusAreasPage() {
               )}
             </div>
           </div>
+
+          {/* Due recall cards — the retention half of "what to study now" */}
+          {dueCards.length > 0 && (
+            <div className="dx-card">
+              <div className="dx-card-body" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--text)', flexShrink: 0 }}>
+                  {dueCards.length} recall card{dueCards.length !== 1 ? 's' : ''} due
+                </span>
+                <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap', flex: 1, minWidth: 160 }}>
+                  {dueBySystem.map(([sys, n]) => (
+                    <span key={sys} style={{
+                      fontSize: 10, fontWeight: 500, padding: '2px 7px', borderRadius: 4,
+                      color: 'var(--muted)', background: 'var(--surface3)',
+                    }}>
+                      {sys.split(' / ')[0]} {n}
+                    </span>
+                  ))}
+                </div>
+                <Link
+                  href="/recall"
+                  style={{
+                    fontSize: 12, fontWeight: 600, color: 'var(--accent)', textDecoration: 'none',
+                    background: 'rgba(79,156,249,0.1)', border: '1px solid rgba(79,156,249,0.2)',
+                    borderRadius: 6, padding: '5px 12px', flexShrink: 0,
+                  }}
+                >
+                  Review now →
+                </Link>
+              </div>
+            </div>
+          )}
 
           {/* Two-column */}
           <div className="dx-grid2">
@@ -468,61 +528,6 @@ export default function FocusAreasPage() {
             </div>
           </div>
 
-          {/* Weekly Plan */}
-          <div className="dx-card">
-            <div className="dx-card-header">
-              <div style={{ fontWeight: 700 }}>This Week&apos;s Training Plan</div>
-              <div style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)', marginTop: 2 }}>
-                Generated from your weak areas + preferences
-              </div>
-            </div>
-            <div className="dx-card-body">
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 10 }}>
-                {weekPlan.map(({ day, task, level, reason }) => {
-                  const isToday = DAY_INDEX[day] === todayDay
-                  return (
-                    <div key={day} style={{
-                      border: isToday ? '1px solid var(--accent)' : '1px solid var(--border)',
-                      borderRadius: 8, overflow: 'hidden',
-                    }}>
-                      <div style={{
-                        padding: '6px 8px', textAlign: 'center', fontSize: 11, fontWeight: 700,
-                        color: isToday ? 'var(--accent)' : 'var(--muted)',
-                        background: isToday ? 'rgba(79,156,249,0.08)' : 'var(--surface2)',
-                        borderBottom: '1px solid var(--border)',
-                      }}>
-                        {day}
-                      </div>
-                      <div style={{ padding: '10px 8px', background: 'var(--surface2)' }}>
-                        <div style={{
-                          fontSize: 11, fontWeight: 600, color: task === 'Rest day' || task === 'Free choice' ? 'var(--muted)' : 'var(--text)',
-                          marginBottom: level ? 6 : 4,
-                        }}>
-                          {task}
-                        </div>
-                        {level && (
-                          <div style={{
-                            fontSize: 9, fontWeight: 600, padding: '2px 5px', borderRadius: 3, display: 'inline-block',
-                            color: LEVEL_COLOR[level], background: 'var(--surface3)', marginBottom: 6,
-                          }}>
-                            {level}
-                          </div>
-                        )}
-                        <div style={{ fontSize: 10, color: 'var(--muted)', fontStyle: 'italic', lineHeight: 1.4 }}>{reason}</div>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-              {prioritized.length > 0 && (
-                <p style={{ margin: '14px 0 0', fontSize: 11, color: 'var(--muted)', fontStyle: 'italic' }}>
-                  This plan targets {Math.min(settings.weeklyVolume, 7 - settings.restDays.length)} case
-                  {Math.min(settings.weeklyVolume, 7 - settings.restDays.length) !== 1 ? 's' : ''} this week,
-                  starting with your weakest system: {prioritized[0].name}. Adjust volume and rest days in Settings.
-                </p>
-              )}
-            </div>
-          </div>
             </>
           )}
 

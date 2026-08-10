@@ -13,13 +13,6 @@ import {
 import { getScheme, setScheme, type Scheme } from '@/app/lib/colorScheme'
 import { clearAllLocalData } from '@/app/lib/clearLocalData'
 
-const DAYS_OF_WEEK = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'] as const
-const DIFF_MIX_OPTIONS: { value: FocusSettings['difficultyMix']; label: string }[] = [
-  { value: 'balanced',          label: 'Balanced (default)' },
-  { value: 'foundations-heavy', label: 'Foundations heavy' },
-  { value: 'clinical-heavy',    label: 'Clinical heavy' },
-  { value: 'advanced-heavy',    label: 'Advanced heavy' },
-]
 const SUPPORT_EMAIL = 'support@medtrainer.app'
 
 type SaveStatus = 'idle' | 'saving' | 'saved' | 'error'
@@ -65,7 +58,7 @@ export default function SettingsPage() {
       setEmail(user.email ?? '')
       const { data: p, error } = await supabase
         .from('profiles')
-        .select('display_name,tier,email_case_reminders,email_weekly_summary,rest_days,weekly_volume,difficulty_mix,default_system')
+        .select('display_name,tier,email_case_reminders,email_weekly_summary,weekly_volume,default_system')
         .eq('id', user.id)
         .single()
       if (error || !p) {
@@ -79,9 +72,7 @@ export default function SettingsPage() {
         // Merge DB training prefs with localStorage
         const local = loadFocusSettings()
         const merged: FocusSettings = {
-          restDays:      (p.rest_days as string[] | null) ?? local.restDays,
-          weeklyVolume:  (p.weekly_volume as number | null) ?? local.weeklyVolume,
-          difficultyMix: ((p.difficulty_mix as FocusSettings['difficultyMix'] | null) ?? local.difficultyMix),
+          weeklyVolume: (p.weekly_volume as number | null) ?? local.weeklyVolume,
         }
         setFocusSettings(merged)
       }
@@ -120,9 +111,7 @@ export default function SettingsPage() {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          rest_days:      focusSettings.restDays,
-          weekly_volume:  focusSettings.weeklyVolume,
-          difficulty_mix: focusSettings.difficultyMix,
+          weekly_volume: focusSettings.weeklyVolume,
         }),
       })
       // Persist locally only once the DB accepted the values, and adopt any
@@ -208,19 +197,7 @@ export default function SettingsPage() {
     form.submit()
   }
 
-  function toggleRestDay(day: string) {
-    setFocusSettings(prev => {
-      if (prev.restDays.includes(day)) {
-        return { ...prev, restDays: prev.restDays.filter(d => d !== day) }
-      }
-      // At least one active day must remain — 7 rest days would make the
-      // weekly-goal cap 0 and the volume input's min exceed its max.
-      if (prev.restDays.length >= 6) return prev
-      return { ...prev, restDays: [...prev.restDays, day] }
-    })
-  }
-
-  const statusText = (s: SaveStatus, errMsg?: string) =>
+  const statusText =(s: SaveStatus, errMsg?: string) =>
     s === 'saving' ? 'Saving…' : s === 'saved' ? 'Saved ✓' : s === 'error' ? (errMsg ?? 'Error — try again') : ''
 
   return (
@@ -349,26 +326,9 @@ export default function SettingsPage() {
             <div className="dx-card-body">
 
               <div className="dx-form-section">
-                <p className="dx-form-section-title" style={{ fontSize: 13, fontWeight: 600 }}>Rest days</p>
-                <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                  {DAYS_OF_WEEK.map(day => (
-                    <button
-                      key={day}
-                      className={`dx-chip${focusSettings.restDays.includes(day) ? ' active' : ''}`}
-                      onClick={() => toggleRestDay(day)}
-                    >
-                      {day}
-                    </button>
-                  ))}
-                </div>
-                <p className="dx-help-text">Rest days are skipped in your weekly training plan.</p>
-              </div>
-
-              <div className="dx-form-section">
                 <p className="dx-form-section-title" style={{ fontSize: 13, fontWeight: 600 }}>Weekly case goal</p>
                 {(() => {
-                  const activeDays = 7 - focusSettings.restDays.length
-                  const effectiveCap = tier === 'free' ? Math.min(14, activeDays * 2) : 49
+                  const effectiveCap = tier === 'free' ? 14 : 49
                   return (
                     <>
                       <input
@@ -381,33 +341,15 @@ export default function SettingsPage() {
                         style={{ maxWidth: 80 }}
                       />
                       <p className="dx-help-text">
-                        {tier === 'free'
-                          ? `Free plan: up to 2 cases per active day (max ${effectiveCap}/week with your current rest days). `
-                          : ''}
-                        Number of cases you aim to complete each week.
+                        {tier === 'free' ? `Free plan: up to ${effectiveCap} cases/week. ` : ''}
+                        Number of cases you aim to complete each week — drives the weekly goal on your dashboard and the pace on Focus Areas.
                       </p>
                     </>
                   )
                 })()}
               </div>
 
-              <div className="dx-form-section">
-                <p className="dx-form-section-title" style={{ fontSize: 13, fontWeight: 600 }}>Difficulty mix</p>
-                <select
-                  className="dx-select"
-                  value={focusSettings.difficultyMix}
-                  onChange={e => setFocusSettings(prev => ({ ...prev, difficultyMix: e.target.value as FocusSettings['difficultyMix'] }))}
-                  style={{ maxWidth: 240 }}
-                >
-                  {DIFF_MIX_OPTIONS.map(o => (
-                    <option key={o.value} value={o.value}>{o.label}</option>
-                  ))}
-                </select>
-                <p className="dx-help-text">Biases your weekly plan toward the selected difficulty tier.</p>
-              </div>
-
               <div className="dx-form-actions">
-                <p className="dx-help-text" style={{ margin: '0 0 8px' }}>Saves rest days, weekly goal, and difficulty mix together.</p>
                 <button className="dx-btn-primary" style={{ fontSize: 13, padding: '7px 18px' }} onClick={savePrefs} disabled={prefStatus === 'saving'}>
                   Save training preferences
                 </button>

@@ -63,11 +63,13 @@ export async function PATCH(req: Request) {
     if (typeof body.weekly_volume !== 'number' || !Number.isFinite(body.weekly_volume)) {
       return Response.json({ error: 'weekly_volume must be a number' }, { status: 400 })
     }
-    // The free-tier cap (2 cases per active day, max 14/week) is enforced here
-    // too — the client-side clamp alone is bypassable via a direct PATCH.
+    // The free-tier cap (14/week) is enforced here too — the client-side clamp
+    // alone is bypassable via a direct PATCH. Flat cap: the old
+    // 2-per-active-day formula depended on rest_days, whose UI knob is gone —
+    // keeping it would leave legacy profiles stuck under a cap they can't edit.
     const { data: profile, error: profileError } = await supabase
       .from('profiles')
-      .select('tier, rest_days')
+      .select('tier')
       .eq('id', user.id)
       .single()
     if (profileError || !profile) {
@@ -75,9 +77,7 @@ export async function PATCH(req: Request) {
       // assuming free would silently shrink a Pro user's goal.
       return Response.json({ error: 'Could not verify plan tier — try again' }, { status: 500 })
     }
-    const restDays = (updates.rest_days ?? (profile?.rest_days as string[] | null) ?? []).length
-    const activeDays = Math.max(0, 7 - restDays)
-    const cap = profile?.tier === 'pro' ? PRO_WEEKLY_CAP : Math.min(14, activeDays * 2)
+    const cap = profile?.tier === 'pro' ? PRO_WEEKLY_CAP : 14
     updates.weekly_volume = Math.min(Math.max(1, Math.floor(body.weekly_volume)), Math.max(1, cap))
   }
 
