@@ -737,6 +737,7 @@ export default function MedTrainer() {
             teachingPoints: reveal.teachingPoints,
             mechanism: reveal.mechanism,
             testImpacts: reveal.testImpacts,
+            recallCards: reveal.recallCards,
           },
           resolvedSystemRef.current || system,
           caseDifficulty,

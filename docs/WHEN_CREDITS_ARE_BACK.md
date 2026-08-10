@@ -77,6 +77,19 @@ Order matters — tag before generating so cases get authored to the correct sid
 - [ ] (Optional) run `node scripts/image-agents.mjs` to populate `verified_images` across the library.
 - [ ] Re-run the planner if the combo map changed: `node scripts/plan-image-cases.mjs` (should stay 30 distinct diagnoses, 0 duplicates).
 
+## 3.5 Finish the recall-card backfill (credits ran out 2026-08-10)
+
+`scripts/backfill-recall.mjs` writes concise case-agnostic `recallCards`
+(+ missing `mechanism`/`differentialPriors`/`testImpacts`) onto every case, and
+keeps the tiered `ground_truth` column in step with `case_data`. The 2026-08-10
+run completed **252/390** before credits ran out (129 credit failures, 9
+truncation failures since fixed by raising `max_tokens` to 6000).
+
+- [ ] Rerun until clean — it is resumable (skips cases that already have `recallCards`):
+  `node scripts/backfill-recall.mjs`
+- Deck ceiling at the stop point: 546 unique cards (176/205 diagnoses with all
+  three tags, 11 with zero — was 187 / 22 / 75 before the run).
+
 ## 4. Audit scripts on the restored library
 
 - [ ] `npm run audit:differentials` — fails a case if its expected workup doesn't rank the true dx #1, if a test confirms a non-target, or flags `expectedLabs` padding. Fix flagged cases.

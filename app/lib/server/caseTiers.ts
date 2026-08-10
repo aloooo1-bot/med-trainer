@@ -93,6 +93,7 @@ export function buildReveal(caseData: CaseData): CaseReveal {
     teachingPoints: caseData.teachingPoints ?? [],
     keyQuestions: caseData.keyQuestions ?? [],
     mechanism: caseData.mechanism,
+    recallCards: caseData.recallCards,
     differentialPriors: caseData.differentialPriors,
     testImpacts: caseData.testImpacts,
     reviewOfSystems: caseData.reviewOfSystems ?? {},

@@ -85,6 +85,18 @@ export interface BeliefState {
 
 // ── Spaced repetition (SM-2) ────────────────────────────────────────────────
 
+/**
+ * Concise, case-agnostic answers authored specifically for the recall deck —
+ * unlike `mechanism` (written for the Why layer) or teachingPoints (written as
+ * case pearls), these carry no "in this patient/case" details. Optional on a
+ * case; extraction falls back to deriving answers from the Why-layer fields.
+ */
+export interface RecallCards {
+  mechanism?: string
+  management?: string
+  discriminator?: string
+}
+
 export type ReviewTag = 'discriminator' | 'management' | 'cutoff' | 'mechanism'
 export type ReviewGrade = 'again' | 'hard' | 'good' | 'easy'
 

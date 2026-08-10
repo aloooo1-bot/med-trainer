@@ -35,7 +35,7 @@ export function splitCase(/** @type {AnyCase} */ caseData) {
     // ── ground truth ──
     diagnosis, differentials, differentialExplanations, teachingPoints,
     keyQuestions, expectedLabs, expectedImaging, relevantTests,
-    differentialPriors, testImpacts, mechanism,
+    differentialPriors, testImpacts, mechanism, recallCards,
     ...rest
   } = caseData
 
@@ -59,7 +59,7 @@ export function splitCase(/** @type {AnyCase} */ caseData) {
     groundTruth: prune({
       diagnosis, differentials, differentialExplanations, teachingPoints,
       keyQuestions, expectedLabs, expectedImaging, relevantTests,
-      differentialPriors, testImpacts, mechanism,
+      differentialPriors, testImpacts, mechanism, recallCards,
     }),
   }
 }

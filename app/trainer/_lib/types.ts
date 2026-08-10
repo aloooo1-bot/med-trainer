@@ -1,4 +1,4 @@
-import type { DifferentialPrior, TestImpacts } from '../../lib/reasoning/types'
+import type { DifferentialPrior, RecallCards, TestImpacts } from '../../lib/reasoning/types'
 
 export interface CaseData {
   patientInfo: { name: string; age: number; gender: string; chiefComplaint: string; height?: string; heightInches?: number }
@@ -40,6 +40,8 @@ export interface CaseData {
   testImpacts?: TestImpacts
   /** 2-3 sentence pathophysiology for the "Why" layer. */
   mechanism?: string
+  /** Concise, case-agnostic spaced-repetition answers (see reasoning/types). */
+  recallCards?: RecallCards
   imagingCategory?: string
   /** Image-first binding: exact local chest film (public path) this case was authored from. Server-only tier. */
   localChestImage?: string

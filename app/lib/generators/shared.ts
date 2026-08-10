@@ -169,6 +169,11 @@ export const JSON_SCHEMA_TEMPLATE = `{
     }
   },
   "mechanism": "<2-3 sentences of pathophysiology linking this case's key findings to the underlying disease mechanism — powers the Why layer>",
+  "recallCards": {
+    "mechanism": "<1-2 sentences, MAXIMUM 35 WORDS: the core pathophysiology of the diagnosis in general. MUST be case-agnostic — no patient details, no 'in this case/patient', no case-specific values>",
+    "management": "<1 sentence, MAXIMUM 30 WORDS: the first-line treatment with concrete agent/dose/threshold. Case-agnostic — treatment of the disease, not of this patient>",
+    "discriminator": "<1 sentence, MAXIMUM 25 WORDS: '<confirmatory test> — <the general finding that confirms this diagnosis>'. Case-agnostic — the classic finding, not this case's exact measurements>"
+  },
   "reviewOfSystems": {
     "Constitutional": "<findings>", "HEENT": "<findings>",
     "Cardiovascular": "<findings>", "Respiratory": "<findings>", "Gastrointestinal": "<findings>",

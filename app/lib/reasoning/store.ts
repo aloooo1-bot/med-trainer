@@ -8,7 +8,7 @@
  * subset of a case, so app/lib/reasoning stays self-contained (no import from
  * the trainer layer).
  */
-import type { MasteryRecord, ReviewItem, TestImpacts } from './types'
+import type { MasteryRecord, RecallCards, ReviewItem, TestImpacts } from './types'
 import { makeReviewItem, scheduleNext } from './spacedRepetition'
 import { updateMastery, masteryKey } from './mastery'
 import type { ReviewGrade } from './types'
@@ -29,35 +29,65 @@ export interface CaseLike {
   teachingPoints?: string[]
   mechanism?: string
   testImpacts?: TestImpacts
+  recallCards?: RecallCards
 }
 
 const MGMT_RE = /\b\d+\s?(mg|mcg|g|units?|mL|mEq)\b|first[-\s]?line|initiate|administer|loading dose|≤|≥|target/i
+
+/**
+ * Incidental/normal-finding "diagnoses" (from the image-first sets) make
+ * worthless recall cards ("no treatment is required…"). Validated against the
+ * full library: matches exactly the incidental set, and phrasing is anchored to
+ * report language so real diagnoses (e.g. Normal Pressure Hydrocephalus) pass.
+ */
+const NON_PATHOLOGY_RE = /unremarkable|incidental|surgical clip|no acute|normal (chest|study|exam|radiograph)|hardware/i
+
+/** Whether a diagnosis is worth a spaced-repetition card at all. */
+export function isRecallWorthy(diagnosis: string): boolean {
+  return !!diagnosis && !NON_PATHOLOGY_RE.test(diagnosis)
+}
 
 function slug(s: string): string {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 60)
 }
 
 /**
+ * Pick the management-pearl teaching point. The generation schema mandates the
+ * LAST teaching point be the management pearl, so prefer it when it matches;
+ * the first-match scan is only a fallback for older cases, since MGMT_RE can
+ * false-positive on any pearl containing a dose, unit, or ≤/≥ threshold.
+ */
+function managementPearl(teachingPoints: string[]): string | undefined {
+  const last = teachingPoints[teachingPoints.length - 1]
+  if (last && MGMT_RE.test(last)) return last
+  return teachingPoints.find(t => MGMT_RE.test(t))
+}
+
+/**
  * Distill a graded case into 1-3 high-yield spaced-repetition prompts:
  * the mechanism (Why), the first-line management pearl, and the confirmatory
- * discriminator. IDs are stable per (diagnosis, tag) so repeating the same
- * diagnosis updates the existing card rather than piling up duplicates.
+ * discriminator. Answers prefer the case's `recallCards` (concise,
+ * case-agnostic text authored for the deck) and fall back to deriving from
+ * the Why-layer/teaching fields. IDs are stable per (diagnosis, tag) so
+ * repeating the same diagnosis refreshes the existing card's text (see
+ * addReviewItems) rather than piling up duplicates.
  */
 export function buildReviewItems(c: CaseLike, system: string, now: number): ReviewItem[] {
   const items: ReviewItem[] = []
   const dx = c.diagnosis
-  if (!dx) return items
+  if (!dx || !isRecallWorthy(dx)) return items
 
-  if (c.mechanism) {
+  const mechanism = c.recallCards?.mechanism ?? c.mechanism
+  if (mechanism) {
     items.push(
       makeReviewItem(
-        { id: `${slug(dx)}::mechanism`, prompt: `What is the underlying mechanism of ${dx}?`, answer: c.mechanism, diagnosis: dx, system, tag: 'mechanism' },
+        { id: `${slug(dx)}::mechanism`, prompt: `What is the underlying mechanism of ${dx}?`, answer: mechanism, diagnosis: dx, system, tag: 'mechanism' },
         now,
       ),
     )
   }
 
-  const mgmt = (c.teachingPoints ?? []).find(t => MGMT_RE.test(t))
+  const mgmt = c.recallCards?.management ?? managementPearl(c.teachingPoints ?? [])
   if (mgmt) {
     items.push(
       makeReviewItem(
@@ -67,18 +97,22 @@ export function buildReviewItems(c: CaseLike, system: string, now: number): Revi
     )
   }
 
-  if (c.testImpacts) {
+  let discriminator = c.recallCards?.discriminator
+  if (!discriminator && c.testImpacts) {
     for (const [test, impacts] of Object.entries(c.testImpacts)) {
       if (impacts[dx]?.effect === 'confirms') {
-        items.push(
-          makeReviewItem(
-            { id: `${slug(dx)}::discriminator`, prompt: `Which test confirms ${dx}, and what does it show?`, answer: `${test} — ${impacts[dx].why}`, diagnosis: dx, system, tag: 'discriminator' },
-            now,
-          ),
-        )
+        discriminator = `${test} — ${impacts[dx].why}`
         break
       }
     }
+  }
+  if (discriminator) {
+    items.push(
+      makeReviewItem(
+        { id: `${slug(dx)}::discriminator`, prompt: `Which test confirms ${dx}, and what does it show?`, answer: discriminator, diagnosis: dx, system, tag: 'discriminator' },
+        now,
+      ),
+    )
   }
 
   return items
@@ -102,7 +136,11 @@ export function loadReviewItems(): ReviewItem[] {
         Number.isFinite(r.ease) &&
         Number.isFinite(r.intervalDays) &&
         Number.isFinite(r.dueAt) &&
-        Number.isFinite(r.repetitions)
+        Number.isFinite(r.repetitions) &&
+        // Self-cleaning: drop incidental-finding cards minted before the
+        // isRecallWorthy gate existed. Both sync sides filter on load, so the
+        // union-merge cannot resurrect them from the account blob.
+        isRecallWorthy((r as ReviewItem).diagnosis ?? '')
     })
   } catch { return [] }
 }
@@ -111,11 +149,22 @@ function saveReviewItems(items: ReviewItem[]): void {
   try { localStorage.setItem(REVIEW_KEY, JSON.stringify(items.slice(-MAX_REVIEW))) } catch {}
 }
 
-/** Merge freshly-extracted items, skipping ids that already exist. */
+/**
+ * Merge freshly-extracted items. New ids append; existing ids refresh their
+ * card text (prompt/answer/diagnosis/system) while keeping the SM-2 scheduling
+ * state — so a later, better-authored case improves a stale card without
+ * resetting the review schedule.
+ */
 export function addReviewItems(newItems: ReviewItem[]): ReviewItem[] {
   const existing = loadReviewItems()
-  const ids = new Set(existing.map(i => i.id))
-  const merged = [...existing, ...newItems.filter(i => !ids.has(i.id))]
+  const byId = new Map(newItems.map(i => [i.id, i]))
+  const merged = existing.map(old => {
+    const fresh = byId.get(old.id)
+    if (!fresh) return old
+    byId.delete(old.id)
+    return { ...old, prompt: fresh.prompt, answer: fresh.answer, diagnosis: fresh.diagnosis, system: fresh.system }
+  })
+  merged.push(...byId.values())
   saveReviewItems(merged)
   return merged
 }

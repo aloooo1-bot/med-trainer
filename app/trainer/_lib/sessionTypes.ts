@@ -70,6 +70,8 @@ export interface CaseReveal {
   teachingPoints: string[]
   keyQuestions: string[]
   mechanism?: string
+  /** Concise, case-agnostic spaced-repetition answers for the recall deck. */
+  recallCards?: CaseData['recallCards']
   differentialPriors?: CaseData['differentialPriors']
   testImpacts?: CaseData['testImpacts']
   /** Canonical ROS findings, for the post-grading "Full:" reveal rows. */

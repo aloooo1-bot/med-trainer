@@ -2,11 +2,23 @@
 
 import { useState, useMemo } from 'react'
 import type { ReviewItem, ReviewTag } from '@/app/lib/reasoning/types'
+import { buildAnkiTsv, ankiExportFilename } from '@/app/lib/reasoning/ankiExport'
 
 const TAG_LABEL: Record<ReviewTag, string> = {
   discriminator: 'Discriminator', management: 'Management', cutoff: 'Cutoff', mechanism: 'Mechanism',
 }
 const DAY = 86_400_000
+
+/** Trigger a client-side download of the deck as an Anki-importable TSV. */
+function downloadAnkiExport(items: ReviewItem[], now: number): void {
+  const blob = new Blob([buildAnkiTsv(items)], { type: 'text/plain;charset=utf-8' })
+  const url = URL.createObjectURL(blob)
+  const a = document.createElement('a')
+  a.href = url
+  a.download = ankiExportFilename(now)
+  a.click()
+  URL.revokeObjectURL(url)
+}
 
 function dueLabel(dueAt: number, now: number): { text: string; due: boolean } {
   const ms = dueAt - now
@@ -40,11 +52,21 @@ export default function DeckBrowser({ items, now }: { items: ReviewItem[]; now: 
     <div className="dx-card">
       <div className="dx-card-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: 8 }}>
         <div style={{ fontWeight: 700 }}>Your deck</div>
-        <div
-          style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)' }}
-          title="Mature = review interval of 3+ weeks, i.e. reliably remembered"
-        >
-          {items.length} cards · {dueNow} due · {mature} mature
+        <div style={{ display: 'flex', alignItems: 'baseline', gap: 10 }}>
+          <div
+            style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)' }}
+            title="Mature = review interval of 3+ weeks, i.e. reliably remembered"
+          >
+            {items.length} cards · {dueNow} due · {mature} mature
+          </div>
+          <button
+            type="button"
+            onClick={() => downloadAnkiExport(items, now)}
+            title="Download the deck as an Anki plain-text import (File → Import). Cards arrive as new; your review schedule stays here."
+            style={{ fontSize: 11, fontWeight: 600, padding: '4px 10px', borderRadius: 6, border: '1px solid var(--border)', background: 'var(--surface2)', color: 'var(--text)', cursor: 'pointer' }}
+          >
+            Export to Anki
+          </button>
         </div>
       </div>
       <div className="dx-card-body" style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
