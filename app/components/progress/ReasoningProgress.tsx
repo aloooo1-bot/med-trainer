@@ -2,12 +2,14 @@
 
 import { useState, useEffect, useMemo } from 'react'
 import Link from 'next/link'
-import { loadMastery, loadCalibration, type CalibrationEntry } from '@/app/lib/reasoning/store'
+import { loadMastery, loadCalibration, loadReviewItems, loadStreak, type CalibrationEntry } from '@/app/lib/reasoning/store'
 import { syncReasoning } from '@/app/lib/reasoning/sync'
 import { MasteryBodyMap } from './MasteryBodyMap'
-import { recommendNext, isMastered, masteryKey } from '@/app/lib/reasoning/mastery'
+import { isMastered } from '@/app/lib/reasoning/mastery'
 import { calibrationSummary, reliabilityBuckets, type ReliabilityBucket } from '@/app/lib/reasoning/prediction'
-import type { MasteryRecord } from '@/app/lib/reasoning/types'
+import { dueCount } from '@/app/lib/reasoning/spacedRepetition'
+import { localDayKey, localDayKeyOffset } from '@/app/lib/localDay'
+import type { MasteryRecord, ReviewItem } from '@/app/lib/reasoning/types'
 
 const SYSTEMS = [
   'Cardiovascular', 'Respiratory', 'Neurologic', 'Gastrointestinal', 'Renal',
@@ -15,12 +17,6 @@ const SYSTEMS = [
   'Musculoskeletal', 'Psychiatric', 'Toxicologic', 'Trauma',
 ]
 const DIFFICULTIES = ['Foundations', 'Clinical', 'Advanced']
-
-function scoreColor(score: number): string {
-  if (score < 60) return 'var(--red)'
-  if (score < 75) return 'var(--amber)'
-  return 'var(--green)'
-}
 
 /**
  * Reliability diagram: stated confidence (x) against actual accuracy (y),
@@ -127,6 +123,9 @@ function ReliabilityDiagram({ buckets, verdict }: { buckets: ReliabilityBucket[]
 export default function ReasoningProgress({ tier = 'free' }: { tier?: string }) {
   const [mastery, setMastery] = useState<MasteryRecord[]>([])
   const [calibration, setCalibration] = useState<CalibrationEntry[]>([])
+  const [deck, setDeck] = useState<ReviewItem[]>([])
+  const [due, setDue] = useState(0)
+  const [streak, setStreak] = useState(0)
   const [loaded, setLoaded] = useState(false)
 
   useEffect(() => {
@@ -138,26 +137,35 @@ export default function ReasoningProgress({ tier = 'free' }: { tier?: string }) 
       if (cancelled) return
       setMastery(loadMastery())
       setCalibration(loadCalibration())
+      const items = loadReviewItems()
+      const now = Date.now()
+      setDeck(items)
+      setDue(dueCount(items, now))
+      // A streak is only alive if the last review was today or yesterday.
+      const s = loadStreak()
+      setStreak(s.lastDay === localDayKey(now) || s.lastDay === localDayKeyOffset(now, 1) ? s.streak : 0)
       setLoaded(true)
     })()
     return () => { cancelled = true }
   }, [])
 
-  const byKey = useMemo(() => new Map(mastery.map(m => [m.key, m])), [mastery])
-  const attemptedSystems = useMemo(
-    () => SYSTEMS.filter(sys => DIFFICULTIES.some(d => byKey.has(masteryKey(sys, d)))),
-    [byKey]
-  )
-  const candidates = useMemo(() => SYSTEMS.flatMap(s => DIFFICULTIES.map(d => ({ system: s, difficulty: d }))), [])
-  const rec = useMemo(() => (mastery.length ? recommendNext(mastery, candidates) : null), [mastery, candidates])
+  const masteredCount = useMemo(() => mastery.filter(isMastered).length, [mastery])
+  const totalSlots = SYSTEMS.length * DIFFICULTIES.length
+
+  const retention = useMemo(() => {
+    if (!deck.length) return null
+    return {
+      total: deck.length,
+      mature: deck.filter(i => i.intervalDays >= 21).length, // same bar as the deck browser
+      due,
+    }
+  }, [deck, due])
 
   const cal = useMemo(() => {
     if (!calibration.length) return null
     return {
-      avg: Math.round(calibration.reduce((a, c) => a + c.score, 0) / calibration.length),
       hitRate: Math.round((calibration.filter(c => c.topHit).length / calibration.length) * 100),
       count: calibration.length,
-      recent: calibration.slice(-12),
     }
   }, [calibration])
 
@@ -200,106 +208,75 @@ export default function ReasoningProgress({ tier = 'free' }: { tier?: string }) 
     <div className="dx-card">
       <div className="dx-card-header">
         <div style={{ fontWeight: 700 }}>Reasoning &amp; mastery</div>
-        {rec && (() => {
-          // Free accounts train at Foundations only — recommend what's launchable.
-          const recDifficulty = tier === 'pro' ? rec.difficulty : 'Foundations'
-          return (
-            <div style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)', marginTop: 2 }}>
-              Recommended next: <strong style={{ color: 'var(--text)' }}>{rec.system} · {recDifficulty}</strong> — {rec.reason}{' '}
-              <Link
-                href={`/trainer?system=${encodeURIComponent(rec.system)}&difficulty=${encodeURIComponent(recDifficulty)}`}
-                style={{ color: 'var(--accent)', textDecoration: 'none', fontWeight: 600 }}
-              >
-                Start →
-              </Link>
-            </div>
-          )
-        })()}
       </div>
       <div className="dx-card-body" style={{ display: 'flex', flexDirection: 'column', gap: 22 }}>
 
-        {/* Body map — mastery as anatomy. The table below keeps the
-            per-difficulty breakdown the figure can't express. */}
+        {/* Body map — mastery as anatomy. Per-system mastered slots live in its
+            tooltips; per-difficulty averages live in Performance Breakdown. */}
         <div>
-          <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--muted)', marginBottom: 10 }}>Coverage</div>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10, flexWrap: 'wrap', gap: 6 }}>
+            <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--muted)' }}>Coverage</div>
+            <div
+              title="Mastered = score ≥ 80 with 3+ attempts and a 2+ correct streak at that system × difficulty"
+              style={{ fontSize: 11, color: masteredCount > 0 ? 'var(--green)' : 'var(--muted)', fontWeight: 600 }}
+            >
+              {masteredCount} of {totalSlots} topic-tiers mastered
+            </div>
+          </div>
           <MasteryBodyMap records={mastery} tier={tier} />
         </div>
 
-        {/* Mastery grid — only systems with at least one attempt */}
-        <div>
-          <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--muted)', marginBottom: 8 }}>Mastery by topic</div>
-          {attemptedSystems.length === 0 ? (
-            <p style={{ fontSize: 12, color: 'var(--muted)', margin: 0 }}>
-              No mastery data yet — complete cases in the trainer to build per-topic mastery.
-            </p>
-          ) : (
-            <div style={{ overflowX: 'auto' }}>
-              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
-                <thead>
-                  <tr>
-                    <th style={{ textAlign: 'left', padding: '4px 8px', color: 'var(--muted)', fontWeight: 500 }}>System</th>
-                    {DIFFICULTIES.map(d => (
-                      <th key={d} style={{ textAlign: 'center', padding: '4px 8px', color: 'var(--muted)', fontWeight: 500 }}>{d}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody>
-                  {attemptedSystems.map(sys => (
-                    <tr key={sys} style={{ borderTop: '1px solid var(--border)' }}>
-                      <td style={{ padding: '6px 8px', color: 'var(--text)', whiteSpace: 'nowrap' }}>{sys}</td>
-                      {DIFFICULTIES.map(d => {
-                        const m = byKey.get(masteryKey(sys, d))
-                        if (!m) return <td key={d} style={{ textAlign: 'center', color: 'var(--muted)' }}>—</td>
-                        return (
-                          <td key={d} style={{ textAlign: 'center', padding: '6px 8px' }}>
-                            <span style={{ fontFamily: 'JetBrains Mono, monospace', fontWeight: 600, color: scoreColor(m.score) }}>{m.score}</span>
-                            {isMastered(m) && <span title="Mastered" style={{ marginLeft: 4, color: 'var(--green)' }}>✓</span>}
-                          </td>
-                        )
-                      })}
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        {/* Retention — the deck is the durable-learning evidence */}
+        {retention && (
+          <div>
+            <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--muted)', marginBottom: 8 }}>Retention</div>
+            <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', alignItems: 'flex-end' }}>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)' }}>{retention.total}</div>
+                <div style={{ fontSize: 11, color: 'var(--muted)' }}>cards in deck</div>
+              </div>
+              <div title="Review interval of 3+ weeks — reliably remembered">
+                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--green)' }}>{retention.mature}</div>
+                <div style={{ fontSize: 11, color: 'var(--muted)' }}>mature</div>
+              </div>
+              <div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: retention.due > 0 ? 'var(--amber)' : 'var(--text)' }}>{retention.due}</div>
+                <div style={{ fontSize: 11, color: 'var(--muted)' }}>due now</div>
+              </div>
+              <div title="Consecutive days with at least one review">
+                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)' }}>{streak}<span style={{ fontSize: 12, color: 'var(--muted)' }}> day{streak !== 1 ? 's' : ''}</span></div>
+                <div style={{ fontSize: 11, color: 'var(--muted)' }}>review streak</div>
+              </div>
+              <Link
+                href="/recall"
+                style={{
+                  fontSize: 12, fontWeight: 600, color: 'var(--accent)', textDecoration: 'none',
+                  background: 'rgba(79,156,249,0.1)', border: '1px solid rgba(79,156,249,0.2)',
+                  borderRadius: 6, padding: '5px 12px', alignSelf: 'center',
+                }}
+              >
+                Review →
+              </Link>
             </div>
-          )}
-          {attemptedSystems.length > 0 && attemptedSystems.length < SYSTEMS.length && (
-            <div style={{ fontSize: 11, color: 'var(--muted)', marginTop: 6 }}>
-              +{SYSTEMS.length - attemptedSystems.length} system{SYSTEMS.length - attemptedSystems.length !== 1 ? 's' : ''} not yet attempted
-            </div>
-          )}
-        </div>
+          </div>
+        )}
 
-        {/* Calibration */}
+        {/* Calibration — one verdict sentence + the reliability diagram */}
         {cal && (
           <div>
             <div style={{ fontSize: 11, textTransform: 'uppercase', letterSpacing: '.06em', color: 'var(--muted)', marginBottom: 10 }}>Pre-test calibration</div>
-            <div style={{ display: 'flex', gap: 28, flexWrap: 'wrap', alignItems: 'flex-end' }}>
-              <div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: scoreColor(cal.avg) }}>{cal.avg}<span style={{ fontSize: 12, color: 'var(--muted)' }}>/100</span></div>
-                <div style={{ fontSize: 11, color: 'var(--muted)' }}>avg ranking agreement</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)' }}>{cal.hitRate}%</div>
-                <div style={{ fontSize: 11, color: 'var(--muted)' }}>top-pick correct</div>
-              </div>
-              <div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text)' }}>{cal.count}</div>
-                <div style={{ fontSize: 11, color: 'var(--muted)' }}>predictions made</div>
-              </div>
-              <div style={{ display: 'flex', alignItems: 'flex-end', gap: 3, height: 40 }} title="Recent prediction scores">
-                {cal.recent.map((c, i) => (
-                  <div key={i} title={`${c.score}/100${c.topHit ? ' · top pick correct' : ''}`}
-                    style={{ width: 8, height: `${Math.max(4, c.score * 0.4)}px`, background: scoreColor(c.score), borderRadius: 2, opacity: 0.85 }} />
-                ))}
-              </div>
-            </div>
-            {confCal && (
-              <p style={{ fontSize: 12, color: 'var(--muted)', marginTop: 12, lineHeight: 1.6 }}>
-                Confidence calibration: you average <strong style={{ color: 'var(--text)' }}>{confCal.avgConfidence}%</strong> confidence
-                but your top pick is right <strong style={{ color: 'var(--text)' }}>{confCal.actualAccuracy}%</strong> of the time —{' '}
-                <strong style={{ color: VERDICT_COLOR[confCal.verdict] }}>{confCal.verdict}</strong>
+            {confCal ? (
+              <p style={{ fontSize: 12, color: 'var(--muted)', margin: 0, lineHeight: 1.6 }}>
+                You average <strong style={{ color: 'var(--text)' }}>{confCal.avgConfidence}%</strong> confidence
+                and your top pick is right <strong style={{ color: 'var(--text)' }}>{confCal.actualAccuracy}%</strong> of the time —{' '}
+                <strong style={{ color: VERDICT_COLOR[confCal.verdict] }}>{confCal.verdict}</strong>.
+                Top pick correct on <strong style={{ color: 'var(--text)' }}>{cal.hitRate}%</strong> of {cal.count} prediction{cal.count !== 1 ? 's' : ''} overall
                 {' '}(Brier {confCal.brier}, {confCal.n} rated).
+              </p>
+            ) : (
+              <p style={{ fontSize: 12, color: 'var(--muted)', margin: 0, lineHeight: 1.6 }}>
+                Top pick correct on <strong style={{ color: 'var(--text)' }}>{cal.hitRate}%</strong> of {cal.count} prediction{cal.count !== 1 ? 's' : ''}.
+                Rate your confidence when committing a prediction to unlock the reliability diagram.
               </p>
             )}
             {buckets.length > 0 && <ReliabilityDiagram buckets={buckets} verdict={confCal?.verdict} />}

@@ -115,6 +115,31 @@ export default function ProgressPage() {
   const avgTimeStr = totalCases ? fmtSeconds(stats.avgSeconds) : '—'
   const medianTimeStr = totalCases ? `${Math.floor(stats.medianSeconds / 60)}m` : ''
 
+  // Growth: last-30-day average vs the 30 days before it. Windows with fewer
+  // than 3 cases don't produce a meaningful average, so the delta shows only
+  // when both sides clear that bar. Computed from the fetched rows — the
+  // 400-row window comfortably covers 60 days of real usage.
+  const growth = useMemo(() => {
+    // eslint-disable-next-line react-hooks/purity
+    const now = Date.now()
+    const d30 = now - 30 * 86_400_000
+    const d60 = now - 60 * 86_400_000
+    const recent: number[] = []
+    const prior: number[] = []
+    for (const s of tracked) {
+      const t = new Date(s.completed_at).getTime()
+      if (t >= d30) recent.push(s.score)
+      else if (t >= d60) prior.push(s.score)
+    }
+    const mean = (a: number[]) => Math.round(a.reduce((x, y) => x + y, 0) / a.length)
+    if (recent.length < 3) return null
+    return {
+      avg: mean(recent),
+      n: recent.length,
+      delta: prior.length >= 3 ? mean(recent) - mean(prior) : null,
+    }
+  }, [tracked])
+
   return (
     <div className="dx-root">
       <Sidebar displayName={displayName} tier={tier} activePage="progress" />
@@ -161,6 +186,14 @@ export default function ProgressPage() {
                   { label: 'Avg Rubric Score', value: `${avgScore}/100`, color: cssScore(avgScore), tip: 'Mean rubric score (0–100): combines history, test ordering, diagnosis accuracy & completeness — a wrong diagnosis can still earn partial workup credit', note: medianScore !== null ? `· median ${medianScore}` : undefined },
                   { label: 'Dx Accuracy',    value: `${correctRate}%`, color: cssScore(correctRate), tip: 'Percent of cases where the submitted diagnosis was correct — distinct from rubric score', note: undefined },
                   { label: 'Avg Time',     value: avgTimeStr,         color: 'var(--muted)',  tip: 'Average time spent per case from first question to diagnosis', note: medianTimeStr ? `· median ${medianTimeStr}` : undefined },
+                  ...(growth ? [{
+                    label: 'Last 30 Days',
+                    value: `${growth.avg}/100`,
+                    color: cssScore(growth.avg),
+                    tip: `Average score over your last 30 days (${growth.n} cases)${growth.delta !== null ? ', compared with the 30 days before' : ''}`,
+                    note: growth.delta === null ? `· ${growth.n} cases`
+                      : growth.delta >= 0 ? `▲ +${growth.delta} vs prior 30d` : `▼ ${growth.delta} vs prior 30d`,
+                  }] : []),
                 ].map(({ label, value, color, tip, note }) => (
                   <div key={label} className="dx-stat-card">
                     <div className="dx-stat-label" title={tip}>{label}</div>
