@@ -80,7 +80,7 @@ export default function Dashboard({
           onStartTraining={() => router.push('/trainer')}
         />
         <div className="dx-content">
-          <NextCaseCard sessions={sessions} systems={systems} />
+          <NextCaseCard systems={systems} tier={tier} />
           <DueReviewCard />
           <div className="dx-grid2">
             <ActivityCalendar sessions={sessions} />

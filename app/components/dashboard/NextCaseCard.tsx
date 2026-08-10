@@ -1,27 +1,27 @@
+'use client'
+
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import type { SystemEntry } from '@/app/lib/dashboardData'
-
-type Session = { score: number; system: string }
+import { recommendNextCase } from '@/app/lib/nextCase'
+import { loadFocusSkips, type FocusSkips } from '@/app/lib/focusSettings'
 
 export default function NextCaseCard({
-  sessions, systems,
+  systems, tier,
 }: {
-  sessions: Session[]; systems: SystemEntry[]
+  systems: SystemEntry[]; tier: string
 }) {
-  let system: string, tier: string, reason: string
-  if (sessions.length === 0 || systems.length === 0) {
-    system = 'Cardiovascular'
-    tier = 'Foundations'
-    reason = 'A great place to start.'
-  } else {
-    const w = systems[0]
-    system = w.name
-    // Progress Foundations → Clinical → Advanced as the system average climbs.
-    tier = w.score < 70 ? 'Foundations' : w.score < 85 ? 'Clinical' : 'Advanced'
-    reason = `Your ${w.name} avg is ${w.score}${w.count ? ` across ${w.count} case${w.count === 1 ? '' : 's'}` : ''}.`
-  }
+  // Focus-tab skips live in localStorage — read after mount so a system the
+  // user snoozed there isn't recommended here in the meantime (SSR renders the
+  // no-skips result; the corrected pick swaps in on hydration).
+  const [skips, setSkips] = useState<FocusSkips>({})
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setSkips(loadFocusSkips())
+  }, [])
 
-  const tierClass = tier.toLowerCase()
+  const rec = recommendNextCase(systems, tier === 'pro', skips)
+  const tierClass = rec.tier.toLowerCase()
 
   return (
     <div className="dx-next-card">
@@ -33,14 +33,16 @@ export default function NextCaseCard({
       </div>
       <p style={{ fontSize: 11, color: 'var(--muted)', margin: '0 0 4px', lineHeight: 1.4 }}
          title="Foundations — classic cases, no timer. Clinical — atypical features, 22-min timer. Advanced — rare/complex, 15-min timer.">
-        Foundations → Clinical → Advanced as your score improves.
+        {tier === 'pro'
+          ? 'Foundations → Clinical → Advanced as your score improves.'
+          : 'Free plan trains at Foundations level — upgrade to Pro for Clinical and Advanced cases.'}
       </p>
       <h2 className="dx-next-headline">
-        {system} <span className={`dx-next-tier ${tierClass}`}>{tier}</span>
+        {rec.system} <span className={`dx-next-tier ${tierClass}`}>{rec.tier}</span>
       </h2>
-      <p className="dx-next-reason">{reason}</p>
+      <p className="dx-next-reason">{rec.reason}</p>
       <Link
-        href={`/trainer?system=${encodeURIComponent(system)}&difficulty=${tier}`}
+        href={`/trainer?system=${encodeURIComponent(rec.system)}&difficulty=${rec.tier}`}
         className="dx-btn-primary dx-next-btn"
       >
         Start case →

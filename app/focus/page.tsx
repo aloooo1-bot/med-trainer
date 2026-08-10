@@ -18,6 +18,7 @@ import {
   loadFocusSkips,
   saveFocusSkip,
 } from '@/app/lib/focusSettings'
+import { recommendedTier, urgencyOf } from '@/app/lib/nextCase'
 import { loadReviewItems } from '@/app/lib/reasoning/store'
 import { dueItems } from '@/app/lib/reasoning/spacedRepetition'
 import type { ReviewItem } from '@/app/lib/reasoning/types'
@@ -111,10 +112,7 @@ export default function FocusAreasPage() {
     systems
       .filter(s => s.count > 0)
       .filter(s => !isSkipped(s.name, skips))
-      .map(s => ({
-        ...s,
-        urgency: Math.round((100 - s.score) * (s.count === 1 ? 1.2 : 1)),
-      }))
+      .map(s => ({ ...s, urgency: urgencyOf(s) }))
       .sort((a, b) => b.urgency - a.urgency),
     [systems, skips]
   )
@@ -254,7 +252,7 @@ export default function FocusAreasPage() {
           {/* Up next — single most actionable recommendation + weekly pace */}
           {prioritized.length > 0 && (() => {
             const top = prioritized[0]
-            const recLevel = !isPro ? 'Foundations' : top.score < 60 ? 'Foundations' : top.score < 80 ? 'Clinical' : 'Advanced'
+            const recLevel = recommendedTier(top.score, isPro)
             return (
               <div className="dx-card">
                 <div className="dx-card-body" style={{ display: 'flex', alignItems: 'center', gap: 14, flexWrap: 'wrap' }}>
@@ -304,7 +302,7 @@ export default function FocusAreasPage() {
             </div>
             <div style={{ padding: '4px 0' }}>
               {prioritized.map((s, i) => {
-                const recLevel = !isPro ? 'Foundations' : s.score < 60 ? 'Foundations' : s.score < 80 ? 'Clinical' : 'Advanced'
+                const recLevel = recommendedTier(s.score, isPro)
                 const isConfirming = confirmSkip === s.name
                 return (
                   <div key={s.name} style={{

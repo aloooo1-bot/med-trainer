@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { loadReviewItems, loadStreak } from '@/app/lib/reasoning/store'
 import { dueCount } from '@/app/lib/reasoning/spacedRepetition'
+import { localDayKey, localDayKeyOffset } from '@/app/lib/localDay'
 
 /**
  * Dashboard prompt to return for spaced-repetition review. Hidden until the user
@@ -19,10 +20,14 @@ export default function DueReviewCard() {
   useEffect(() => {
     // Mount-only load of the review deck from localStorage (unavailable during SSR).
     const items = loadReviewItems()
+    const now = Date.now()
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setTotal(items.length)
-    setDue(dueCount(items, Date.now()))
-    setStreak(loadStreak().streak)
+    setDue(dueCount(items, now))
+    // A streak is only alive if the last review was today or yesterday —
+    // same rule as the Progress tab's retention strip.
+    const s = loadStreak()
+    setStreak(s.lastDay === localDayKey(now) || s.lastDay === localDayKeyOffset(now, 1) ? s.streak : 0)
     setLoaded(true)
   }, [])
 
