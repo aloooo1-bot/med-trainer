@@ -334,11 +334,12 @@ export default function HistoryPage() {
   const noteSaveTimers = useRef<Record<string, ReturnType<typeof setTimeout>>>({})
   const [tier, setTier]                 = useState('free')
 
-  // Phase 4b: additional filter state
+  // Phase 4b: additional filter state — all single-select so the whole filter
+  // surface fits one toolbar row (the old multi-select chip walls didn't).
   const [searchRaw, setSearchRaw]         = useState('')
   const [searchQuery, setSearchQuery]     = useState('')
-  const [systemFilter, setSystemFilter]   = useState<Set<string>>(new Set())
-  const [scoreBuckets, setScoreBuckets]   = useState<Set<string>>(new Set())
+  const [systemFilter, setSystemFilter]   = useState<string>('all')
+  const [scoreBand, setScoreBand]         = useState<string>('all')
   const [dateRange, setDateRange]         = useState<DateRange>('all')
   // YYYY-MM-DD (local) from the ?date= deep link; scopes the Supabase fetch to that day.
   const [dayFilter, setDayFilter]         = useState<string | null>(() => {
@@ -410,7 +411,7 @@ export default function HistoryPage() {
     const sys = new URLSearchParams(window.location.search).get('system')
     // Deep-link filters come from the URL query, only available after mount.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (sys) setSystemFilter(new Set([sys]))
+    if (sys) setSystemFilter(sys)
   }, [])
 
   // Deep-link expand from ?expand=<id>
@@ -432,11 +433,11 @@ export default function HistoryPage() {
     return () => clearTimeout(t)
   }, [searchRaw])
 
-  // Systems list for multi-select chips. Includes any active filter values
-  // (e.g. a bad ?system= deep link) so a filter matching zero sessions still
-  // renders a chip the user can click to remove.
+  // Systems list for the select. Includes the active filter value (e.g. a bad
+  // ?system= deep link) so a filter matching zero sessions still renders an
+  // option the user can switch away from.
   const systemList = useMemo(
-    () => Array.from(new Set([...sessions.map(s => s.system), ...systemFilter])).sort(),
+    () => Array.from(new Set([...sessions.map(s => s.system), ...(systemFilter !== 'all' ? [systemFilter] : [])])).sort(),
     [sessions, systemFilter]
   )
 
@@ -453,8 +454,8 @@ export default function HistoryPage() {
     const q = searchQuery
     return sessions.filter(s => {
       if (diffFilter !== 'All' && s.difficulty !== diffFilter) return false
-      if (systemFilter.size > 0 && !systemFilter.has(s.system)) return false
-      if (scoreBuckets.size > 0 && !scoreBuckets.has(scoreBucketFor(s.score))) return false
+      if (systemFilter !== 'all' && s.system !== systemFilter) return false
+      if (scoreBand !== 'all' && scoreBucketFor(s.score) !== scoreBand) return false
       if (dateCutoff > 0 && s.completedAt < dateCutoff) return false
       if (dayFilter && localDayKey(s.completedAt) !== dayFilter) return false
       if (onlyBookmarked && !s.bookmarked) return false
@@ -462,11 +463,11 @@ export default function HistoryPage() {
       if (q && !(s.userDiagnosis ?? '').toLowerCase().includes(q) && !s.diagnosis.toLowerCase().includes(q) && !(s.notes ?? '').toLowerCase().includes(q)) return false
       return true
     })
-  }, [sessions, diffFilter, systemFilter, scoreBuckets, dateCutoff, dayFilter, onlyBookmarked, searchQuery, wrongDxOnly])
+  }, [sessions, diffFilter, systemFilter, scoreBand, dateCutoff, dayFilter, onlyBookmarked, searchQuery, wrongDxOnly])
 
-  const isFiltered = diffFilter !== 'All' || systemFilter.size > 0 || scoreBuckets.size > 0 || dateRange !== 'all' || dayFilter !== null || onlyBookmarked || searchQuery.length > 0 || wrongDxOnly
+  const isFiltered = diffFilter !== 'All' || systemFilter !== 'all' || scoreBand !== 'all' || dateRange !== 'all' || dayFilter !== null || onlyBookmarked || searchQuery.length > 0 || wrongDxOnly
 
-  async function loadMore() {
+  const loadMore = useCallback(async () => {
     if (loadingMore) return
     setLoadingMore(true)
     try {
@@ -494,7 +495,18 @@ export default function HistoryPage() {
       // leave hasMore as-is so the user can retry
     }
     setLoadingMore(false)
-  }
+  }, [loadingMore, source, dayFilter, sessions.length])
+
+  // Filters run client-side over the loaded rows. While any filter is active,
+  // keep pulling older pages so the filtered view — and its "Matching" count —
+  // reflects the whole history rather than just the most recent page.
+  useEffect(() => {
+    if (!loaded || !isFiltered || !hasMore || loadingMore) return
+    // Kicks off a paged fetch (an external-system sync); each page's arrival
+    // re-runs the effect until the history is fully loaded or filters clear.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    loadMore()
+  }, [loaded, isFiltered, hasMore, loadingMore, loadMore])
 
   function exportFiltered(format: 'csv' | 'json') {
     const stamp = localDayKey(Date.now())
@@ -526,33 +538,13 @@ export default function HistoryPage() {
 
   function clearAllFilters() {
     setDiffFilter('All')
-    setSystemFilter(new Set())
-    setScoreBuckets(new Set())
+    setSystemFilter('all')
+    setScoreBand('all')
     setDateRange('all')
     clearDayFilter()
     setOnlyBookmarked(false)
     setWrongDxOnly(false)
     setSearchRaw('')
-    setExpandedId(null)
-  }
-
-  function toggleSystem(sys: string) {
-    setSystemFilter(prev => {
-      const next = new Set(prev)
-      if (next.has(sys)) next.delete(sys)
-      else next.add(sys)
-      return next
-    })
-    setExpandedId(null)
-  }
-
-  function toggleBucket(b: string) {
-    setScoreBuckets(prev => {
-      const next = new Set(prev)
-      if (next.has(b)) next.delete(b)
-      else next.add(b)
-      return next
-    })
     setExpandedId(null)
   }
 
@@ -562,12 +554,8 @@ export default function HistoryPage() {
     return counts
   }, [sessions])
 
-  // Phase 4a: recent trend (last 5 vs prior 5)
-  const recentTrend = useMemo(() => {
-    if (sessions.length < 10) return null
-    const avg = (arr: CaseSessionRecord[]) => arr.reduce((a, s) => a + s.score, 0) / arr.length
-    return Math.round(avg(sessions.slice(0, 5)) - avg(sessions.slice(5, 10)))
-  }, [sessions])
+  // Parent sessions by id, for the redo-improvement delta on redo rows.
+  const byId = useMemo(() => new Map(sessions.map(s => [s.id, s])), [sessions])
 
   const stats = useMemo(() => {
     if (filtered.length === 0) return null
@@ -709,38 +697,25 @@ export default function HistoryPage() {
             </p>
           </div>
 
-          {/* Stats row */}
+          {/* Stats row — trend analysis lives on the Progress tab */}
           {stats && (
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 16, marginBottom: 24 }}>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 16, marginBottom: 24 }}>
               <div className="dx-card" style={{ padding: '16px 20px' }}>
                 <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>{isFiltered ? 'Matching' : 'Completed'}</div>
-                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'JetBrains Mono, monospace' }}>{stats.total}</div>
+                <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--text-primary)', fontFamily: 'JetBrains Mono, monospace' }}>
+                  {stats.total}
+                  {isFiltered && hasMore && <span style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)', marginLeft: 8 }}>searching older cases…</span>}
+                </div>
               </div>
               <div className="dx-card" style={{ padding: '16px 20px' }}>
                 <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Avg Score</div>
                 <div style={{ fontSize: 22, fontWeight: 700, color: scoreColorVar(stats.avgScore), fontFamily: 'JetBrains Mono, monospace' }}>{stats.avgScore.toFixed(1)}</div>
               </div>
-              <div className="dx-card" style={{ padding: '16px 20px' }}>
-                <div style={{ fontSize: 11, color: 'var(--muted)', textTransform: 'uppercase', letterSpacing: '0.06em', marginBottom: 6 }}>Recent trend</div>
-                {recentTrend === null ? (
-                  <div style={{ fontSize: 22, fontWeight: 700, color: 'var(--muted)', fontFamily: 'JetBrains Mono, monospace' }}>
-                    —<span style={{ fontSize: 11, marginLeft: 6, fontWeight: 400 }}>(need 10)</span>
-                  </div>
-                ) : (
-                  <div
-                    title="Average score of your last 5 cases minus the 5 before them, in points"
-                    style={{ fontSize: 22, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace', color: recentTrend > 0 ? 'var(--green)' : recentTrend < 0 ? 'var(--red)' : 'var(--muted)' }}
-                  >
-                    {recentTrend > 0 ? `+${recentTrend}` : recentTrend}<span style={{ fontSize: 12, fontWeight: 500 }}> pts</span>
-                  </div>
-                )}
-              </div>
             </div>
           )}
 
-          {/* Filter bar */}
+          {/* Filter toolbar — one row, everything single-select */}
           <div className="dx-history-filters">
-            {/* Search + clear */}
             <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
               <input
                 className="dx-search"
@@ -748,23 +723,53 @@ export default function HistoryPage() {
                 placeholder="Search by diagnosis or notes…"
                 value={searchRaw}
                 onChange={e => setSearchRaw(e.target.value)}
-                style={{ flex: '1 1 200px', minWidth: 0 }}
+                style={{ flex: '1 1 180px', minWidth: 0 }}
               />
-              {isFiltered && (
-                <button className="dx-chip" onClick={clearAllFilters} style={{ color: 'var(--muted)' }}>
-                  Clear filters
-                </button>
-              )}
-              <button className="dx-chip" onClick={() => exportFiltered('csv')} title="Download the currently filtered cases as CSV">
-                ⬇ CSV
-              </button>
-              <button className="dx-chip" onClick={() => exportFiltered('json')} title="Download the currently filtered cases as JSON">
-                ⬇ JSON
-              </button>
-            </div>
-
-            {/* Bookmarked + study filter chips */}
-            <div className="dx-filter-chips">
+              <select
+                className="dx-select"
+                value={diffFilter}
+                onChange={e => { setDiffFilter(e.target.value as DiffFilter); setExpandedId(null) }}
+                aria-label="Filter by difficulty"
+                style={{ fontSize: 12, padding: '6px 8px' }}
+              >
+                {DIFF_FILTERS.map(d => (
+                  <option key={d} value={d}>
+                    {d === 'All' ? `All levels (${sessions.length})` : `${d} (${diffCounts[d] ?? 0})`}
+                  </option>
+                ))}
+              </select>
+              <select
+                className="dx-select"
+                value={systemFilter}
+                onChange={e => { setSystemFilter(e.target.value); setExpandedId(null) }}
+                aria-label="Filter by system"
+                style={{ fontSize: 12, padding: '6px 8px', maxWidth: 170 }}
+              >
+                <option value="all">All systems</option>
+                {systemList.map(sys => <option key={sys} value={sys}>{sys}</option>)}
+              </select>
+              <select
+                className="dx-select"
+                value={scoreBand}
+                onChange={e => { setScoreBand(e.target.value); setExpandedId(null) }}
+                aria-label="Filter by score band"
+                style={{ fontSize: 12, padding: '6px 8px' }}
+              >
+                <option value="all">Any score</option>
+                {SCORE_BUCKETS.map(b => <option key={b} value={b}>{b}</option>)}
+              </select>
+              <select
+                className="dx-select"
+                value={dateRange}
+                onChange={e => { setDateRange(e.target.value as DateRange); setExpandedId(null) }}
+                aria-label="Filter by date range"
+                style={{ fontSize: 12, padding: '6px 8px' }}
+              >
+                <option value="all">All time</option>
+                <option value="7d">Last 7d</option>
+                <option value="30d">Last 30d</option>
+                <option value="90d">Last 90d</option>
+              </select>
               <button
                 className={`dx-chip${onlyBookmarked ? ' active' : ''}`}
                 onClick={() => { setOnlyBookmarked(v => !v); setExpandedId(null) }}
@@ -776,74 +781,34 @@ export default function HistoryPage() {
                 onClick={() => { setWrongDxOnly(v => !v); setExpandedId(null) }}
                 title="Only show cases where the submitted diagnosis was incorrect"
               >
-                Wrong diagnosis
+                Wrong dx
               </button>
-            </div>
-
-            {/* Difficulty chips */}
-            <div className="dx-filter-chips">
-              {DIFF_FILTERS.map(d => {
-                const count = d === 'All' ? sessions.length : (diffCounts[d] ?? 0)
-                return (
-                  <button
-                    key={d}
-                    className={`dx-chip${diffFilter === d ? ' active' : ''}`}
-                    onClick={() => { setDiffFilter(d); setExpandedId(null) }}
-                  >
-                    {d} ({count})
-                  </button>
-                )
-              })}
-            </div>
-
-            {/* System chips (multi-select) */}
-            {(systemList.length > 1 || systemFilter.size > 0) && (
-              <div className="dx-filter-chips">
-                {systemList.map(sys => (
-                  <button
-                    key={sys}
-                    className={`dx-chip${systemFilter.has(sys) ? ' active' : ''}`}
-                    onClick={() => toggleSystem(sys)}
-                  >
-                    {sys}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Score buckets + date range */}
-            <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-              <div className="dx-filter-chips">
-                {SCORE_BUCKETS.map(b => (
-                  <button
-                    key={b}
-                    className={`dx-chip${scoreBuckets.has(b) ? ' active' : ''}`}
-                    onClick={() => toggleBucket(b)}
-                  >
-                    {b}
-                  </button>
-                ))}
-              </div>
-              <div className="dx-filter-chips">
-                {(['all', '7d', '30d', '90d'] as const).map(r => (
-                  <button
-                    key={r}
-                    className={`dx-chip${dateRange === r ? ' active' : ''}`}
-                    onClick={() => { setDateRange(r); setExpandedId(null) }}
-                  >
-                    {r === 'all' ? 'All time' : `Last ${r}`}
-                  </button>
-                ))}
-                {dayFilter && (
-                  <button
-                    className="dx-chip active"
-                    onClick={() => { clearDayFilter(); setExpandedId(null) }}
-                    title="Showing a single day — click to remove this filter"
-                  >
-                    {new Date(`${dayFilter}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} ✕
-                  </button>
-                )}
-              </div>
+              {dayFilter && (
+                <button
+                  className="dx-chip active"
+                  onClick={() => { clearDayFilter(); setExpandedId(null) }}
+                  title="Showing a single day — click to remove this filter"
+                >
+                  {new Date(`${dayFilter}T00:00:00`).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })} ✕
+                </button>
+              )}
+              {isFiltered && (
+                <button className="dx-chip" onClick={clearAllFilters} style={{ color: 'var(--muted)' }}>
+                  Clear
+                </button>
+              )}
+              <select
+                className="dx-select"
+                value=""
+                onChange={e => { if (e.target.value) exportFiltered(e.target.value as 'csv' | 'json'); e.target.value = '' }}
+                aria-label="Export the currently filtered cases"
+                title="Download the currently filtered cases"
+                style={{ fontSize: 12, padding: '6px 8px', color: 'var(--muted)', marginLeft: 'auto' }}
+              >
+                <option value="" disabled>⬇ Export…</option>
+                <option value="csv">CSV</option>
+                <option value="json">JSON</option>
+              </select>
             </div>
           </div>
 
@@ -929,15 +894,32 @@ export default function HistoryPage() {
                         <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: 13, fontWeight: 600 }}>
                           {session.system}
                         </span>
-                        {session.parentSessionId && (
-                          <button
-                            className="dx-redo-badge"
-                            onClick={e => { e.stopPropagation(); scrollToParent(session.parentSessionId!) }}
-                            title="Show original"
-                          >
-                            ↻ redo
-                          </button>
-                        )}
+                        {session.parentSessionId && (() => {
+                          const parent = byId.get(session.parentSessionId!)
+                          const delta = parent ? session.score - parent.score : null
+                          return (
+                            <>
+                              <button
+                                className="dx-redo-badge"
+                                onClick={e => { e.stopPropagation(); scrollToParent(session.parentSessionId!) }}
+                                title="Show original"
+                              >
+                                ↻ redo
+                              </button>
+                              {delta !== null && delta !== 0 && (
+                                <span
+                                  title={`${Math.abs(delta)} points ${delta > 0 ? 'better' : 'worse'} than the original attempt (${parent!.score})`}
+                                  style={{
+                                    fontSize: 10, fontWeight: 700, fontFamily: 'JetBrains Mono, monospace',
+                                    color: delta > 0 ? 'var(--green)' : 'var(--red)', flexShrink: 0,
+                                  }}
+                                >
+                                  {delta > 0 ? `+${delta}` : delta}
+                                </span>
+                              )}
+                            </>
+                          )
+                        })()}
                       </span>
 
                       <span style={{ overflow: 'visible' }}>
@@ -1005,14 +987,19 @@ export default function HistoryPage() {
 
           {hasMore && (
             <div style={{ textAlign: 'center', marginTop: 16 }}>
-              <button
-                className="dx-chip"
-                onClick={loadMore}
-                disabled={loadingMore}
-                style={{ padding: '8px 20px', fontSize: 13 }}
-              >
-                {loadingMore ? 'Loading…' : 'Load older cases'}
-              </button>
+              {isFiltered ? (
+                // Auto-loading drains the remaining pages while filters are active.
+                <span style={{ fontSize: 12, color: 'var(--muted)' }}>Searching older cases…</span>
+              ) : (
+                <button
+                  className="dx-chip"
+                  onClick={loadMore}
+                  disabled={loadingMore}
+                  style={{ padding: '8px 20px', fontSize: 13 }}
+                >
+                  {loadingMore ? 'Loading…' : 'Load older cases'}
+                </button>
+              )}
             </div>
           )}
 
