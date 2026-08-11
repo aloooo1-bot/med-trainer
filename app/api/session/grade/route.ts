@@ -29,6 +29,7 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({})) as {
       sessionId?: string; diagnosis?: string; reasoningText?: string; timedOut?: boolean
+      workingDifferential?: unknown
     }
     const access = await requireOwnSession(body.sessionId)
     if (!access.ok) return access.response
@@ -42,7 +43,16 @@ export async function POST(req: NextRequest) {
 
     const state = replayEvents(events)
     const reasoningText = (body.reasoningText ?? '').trim().slice(0, 20_000)
-    const input = assembleGradingInput(session, state, diagnosis, reasoningText, !!body.timedOut)
+    // Optional student-authored differential — context for the grader only.
+    // Same caps as /api/session/predict; absent field = pre-existing behavior.
+    const workingDifferential = Array.isArray(body.workingDifferential)
+      ? body.workingDifferential
+          .filter((x): x is string => typeof x === 'string')
+          .map(x => x.trim().slice(0, 80))
+          .filter(Boolean)
+          .slice(0, 10)
+      : []
+    const input = assembleGradingInput(session, state, diagnosis, reasoningText, !!body.timedOut, workingDifferential)
 
     const usages: Array<{ type: string; usage: RawUsage }> = []
     const result = await gradeSession(input, (type, usage) => usages.push({ type, usage }))

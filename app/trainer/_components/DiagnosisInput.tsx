@@ -82,17 +82,19 @@ const DIAGNOSIS_LIST: string[] = [
   'Toxic epidermal necrolysis', 'Urticaria (hives)',
 ]
 
-export function DiagnosisInput({ value, onChange, onKeyDown, disabled }: {
+export function DiagnosisInput({ value, onChange, onKeyDown, disabled, noSuggestions }: {
   value: string
   onChange: (val: string) => void
   onKeyDown?: (e: React.KeyboardEvent<HTMLInputElement>) => void
   disabled?: boolean
+  /** Plain input, no type-ahead — Advanced hides every list to avoid cueing. */
+  noSuggestions?: boolean
 }) {
   const [open, setOpen] = useState(false)
   const [activeIdx, setActiveIdx] = useState(-1)
   const containerRef = useRef<HTMLDivElement>(null)
 
-  const matches = value.trim().length >= 2
+  const matches = !noSuggestions && value.trim().length >= 2
     ? DIAGNOSIS_LIST.filter(d => d.toLowerCase().includes(value.toLowerCase())).slice(0, 8)
     : []
 

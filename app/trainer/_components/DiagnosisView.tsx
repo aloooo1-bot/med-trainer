@@ -28,6 +28,7 @@ export function DiagnosisView({
   feedbackSubmitted, setFeedbackSubmitted,
   feedbackSubmitting, setFeedbackSubmitting,
   notes,
+  workingDifferential,
   submitDiagnosis, generateCase, orderedTests, dimensionAverages,
 }: {
   caseData: CaseData
@@ -60,7 +61,8 @@ export function DiagnosisView({
   feedbackSubmitting: boolean
   setFeedbackSubmitting: React.Dispatch<React.SetStateAction<boolean>>
   notes: NotesState
-  setNotes: React.Dispatch<React.SetStateAction<NotesState>>
+  /** The student's own working differential list, for the scorecard echo. */
+  workingDifferential?: string[]
   submitDiagnosis: (overrideDiagnosis?: string, overridePresentation?: string, timedOut?: boolean) => Promise<GradingResult | null>
   generateCase: (overrideSystem?: string, overrideDifficulty?: string, overrideDiagnosis?: string) => Promise<CaseData | null>
   orderedTests: Set<string>
@@ -159,6 +161,9 @@ export function DiagnosisView({
               onChange={setUserDiagnosis}
               onKeyDown={e => e.key === 'Enter' && caseDifficulty === 'Foundations' && submitDiagnosis()}
               disabled={gradingLoading || locked}
+              // Advanced hides every list to avoid cueing — the type-ahead
+              // corpus would leak candidate diagnoses through autocomplete.
+              noSuggestions={caseDifficulty === 'Advanced'}
             />
           </div>
 
@@ -506,6 +511,33 @@ export function DiagnosisView({
         {gradingResult.differentials?.length > 0 && (
           <div className="border-t border-rule px-5 py-4">
             <h3 className="font-serif text-sm font-semibold text-ink mb-3">Differential Diagnosis Discussion</h3>
+            {(workingDifferential?.length ?? 0) > 0 && (() => {
+              // Loose token match against the revealed diagnosis — same idea as
+              // history's diagnosisIsPartial: every substantial word present.
+              const norm = (s: string) => s.toLowerCase().replace(/[^a-z0-9\s]/g, ' ').replace(/\s+/g, ' ').trim()
+              const dxTokens = norm(caseData.diagnosis ?? '').split(' ').filter(t => t.length > 3)
+              const matchesDx = (entry: string) => {
+                const e = norm(entry)
+                return dxTokens.length > 0 && dxTokens.every(t => e.includes(t))
+              }
+              return (
+                <div className="mb-3 rounded-md border border-surface-4 bg-surface-1 px-3.5 py-2.5">
+                  <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide text-ink-tertiary">Your differential going in</div>
+                  <ol className="flex flex-col gap-1">
+                    {workingDifferential!.map((name, i) => {
+                      const hit = matchesDx(name)
+                      return (
+                        <li key={`${name}-${i}`} className="flex items-center gap-2 text-[12px] text-ink-secondary">
+                          <span className="flex h-[18px] w-[18px] shrink-0 items-center justify-center rounded-full bg-surface-3 font-mono text-[10px]">{i + 1}</span>
+                          <span className={hit ? 'font-semibold text-confirmed' : ''}>{name}</span>
+                          {hit && <span className="text-confirmed" title="Matches the correct diagnosis">✓</span>}
+                        </li>
+                      )
+                    })}
+                  </ol>
+                </div>
+              )
+            })()}
             <div className="space-y-2">
               {gradingResult.differentials.map((dx, i) => {
                 const colonIdx = dx.indexOf(':')

@@ -186,4 +186,6 @@ export interface GradingInput {
   differentialAnalysis?: string
   /** The student's pre-test leading-diagnosis commitment + confidence, for clinical-reasoning grading. */
   studentPrediction?: string
+  /** The student's own working differential at submission — context only, never penalized. */
+  studentWorkingDifferential?: string
 }

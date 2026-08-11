@@ -39,6 +39,7 @@ import { Badge } from './_components/Badge'
 import { MicButton } from './_components/MicButton'
 import { HelpModal, hasHelpContent } from './_components/HelpModal'
 import { HPIView } from './_components/HPIView'
+import { WorkingDifferential } from './_components/WorkingDifferential'
 import { ROSView } from './_components/ROSView'
 import { ExamView } from './_components/ExamView'
 import { OrderView } from './_components/OrderView'
@@ -125,6 +126,10 @@ export default function MedTrainer() {
   // Pre-test differential ranking + confidence the student commits before ordering tests (null = not yet locked).
   const [prediction, setPrediction] = useState<string[] | null>(null)
   const [predictionConfidence, setPredictionConfidence] = useState<number | null>(null)
+  // The student's living differential list — revised freely during the case,
+  // sent to the grader as context on submit. Persisted per session so a
+  // refresh/resume doesn't lose it (client-side only; never gates anything).
+  const [workingDiff, setWorkingDiff] = useState<string[]>([])
   const [expandedCategory, setExpandedCategory] = useState<DimensionKey | null>(null)
   /** This student's own mean per dimension, for the scorecard comparison line. */
   const [dimensionAverages, setDimensionAverages] = useState<DimensionAverage[]>([])
@@ -147,8 +152,6 @@ export default function MedTrainer() {
   const [hpiValues, setHpiValues] = useState<Partial<Record<HPIField, string>>>({})
   const [activeCaseId, setActiveCaseId] = useState<string | null>(null)
 
-  // Clinical accordion state
-  const [openCategories, setOpenCategories] = useState<Set<string>>(new Set())
   // Advanced search state
   const [testSearchQuery, setTestSearchQuery] = useState('')
   const [showSearchDropdown, setShowSearchDropdown] = useState(false)
@@ -166,8 +169,6 @@ export default function MedTrainer() {
   const [notes, setNotes] = useState<NotesState>({ mode: 'free', content: '', open: false })
   const [caseStarted, setCaseStarted] = useState(true)
   const [zoomedImage, setZoomedImage] = useState<{ src: string; alt: string } | null>(null)
-  const [showHistory, setShowHistory] = useState(false)
-  const [historyEntries] = useState<CaseHistoryEntry[]>([])
   const [pendingGenerateWithNotes, setPendingGenerateWithNotes] = useState(false)
   const [helpSection, setHelpSection] = useState<string | null>(null)
   const [generationError, setGenerationError] = useState<string | null>(null)
@@ -414,6 +415,12 @@ export default function MedTrainer() {
       if (data.submittedDiagnosis) setUserDiagnosis(data.submittedDiagnosis)
     }
     setInPresentation(data.session.phase === 'presentation')
+    // Working differential is client-persisted per session (never server state).
+    try {
+      const raw = localStorage.getItem(`medtrainer_working_diff_${data.session.sessionId}`)
+      const parsed = raw ? JSON.parse(raw) : []
+      setWorkingDiff(Array.isArray(parsed) ? parsed.filter((x): x is string => typeof x === 'string') : [])
+    } catch { setWorkingDiff([]) }
     // Timer state is not persisted server-side yet — resume unlocked so the
     // student can continue (the server log still bounds what counts as elicited).
     setCaseStarted(true)
@@ -435,6 +442,7 @@ export default function MedTrainer() {
     setGradingResult(null)
     setPrediction(null)
     setPredictionConfidence(null)
+    setWorkingDiff([])
     setUserDiagnosis('')
     setFeedbackRatings({})
     setFeedbackHover({})
@@ -444,7 +452,6 @@ export default function MedTrainer() {
     setUserPresentation('')
     setActiveSection('hpi')
     setCollapsedPanels(new Set())
-    setOpenCategories(new Set())
     setRosState(makeInitialROSState())
     setHpiValues({})
     setInPresentation(false)
@@ -542,6 +549,16 @@ export default function MedTrainer() {
     if (sessionId) {
       postSession('/api/session/predict', { sessionId, ranking, confidence }).catch(() => {})
     }
+  }
+
+  /** Update the working differential and persist it per session for resume. */
+  const updateWorkingDiff = (next: string[]) => {
+    setWorkingDiff(next)
+    if (!sessionId) return
+    try {
+      if (next.length) localStorage.setItem(`medtrainer_working_diff_${sessionId}`, JSON.stringify(next))
+      else localStorage.removeItem(`medtrainer_working_diff_${sessionId}`)
+    } catch {}
   }
 
   /**
@@ -662,6 +679,8 @@ export default function MedTrainer() {
       // written reasoning, so it cannot inflate what it asked or ordered.
       const data = await postSession<GradeResponse>('/api/session/grade', {
         sessionId, diagnosis: diagnosisToGrade, reasoningText, timedOut,
+        // Student-authored context only — the grader must not penalize its absence.
+        ...(workingDiff.length ? { workingDifferential: workingDiff } : {}),
       })
       recordUsages(data.usages)
       const result = data.result
@@ -1082,8 +1101,8 @@ export default function MedTrainer() {
           addOrderedTest={addOrderedTest}
           orderCustomTest={orderCustomTest}
           removeOrderedTest={removeOrderedTest}
-          openCategories={openCategories}
-          setOpenCategories={setOpenCategories}
+          caseKey={sessionId ?? ''}
+          workingTop={workingDiff[0]}
           testSearchQuery={testSearchQuery}
           setTestSearchQuery={setTestSearchQuery}
           showSearchDropdown={showSearchDropdown}
@@ -1148,7 +1167,7 @@ export default function MedTrainer() {
           feedbackSubmitting={feedbackSubmitting}
           setFeedbackSubmitting={setFeedbackSubmitting}
           notes={notes}
-          setNotes={setNotes}
+          workingDifferential={workingDiff}
           submitDiagnosis={submitDiagnosis}
           generateCase={generateCase}
           orderedTests={orderedTests}
@@ -1518,6 +1537,10 @@ export default function MedTrainer() {
               />
               <div ref={chatEndRef} />
             </div>
+            {/* Your differential — the student's living list, revisable all case long */}
+            {caseData && (
+              <WorkingDifferential items={workingDiff} onChange={updateWorkingDiff} disabled={gradingLoading} />
+            )}
             {/* Notes */}
             <div className="flex flex-col border-t border-surface-4">
               <div className="flex items-center justify-between border-b border-surface-4 px-4 py-2 flex-shrink-0">
@@ -1791,62 +1814,6 @@ export default function MedTrainer() {
         <HelpModal section={helpSection} onClose={() => setHelpSection(null)} />
       )}
 
-      {/* Case history modal */}
-      {showHistory && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-sm" onClick={() => setShowHistory(false)}>
-          <div className="mx-4 w-full max-w-xl rounded-xl border border-surface-4 bg-surface-1 shadow-2xl" onClick={e => e.stopPropagation()}>
-            <div className="flex items-center justify-between border-b border-surface-4 px-5 py-4">
-              <h3 className="text-base font-semibold text-ink-primary">Case History</h3>
-              <button onClick={() => setShowHistory(false)} className="text-ink-tertiary hover:text-ink-secondary transition-colors text-xl leading-none">×</button>
-            </div>
-            <div className="max-h-[60vh] overflow-y-auto">
-              {historyEntries.length === 0 ? (
-                <div className="px-5 py-10 text-center text-sm text-ink-tertiary">No cases completed yet. Generate a case to get started.</div>
-              ) : (
-                <table className="w-full text-xs">
-                  <thead className="border-b border-surface-4 text-ink-tertiary uppercase tracking-wide">
-                    <tr>
-                      <th className="px-4 py-2.5 text-left font-medium">Date</th>
-                      <th className="px-4 py-2.5 text-left font-medium">Difficulty</th>
-                      <th className="px-4 py-2.5 text-left font-medium">Score</th>
-                      <th className="px-4 py-2.5 text-left font-medium">Result</th>
-                      <th className="px-4 py-2.5 text-left font-medium">Correct Dx</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {historyEntries.map(entry => (
-                      <tr key={entry.id} className="border-b border-surface-4/50 hover:bg-surface-2/30 transition-colors">
-                        <td className="px-4 py-2.5 text-ink-tertiary">{new Date(entry.date).toLocaleDateString()}</td>
-                        <td className="px-4 py-2.5">
-                          <span className={`font-medium ${entry.difficulty === 'Advanced' ? 'text-critical' : entry.difficulty === 'Clinical' ? 'text-caution' : 'text-confirmed'}`}>{entry.difficulty}</span>
-                        </td>
-                        <td className="px-4 py-2.5">
-                          <span className={`font-bold tabular-nums ${entry.score >= 70 ? 'text-confirmed' : entry.score >= 50 ? 'text-caution' : 'text-critical'}`}>{entry.score}/100</span>
-                        </td>
-                        <td className="px-4 py-2.5">
-                          <span className={entry.correct ? 'text-confirmed' : 'text-critical'}>{entry.correct ? '✓ Correct' : '✗ Incorrect'}</span>
-                        </td>
-                        <td className="px-4 py-2.5 text-ink-secondary max-w-[160px] truncate" title={entry.diagnosis}>{entry.diagnosis}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              )}
-            </div>
-            {historyEntries.length > 0 && (() => {
-              const avg = Math.round(historyEntries.reduce((s, entry) => s + entry.score, 0) / historyEntries.length)
-              const correctCount = historyEntries.filter(entry => entry.correct).length
-              return (
-                <div className="border-t border-surface-4 px-5 py-3 flex gap-6 text-xs text-ink-tertiary">
-                  <span>{historyEntries.length} cases</span>
-                  <span>Avg score: <span className="text-ink-secondary font-medium">{avg}/100</span></span>
-                  <span>Accuracy: <span className="text-ink-secondary font-medium">{Math.round((correctCount / historyEntries.length) * 100)}%</span></span>
-                </div>
-              )
-            })()}
-          </div>
-        </div>
-      )}
     </div>
   )
 }

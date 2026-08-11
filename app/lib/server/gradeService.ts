@@ -112,6 +112,8 @@ export function assembleGradingInput(
   submittedDiagnosis: string,
   reasoningText: string,
   timedOut: boolean,
+  /** Student-authored working differential (optional context; sanitized by the route). */
+  workingDifferential: string[] = [],
 ): GradingInput {
   const caseData = session.caseData
   const caseDifficulty = session.difficulty
@@ -250,6 +252,9 @@ export function assembleGradingInput(
       ? {
           studentPrediction: `Before ordering any tests, the student committed to a leading diagnosis of "${prediction.ranking[0]}"${prediction.confidence != null ? ` at ${Math.round(prediction.confidence * 100)}% confidence` : ''}.`,
         }
+      : {}),
+    ...(workingDifferential.length
+      ? { studentWorkingDifferential: workingDifferential.map((d, i) => `${i + 1}. ${d}`).join('; ') }
       : {}),
   }
 }

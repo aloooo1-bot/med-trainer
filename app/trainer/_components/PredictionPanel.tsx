@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 
 /**
  * Confidence presets carry a plain-language gloss. A student asked for a bare
@@ -17,7 +17,9 @@ const CONFIDENCE_PRESETS: { value: number; gloss: string }[] = [
 ]
 
 /**
- * Pre-test commitment, BEFORE ordering any tests.
+ * Pre-test read, BEFORE ordering any tests. Optional — nothing gates on it —
+ * but committing is what powers calibration tracking, so the panel nudges and
+ * offers an explicit skip instead of pretending to be a gate.
  *
  * - Foundations (open=false): "training wheels" — the candidate diagnoses are
  *   shown and the student ranks them + states confidence. Recognition practice.
@@ -32,6 +34,7 @@ export function PredictionPanel({
   open = false,
   prediction,
   confidence,
+  suggestedLeading,
   onLock,
 }: {
   candidates: string[]
@@ -39,11 +42,23 @@ export function PredictionPanel({
   /** Locked prediction (ranked names, or [leadingDx] in open mode), or null while editing. */
   prediction: string[] | null
   confidence?: number | null
+  /** Top of the student's working differential — prefills the open-mode input. */
+  suggestedLeading?: string
   onLock: (ranking: string[], confidence: number) => void
 }) {
   const [ranking, setRanking] = useState<string[]>([])
   const [leadingDx, setLeadingDx] = useState('')
   const [conf, setConf] = useState<number | null>(null)
+  const [skipped, setSkipped] = useState(false)
+
+  // Open-mode prefill: adopt the working differential's top entry while the
+  // student hasn't typed anything of their own. Editable like any input text.
+  useEffect(() => {
+    // Prop→state sync on external change only; guarded so it never loops.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (open && suggestedLeading && leadingDx === '') setLeadingDx(suggestedLeading)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [suggestedLeading, open])
 
   // Ranked mode needs a candidate list; open (free-text) mode does not —
   // gated difficulties deliberately never receive candidates (anti-cueing).
@@ -81,6 +96,20 @@ export function PredictionPanel({
     )
   }
 
+  // Skipped → a quiet one-line chip; reopenable until the student locks or grades.
+  if (skipped) {
+    return (
+      <button
+        type="button"
+        onClick={() => setSkipped(false)}
+        className="flex w-full items-center justify-between rounded-md border border-surface-3 bg-surface-1 px-3 py-2 text-left text-[11px] text-ink-tertiary hover:border-surface-4 hover:text-ink-secondary"
+      >
+        <span>Pre-test read skipped — no calibration tracking for this case</span>
+        <span className="font-semibold text-primary-500">Reopen</span>
+      </button>
+    )
+  }
+
   const toggle = (name: string) =>
     setRanking(prev => (prev.includes(name) ? prev.filter(x => x !== name) : [...prev, name]))
 
@@ -88,14 +117,23 @@ export function PredictionPanel({
   const canLock = ready && conf != null
 
   return (
-    <div className="rounded-md border p-3" style={{ borderColor: 'var(--amber, #f59e0b)' }}>
-      <div className="mb-1 text-[11px] font-semibold uppercase tracking-wide" style={{ color: 'var(--amber, #f59e0b)' }}>
-        Commit your {open ? 'leading diagnosis' : 'differential'} first
+    <div className="rounded-md border border-surface-3 p-3">
+      <div className="mb-1 flex items-baseline justify-between gap-2">
+        <span className="text-[11px] font-semibold uppercase tracking-wide text-ink-secondary">
+          Pre-test read <span className="font-normal normal-case text-ink-tertiary">— optional</span>
+        </span>
+        <button
+          type="button"
+          onClick={() => setSkipped(true)}
+          className="text-[11px] text-ink-tertiary underline-offset-2 hover:text-ink-secondary hover:underline"
+        >
+          Skip — order tests directly
+        </button>
       </div>
       <p className="mb-2.5 text-[11px] leading-snug text-ink-tertiary">
         {open
-          ? <>From the presentation alone, what&apos;s your leading diagnosis — <em>before</em> ordering tests? The full differential is revealed afterward.</>
-          : <>Rank these from most to least likely <em>before</em> ordering tests, then state your confidence.</>}
+          ? <>From the presentation alone, what&apos;s your leading diagnosis? Committing <em>before</em> tests is what trains calibration — the full differential is revealed afterward.</>
+          : <>Rank these from most to least likely and state your confidence. Committing <em>before</em> tests is what trains calibration.</>}
       </p>
 
       {open ? (

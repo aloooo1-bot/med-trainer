@@ -38,6 +38,7 @@ export function OrderView({
   caseData, caseDifficulty, scaffoldingLevel, prediction, predictionConfidence, onLockPrediction,
   predictionCandidates, caseSearchTests, orderedTests, selectedTests,
   toggleTest, orderTests, orderCustomTest, removeOrderedTest,
+  caseKey, workingTop,
   testSearchQuery, setTestSearchQuery, showSearchDropdown, setShowSearchDropdown,
   customTestInput, setCustomTestInput, locked,
 }: {
@@ -64,8 +65,10 @@ export function OrderView({
   addOrderedTest: (name: string) => void
   orderCustomTest: () => void
   removeOrderedTest: (name: string) => void
-  openCategories: Set<string>
-  setOpenCategories: React.Dispatch<React.SetStateAction<Set<string>>>
+  /** Stable per-session key so PredictionPanel's local state resets each case. */
+  caseKey: string
+  /** Top of the student's working differential — prefills the open-mode pre-test read. */
+  workingTop?: string
   testSearchQuery: string
   setTestSearchQuery: React.Dispatch<React.SetStateAction<string>>
   showSearchDropdown: boolean
@@ -96,7 +99,7 @@ export function OrderView({
     const allOrdered = (name: string) => orderedTests.has(name)
     return (
       <div className="space-y-4">
-        <PredictionPanel candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
+        <PredictionPanel key={caseKey} candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} suggestedLeading={workingTop} onLock={onLockPrediction} />
         <SectionCard title="Laboratory Studies">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {caseData.availableLabs.map(lab => {
@@ -164,7 +167,7 @@ export function OrderView({
 
     return (
       <div className="space-y-4">
-        <PredictionPanel candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
+        <PredictionPanel key={caseKey} candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} suggestedLeading={workingTop} onLock={onLockPrediction} />
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
             <svg className="h-4 w-4 text-ink-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -320,7 +323,7 @@ export function OrderView({
 
   return (
     <div className="space-y-4">
-      <PredictionPanel candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} onLock={onLockPrediction} />
+      <PredictionPanel key={caseKey} candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} suggestedLeading={workingTop} onLock={onLockPrediction} />
       <div className="rounded-md border border-primary-200 bg-primary-50 px-4 py-3">
         <p className="text-xs text-primary-700">
           <span className="font-semibold">Advanced difficulty:</span> no pre-listed lab panels — search and type test names from memory. Imaging modalities are listed below for reference.
