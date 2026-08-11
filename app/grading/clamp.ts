@@ -17,19 +17,23 @@ export function clampDimensions(result: GradingResult, difficulty: string): void
 }
 
 /**
- * Tidy the itemised deductions and check they explain the gap.
+ * Tidy the itemised deductions and make the score consistent with them.
  *
- * The SCORE IS AUTHORITATIVE and is never rewritten to fit the list. It is
- * recomputed from the dimensions in gradeService, recomputed again when the
- * session is saved, and is the number already sitting in a student's history —
- * bending it to match a model's arithmetic would silently rewrite a recorded
- * grade to make a caption tidy.
+ * Directional reconciliation:
+ *  - When the score is HIGHER than the deductions imply (score > max − sum),
+ *    the model under-subtracted — the flagrant case being full marks alongside
+ *    itemised criticism, which shipped a student a 15/15 with −15 of reasons.
+ *    The deduction reasons are specific, checkable claims; the inflated score
+ *    is the arithmetic slip. Lower the score to max − sum (floored at 0).
+ *  - When the score is LOWER than the deductions imply, keep it. An incomplete
+ *    list that under-explains the gap is acceptable; a score is never RAISED
+ *    to fit a list.
  *
- * So when the items do not sum to `max − score` the items are kept and the
- * mismatch is logged. The row header shows the authoritative `−N` either way,
- * so a bad list under-explains the gap rather than misstating it.
- *
- * Must run AFTER clampDimensions, so the gap is measured against a legal score.
+ * This runs in gradeSession BEFORE anything is persisted, and the headline
+ * total is recomputed from the dimensions immediately after — so lowering an
+ * inflated dimension here corrects the recorded grade rather than rewriting
+ * one. Must run AFTER clampDimensions, so the gap is measured against a legal
+ * score.
  */
 export function reconcileDeductions(result: GradingResult, difficulty: string): void {
   if (!result.dimensions) return
@@ -44,12 +48,18 @@ export function reconcileDeductions(result: GradingResult, difficulty: string): 
       .filter(d => Number.isFinite(d.points) && d.points > 0 && d.reason !== '')
     dim.deductions = cleaned
 
-    const gap = max - dim.score
     const sum = cleaned.reduce((s, d) => s + d.points, 0)
-    if (cleaned.length > 0 && sum !== gap) {
+    const implied = Math.max(0, max - sum)
+    if (cleaned.length > 0 && dim.score > implied) {
       console.warn(
-        `[GRADING] ${key} deductions sum to ${sum} but the gap is ${gap} ` +
-        `(${dim.score}/${max}) — score left untouched, list shown as returned`,
+        `[GRADING] ${key} score ${dim.score}/${max} exceeds what its own deductions allow ` +
+        `(−${sum} ⇒ ${implied}) — lowered to ${implied}`,
+      )
+      dim.score = implied
+    } else if (cleaned.length > 0 && dim.score < implied) {
+      console.warn(
+        `[GRADING] ${key} deductions sum to ${sum} but the gap is ${max - dim.score} ` +
+        `(${dim.score}/${max}) — list under-explains the gap; score kept`,
       )
     }
   }

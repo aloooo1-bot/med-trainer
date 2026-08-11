@@ -3,7 +3,7 @@ import assert from 'node:assert/strict'
 import { clampDimensions, reconcileDeductions } from '../clamp'
 import { normalizeMissedQuestions, type GradingResult, type GradingInput } from '../types'
 import { GradingResultSchema } from '../schemas'
-import { buildRubricPrompt } from '../rubric'
+import { buildRubricPrompt, getRubric } from '../rubric'
 
 function makeResult(testOrdering: GradingResult['dimensions'] extends undefined ? never : { score: number; feedback: string; deductions?: Array<{ points: number; reason: string }> }): GradingResult {
   return {
@@ -42,17 +42,55 @@ test('deductions that explain the gap are left exactly as returned', () => {
   assert.equal(sum, 20 - 15)
 })
 
-test('a mismatched sum NEVER rewrites the score', () => {
-  // The score is recomputed server-side, recomputed again on save, and is the
-  // number already in the student's history. Bending it to make a caption tidy
-  // would silently rewrite a recorded grade.
+test('a score above what its deductions allow is lowered to max − sum', () => {
+  // score 15/20 with a 9-point deduction implies 11 — the model under-subtracted.
   const r = makeResult({
     score: 15, feedback: '',
     deductions: [{ points: 9, reason: 'did not order CBC' }],
   })
   reconcileDeductions(r, 'Clinical')
-  assert.equal(r.dimensions!.testOrdering.score, 15, 'score is authoritative')
-  assert.equal(r.dimensions!.testOrdering.deductions!.length, 1, 'items are kept, not silently dropped')
+  assert.equal(r.dimensions!.testOrdering.score, 11, 'lowered to what the list justifies')
+  assert.equal(r.dimensions!.testOrdering.deductions!.length, 1, 'items are kept')
+})
+
+test('full marks alongside deductions — the shipped contradiction — is corrected', () => {
+  // The real-world case: clinicalReasoning 15/15 with three −5 deductions shown
+  // to the student. Consistent score is 0/15, and the headline recomputes.
+  const r = makeResult({ score: 20, feedback: '', deductions: [] })
+  r.dimensions!.clinicalReasoning = {
+    score: 15, feedback: 'anchoring bias',
+    deductions: [
+      { points: 5, reason: 'anchored on organism without cultures' },
+      { points: 5, reason: 'missed pre-LP imaging with focal deficits' },
+      { points: 5, reason: 'no differential articulated' },
+    ],
+  }
+  reconcileDeductions(r, 'Clinical')
+  assert.equal(r.dimensions!.clinicalReasoning!.score, 0)
+  // gradeSession recomputes the headline from the rubric dimensions after this
+  // pass — emulate it to prove the top line self-corrects (37 → 22 shape).
+  const dims = r.dimensions!
+  const headline = getRubric('Clinical').reduce((s, { key }) => s + (dims[key]?.score ?? 0), 0)
+  assert.equal(headline, 85) // hi 20 + to 20 + da 30 + dc 15 + cr 0 — the inflated 15 no longer counts
+})
+
+test('a score LOWER than the list implies is never raised', () => {
+  // 10/20 with a single 3-point item: the list under-explains the 10-point gap.
+  const r = makeResult({
+    score: 10, feedback: '',
+    deductions: [{ points: 3, reason: 'did not order CBC' }],
+  })
+  reconcileDeductions(r, 'Clinical')
+  assert.equal(r.dimensions!.testOrdering.score, 10, 'under-explained gap keeps the score')
+})
+
+test('the implied score floors at 0 when deductions exceed the max', () => {
+  const r = makeResult({
+    score: 18, feedback: '',
+    deductions: [{ points: 15, reason: 'a' }, { points: 15, reason: 'b' }],
+  })
+  reconcileDeductions(r, 'Clinical')
+  assert.equal(r.dimensions!.testOrdering.score, 0)
 })
 
 test('unusable deduction items are dropped', () => {
@@ -82,8 +120,9 @@ test('reconciliation runs safely after clamping an illegal score', () => {
   const r = makeResult({ score: 99, feedback: '', deductions: [{ points: 2, reason: 'x' }] })
   clampDimensions(r, 'Clinical')
   reconcileDeductions(r, 'Clinical')
-  assert.equal(r.dimensions!.testOrdering.score, 20, 'clamped to max first')
-  // gap is now 0, the single item cannot explain it — kept, logged, score intact
+  // Clamped 99 → 20 first; then the 2-point item implies 18, and a clamped-to-max
+  // score with a live deduction is exactly the inflated case — lowered to 18.
+  assert.equal(r.dimensions!.testOrdering.score, 18)
   assert.equal(r.dimensions!.testOrdering.deductions!.length, 1)
 })
 
@@ -159,6 +198,19 @@ test('the prompt forbids inventing line items to make the arithmetic work', () =
   assert.ok(p.includes('do not'), 'anti-fabrication clause present')
   assert.ok(p.includes('you removed too many points'))
   assert.ok(p.includes('An invented line item is worse than a blunt score'))
+})
+
+test('the prompt requires the score to have its deductions already subtracted', () => {
+  const p = buildRubricPrompt(baseInput)
+  assert.ok(p.includes('score = max − (sum of that dimension\'s deductions)'))
+  assert.ok(p.includes('self-contradictory'))
+})
+
+test('the prompt treats HPI-stated facts as pre-answered for missedQuestions and scoring', () => {
+  const p = buildRubricPrompt(baseInput)
+  assert.ok(p.includes('AND the case HPI at the top of this prompt'))
+  assert.ok(p.includes('PRE-ANSWERED'))
+  assert.ok(p.includes('or that is stated in the HPI counts as covered'))
 })
 
 test('the prompt asks for youAsked and forbids fabricating the quote', () => {
