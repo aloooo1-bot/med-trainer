@@ -165,7 +165,7 @@ export default function MedTrainer() {
   const [showTerminal, setShowTerminal] = useState(false)
   const [terminalLoading, setTerminalLoading] = useState(false)
 
-  const [timedOutToast, setTimedOutToast] = useState(false)
+  const [overtimeToast, setOvertimeToast] = useState(false)
   const [notes, setNotes] = useState<NotesState>({ mode: 'free', content: '', open: false })
   const [caseStarted, setCaseStarted] = useState(true)
   const [zoomedImage, setZoomedImage] = useState<{ src: string; alt: string } | null>(null)
@@ -178,7 +178,6 @@ export default function MedTrainer() {
   const [feedbackText, setFeedbackText] = useState('')
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false)
   const [feedbackSubmitting, setFeedbackSubmitting] = useState(false)
-  const timerExpireRef = useRef<(() => void) | null>(null)
   const analyticsSessionRef = useRef<ActiveSession | null>(null)
   const activeSectionRef = useRef<string>('hpi')
   const resolvedSystemRef = useRef<string>('')
@@ -236,12 +235,11 @@ export default function MedTrainer() {
   // True when a Clinical/Advanced case exists but the timer hasn't been started yet
   const locked = !caseStarted
 
+  // Soft deadline: expiry announces overtime but never ends the case — the
+  // student keeps working and the eventual submission is flagged as over time.
   const handleTimerExpire = useCallback(() => {
-    setTimedOutToast(true)
-    setTimeout(() => {
-      setTimedOutToast(false)
-      timerExpireRef.current?.()
-    }, 2000)
+    setOvertimeToast(true)
+    setTimeout(() => setOvertimeToast(false), 6000)
   }, [])
 
   const { timerState, startTimer, pauseTimer, resumeTimer, completeTimer, resetTimer } = useTimer(handleTimerExpire)
@@ -663,11 +661,15 @@ export default function MedTrainer() {
     }
   }
 
-  const submitDiagnosis = async (overrideDiagnosis?: string, overridePresentation?: string, timedOut = false): Promise<GradingResult | null> => {
+  const submitDiagnosis = async (overrideDiagnosis?: string, overridePresentation?: string): Promise<GradingResult | null> => {
     setGradingError(null)
     const diagnosisToGrade = (overrideDiagnosis !== undefined ? overrideDiagnosis : userDiagnosis).trim()
     if (!diagnosisToGrade || !caseData || !sessionId || gradingLoading) return null
     if (overrideDiagnosis !== undefined) setUserDiagnosis(overrideDiagnosis)
+    // Elapsed only ticks while the case runs, so elapsed >= total means the
+    // encounter went into overtime at some point — even if the timer was
+    // completed later by entering the write-up phase.
+    const timedOut = timerState.totalSeconds > 0 && timerState.elapsedSeconds >= timerState.totalSeconds
     completeTimer()
     setGradingLoading(true)
 
@@ -826,12 +828,6 @@ export default function MedTrainer() {
       setGradingLoading(false)
     }
   }
-
-  // Wire the expire callback so it can call submitDiagnosis (defined above).
-  // Updated in an effect (not during render) so the ref always points at the latest closure.
-  useEffect(() => {
-    timerExpireRef.current = () => submitDiagnosis('Time expired', '', true)
-  })
 
   const addTerminalLines = (...lines: TerminalLine[]) => {
     setTerminalLines(prev => [...prev, ...lines])
@@ -1266,6 +1262,13 @@ export default function MedTrainer() {
             <div className="flex items-center gap-1.5">
               {timerState.status === 'paused' ? (
                 <span className="text-[11px] font-mono text-ink-tertiary tracking-widest">PAUSED</span>
+              ) : timerState.status === 'expired' ? (
+                <span
+                  className="text-[13px] font-mono tabular-nums text-critical"
+                  title="Time is up — you can keep working; the case will be marked as over time"
+                >
+                  +{fmtTime(Math.max(0, timerState.elapsedSeconds - timerState.totalSeconds))}
+                </span>
               ) : (() => {
                 const rem = timerState.remainingSeconds
                 const isWarning  = rem <= 300 && rem > 120
@@ -1316,10 +1319,10 @@ export default function MedTrainer() {
         </div>
       </header>
 
-      {/* Timed-out toast */}
-      {timedOutToast && (
-        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 rounded-lg border border-critical-border bg-critical-bg px-5 py-3 text-sm font-medium text-critical shadow-xl">
-          Time&apos;s up — submitting your case…
+      {/* Overtime toast */}
+      {overtimeToast && (
+        <div className="fixed top-16 left-1/2 -translate-x-1/2 z-50 rounded-lg border border-caution-border bg-caution-bg px-5 py-3 text-sm font-medium text-caution shadow-xl">
+          Time&apos;s up — you can keep working. The case will be marked as over time.
         </div>
       )}
 

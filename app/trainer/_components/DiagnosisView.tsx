@@ -64,7 +64,7 @@ export function DiagnosisView({
   notes: NotesState
   /** The student's own working differential list, for the scorecard echo. */
   workingDifferential?: string[]
-  submitDiagnosis: (overrideDiagnosis?: string, overridePresentation?: string, timedOut?: boolean) => Promise<GradingResult | null>
+  submitDiagnosis: (overrideDiagnosis?: string, overridePresentation?: string) => Promise<GradingResult | null>
   generateCase: (overrideSystem?: string, overrideDifficulty?: string, overrideDiagnosis?: string) => Promise<CaseData | null>
   orderedTests: Set<string>
   /** This student's own mean per dimension, as fractions of each max. */

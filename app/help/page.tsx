@@ -144,7 +144,7 @@ export default function HelpPage() {
                   }}
                 >
                   <strong style={{ color: 'var(--text-secondary)' }}>Efficiency (/10, not included in /100 score):</strong>{' '}
-                  At Clinical and Advanced difficulty, a timer tracks how quickly you complete the case. Efficiency is shown as a separate indicator on the scorecard and does not affect your rubric score.
+                  At Clinical and Advanced difficulty, a timer tracks how quickly you complete the case. If time runs out you are not cut off — the case continues into overtime, and the overrun is noted in your feedback. Efficiency is shown as a separate indicator on the scorecard and does not affect your rubric score.
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 12, marginTop: 4 }}>
                   {[

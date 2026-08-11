@@ -87,14 +87,14 @@ test('buildRubricPrompt shows placeholder when no reasoning', () => {
   assert.ok(prompt.includes('(No clinical reasoning text provided)'))
 })
 
-test('buildRubricPrompt includes timed-out note when timedOut=true', () => {
+test('buildRubricPrompt includes overtime note when timedOut=true', () => {
   const prompt = buildRubricPrompt({ ...baseInput, timedOut: true })
-  assert.ok(prompt.includes('time expired'))
+  assert.ok(prompt.includes('over the case time limit'))
 })
 
-test('buildRubricPrompt does NOT include timed-out note when timedOut=false', () => {
+test('buildRubricPrompt does NOT include overtime note when timedOut=false', () => {
   const prompt = buildRubricPrompt({ ...baseInput, timedOut: false })
-  assert.ok(!prompt.includes('time expired'))
+  assert.ok(!prompt.includes('over the case time limit'))
 })
 
 test('buildRubricPrompt includes Advanced test ordering note for Advanced difficulty', () => {
