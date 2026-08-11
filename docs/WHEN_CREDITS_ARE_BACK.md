@@ -63,6 +63,7 @@ Everything below compiles and is unit-tested; it was never exercised live.
 - [ ] **Bound chest film:** an image-first chest case serves its exact authored film.
 - [ ] **Working-differential + optional pre-test read (2026-08-11):** on a live Clinical case, verify the right-rail "Your differential" panel (add/reorder/remove, survives refresh via resume), the PredictionPanel skip→reopen chip, the open-mode prefill from the differential's top entry, the scorecard "Your differential going in" echo with ✓ on the correct dx, and that the grader received the list (studentWorkingDifferential in the grade prompt) without penalizing its absence on a control case.
 - [ ] **Grading consistency fixes (2026-08-11):** on a live graded case, confirm (a) any dimension with deductions displays `max − sum(deductions)` — never full marks alongside itemized criticism, and (b) key questions whose facts are stated in the visible HPI (e.g. cerebral-abscess dental history) are neither penalized in History & Interview nor listed under "What you missed".
+- [ ] **Scorecard layout rework (2026-08-11):** on a live graded case, verify the three feedback sections render stacked (What you missed → Teaching points → Strengths, all visible), the recall-cards strip appears with the correct count and Review link, and the Test Ordering row's expanded panel shows core-workup ✓/✗ chips matching what was actually ordered.
 - [ ] Run `/verify` skill or a manual click-through for the above.
 
 ## 3. Image pipeline execution (the image-first work)

@@ -68,7 +68,7 @@ export function ScoreRing({ score }: { score: number }) {
 }
 
 export function CategoryRow({
-  label, dim, max, pct, expanded, onToggle, index = 0, average,
+  label, dim, max, pct, expanded, onToggle, index = 0, average, extra,
 }: {
   label: string
   dim: { score: number; feedback: string; deductions?: Array<{ points: number; reason: string }> }
@@ -80,6 +80,8 @@ export function CategoryRow({
   index?: number
   /** This student's own mean on this dimension, rescaled to `max`. */
   average?: { score: number; n: number } | null
+  /** Dimension-specific detail rendered in the expanded panel (e.g. workup chips). */
+  extra?: React.ReactNode
 }) {
   // The authoritative gap, from the score itself. Shown even when the model's
   // itemisation disagrees with it, so the header never misstates the loss.
@@ -147,6 +149,8 @@ export function CategoryRow({
                 ))}
               </ul>
             )}
+
+            {extra}
 
             {average && average.n > 0 && (
               <p className="mt-3 text-xs text-ink-3">

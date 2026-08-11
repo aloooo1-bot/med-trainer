@@ -2,7 +2,8 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { SectionCard } from './SectionCard'
 import { ScoreRing, CategoryRow, ScorecardNotesPanel } from './ScoreRing'
-import { FeedbackTabs, type FeedbackSection } from './FeedbackTabs'
+import { FeedbackSections, type FeedbackSection } from './FeedbackSections'
+import { buildReviewItems } from '@/app/lib/reasoning/store'
 import { DiagnosisInput } from './DiagnosisInput'
 import { WhyPanel } from './WhyPanel'
 import { MicButton } from './MicButton'
@@ -411,6 +412,38 @@ export function DiagnosisView({
                       setCategoryTouched(true)
                       setExpandedCategory(shownCategory === key ? null : key)
                     }}
+                    // The reveal names the core workup — show which of it was
+                    // actually ordered instead of leaving the gap to prose.
+                    extra={key === 'testOrdering' ? (() => {
+                      const expected = [...(caseData.expectedLabs ?? []), ...(caseData.expectedImaging ?? [])]
+                      if (expected.length === 0) return null
+                      const orderedLower = new Set(Array.from(orderedTests).map(t => t.toLowerCase()))
+                      return (
+                        <div className="mt-3">
+                          <div className="mb-1.5 text-[10px] font-semibold uppercase tracking-wide" style={{ color: 'var(--color-ink-3)' }}>
+                            Core workup for this diagnosis
+                          </div>
+                          <div style={{ display: 'flex', gap: 5, flexWrap: 'wrap' }}>
+                            {expected.map(test => {
+                              const ordered = orderedLower.has(test.toLowerCase())
+                              return (
+                                <span
+                                  key={test}
+                                  title={ordered ? 'You ordered this' : 'Not ordered'}
+                                  style={{
+                                    fontSize: 11, fontWeight: 500, padding: '2px 8px', borderRadius: 4,
+                                    color: ordered ? 'var(--color-confirmed)' : 'var(--color-critical)',
+                                    background: ordered ? 'var(--confirmed-bg)' : 'var(--critical-bg)',
+                                  }}
+                                >
+                                  {ordered ? '✓' : '✗'} {test}
+                                </span>
+                              )
+                            })}
+                          </div>
+                        </div>
+                      )
+                    })() : undefined}
                   />
                 )
               })}
@@ -425,19 +458,14 @@ export function DiagnosisView({
           </div>
         </div>
 
-        {/* C — Feedback section carousel */}
+        {/* C — Feedback sections, stacked: the learning content leads (missed →
+            teaching), strengths close on the positive note. */}
         {((gradingResult.strengths?.length ?? 0) > 0
           || (gradingResult.missedQuestions?.length ?? 0) > 0
           || (gradingResult.teachingPoints?.length ?? 0) > 0) && (
           <div style={{ borderTop: '1px solid var(--color-rule)', paddingTop: 12, paddingBottom: 4, background: 'var(--color-paper)' }}>
             {(() => {
-              const strengthsAll = [
-                ...(gradingResult.strengths ?? []),
-              ]
               const feedSections: FeedbackSection[] = []
-              if (strengthsAll.length > 0) feedSections.push({
-                title: 'Strengths', items: strengthsAll, tone: 'confirmed', icon: '✓',
-              })
               // Each miss carries the nearest thing the student actually said,
               // so "you should have asked X" is answerable with "…I asked this
               // instead" rather than leaving them to reconstruct it from memory.
@@ -458,10 +486,51 @@ export function DiagnosisView({
               if ((gradingResult.teachingPoints?.length ?? 0) > 0) feedSections.push({
                 title: 'Teaching points', items: gradingResult.teachingPoints!, tone: 'insight', icon: '★',
               })
-              return <FeedbackTabs sections={feedSections} />
+              if ((gradingResult.strengths?.length ?? 0) > 0) feedSections.push({
+                title: 'Strengths', items: gradingResult.strengths!, tone: 'confirmed', icon: '✓',
+              })
+              return <FeedbackSections sections={feedSections} />
             })()}
           </div>
         )}
+
+        {/* Recall loop closure — the cards this case just minted. Count is
+            recomputed from the same reveal fields recordCaseOutcome used;
+            `now` only stamps scheduling fields, so 0 keeps this render-pure. */}
+        {(() => {
+          const cards = buildReviewItems(
+            {
+              diagnosis: caseData.diagnosis ?? '',
+              teachingPoints: caseData.teachingPoints,
+              mechanism: caseData.mechanism,
+              testImpacts: caseData.testImpacts,
+              recallCards: caseData.recallCards,
+            },
+            resolvedSystem,
+            0,
+          )
+          if (cards.length === 0) return null
+          return (
+            <div className="border-t border-rule px-5 py-3" style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+              <span aria-hidden="true" style={{ fontSize: 16 }}>🗂️</span>
+              <span style={{ fontSize: 13, color: 'var(--color-ink-2)', flex: 1, minWidth: 200 }}>
+                {cards.length} recall card{cards.length === 1 ? '' : 's'} for{' '}
+                <strong style={{ color: 'var(--color-ink)' }}>{caseData.diagnosis}</strong> {cards.length === 1 ? 'is' : 'are'} in your deck —
+                spaced review is what makes this case stick.
+              </span>
+              <Link
+                href="/recall"
+                style={{
+                  fontSize: 12, fontWeight: 600, color: 'var(--accent)', textDecoration: 'none',
+                  background: 'rgba(79,156,249,0.1)', border: '1px solid rgba(79,156,249,0.2)',
+                  borderRadius: 6, padding: '5px 12px', flexShrink: 0,
+                }}
+              >
+                Review now →
+              </Link>
+            </div>
+          )
+        })()}
 
         {/* Patient communication — reported, never scored. Labelled as such so
             it can never read as points the student lost. */}
