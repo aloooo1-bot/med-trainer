@@ -62,6 +62,14 @@ export function scheduleNext(item: ReviewItem, grade: ReviewGrade, now: number):
   }
 }
 
+/** Human interval for a grade preview: 1d, 6d, 3w, 2mo. */
+export function formatInterval(days: number): string {
+  if (days < 1) return 'today'
+  if (days < 21) return `${Math.round(days)}d`
+  if (days < 61) return `${Math.round(days / 7)}w`
+  return `${Math.round(days / 30)}mo`
+}
+
 /** Items due for review now, soonest-due first. */
 export function dueItems(items: ReviewItem[], now: number): ReviewItem[] {
   return items.filter(i => i.dueAt <= now).sort((a, b) => a.dueAt - b.dueAt)

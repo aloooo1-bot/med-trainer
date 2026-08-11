@@ -6,7 +6,7 @@ import Sidebar from '@/app/components/dashboard/Sidebar'
 import { createClient } from '@/app/lib/supabase/client'
 import { loadReviewItems, gradeReviewItem, restoreReviewItem, recordReviewDay, loadStreak } from '@/app/lib/reasoning/store'
 import { syncReasoning, pushReasoning } from '@/app/lib/reasoning/sync'
-import { dueItems } from '@/app/lib/reasoning/spacedRepetition'
+import { dueItems, scheduleNext, formatInterval } from '@/app/lib/reasoning/spacedRepetition'
 import type { ReviewItem, ReviewGrade, ReviewTag } from '@/app/lib/reasoning/types'
 import DeckBrowser from './DeckBrowser'
 import { EmptyState } from '@/app/components/EmptyState'
@@ -94,6 +94,15 @@ export default function RecallPage() {
     setIdx(i => i + 1)
   }, [current])
 
+  // Skip: back of today's queue, ungraded and uncounted — the schedule is
+  // untouched and the card returns before the session ends.
+  const skip = useCallback(() => {
+    if (!current) return
+    setQueue(q => [...q, current])
+    setIdx(i => i + 1)
+    setShowAnswer(false)
+  }, [current])
+
   const undo = useCallback(() => {
     if (!lastAction) return
     // Restore the card's pre-grade scheduling and step back to it. The daily
@@ -114,6 +123,7 @@ export default function RecallPage() {
       // Don't hijack typing in the deck search box or any form field.
       const t = e.target as HTMLElement | null
       if (t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA' || t.isContentEditable)) return
+      if (e.key === 's') { e.preventDefault(); skip(); return }
       if (!showAnswer) {
         if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); setShowAnswer(true) }
         return
@@ -124,7 +134,7 @@ export default function RecallPage() {
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [showAnswer, current, grade])
+  }, [showAnswer, current, grade, skip])
 
   const remaining = queue.length - idx
   const done = loaded && (queue.length === 0 || idx >= queue.length)
@@ -200,7 +210,7 @@ export default function RecallPage() {
             <>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
                 <span style={{ fontSize: 12, color: 'var(--muted)', fontFamily: 'JetBrains Mono, monospace' }} title={streak > 0 ? `${streak}-day review streak` : undefined}>
-                  {remaining} due{streak > 0 ? `  ·  🔥 ${streak}-day review streak` : ''}
+                  {remaining} left · {reviewedCount} done{streak > 0 ? `  ·  🔥 ${streak}-day review streak` : ''}
                 </span>
                 <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                   {lastAction && (
@@ -228,28 +238,42 @@ export default function RecallPage() {
                       {current.answer}
                     </p>
                   ) : (
-                    <button
-                      onClick={() => setShowAnswer(true)}
-                      style={{ alignSelf: 'flex-start', marginTop: 'auto', padding: '8px 18px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface2)', color: 'var(--text)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
-                    >
-                      Show answer <span style={{ opacity: 0.5, fontWeight: 400 }}>(space)</span>
-                    </button>
+                    <div style={{ display: 'flex', gap: 8, marginTop: 'auto' }}>
+                      <button
+                        onClick={() => setShowAnswer(true)}
+                        style={{ padding: '8px 18px', borderRadius: 8, border: '1px solid var(--border)', background: 'var(--surface2)', color: 'var(--text)', fontSize: 13, fontWeight: 600, cursor: 'pointer' }}
+                      >
+                        Show answer <span style={{ opacity: 0.5, fontWeight: 400 }}>(space)</span>
+                      </button>
+                      <button
+                        onClick={skip}
+                        title="See this card again at the end of today's session — schedule unchanged"
+                        style={{ padding: '8px 14px', borderRadius: 8, border: '1px solid var(--border)', background: 'transparent', color: 'var(--muted)', fontSize: 13, cursor: 'pointer' }}
+                      >
+                        Skip <span style={{ opacity: 0.5 }}>(s)</span>
+                      </button>
+                    </div>
                   )}
                 </div>
 
                 {showAnswer && (
                   <div style={{ display: 'flex', gap: 8, padding: '14px 24px', borderTop: '1px solid var(--border)' }}>
-                    {GRADES.map((g, gi) => (
-                      <button
-                        key={g.grade}
-                        onClick={() => grade(g.grade, Date.now())}
-                        style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: `1px solid ${g.color}`, background: 'transparent', color: g.color, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
-                        title={`${g.hint} — press ${gi + 1}`}
-                      >
-                        {g.label}
-                        <span style={{ display: 'block', fontSize: 10, fontWeight: 400, opacity: 0.7 }}>{gi + 1} · {g.hint}</span>
-                      </button>
-                    ))}
+                    {GRADES.map((g, gi) => {
+                      // What this grade commits to — Anki-style interval preview,
+                      // from the pure scheduler (session `now`, not wall clock).
+                      const next = formatInterval(scheduleNext(current, g.grade, now).intervalDays)
+                      return (
+                        <button
+                          key={g.grade}
+                          onClick={() => grade(g.grade, Date.now())}
+                          style={{ flex: 1, padding: '10px 0', borderRadius: 8, border: `1px solid ${g.color}`, background: 'transparent', color: g.color, fontSize: 13, fontWeight: 700, cursor: 'pointer' }}
+                          title={`${g.hint} — press ${gi + 1}`}
+                        >
+                          {g.label}
+                          <span style={{ display: 'block', fontSize: 10, fontWeight: 400, opacity: 0.7 }}>{gi + 1} · {g.hint} · {next}</span>
+                        </button>
+                      )
+                    })}
                   </div>
                 )}
               </div>

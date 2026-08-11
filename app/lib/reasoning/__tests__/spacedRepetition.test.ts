@@ -1,6 +1,6 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
-import { makeReviewItem, scheduleNext, dueItems, dueCount } from '../spacedRepetition'
+import { makeReviewItem, scheduleNext, dueItems, dueCount, formatInterval } from '../spacedRepetition'
 import type { ReviewItem } from '../types'
 
 const T0 = 1_700_000_000_000 // fixed epoch for deterministic tests
@@ -64,4 +64,15 @@ test('dueItems / dueCount select only items at or past their due time', () => {
   assert.deepEqual(dueItems(all, T0).map(i => i.id), ['r1'])
   // a day later both are due
   assert.equal(dueCount(all, T0 + DAY), 2)
+})
+
+test('formatInterval renders days, weeks, and months at sensible cutoffs', () => {
+  assert.equal(formatInterval(0), 'today')
+  assert.equal(formatInterval(1), '1d')
+  assert.equal(formatInterval(6), '6d')
+  assert.equal(formatInterval(20), '20d')
+  assert.equal(formatInterval(21), '3w')
+  assert.equal(formatInterval(45), '6w')
+  assert.equal(formatInterval(61), '2mo')
+  assert.equal(formatInterval(120), '4mo')
 })
