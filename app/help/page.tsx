@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import { useState, useEffect } from 'react'
+import Link from 'next/link'
 import '@/app/dashboard.css'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import { createClient } from '@/app/lib/supabase/client'
@@ -39,8 +40,17 @@ const FAQS: FAQ[] = [
   },
   {
     q: 'How does the recommendation algorithm choose what to study?',
-    a: 'Systems are ranked by urgency = (100 − avg_score) × (1.2 if only 1 case, else 1.0). Single-case systems get the 1.2× multiplier because one data point is less reliable; multi-case systems carry a factor of 1.0 (no multiplier). Your weekly plan then fills active days with the top-urgency systems in order.',
+    a: 'Systems are ranked by urgency = (100 − avg_score) × (1.2 if only 1 case, else 1.0). Single-case systems get the 1.2× multiplier because one data point is less reliable; multi-case systems carry a factor of 1.0 (no multiplier). The most urgent system becomes the recommended next case on your Dashboard and the Up-next pick on Focus Areas — both use the same engine.',
     link: { href: '#recommendation-algorithm', label: 'See algorithm details →' },
+  },
+  {
+    q: 'How are recall cards created?',
+    a: 'Finishing a case mints up to three flashcards for its diagnosis — the mechanism (why it happens), the first-line management, and the confirmatory test. Cards are deduplicated per diagnosis, so repeating a case refreshes the existing cards instead of piling up copies, and incidental findings (like a normal film) produce no cards.',
+    link: { href: '#recall', label: 'See recall & spaced repetition →' },
+  },
+  {
+    q: 'Can I use my cards in Anki?',
+    a: 'Yes — on the Recall tab, "Export to Anki" downloads your deck as an Anki plain-text file (File → Import in Anki desktop). Cards arrive tagged by system and card type under a MedTrainer deck. They import as new cards; your in-app review schedule stays here and keeps working independently.',
   },
   {
     q: 'How do I redo a case?',
@@ -155,6 +165,51 @@ export default function HelpPage() {
             </div>
           </div>
 
+          {/* Recall & spaced repetition */}
+          <div id="recall" className="dx-card">
+            <div className="dx-card-header">
+              <div style={{ fontWeight: 700 }}>Recall &amp; spaced repetition</div>
+              <div style={{ fontSize: 11, fontWeight: 400, color: 'var(--muted)', marginTop: 2 }}>
+                Cases teach the reasoning; the recall deck makes it stick.
+              </div>
+            </div>
+            <div className="dx-card-body">
+              <div className="dx-help-section">
+                <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>
+                  Every case you finish mints up to <strong style={{ color: 'var(--text)' }}>three flashcards</strong> for its diagnosis:
+                </p>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 10 }}>
+                  {[
+                    { name: 'Mechanism', desc: 'The core pathophysiology — why the disease produces its findings.' },
+                    { name: 'Management', desc: 'The first-line treatment, with the concrete agent, dose, or threshold.' },
+                    { name: 'Discriminator', desc: 'The confirmatory test and the finding that clinches the diagnosis.' },
+                  ].map(c => (
+                    <div key={c.name} style={{ background: 'var(--surface2)', borderRadius: 8, padding: '10px 14px', border: '1px solid var(--border)' }}>
+                      <div style={{ fontSize: 12, fontWeight: 700, color: 'var(--text)', marginBottom: 4 }}>{c.name}</div>
+                      <div style={{ fontSize: 11, color: 'var(--muted)', lineHeight: 1.5 }}>{c.desc}</div>
+                    </div>
+                  ))}
+                </div>
+                <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>
+                  Cards are scheduled with <strong style={{ color: 'var(--text)' }}>SM-2</strong> — the same algorithm Anki uses.
+                  Grade each recall <em>Again / Hard / Good / Easy</em> and the interval stretches as you prove you remember:
+                  1 day, 6 days, then multiplying with each success. A card whose interval reaches{' '}
+                  <strong style={{ color: 'var(--text)' }}>3 weeks counts as mature</strong> — reliably remembered.
+                  Reviewing on consecutive days builds your review streak.
+                </p>
+                <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>
+                  One deck per diagnosis, not per attempt — repeating a case refreshes its cards with better answers without
+                  resetting your schedule. Due cards surface on the{' '}
+                  <Link href="/" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Dashboard</Link>,{' '}
+                  <a href="/focus" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Focus Areas</a>, and the{' '}
+                  <a href="/recall" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Recall</a> tab, where you can also
+                  export the whole deck to <strong style={{ color: 'var(--text)' }}>Anki</strong> (plain-text import, tagged by
+                  system and card type). Your deck syncs to your account when signed in.
+                </p>
+              </div>
+            </div>
+          </div>
+
           {/* Tiers */}
           <div className="dx-card">
             <div className="dx-card-header" style={{ fontWeight: 700 }}>Plans</div>
@@ -163,7 +218,7 @@ export default function HelpPage() {
                 {[
                   {
                     name: 'Free', badge: '',
-                    features: ['2 cases per day', 'Core scorecard (4 dimensions at Foundations, 5 at Clinical/Advanced)', 'Case history (last 50 cases)', 'Bookmarks and search', 'Focus areas & study queue'],
+                    features: ['2 cases per day', 'Core scorecard (4 dimensions at Foundations, 5 at Clinical/Advanced)', 'Full case history', 'Bookmarks and search', 'Focus areas & study queue'],
                   },
                   {
                     name: 'Pro', badge: 'pro',
@@ -199,14 +254,18 @@ export default function HelpPage() {
                 </div>
                 <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>
                   A higher urgency means you need more practice. The 1.2× case-count factor for single-case systems reflects
-                  that one data point is less reliable than multiple attempts. Systems are sorted by urgency
-                  descending; your weekly training plan fills active days in that order.
+                  that one data point is less reliable than multiple attempts. The most urgent system becomes the
+                  recommended next case on your{' '}
+                  <Link href="/" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Dashboard</Link> and the Up-next pick on{' '}
+                  <a href="/focus" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Focus Areas</a>, where the full
+                  queue is ranked in the same order. The recommended difficulty steps up as your average in that system
+                  climbs (below 60 → Foundations, 60–79 → Clinical, 80+ → Advanced; Free accounts train at Foundations).
                 </p>
                 <p style={{ margin: 0, fontSize: 13, color: 'var(--muted)', lineHeight: 1.6 }}>
-                  You can customize rest days, volume, and difficulty mix in{' '}
+                  Set your weekly case goal in{' '}
                   <a href="/settings" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Settings</a>,
-                  or skip individual systems from the{' '}
-                  <a href="/focus" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Focus Areas</a> tab.
+                  or snooze individual systems for 14 days from the{' '}
+                  <a href="/focus" style={{ color: 'var(--accent)', textDecoration: 'none' }}>Focus Areas</a> queue.
                 </p>
               </div>
             </div>
