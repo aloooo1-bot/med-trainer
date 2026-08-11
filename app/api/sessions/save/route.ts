@@ -96,6 +96,10 @@ export async function POST(req: Request) {
     bookmarked: body.bookmarked === true,
     parent_session_id: body.parentSessionId ?? null,
     notes: body.notes ?? '',
+    // Join key back to the event log, so the finished case can be replayed for
+    // review. Taken from the server session requireOwnSession resolved, not the
+    // posted value — same id, but sourced from the record we actually verified.
+    trainer_session_id: session.id,
   })
 
   if (error) {

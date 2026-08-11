@@ -169,6 +169,8 @@ export interface Database {
           parent_session_id: string | null
           notes: string
           created_at: string
+          /** Join key to trainer_sessions for transcript/results replay (0007). */
+          trainer_session_id: string | null
         }
         Insert: {
           id: string
@@ -192,6 +194,7 @@ export interface Database {
           parent_session_id?: string | null
           notes?: string
           created_at?: string
+          trainer_session_id?: string | null
         }
         Update: Partial<Database['public']['Tables']['case_sessions']['Insert']>
       }

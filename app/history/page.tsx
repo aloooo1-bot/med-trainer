@@ -8,6 +8,7 @@ import { getRubric } from '../grading/rubric'
 import { createClient } from '../lib/supabase/client'
 import Sidebar from '@/app/components/dashboard/Sidebar'
 import ReportCaseModal from '@/app/components/dashboard/ReportCaseModal'
+import CaseReplay from '@/app/components/dashboard/CaseReplay'
 import { localDayKey } from '@/app/lib/localDay'
 import { EmptyState } from '@/app/components/EmptyState'
 
@@ -96,6 +97,13 @@ function ScoreDetail({
         <p style={{ fontSize: 12, color: 'var(--muted)', fontStyle: 'italic' }}>
           Detailed scorecard not available for this session.
         </p>
+        {/* No scorecard is no reason to lose the encounter — it is often the
+            more useful half for studying anyway. */}
+        {session.trainerSessionId && (
+          <div style={{ marginTop: 12 }}>
+            <CaseReplay trainerSessionId={session.trainerSessionId} />
+          </div>
+        )}
         <div className="dx-notes-section" style={{ marginTop: 12 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             <div className="dx-notes-label">Your notes</div>
@@ -232,6 +240,11 @@ function ScoreDetail({
         </div>
       </div>
 
+      {/* The encounter itself — collapsed disclosures, so reviewing the
+          transcript is a deliberate click rather than a wall of text under
+          every scorecard. */}
+      {session.trainerSessionId && <CaseReplay trainerSessionId={session.trainerSessionId} />}
+
       {/* Notes */}
       <div className="dx-notes-section">
         <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -290,6 +303,7 @@ function rowToRecord(row: any): CaseSessionRecord {
     bookmarked: row.bookmarked ?? false,
     parentSessionId: row.parent_session_id ?? null,
     notes: row.notes ?? '',
+    trainerSessionId: row.trainer_session_id ?? null,
   }
 }
 

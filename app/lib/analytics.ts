@@ -74,6 +74,12 @@ export interface CaseSessionRecord {
   bookmarked?: boolean
   parentSessionId?: string | null
   notes?: string
+  /**
+   * The server session this record came from — the join key /api/sessions/replay
+   * needs to rebuild the transcript and results for review. Absent on rows
+   * written before the link existed, and on purely local records.
+   */
+  trainerSessionId?: string | null
 }
 
 // Held in a React ref during a live case; never persisted until submitDiagnosis
@@ -204,7 +210,8 @@ export function recordAbandonedSession(active: ActiveSession, tabAtAbandon: stri
 
 export function finalizeSession(
   active: ActiveSession,
-  outcome: Pick<CaseSessionRecord, 'diagnosis' | 'userDiagnosis' | 'correct' | 'score'> & { gradingResult?: GradingResult }
+  outcome: Pick<CaseSessionRecord, 'diagnosis' | 'userDiagnosis' | 'correct' | 'score'>
+    & { gradingResult?: GradingResult; trainerSessionId?: string | null }
 ): CaseSessionRecord {
   const completedAt = Date.now()
   const record: CaseSessionRecord = {

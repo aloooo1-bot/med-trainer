@@ -729,6 +729,10 @@ export default function MedTrainer() {
           correct: result.correct ?? false,
           score: result.score ?? 0,
           gradingResult: result,
+          // Carried on the local record too, not just the cloud row — the
+          // localStorage fallback would otherwise lose the only key that can
+          // reach this case's transcript and results.
+          trainerSessionId: sessionId,
         })
         if (activeRedoOfRef.current) {
           record.parentSessionId = activeRedoOfRef.current
