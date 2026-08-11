@@ -34,6 +34,44 @@ function TestChip({ name, isOrdered, isSelected, locked, onClick }: {
   )
 }
 
+/**
+ * The pending selection, as removable chips.
+ *
+ * Tests reached through the search box exist nowhere else on the page — the
+ * order-set and common-test grids only render their own fixed lists — so
+ * without this panel a searched test could be selected but neither seen nor
+ * unselected. Chips (not stacked rows) because an order set can add eight at
+ * once and this sits above the lists it summarizes.
+ */
+function SelectedTestsPanel({ selected, toggleTest, locked }: {
+  selected: string[]
+  toggleTest: (name: string) => void
+  locked: boolean
+}) {
+  if (selected.length === 0) return null
+  return (
+    <SectionCard title={`Selected — not yet ordered (${selected.length})`}>
+      <div className="flex flex-wrap gap-2">
+        {selected.map(t => (
+          <button
+            key={t}
+            onClick={() => !locked && toggleTest(t)}
+            disabled={locked}
+            title={`Remove ${t} from your selection`}
+            className="group inline-flex items-center gap-1.5 rounded-md border border-primary-300 bg-primary-50 px-3 py-1.5 text-xs font-medium text-primary-700 hover:border-critical-border hover:bg-critical-bg hover:text-critical disabled:cursor-not-allowed disabled:opacity-50 transition-colors"
+          >
+            {t}
+            <span aria-hidden className="text-primary-400 group-hover:text-critical">✕</span>
+          </button>
+        ))}
+      </div>
+      <p className="mt-2.5 text-[11px] text-ink-tertiary">
+        Click a test to remove it. Nothing reaches the lab until you order.
+      </p>
+    </SectionCard>
+  )
+}
+
 export function OrderView({
   caseData, caseDifficulty, scaffoldingLevel, prediction, predictionConfidence, onLockPrediction,
   predictionCandidates, caseSearchTests, orderedTests, selectedTests,
@@ -203,6 +241,10 @@ export function OrderView({
                     onMouseDown={() => {
                       if (!isOrdered && !locked) {
                         toggleTest(result.name)
+                        // The dropdown closes on blur either way; clearing
+                        // leaves the box ready for the next test and the
+                        // selection visible in the panel below.
+                        setTestSearchQuery('')
                       }
                     }}
                     disabled={isOrdered || locked}
@@ -232,6 +274,8 @@ export function OrderView({
             </div>
           )}
         </div>
+
+        <SelectedTestsPanel selected={Array.from(selectedTests)} toggleTest={toggleTest} locked={locked} />
 
         {/* Syndrome order sets — the standard workup for this presentation.
             Add the whole set, or pick individual tests. */}
@@ -386,6 +430,8 @@ export function OrderView({
         )}
       </div>
 
+      <SelectedTestsPanel selected={selectedList} toggleTest={toggleTest} locked={locked} />
+
       <SectionCard title="Imaging Studies">
         <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
           {IMAGING_WITH_IMAGES.map(study => {
@@ -414,19 +460,6 @@ export function OrderView({
           })}
         </div>
       </SectionCard>
-
-      {selectedList.length > 0 && (
-        <SectionCard title={`Selected Tests (${selectedList.length})`}>
-          <div className="space-y-2">
-            {selectedList.map(t => (
-              <div key={t} className="flex items-center justify-between rounded-md border border-primary-300 bg-primary-50 px-3 py-2">
-                <span className="text-sm text-primary-700">{t}</span>
-                <button onClick={() => toggleTest(t)} className="text-primary-400 hover:text-primary-700 text-xs transition-colors ml-3 flex-shrink-0">✕</button>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
-      )}
 
       {orderedList.length > 0 && (
         <SectionCard title={`Ordered Tests (${orderedList.length})`}>
