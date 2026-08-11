@@ -15,8 +15,9 @@ import type { CaseData } from '../../trainer/_lib/types'
  *  - Supabase (`trainer_sessions` + `session_events`, service-role writes) —
  *    the production path; see supabase/migrations/.
  *  - Local JSON files under .data/sessions/ — development fallback used when
- *    SESSION_STORE=file or when Supabase is unreachable in dev (the original
- *    project was deleted; see README note in supabase/migrations/).
+ *    SESSION_STORE=file, when DEV_AUTH_BYPASS=1 (the synthetic dev user can't
+ *    satisfy the trainer_sessions FK to auth.users), or when Supabase is
+ *    unreachable in dev.
  */
 
 export type SessionPhase = 'active' | 'presentation' | 'graded'
@@ -224,7 +225,14 @@ let _store: SessionStore | null = null
 export async function getSessionStore(): Promise<SessionStore> {
   if (_store) return _store
 
-  if (process.env.SESSION_STORE === 'file' || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+  // The dev auth bypass (DEV_AUTH_BYPASS=1) serves a synthetic user that can
+  // never exist in auth.users, so the Supabase store's user_id FK rejects
+  // every session write even when the project is reachable. Route bypass
+  // sessions to the local file store. NODE_ENV-gated like the bypass itself.
+  const devAuthBypass =
+    process.env.NODE_ENV === 'development' && process.env.DEV_AUTH_BYPASS === '1'
+
+  if (devAuthBypass || process.env.SESSION_STORE === 'file' || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
     _store = new FileSessionStore()
     return _store
   }

@@ -12,6 +12,9 @@ export interface SessionUser {
  * Dev escape hatch: with the Supabase project unreachable there is no way to
  * authenticate locally, so `DEV_AUTH_BYPASS=1` (honored ONLY in development
  * builds) yields a synthetic local user. Never set it in production.
+ * Sessions for this user are kept in the local file store — the id is not a
+ * real auth.users row, so the Supabase session tables would reject it
+ * (see getSessionStore in sessionStore.ts).
  */
 export async function getSessionUser(): Promise<SessionUser | null> {
   if (process.env.NODE_ENV === 'development' && process.env.DEV_AUTH_BYPASS === '1') {
