@@ -1,8 +1,9 @@
 import { type HPIField } from '@/app/lib/rosDetector'
 import { SectionCard } from './SectionCard'
+import { ChatTranscript, type TranscriptMessage } from './ChatTranscript'
 import { selectHpi, type CaseData } from '../_lib/types'
 
-export function HPIView({ caseData, caseDifficulty, hpiValues, caseStarted, startTimer, setCaseStarted, chatInputRef }: {
+export function HPIView({ caseData, caseDifficulty, hpiValues, caseStarted, startTimer, setCaseStarted, chatInputRef, transcript }: {
   caseData: CaseData
   caseDifficulty: string
   /** Server-revealed background-history values (gated difficulties). Undefined = still locked. */
@@ -11,6 +12,14 @@ export function HPIView({ caseData, caseDifficulty, hpiValues, caseStarted, star
   startTimer: (difficulty: string) => void
   setCaseStarted: React.Dispatch<React.SetStateAction<boolean>>
   chatInputRef: React.RefObject<HTMLTextAreaElement | null>
+  /**
+   * The interview transcript, passed ONLY once the case is graded. While the
+   * case is live the chat panel on the right holds it, so repeating it here
+   * would just be a stale second copy; grading retires that panel and this
+   * becomes the transcript's home. The scorecard deliberately does not carry
+   * it — the history belongs with the history.
+   */
+  transcript?: TranscriptMessage[]
 }) {
   const isGatedHPI = caseDifficulty === 'Clinical' || caseDifficulty === 'Advanced'
 
@@ -102,6 +111,13 @@ export function HPIView({ caseData, caseDifficulty, hpiValues, caseStarted, star
                 </div>
               </div>
             ))}
+          </div>
+        </SectionCard>
+      )}
+      {transcript && transcript.length > 0 && (
+        <SectionCard title={`Patient Interview — ${transcript.filter(m => m.role === 'user').length} question${transcript.filter(m => m.role === 'user').length === 1 ? '' : 's'} asked`}>
+          <div className="space-y-3">
+            <ChatTranscript messages={transcript} patientName={caseData.patientInfo.name} />
           </div>
         </SectionCard>
       )}

@@ -1064,6 +1064,7 @@ export default function MedTrainer() {
           startTimer={startTimer}
           setCaseStarted={setCaseStarted}
           chatInputRef={chatInputRef}
+          transcript={gradingResult ? chatMessages : undefined}
         />
       case 'ros':
         return <ROSView
@@ -1508,7 +1509,9 @@ export default function MedTrainer() {
               The encounter is over at that point: the chart is locked, the
               patient cannot be asked anything further, and the scorecard is
               long. Handing its 420px back to the results is worth more than
-              keeping a transcript nobody can add to. */}
+              keeping a live panel nobody can add to. The transcript itself
+              is not lost — it reappears read-only at the foot of the HPI
+              tab, where the history belongs. */}
           {!gradingResult && (
           <div className="flex w-[420px] flex-shrink-0 flex-col border-l border-surface-4 bg-surface-1">
             {/* Panel header */}
