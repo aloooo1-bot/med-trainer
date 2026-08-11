@@ -1,11 +1,11 @@
 {
-  "generatedAt": "2026-08-11T15:47:23.912Z",
+  "generatedAt": "2026-08-11T16:00:38.910Z",
   "casesScanned": 392,
   "questionsChecked": 1960,
-  "casesWithOverlap": 311,
-  "fullCount": 13,
+  "casesWithOverlap": 310,
+  "fullCount": 5,
   "recurrenceCount": 180,
-  "partialCount": 419,
+  "partialCount": 422,
   "findings": [
     {
       "id": "gastrointestinal-clinical-small-bowel-obstruction-0",
@@ -50,40 +50,6 @@
       ]
     },
     {
-      "id": "img-MPX2266_synpic21022",
-      "system": "Infectious",
-      "difficulty": "Clinical",
-      "diagnosis": "Cerebral abscesses",
-      "hpi": "47-year-old man with 10 days of left-sided headache, subjective fevers, and 2 days of right hemiparesis after recent dental work for a periapical abscess. Two focal motor seizures of the right hand.",
-      "hits": [
-        {
-          "question": "Have you had any recent dental procedures, sinus infections, or ear infections?",
-          "matched": [
-            "dental"
-          ],
-          "coverage": 0.25,
-          "severity": "PARTIAL"
-        },
-        {
-          "question": "Have you had episodes of confusion, seizures, or new weakness?",
-          "matched": [
-            "seizur",
-            "weaknes"
-          ],
-          "coverage": 0.67,
-          "severity": "FULL"
-        },
-        {
-          "question": "Any history of congenital heart disease, prosthetic valves, or recent fevers/chills?",
-          "matched": [
-            "fever"
-          ],
-          "coverage": 0.14,
-          "severity": "PARTIAL"
-        }
-      ]
-    },
-    {
       "id": "renal-foundations-prerenal-acute-kidney-injury-0",
       "system": "Renal",
       "difficulty": "Foundations",
@@ -114,80 +80,6 @@
           ],
           "coverage": 0.2,
           "severity": "PARTIAL"
-        }
-      ]
-    },
-    {
-      "id": "gastrointestinal-foundations-acute-appendicitis-0",
-      "system": "Gastrointestinal",
-      "difficulty": "Foundations",
-      "diagnosis": "Acute Appendicitis",
-      "hpi": "Tomasz Wierzbicki is a 19-year-old male presenting with 18 hours of abdominal pain. The pain began around his belly button and has since moved to the right lower abdomen. He rates it 7/10 in severity.",
-      "hits": [
-        {
-          "question": "Where exactly did the pain start, and has it moved since it began?",
-          "matched": [
-            "pain",
-            "mov",
-            "since",
-            "began"
-          ],
-          "coverage": 0.67,
-          "severity": "FULL"
-        },
-        {
-          "question": "Have you had any similar episodes of abdominal pain in the past?",
-          "matched": [
-            "abdominal",
-            "pain"
-          ],
-          "coverage": 1,
-          "severity": "RECURRENCE"
-        },
-        {
-          "question": "Is there anything that makes the pain better or worse, such as movement or eating?",
-          "matched": [
-            "pain"
-          ],
-          "coverage": 0.14,
-          "severity": "PARTIAL"
-        }
-      ]
-    },
-    {
-      "id": "img-MPX1896_synpic27390",
-      "system": "Respiratory",
-      "difficulty": "Clinical",
-      "diagnosis": "Congenital diaphragmatic hernia",
-      "hpi": "Term female neonate with severe respiratory distress, cyanosis, and difficult ventilation immediately after birth. Examination notable for a scaphoid abdomen and displaced heart sounds. Limited prenatal imaging at an outside facility was reportedly inconclusive.",
-      "hits": [
-        {
-          "question": "What did the prenatal ultrasounds show, including the position of the stomach and heart?",
-          "matched": [
-            "prenatal",
-            "heart"
-          ],
-          "coverage": 0.33,
-          "severity": "PARTIAL"
-        },
-        {
-          "question": "Did bag-mask ventilation cause progressive abdominal distension or worsening saturations?",
-          "matched": [
-            "ventilation"
-          ],
-          "coverage": 0.13,
-          "severity": "PARTIAL"
-        },
-        {
-          "question": "Is the abdomen scaphoid, and where are the heart sounds best auscultated?",
-          "matched": [
-            "abdomen",
-            "scaphoid",
-            "heart",
-            "sound"
-          ],
-          "coverage": 0.67,
-          "severity": "FULL"
         }
       ]
     },
@@ -225,94 +117,6 @@
           ],
           "coverage": 0.2,
           "severity": "PARTIAL"
-        }
-      ]
-    },
-    {
-      "id": "img-MPX2313_synpic27141-clinical",
-      "system": "Respiratory",
-      "difficulty": "Clinical",
-      "diagnosis": "Right upper lobe pneumonia",
-      "hpi": "67-year-old woman with 4 days of productive cough with rusty sputum, fever to 102°F, chills, and right-sided pleuritic chest pain. Increasing dyspnea on exertion. No recent travel or sick contacts.",
-      "hits": [
-        {
-          "question": "What is the color and quantity of your sputum, and has it changed over the course of your illness?",
-          "matched": [
-            "sputum"
-          ],
-          "coverage": 0.17,
-          "severity": "PARTIAL"
-        },
-        {
-          "question": "Have you had any recent travel, exposure to sick contacts, or known TB exposure?",
-          "matched": [
-            "travel",
-            "sick",
-            "contact"
-          ],
-          "coverage": 0.75,
-          "severity": "FULL"
-        },
-        {
-          "question": "Have you experienced any unintentional weight loss, night sweats, or chronic cough prior to this illness?",
-          "matched": [
-            "cough"
-          ],
-          "coverage": 0.13,
-          "severity": "RECURRENCE"
-        }
-      ]
-    },
-    {
-      "id": "local-urine-uti-0",
-      "system": "Renal",
-      "difficulty": "Foundations",
-      "diagnosis": "Acute Uncomplicated Cystitis (UTI)",
-      "hpi": "A 24-year-old woman presents with painful urination and urinary urgency lasting 2 days. She reports needing to urinate frequently but producing only small amounts each time. She has not had fever or back pain.",
-      "hits": [
-        {
-          "question": "Do you have any flank or back pain, fever, or chills?",
-          "matched": [
-            "back",
-            "pain",
-            "fever"
-          ],
-          "coverage": 0.6,
-          "severity": "FULL"
-        },
-        {
-          "question": "Have you had urinary tract infections before, and how were they treated?",
-          "matched": [
-            "urinary"
-          ],
-          "coverage": 0.2,
-          "severity": "RECURRENCE"
-        }
-      ]
-    },
-    {
-      "id": "img-MPX1161_synpic40025",
-      "system": "Gastrointestinal",
-      "difficulty": "Clinical",
-      "diagnosis": "Bowel obstruction",
-      "hpi": "58-year-old man with 3 days of abdominal distension, crampy pain, bilious vomiting, and obstipation. Reports 12-lb weight loss and intermittent hematochezia over 4 months. Prior similar self-resolving episodes.",
-      "hits": [
-        {
-          "question": "Have you had any prior abdominal surgeries or hernias?",
-          "matched": [
-            "abdominal"
-          ],
-          "coverage": 0.33,
-          "severity": "RECURRENCE"
-        },
-        {
-          "question": "Have you had any unintentional weight loss?",
-          "matched": [
-            "weight",
-            "los"
-          ],
-          "coverage": 0.67,
-          "severity": "FULL"
         }
       ]
     },
@@ -358,46 +162,6 @@
             "urine"
           ],
           "coverage": 0.67,
-          "severity": "FULL"
-        }
-      ]
-    },
-    {
-      "id": "img-MPX1580_synpic57545",
-      "system": "Cardiovascular",
-      "difficulty": "Foundations",
-      "diagnosis": "Post-sternotomy with coronary artery bypass graft",
-      "hpi": "Mr. Kovalenko is a 68-year-old man presenting for routine follow-up. He reports feeling well and denies chest pain or shortness of breath. He is six months post-operative.",
-      "hits": [
-        {
-          "question": "Have you had any chest pain, pressure, or shortness of breath since your surgery?",
-          "matched": [
-            "chest",
-            "pain",
-            "shortnes",
-            "breath",
-            "surgery"
-          ],
-          "coverage": 0.71,
-          "severity": "FULL"
-        }
-      ]
-    },
-    {
-      "id": "infectious-clinical-influenza-0",
-      "system": "Infectious",
-      "difficulty": "Clinical",
-      "diagnosis": "Influenza",
-      "hpi": "34-year-old female presenting with sudden-onset fever, severe body aches, and dry cough for 2 days. She has not received influenza vaccination this season.",
-      "hits": [
-        {
-          "question": "Have you received an influenza vaccine this season?",
-          "matched": [
-            "receiv",
-            "influenza",
-            "season"
-          ],
-          "coverage": 0.75,
           "severity": "FULL"
         }
       ]
@@ -2077,6 +1841,39 @@
       ]
     },
     {
+      "id": "img-MPX2266_synpic21022",
+      "system": "Infectious",
+      "difficulty": "Clinical",
+      "diagnosis": "Cerebral abscesses",
+      "hpi": "47-year-old man with 10 days of left-sided headache, subjective fevers, and 2 days of right hemiparesis after recent dental work for a periapical abscess. Two focal motor seizures of the right hand.",
+      "hits": [
+        {
+          "question": "Have you had any recent dental procedures, sinus infections, or ear infections?",
+          "matched": [
+            "dental"
+          ],
+          "coverage": 0.25,
+          "severity": "PARTIAL"
+        },
+        {
+          "question": "Did you take antibiotics after the dental procedure, and did you finish the full course?",
+          "matched": [
+            "dental"
+          ],
+          "coverage": 0.14,
+          "severity": "PARTIAL"
+        },
+        {
+          "question": "Any history of congenital heart disease, prosthetic valves, or recent fevers/chills?",
+          "matched": [
+            "fever"
+          ],
+          "coverage": 0.14,
+          "severity": "PARTIAL"
+        }
+      ]
+    },
+    {
       "id": "infectious-clinical-acute-osteomyelitis-0",
       "system": "Infectious",
       "difficulty": "Clinical",
@@ -3719,6 +3516,31 @@
       ]
     },
     {
+      "id": "local-urine-uti-0",
+      "system": "Renal",
+      "difficulty": "Foundations",
+      "diagnosis": "Acute Uncomplicated Cystitis (UTI)",
+      "hpi": "A 24-year-old woman presents with painful urination and urinary urgency lasting 2 days. She reports needing to urinate frequently but producing only small amounts each time. She has not had fever or back pain.",
+      "hits": [
+        {
+          "question": "Is there any chance you could be pregnant — when was your last menstrual period?",
+          "matched": [
+            "last"
+          ],
+          "coverage": 0.14,
+          "severity": "PARTIAL"
+        },
+        {
+          "question": "Have you had urinary tract infections before, and how were they treated?",
+          "matched": [
+            "urinary"
+          ],
+          "coverage": 0.2,
+          "severity": "RECURRENCE"
+        }
+      ]
+    },
+    {
       "id": "img-MPX1723_synpic34922-advanced",
       "system": "Neurologic",
       "difficulty": "Advanced",
@@ -4109,6 +3931,31 @@
             "gout"
           ],
           "coverage": 0.17,
+          "severity": "RECURRENCE"
+        }
+      ]
+    },
+    {
+      "id": "img-MPX2313_synpic27141-clinical",
+      "system": "Respiratory",
+      "difficulty": "Clinical",
+      "diagnosis": "Right upper lobe pneumonia",
+      "hpi": "67-year-old woman with 4 days of productive cough with rusty sputum, fever to 102°F, chills, and right-sided pleuritic chest pain. Increasing dyspnea on exertion. No recent travel or sick contacts.",
+      "hits": [
+        {
+          "question": "What is the color and quantity of your sputum, and has it changed over the course of your illness?",
+          "matched": [
+            "sputum"
+          ],
+          "coverage": 0.17,
+          "severity": "PARTIAL"
+        },
+        {
+          "question": "Have you experienced any unintentional weight loss, night sweats, or chronic cough prior to this illness?",
+          "matched": [
+            "cough"
+          ],
+          "coverage": 0.13,
           "severity": "RECURRENCE"
         }
       ]
@@ -4584,6 +4431,32 @@
       ]
     },
     {
+      "id": "gastrointestinal-foundations-acute-appendicitis-0",
+      "system": "Gastrointestinal",
+      "difficulty": "Foundations",
+      "diagnosis": "Acute Appendicitis",
+      "hpi": "Tomasz Wierzbicki is a 19-year-old male presenting with 18 hours of abdominal pain. The pain began around his belly button and has since moved to the right lower abdomen. He rates it 7/10 in severity.",
+      "hits": [
+        {
+          "question": "Have you had any similar episodes of abdominal pain in the past?",
+          "matched": [
+            "abdominal",
+            "pain"
+          ],
+          "coverage": 1,
+          "severity": "RECURRENCE"
+        },
+        {
+          "question": "Is there anything that makes the pain better or worse, such as movement or eating?",
+          "matched": [
+            "pain"
+          ],
+          "coverage": 0.14,
+          "severity": "PARTIAL"
+        }
+      ]
+    },
+    {
       "id": "trauma-clinical-pelvic-fracture-0",
       "system": "Trauma",
       "difficulty": "Clinical",
@@ -4892,6 +4765,32 @@
             "month"
           ],
           "coverage": 0.43,
+          "severity": "PARTIAL"
+        }
+      ]
+    },
+    {
+      "id": "img-MPX1896_synpic27390",
+      "system": "Respiratory",
+      "difficulty": "Clinical",
+      "diagnosis": "Congenital diaphragmatic hernia",
+      "hpi": "Term female neonate with severe respiratory distress, cyanosis, and difficult ventilation immediately after birth. Examination notable for a scaphoid abdomen and displaced heart sounds. Limited prenatal imaging at an outside facility was reportedly inconclusive.",
+      "hits": [
+        {
+          "question": "What did the prenatal ultrasounds show, including the position of the stomach and heart?",
+          "matched": [
+            "prenatal",
+            "heart"
+          ],
+          "coverage": 0.33,
+          "severity": "PARTIAL"
+        },
+        {
+          "question": "Did bag-mask ventilation cause progressive abdominal distension or worsening saturations?",
+          "matched": [
+            "ventilation"
+          ],
+          "coverage": 0.13,
           "severity": "PARTIAL"
         }
       ]
@@ -6069,6 +5968,24 @@
       ]
     },
     {
+      "id": "img-MPX1580_synpic57545",
+      "system": "Cardiovascular",
+      "difficulty": "Foundations",
+      "diagnosis": "Post-sternotomy with coronary artery bypass graft",
+      "hpi": "Mr. Kovalenko is a 68-year-old man presenting for routine follow-up. He reports feeling well and denies chest pain or shortness of breath. He is six months post-operative.",
+      "hits": [
+        {
+          "question": "How much activity can you manage now — do you get chest pain or breathlessness when you exert yourself?",
+          "matched": [
+            "chest",
+            "pain"
+          ],
+          "coverage": 0.29,
+          "severity": "PARTIAL"
+        }
+      ]
+    },
+    {
       "id": "img-CXR216_IM-0777-2001",
       "system": "Cardiovascular",
       "difficulty": "Foundations",
@@ -6134,6 +6051,23 @@
             "headache"
           ],
           "coverage": 0.2,
+          "severity": "RECURRENCE"
+        }
+      ]
+    },
+    {
+      "id": "img-MPX1161_synpic40025",
+      "system": "Gastrointestinal",
+      "difficulty": "Clinical",
+      "diagnosis": "Bowel obstruction",
+      "hpi": "58-year-old man with 3 days of abdominal distension, crampy pain, bilious vomiting, and obstipation. Reports 12-lb weight loss and intermittent hematochezia over 4 months. Prior similar self-resolving episodes.",
+      "hits": [
+        {
+          "question": "Have you had any prior abdominal surgeries or hernias?",
+          "matched": [
+            "abdominal"
+          ],
+          "coverage": 0.33,
           "severity": "RECURRENCE"
         }
       ]
