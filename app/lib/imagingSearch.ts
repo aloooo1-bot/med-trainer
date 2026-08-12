@@ -40,6 +40,9 @@ const BODY_PART_TERMS: Array<[string, string[]]> = [
   ['spine',     ['spine', 'spinal', 'vertebr']],
   ['brain',     ['brain', 'head', 'cranial', 'intracranial']],
   ['chest',     ['chest', 'thorax', 'thoracic']],
+  // Before 'abdomen', so a renal study resolves to the organ rather than the
+  // cavity — "Renal Ultrasound" previously matched no body part at all.
+  ['kidney',    ['kidney', 'renal', 'nephro', 'ureter']],
   ['abdomen',   ['abdomen', 'abdominal', 'liver', 'spleen', 'pancreas', 'bowel']],
   ['pelvis',    ['pelvis', 'pelvic', 'bladder', 'uterus', 'ovary', 'prostate']],
   ['neck',      ['neck', 'thyroid', 'carotid', 'cervical soft tissue']],
@@ -212,7 +215,19 @@ function getTestParams(orderedTest: string): TestParams | null {
 // Diagnosis → search query map
 // ---------------------------------------------------------------------------
 
-const DIAGNOSIS_QUERY_MAP: Array<[string[], Partial<Record<ModalityKey, string>>]> = [
+/**
+ * A modality's search query, optionally split by body part.
+ *
+ * A plain string is the query for every study in that modality. The record form
+ * exists because one modality can be ordered at two different anatomies in the
+ * same case, looking for two different things: an endocarditis patient gets an
+ * MRI of the spine for discitis AND an MRI of the brain for septic emboli, and
+ * a single "endocarditis MRI" query cannot serve both. Keys are body parts as
+ * extractBodyPart returns them, plus `default` for anything unlisted.
+ */
+type ModalityQuery = string | ({ default?: string } & Partial<Record<string, string>>)
+
+const DIAGNOSIS_QUERY_MAP: Array<[string[], Partial<Record<ModalityKey, ModalityQuery>>]> = [
   // ── Cardiovascular ───────────────────────────────────────────────────────
   [['stemi', 'st-elevation myocardial infarction'],
     { xray: 'cardiomegaly pulmonary edema', us: 'wall motion abnormality echocardiogram STEMI' }],
@@ -239,7 +254,20 @@ const DIAGNOSIS_QUERY_MAP: Array<[string[], Partial<Record<ModalityKey, string>>
   [['myocarditis'],
     { mri: 'myocarditis cardiac MRI late gadolinium enhancement', us: 'myocarditis echocardiogram' }],
   [['endocarditis', 'infective endocarditis'],
-    { us: 'endocarditis vegetation echocardiogram valve', xray: 'endocarditis chest' }],
+    { us: 'endocarditis vegetation echocardiogram valve',
+      xray: 'endocarditis chest',
+      // Both MRIs in these cases image a COMPLICATION, not the valve: the spine
+      // for embolic discitis, the brain for septic emboli. Without these the
+      // modality fallback reached for the xray query and searched a lumbar MRI
+      // as "endocarditis chest".
+      mri: {
+        lumbar: 'discitis vertebral osteomyelitis endplate MRI',
+        thoracic: 'discitis vertebral osteomyelitis endplate MRI',
+        cervical: 'discitis vertebral osteomyelitis endplate MRI',
+        spine: 'discitis vertebral osteomyelitis endplate MRI',
+        brain: 'septic emboli cerebral infarction diffusion weighted MRI',
+        default: 'septic embolic infarction MRI',
+      } }],
   [['atrial fibrillation', 'afib', 'atrial flutter'],
     { xray: 'atrial fibrillation cardiomegaly' }],
   [['pulmonary hypertension'],
@@ -488,14 +516,140 @@ const DIAGNOSIS_QUERY_MAP: Array<[string[], Partial<Record<ModalityKey, string>>
     { xray: 'hirschsprung disease transition zone', ct: 'hirschsprung disease megacolon' }],
 ]
 
-function getDiagnosisQuery(caseDiagnosis: string, modality: ModalityKey): string {
+/**
+ * Anatomic regions, for deciding whether one study's query can stand in for
+ * another's. Parts within a region are close enough to share a search; parts in
+ * different regions are not.
+ */
+const REGION_OF: Record<string, string> = {
+  cervical: 'spine', thoracic: 'spine', lumbar: 'spine', spine: 'spine',
+  brain: 'head', neck: 'neck', chest: 'chest',
+  abdomen: 'abdomen', pelvis: 'abdomen', kidney: 'abdomen',
+  knee: 'limb', hip: 'limb', ankle: 'limb', wrist: 'limb',
+  elbow: 'limb', foot: 'limb', hand: 'limb', shoulder: 'limb',
+}
+
+/**
+ * True when a candidate query is about a different part of the body than the
+ * study being ordered.
+ *
+ * The modality fallback below is worth keeping — a chest query written for
+ * radiographs usually suits a chest CT — but it silently crossed anatomies too,
+ * sending a lumbar spine MRI to Open-i as "endocarditis chest". Queries that
+ * name no body part at all (most of them) never conflict.
+ */
+function conflictsWithBodyPart(query: string, bodyPart: string): boolean {
+  if (!bodyPart || !query) return false
+  const queryPart = extractBodyPart(query)
+  if (!queryPart || queryPart === bodyPart) return false
+  const a = REGION_OF[queryPart]
+  const b = REGION_OF[bodyPart]
+  return Boolean(a && b && a !== b)
+}
+
+/**
+ * Modality nouns, stripped from a query borrowed across modalities.
+ *
+ * The Open-i request already constrains modality through its `it` and `coll`
+ * parameters, so these words add nothing when they match and actively mislead
+ * when they don't — a head CT borrowing the brain MRI query was searching a CT
+ * collection for "diffusion weighted MRI".
+ */
+const MODALITY_TOKENS =
+  /\b(mri|magnetic resonance|diffusion[- ]weighted|dwi|ct|computed tomography|radiograph|x-?ray|ultrasound|echocardiogram|echo)\b/gi
+
+function stripModalityWords(query: string): string {
+  return query.replace(MODALITY_TOKENS, ' ').replace(/\s+/g, ' ').trim()
+}
+
+function resolveModalityQuery(q: ModalityQuery | undefined, bodyPart: string): string {
+  if (!q) return ''
+  if (typeof q === 'string') return q
+  return (bodyPart && q[bodyPart]) || q.default || ''
+}
+
+function getDiagnosisQuery(caseDiagnosis: string, modality: ModalityKey, bodyPart = ''): string {
   const n = caseDiagnosis.toLowerCase()
   for (const [keys, queries] of DIAGNOSIS_QUERY_MAP) {
     if (keys.some(k => n.includes(k) || k.includes(n))) {
-      return queries[modality] ?? queries.xray ?? queries.ct ?? queries.mri ?? queries.us ?? ''
+      const exact = resolveModalityQuery(queries[modality], bodyPart)
+      if (exact) return exact
+      // Fall back across modalities, but never onto a different body region,
+      // and never carrying the source modality's own vocabulary along.
+      for (const alt of [queries.xray, queries.ct, queries.mri, queries.us]) {
+        const candidate = resolveModalityQuery(alt, bodyPart)
+        if (candidate && !conflictsWithBodyPart(candidate, bodyPart)) {
+          return stripModalityWords(candidate)
+        }
+      }
+      return ''
     }
   }
   return ''
+}
+
+/** Spine parts need the word "spine" to read as anatomy rather than an adjective. */
+const BODY_PART_PHRASE: Record<string, string> = {
+  lumbar: 'lumbar spine', thoracic: 'thoracic spine', cervical: 'cervical spine',
+}
+
+const MODALITY_WORD: Record<ModalityKey, string> = {
+  xray: 'radiograph', ct: 'CT', mri: 'MRI', us: 'ultrasound',
+}
+
+/**
+ * Last resort before falling back to the diagnosis words: search the anatomy.
+ *
+ * A generic but correct "lumbar spine MRI" returns usable films; the old
+ * fallback pasted the diagnosis onto the body part ("Infective Endocarditis
+ * lumbar") and returned nothing usable at all.
+ */
+function bodyPartQuery(bodyPart: string, modality: ModalityKey): string {
+  if (!bodyPart) return ''
+  return `${BODY_PART_PHRASE[bodyPart] ?? bodyPart} ${MODALITY_WORD[modality]}`
+}
+
+/**
+ * Resolve an ordered study to the Open-i query and modality parameters.
+ *
+ * Split out of fetchImagingResults so the choice of query — the part that
+ * decides whether a student sees a relevant film or an unrelated one — can be
+ * asserted without a network round trip.
+ *
+ * Returns null when the test name resolves to no imaging modality at all.
+ */
+export function buildImagingQuery(params: {
+  orderedTest: string
+  caseDiagnosis: string
+  imagingCategory?: string
+}): { query: string; testParams: TestParams; bodyPart: string } | null {
+  const { orderedTest, caseDiagnosis, imagingCategory } = params
+
+  const testParams = getTestParams(orderedTest)
+  if (!testParams) return null
+
+  // Extract body part from the ordered test name (e.g. "Knee MRI" → "knee")
+  const bodyPart = extractBodyPart(orderedTest)
+
+  // The diagnosis map for this modality AND body part first, then the anatomy
+  // alone, then the diagnosis words.
+  let baseQuery = getDiagnosisQuery(caseDiagnosis, testParams.modality, bodyPart)
+    || bodyPartQuery(bodyPart, testParams.modality)
+
+  if (!baseQuery) {
+    // Fallback: use first 3 words of diagnosis, enhanced with body part if available
+    const diagWords = caseDiagnosis.split(/\s+/).slice(0, 3).join(' ')
+    baseQuery = bodyPart ? `${diagWords} ${bodyPart}` : diagWords
+  } else if (bodyPart && !baseQuery.toLowerCase().includes(bodyPart)) {
+    // Enhance existing query with body-part context when it's not already there
+    baseQuery = `${baseQuery} ${bodyPart}`
+  }
+
+  return {
+    query: [baseQuery, imagingCategory].filter(Boolean).join(' ').trim(),
+    testParams,
+    bodyPart,
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -511,25 +665,9 @@ export async function fetchImagingResults(params: {
 }): Promise<OpenIResult[]> {
   const { orderedTest, caseDiagnosis, imagingCategory, baseUrl } = params
 
-  const testParams = getTestParams(orderedTest)
-  if (!testParams) return []
-
-  // Extract body part from the ordered test name (e.g. "Knee MRI" → "knee")
-  const bodyPart = extractBodyPart(orderedTest)
-
-  // Build the search query
-  let baseQuery = getDiagnosisQuery(caseDiagnosis, testParams.modality)
-
-  if (!baseQuery) {
-    // Fallback: use first 3 words of diagnosis, enhanced with body part if available
-    const diagWords = caseDiagnosis.split(/\s+/).slice(0, 3).join(' ')
-    baseQuery = bodyPart ? `${diagWords} ${bodyPart}` : diagWords
-  } else if (bodyPart && !baseQuery.toLowerCase().includes(bodyPart)) {
-    // Enhance existing query with body-part context when it's not already there
-    baseQuery = `${baseQuery} ${bodyPart}`
-  }
-
-  const query = [baseQuery, imagingCategory].filter(Boolean).join(' ').trim()
+  const built = buildImagingQuery({ orderedTest, caseDiagnosis, imagingCategory })
+  if (!built) return []
+  const { query, testParams } = built
 
   try {
     const sp = new URLSearchParams({ query, it: testParams.it, m: '1', n: '6' })
