@@ -42,6 +42,34 @@ export function correctDiagnosisFloor(difficulty) {
   return difficulty === 'Foundations' ? 86 : 82
 }
 
+/** Ceiling on the total when the primary diagnosis is wrong. */
+export const WRONG_DIAGNOSIS_CAP = 60
+/** The softer ceiling when the entity is only partly wrong — see partialCreditBand. */
+export const WRONG_DIAGNOSIS_CAP_PARTIAL = 70
+
+/**
+ * The diagnosisAccuracy range that counts as partial credit: right organ system
+ * or syndrome, wrong pathological process.
+ */
+export function partialCreditBand(difficulty) {
+  const da = getRubric(difficulty).find(d => d.key === 'diagnosisAccuracy')
+  return { min: Math.round(da.max * 0.59), max: Math.round(da.max * 0.78) }
+}
+
+/**
+ * Maximum total for a wrong diagnosis, given how wrong it was.
+ *
+ * The mirror of correctDiagnosisFloor and unenforced for the same reason: it
+ * was stated to the grader as a MUST with a verify step and nothing summed the
+ * dimensions afterwards. enforceWrongDiagnosisCap applies it server-side.
+ */
+export function wrongDiagnosisCap(difficulty, diagnosisAccuracyScore) {
+  const band = partialCreditBand(difficulty)
+  return diagnosisAccuracyScore >= band.min && diagnosisAccuracyScore <= band.max
+    ? WRONG_DIAGNOSIS_CAP_PARTIAL
+    : WRONG_DIAGNOSIS_CAP
+}
+
 // ── Grading system prompt ─────────────────────────────────────────────────────
 
 export const GRADING_SYSTEM_PROMPT = `You are a medical education evaluator grading a trainee's diagnostic performance.
@@ -75,8 +103,9 @@ export function buildRubricPrompt(input) {
   const toFloor    = Math.round(to.max * 0.61)
 
   const daCorrectMin = Math.round(da.max * 0.81)
-  const daPartialMin = Math.round(da.max * 0.59)
-  const daPartialMax = Math.round(da.max * 0.78)
+  // Shared with enforceWrongDiagnosisCap, which decides between the 60 and 70
+  // ceilings by testing diagnosisAccuracy against this same band.
+  const { min: daPartialMin, max: daPartialMax } = partialCreditBand(input.difficulty)
   const daStemiCap   = isFoundations ? Math.round(da.max * 0.44) : Math.round(da.max * 0.43)
 
   const dcFoundMin = Math.round(dc.max * 0.75)
@@ -286,9 +315,9 @@ HARD FLOOR — CORRECT DIAGNOSIS:
 - A testOrdering score of ≤ ${toFloor}/${to.max} is only valid if the student missed 2+ core expected tests (from the must-order list above) — not for missing supplementary/advanced tests.
 
 WRONG DIAGNOSIS TOTAL SCORE CAP:
-- When correct=false (wrong primary diagnosis), the total score MUST NOT exceed 60/100, regardless of how high workup sub-scores are. A student who named the wrong pathological entity cannot receive a passing total. After drafting dimension scores: if their sum exceeds 60, reduce historyInterview first, then testOrdering, until the total equals 60.
-- PARTIAL-CREDIT EXCEPTION: When the student named the correct organ system or syndrome but the wrong pathological process (diagnosisAccuracy in the ${daPartialMin}–${daPartialMax} partial-credit band), the cap is 70/100 instead of 60/100.
-- VERIFY before returning: if correct=false, confirm total score ≤ 60 (or ≤ 70 for partial-credit cases). If your draft exceeds the cap, revise before submitting.
+- When correct=false (wrong primary diagnosis), the total score MUST NOT exceed ${WRONG_DIAGNOSIS_CAP}/100, regardless of how high workup sub-scores are. A student who named the wrong pathological entity cannot receive a passing total. After drafting dimension scores: if their sum exceeds ${WRONG_DIAGNOSIS_CAP}, reduce historyInterview first, then testOrdering, until the total equals ${WRONG_DIAGNOSIS_CAP}.
+- PARTIAL-CREDIT EXCEPTION: When the student named the correct organ system or syndrome but the wrong pathological process (diagnosisAccuracy in the ${daPartialMin}–${daPartialMax} partial-credit band), the cap is ${WRONG_DIAGNOSIS_CAP_PARTIAL}/100 instead of ${WRONG_DIAGNOSIS_CAP}/100.
+- VERIFY before returning: if correct=false, confirm total score ≤ ${WRONG_DIAGNOSIS_CAP} (or ≤ ${WRONG_DIAGNOSIS_CAP_PARTIAL} for partial-credit cases). If your draft exceeds the cap, revise before submitting.
 
 PIVOTAL TEST MANDATORY DEDUCTION:
 - A "pivotal test" is the single confirmatory test whose absence makes it impossible to differentiate the primary diagnosis from a dangerous alternative at this difficulty level. Examples: LP in suspected bacterial meningitis (to rule out SAH and get CSF culture), CT-PA in suspected PE, troponin in chest-pain presentations.

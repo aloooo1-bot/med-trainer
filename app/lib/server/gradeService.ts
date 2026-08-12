@@ -1,7 +1,12 @@
 import 'server-only'
 import type { GradingInput, GradingResult } from '../../grading/types'
 import { GRADING_SYSTEM_PROMPT, buildRubricPrompt, buildOralPrompt, getRubric } from '../../grading/rubric'
-import { clampDimensions, enforceCorrectDiagnosisFloor, reconcileDeductions } from '../../grading/clamp'
+import {
+  clampDimensions,
+  enforceCorrectDiagnosisFloor,
+  enforceWrongDiagnosisCap,
+  reconcileDeductions,
+} from '../../grading/clamp'
 import { GradingResultSchema } from '../../grading/schemas'
 import { formatEvidenceSummary } from '../reasoning/differential'
 import { stripStageDirections } from '../transcriptText'
@@ -342,6 +347,7 @@ export async function gradeSession(
   // floor has to see the settled numbers, and anything it raises must not then
   // be pulled back down.
   enforceCorrectDiagnosisFloor(result, input.difficulty)
+  enforceWrongDiagnosisCap(result, input.difficulty)
   if (result.dimensions) {
     // Sum over the RUBRIC, not over whatever keys the model returned. The
     // schema still admits examinationFocus, which is in neither rubric — via

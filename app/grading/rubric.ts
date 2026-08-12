@@ -5,6 +5,8 @@ import {
   getRubric as _getRubric,
   buildRubricPrompt as _buildRubricPrompt,
   correctDiagnosisFloor as _correctDiagnosisFloor,
+  wrongDiagnosisCap as _wrongDiagnosisCap,
+  partialCreditBand as _partialCreditBand,
 } from './rubric.mjs'
 
 // ── Types (TS-only — erased at runtime) ──────────────────────────────────────
@@ -35,6 +37,16 @@ export function getRubric(difficulty: string): RubricDimension[] {
 /** Minimum total guaranteed to a correct diagnosis — see enforceCorrectDiagnosisFloor. */
 export function correctDiagnosisFloor(difficulty: string): number {
   return _correctDiagnosisFloor(difficulty) as number
+}
+
+/** The diagnosisAccuracy range counting as partial credit (right system, wrong process). */
+export function partialCreditBand(difficulty: string): { min: number; max: number } {
+  return _partialCreditBand(difficulty) as { min: number; max: number }
+}
+
+/** Maximum total for a wrong diagnosis — see enforceWrongDiagnosisCap. */
+export function wrongDiagnosisCap(difficulty: string, diagnosisAccuracyScore: number): number {
+  return _wrongDiagnosisCap(difficulty, diagnosisAccuracyScore) as number
 }
 
 export function buildRubricPrompt(input: GradingInput): string {

@@ -1,5 +1,5 @@
 import type { Deduction, GradingResult } from './types'
-import { correctDiagnosisFloor, getRubric } from './rubric'
+import { correctDiagnosisFloor, getRubric, wrongDiagnosisCap } from './rubric'
 
 /** Clamp per-dimension scores into their rubric ranges (model may exceed them). */
 export function clampDimensions(result: GradingResult, difficulty: string): void {
@@ -189,6 +189,74 @@ export function enforceCorrectDiagnosisFloor(result: GradingResult, difficulty: 
     console.warn(
       `[GRADING] correct diagnosis totalled ${before}/100, below the ${difficulty} floor of ` +
       `${floor} — raised to ${after} across ${touched} dimension(s)`,
+    )
+  }
+}
+
+/**
+ * Enforce the rubric's cap on a wrong diagnosis: 60/100, or 70 when the student
+ * named the right organ system with the wrong pathological process.
+ *
+ * The mirror of enforceCorrectDiagnosisFloor, unenforced for the same reason —
+ * stated to the grader as a MUST with a verify step, with nothing summing the
+ * dimensions afterwards. The failure mode is the more damaging of the two: a
+ * thorough workup that reaches the wrong answer scores every process dimension
+ * highly, and the rubric's whole position is that naming the wrong entity
+ * cannot be a passing grade however good the process was.
+ *
+ * Points come off in the rubric's stated order — historyInterview first, then
+ * testOrdering. Each reduction adds a deduction naming the cap, so a student
+ * who loses six points to it can see that it was the cap and not an unnamed
+ * judgment about their interview.
+ *
+ * Must run AFTER reconcileDeductions, whose job is the opposite direction
+ * (lowering inflated scores to match their lists); a cap applied first would be
+ * measured against numbers that were about to move.
+ */
+export function enforceWrongDiagnosisCap(result: GradingResult, difficulty: string): void {
+  if (!result.dimensions || result.correct) return
+
+  const rubric = getRubric(difficulty)
+  const dims = result.dimensions
+  const total = () => rubric.reduce((sum, { key }) => sum + (dims[key]?.score ?? 0), 0)
+
+  const cap = wrongDiagnosisCap(difficulty, dims.diagnosisAccuracy?.score ?? 0)
+  const before = total()
+  if (before <= cap) return
+
+  const order = [...new Set(['historyInterview', 'testOrdering', ...rubric.map(d => d.key)])]
+  let touched = 0
+
+  for (const key of order) {
+    const dim = dims[key as keyof typeof dims]
+    if (!dim) continue
+
+    const excess = total() - cap
+    if (excess <= 0) break
+
+    const cut = Math.min(excess, dim.score)
+    if (cut <= 0) continue
+
+    dim.score -= cut
+    dim.deductions = [
+      ...(dim.deductions ?? []),
+      { points: cut, reason: `Total capped at ${cap}/100 — the submitted diagnosis was incorrect` },
+    ]
+    touched++
+  }
+
+  const after = total()
+  if (after > cap) {
+    // Only reachable if diagnosisAccuracy alone exceeds the cap, which means the
+    // grader awarded near-full accuracy while calling the diagnosis wrong.
+    console.warn(
+      `[GRADING] wrong diagnosis totalled ${after}/100 with every dimension at zero — ` +
+      `cap of ${cap} unreachable; diagnosisAccuracy was ${dims.diagnosisAccuracy?.score} with correct=false`,
+    )
+  } else {
+    console.warn(
+      `[GRADING] wrong diagnosis totalled ${before}/100, above the ${difficulty} cap of ` +
+      `${cap} — lowered to ${after} across ${touched} dimension(s)`,
     )
   }
 }
