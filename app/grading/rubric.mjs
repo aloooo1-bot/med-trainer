@@ -30,6 +30,18 @@ export function getRubric(difficulty) {
   return difficulty === 'Foundations' ? FOUNDATIONS_RUBRIC : CLINICAL_ADVANCED_RUBRIC
 }
 
+/**
+ * Minimum total a correct diagnosis is guaranteed, by difficulty.
+ *
+ * Stated to the grader as a MUST in the HARD FLOOR block, but a prompt is not
+ * an enforcement mechanism: it was quietly missed in practice (a Clinical case
+ * with the right diagnosis returned 70). enforceCorrectDiagnosisFloor applies
+ * it server-side, and both read this so the promise and the check cannot drift.
+ */
+export function correctDiagnosisFloor(difficulty) {
+  return difficulty === 'Foundations' ? 86 : 82
+}
+
 // ── Grading system prompt ─────────────────────────────────────────────────────
 
 export const GRADING_SYSTEM_PROMPT = `You are a medical education evaluator grading a trainee's diagnostic performance.
@@ -72,7 +84,7 @@ export function buildRubricPrompt(input) {
   const dcClinMax  = dc.max
   const dcLowMax   = Math.round(dc.max * 0.44)
 
-  const hardFloorGeneric     = isFoundations ? 86 : 82
+  const hardFloorGeneric     = correctDiagnosisFloor(input.difficulty)
   const hardFloorFoundCorr   = 86
 
   // Key-question elicitation governs a bounded share of historyInterview — the

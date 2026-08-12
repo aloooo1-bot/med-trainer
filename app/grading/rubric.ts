@@ -4,6 +4,7 @@ import {
   GRADING_SYSTEM_PROMPT as _GRADING_SYSTEM_PROMPT,
   getRubric as _getRubric,
   buildRubricPrompt as _buildRubricPrompt,
+  correctDiagnosisFloor as _correctDiagnosisFloor,
 } from './rubric.mjs'
 
 // ── Types (TS-only — erased at runtime) ──────────────────────────────────────
@@ -29,6 +30,11 @@ export const GRADING_SYSTEM_PROMPT: string = _GRADING_SYSTEM_PROMPT
 
 export function getRubric(difficulty: string): RubricDimension[] {
   return _getRubric(difficulty) as RubricDimension[]
+}
+
+/** Minimum total guaranteed to a correct diagnosis — see enforceCorrectDiagnosisFloor. */
+export function correctDiagnosisFloor(difficulty: string): number {
+  return _correctDiagnosisFloor(difficulty) as number
 }
 
 export function buildRubricPrompt(input: GradingInput): string {
