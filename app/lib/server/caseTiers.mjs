@@ -17,6 +17,19 @@
 
 /** @typedef {Record<string, any>} AnyCase */
 
+/**
+ * The HPI the student sees at a given difficulty.
+ *
+ * Lives here rather than in the server-only wrapper so patientPrompt.mjs can
+ * use it — the patient agent must open from exactly the story the student was
+ * told, or it contradicts the presentation on the first question.
+ */
+export function selectHpiForDifficulty(/** @type {AnyCase} */ c, /** @type {string} */ difficulty) {
+  if (difficulty === 'Clinical' && c.clinicalHpi) return c.clinicalHpi
+  if (difficulty === 'Advanced' && c.advancedHpi) return c.advancedHpi
+  return c.hpi
+}
+
 /** Split a full case_data object into the four storage tiers. */
 export function splitCase(/** @type {AnyCase} */ caseData) {
   const {

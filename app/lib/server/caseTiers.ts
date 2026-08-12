@@ -2,7 +2,11 @@ import 'server-only'
 import type { CaseData } from '../../trainer/_lib/types'
 import type { CasePresentation, CaseReveal } from '../../trainer/_lib/sessionTypes'
 import { caseBmiIsInterpretable } from '../bmi'
-import { splitCase as _splitCase, joinCase as _joinCase } from './caseTiers.mjs'
+import {
+  splitCase as _splitCase,
+  joinCase as _joinCase,
+  selectHpiForDifficulty as _selectHpiForDifficulty,
+} from './caseTiers.mjs'
 
 export type { CasePresentation, CaseReveal }
 
@@ -22,9 +26,7 @@ export function joinCase(tiers: Partial<CaseTiers>): CaseData {
 }
 
 export function selectHpiForDifficulty(c: CaseData, difficulty: string): string {
-  if (difficulty === 'Clinical' && c.clinicalHpi) return c.clinicalHpi
-  if (difficulty === 'Advanced' && c.advancedHpi) return c.advancedHpi
-  return c.hpi
+  return _selectHpiForDifficulty(c as unknown as Record<string, unknown>, difficulty) as string
 }
 
 /**
