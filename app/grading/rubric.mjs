@@ -75,6 +75,21 @@ export function buildRubricPrompt(input) {
   const hardFloorGeneric     = isFoundations ? 86 : 82
   const hardFloorFoundCorr   = 86
 
+  // Key-question elicitation governs a bounded share of historyInterview — the
+  // rest reflects interview quality (targeted questioning, pertinent negatives,
+  // safety-critical differential coverage), which a checklist cannot measure.
+  // Spreading that share across the case's OWN question count is what makes the
+  // ceiling proportional: the old rule capped at 61% the moment a second
+  // question was missed, so on the library's uniform 5-question cases the 2nd
+  // miss cost several times the 1st and 2-of-5 was punished as "half or more".
+  const KQ_SHARE = 0.6
+  const kqCount = (input.keyQuestions ?? []).length
+  const kqPerMiss = kqCount > 0 ? (hi.max * KQ_SHARE) / kqCount : 0
+  const kqCeiling = n => Math.round(hi.max - n * kqPerMiss)
+  const kqTable = kqCount > 0
+    ? Array.from({ length: kqCount }, (_, i) => `    ${i + 1} missed → historyInterview ≤ ${kqCeiling(i + 1)}/${hi.max}`).join('\n')
+    : ''
+
 
   const weightBlock = rubric
     .map(d => `- ${d.label} (${d.key}): ${d.max} points`)
@@ -136,8 +151,7 @@ HISTORY & INTERVIEW (/${hi.max}):
 - Do not penalize for questions not asked unless they are critical to ruling out a dangerous alternative diagnosis or directly change management
 - A student who asked high-yield targeted questions should score ${hiFloor}-${hiHigh}/${hi.max}; score ${hiLow}-${hi.max} if they also asked about safety-critical differentials (e.g. PE symptoms in a DVT case)
 - ${hiMid}-${hiHigh}: asked most high-yield questions; missed 1 management-relevant area
-- Only drop to ${hiFloor} if the student missed 2+ questions that each independently change management
-- Never drop below ${hiNever} for a Foundations case unless the interview was entirely absent or off-topic
+${kqCount > 0 ? '- Deductions for un-elicited key questions are governed ENTIRELY by the KEY-QUESTION PROPORTIONAL FLOOR RULE below, which scales the ceiling to how many were missed. Do not apply an independent fixed cap here, and do not treat any particular miss count as a categorical drop to the bottom band.\n' : ''}- Never drop below ${hiNever} for a Foundations case unless the interview was entirely absent or off-topic
 ${isFoundations ? `- Foundations difficulty: do NOT penalize for missing advanced risk-stratification questions (e.g. hypercoagulable workup, formal scoring tools) — these are Clinical/Advanced expectations\n` : ''}
 TEST ORDERING (/${to.max}):
 ${input.expectedLabs?.length ? `Core expected tests for this diagnosis (MUST-ORDER list — the standard acute workup):
@@ -269,11 +283,18 @@ PIVOTAL TEST MANDATORY DEDUCTION:
 - If the pivotal test is absent from the student's ordered set AND the student's diagnosis was wrong: testOrdering MUST be in the lower band (≤ ${toLowMax}/${to.max}) — it cannot be near-full even if other workup was appropriate.
 - If the pivotal test is absent but the diagnosis was still correct: reduce testOrdering by at least 3 points below the upper band, but the deduction lives ONLY in testOrdering — do NOT let it pull diagnosisAccuracy or the total below the correct-diagnosis hard floor. Frame the feedback around PROOF, not luck: the diagnosis was right but unconfirmed — in a real encounter no one tells you you are correct, and the confirmatory test is how you would know. Say what the pivotal test would have established (e.g. "Your diagnosis of PE was correct, but without CT-PA it remained unproven — in practice you'd be anticoagulating on clinical suspicion alone"). Do NOT call the student "lucky", do NOT imply the reasoning was invalid, and do NOT penalize a correct diagnosis merely for skipping supplementary or redundant tests — only the single pivotal confirmatory test triggers this.
 
-KEY-QUESTION PROPORTIONAL FLOOR RULE:
-- Count the keyQuestions that the student neither proactively asked nor incidentally surfaced. Call this N_missed.
-- If N_missed ≥ 2: historyInterview MUST be ≤ ${hiFloor}/${hi.max}. A student who missed half or more of the listed key questions cannot score in the upper band.
-- VERIFY before returning: count N_missed from the transcript. If N_missed ≥ 2 and your draft historyInterview > ${hiFloor}, lower it before submitting.
-
+${kqCount > 0 ? `KEY-QUESTION PROPORTIONAL FLOOR RULE:
+- Count the keyQuestions that the student neither proactively asked nor incidentally surfaced, and weight each one:
+    • FULL (1.0) — the answer would independently change management or rule out a dangerous alternative diagnosis.
+    • HALF (0.5) — the question is on the list, but its answer would only add completeness.
+  Sum the weights. Call this N_missed. Questions surfaced incidentally are already half-credited in the HISTORY & INTERVIEW block above and do NOT count here — never deduct for them twice.
+- This case lists ${kqCount} key questions, so each full-weight miss costs at most ${kqPerMiss.toFixed(1)} points of historyInterview (a half-weight miss, ${(kqPerMiss / 2).toFixed(1)}):
+${kqTable}
+  For a fractional N_missed, subtract N_missed × ${kqPerMiss.toFixed(1)} from ${hi.max} and round to the nearest whole point.
+- The ceiling scales with how much of the list was missed — there is NO fixed cliff at any particular count. Missing 2 of ${kqCount} is ${Math.round((2 / kqCount) * 100)}% of the list and must be scored as ${Math.round((2 / kqCount) * 100)}%-worth of shortfall, not as a categorical drop to the bottom band.
+- These are CEILINGS, not targets. They bound what un-asked key questions alone may cost; the remaining ${Math.round((1 - KQ_SHARE) * 100)}% of the dimension reflects overall interview quality and may be reduced separately only for a gap you name concretely, per the SCORE↔FEEDBACK CONSISTENCY RULE.
+- VERIFY before returning: recompute N_missed from the transcript and confirm your draft historyInterview is ≤ the ceiling for that count. If it is at or below the ceiling, do NOT lower it further to fit any other threshold.
+` : ''}
 VITALS CROSS-REFERENCE RULE:
 - Vital signs (HR, BP, RR, temperature, SpO2, weight, BMI) are pre-presented to the student and appear in the case data above. Before issuing any fabrication warning for a vital sign the student cited, verify the cited value against the case vitals. Only flag as fabricated if the cited value is materially wrong (e.g., student says BP 180/110 when actual BP was 120/80). Do NOT penalize a student for citing a vital sign that matches or closely approximates the case data — they are reading it, not inventing it.
 

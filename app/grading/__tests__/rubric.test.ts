@@ -186,3 +186,89 @@ test('INCORRECT ADDED SPECIFICITY rule present in prompt', () => {
   assert.ok(p.includes('INCORRECT ADDED SPECIFICITY'))
   assert.ok(p.includes('clinically wrong'))
 })
+
+// ── Key-question ceiling scales with the misses ──────────────────────────────
+//
+// The rule used to cap historyInterview at 61% of max the instant a SECOND key
+// question was missed, justified as "missed half or more". Every case in the
+// library carries exactly 5 key questions, so it fired at 40% of the list and
+// made the 2nd miss cost several times the 1st — a cliff, on a dimension whose
+// own rubric says to reward targeted questioning over exhaustive checklists.
+
+// Clinical historyInterview is /20 over a 5-question list: 60% of the dimension
+// spread across 5 questions is 2.4 points per full-weight miss.
+const fiveQuestions: GradingInput = {
+  ...baseInput,
+  keyQuestions: [
+    'Recent dental work or procedures',
+    'Injection drug use',
+    'Prosthetic valve or prior valve disease',
+    'Indwelling catheter or recent instrumentation',
+    'Prior episode of endocarditis',
+  ],
+}
+
+test('key-question ceiling declines one step at a time, with no cliff', () => {
+  const p = buildRubricPrompt(fiveQuestions)
+  assert.ok(p.includes('1 missed → historyInterview ≤ 18/20'))
+  assert.ok(p.includes('2 missed → historyInterview ≤ 15/20'))
+  assert.ok(p.includes('3 missed → historyInterview ≤ 13/20'))
+  assert.ok(p.includes('4 missed → historyInterview ≤ 10/20'))
+  assert.ok(p.includes('5 missed → historyInterview ≤ 8/20'))
+  assert.ok(p.includes('NO fixed cliff'))
+})
+
+test('the second miss costs no more than the first', () => {
+  const p = buildRubricPrompt(fiveQuestions)
+  const ceilings = [...p.matchAll(/(\d) missed → historyInterview ≤ (\d+)\/20/g)]
+    .map(m => Number(m[2]))
+  assert.equal(ceilings.length, 5)
+  const steps = ceilings.slice(1).map((c, i) => ceilings[i] - c)
+  const first = 20 - ceilings[0]
+  for (const step of steps) {
+    assert.ok(step <= first + 1,
+      `each successive miss must cost about as much as the first (${first}), got ${step}`)
+  }
+})
+
+test('the old fixed 2-miss cap is gone from both the rule and the band list', () => {
+  const p = buildRubricPrompt(fiveQuestions)
+  assert.ok(!p.includes('If N_missed ≥ 2'),
+    'the categorical 2-miss cap must not survive anywhere in the prompt')
+  assert.ok(!p.includes('missed half or more'))
+  assert.ok(!p.includes('Only drop to 12 if the student missed 2+ questions'),
+    'the HISTORY & INTERVIEW band list must not re-impose its own fixed cap')
+  assert.ok(p.includes('governed ENTIRELY by the KEY-QUESTION PROPORTIONAL FLOOR RULE'))
+})
+
+test('misses are weighted by whether they change management', () => {
+  const p = buildRubricPrompt(fiveQuestions)
+  assert.ok(p.includes('FULL (1.0)'))
+  assert.ok(p.includes('HALF (0.5)'))
+  assert.ok(p.includes('independently change management'),
+    'a miss that changes nothing must not cost what a management-relevant one does')
+  assert.ok(p.includes('never deduct for them twice'),
+    'incidental surfacing is already half-credited upstream')
+})
+
+test('the ceiling table is derived from the case\'s own key-question count', () => {
+  // Two questions, so one miss is half the list and costs proportionally more.
+  const p = buildRubricPrompt(baseInput)
+  assert.ok(p.includes('This case lists 2 key questions'))
+  assert.ok(p.includes('1 missed → historyInterview ≤ 14/20'))
+  assert.ok(p.includes('2 missed → historyInterview ≤ 8/20'))
+  assert.ok(!p.includes('3 missed →'), 'the table stops at the number of questions that exist')
+})
+
+test('Foundations scales the same rule over its larger dimension', () => {
+  const p = buildRubricPrompt({ ...fiveQuestions, difficulty: 'Foundations' })
+  assert.ok(p.includes('1 missed → historyInterview ≤ 21/24'))
+  assert.ok(p.includes('2 missed → historyInterview ≤ 18/24'))
+})
+
+test('the whole block is omitted when the case lists no key questions', () => {
+  const p = buildRubricPrompt({ ...baseInput, keyQuestions: [] })
+  assert.ok(!p.includes('KEY-QUESTION PROPORTIONAL FLOOR RULE'),
+    'a case with no key questions has no checklist to cap against')
+  assert.ok(!p.includes('missed → historyInterview'))
+})
