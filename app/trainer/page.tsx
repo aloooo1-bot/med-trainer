@@ -43,6 +43,7 @@ import { WorkingDifferential } from './_components/WorkingDifferential'
 import { ROSView } from './_components/ROSView'
 import { ExamView } from './_components/ExamView'
 import { OrderView } from './_components/OrderView'
+import { PredictionPanel } from './_components/PredictionPanel'
 import { ResultsView } from './_components/ResultsView'
 import { DiagnosisView } from './_components/DiagnosisView'
 import { CaseLoading } from './_components/CaseLoading'
@@ -1090,10 +1091,6 @@ export default function MedTrainer() {
           caseData={caseData}
           caseDifficulty={caseDifficulty}
           scaffoldingLevel={sessionMeta.scaffoldingLevel}
-          prediction={prediction}
-          predictionConfidence={predictionConfidence}
-          onLockPrediction={lockPrediction}
-          predictionCandidates={sessionMeta.predictionCandidates}
           caseSearchTests={sessionMeta.caseSearchTests}
           orderedTests={orderedTests}
           selectedTests={selectedTests}
@@ -1102,8 +1099,6 @@ export default function MedTrainer() {
           addOrderedTest={addOrderedTest}
           orderCustomTest={orderCustomTest}
           removeOrderedTest={removeOrderedTest}
-          caseKey={sessionId ?? ''}
-          workingTop={workingDiff[0]}
           testSearchQuery={testSearchQuery}
           setTestSearchQuery={setTestSearchQuery}
           showSearchDropdown={showSearchDropdown}
@@ -1550,6 +1545,25 @@ export default function MedTrainer() {
             {/* Your differential — the student's living list, revisable all case long */}
             {caseData && (
               <WorkingDifferential items={workingDiff} onChange={updateWorkingDiff} disabled={gradingLoading} />
+            )}
+            {/* Pre-test read. Lives here rather than at the head of the Orders
+                tab, where it was a second diagnosis input competing with the
+                working differential directly above — the student's own reasoning
+                belongs in one column. Still pre-test in the sense that matters:
+                it locks once, before any result is back, and prefills from the
+                top of the differential. */}
+            {caseData && (
+              <div className="border-t border-surface-4 px-4 py-3">
+                <PredictionPanel
+                  key={sessionId ?? ''}
+                  candidates={sessionMeta.predictionCandidates}
+                  open={caseDifficulty !== 'Foundations'}
+                  prediction={prediction}
+                  confidence={predictionConfidence}
+                  suggestedLeading={workingDiff[0]}
+                  onLock={lockPrediction}
+                />
+              </div>
             )}
             {/* Notes */}
             <div className="flex flex-col border-t border-surface-4">

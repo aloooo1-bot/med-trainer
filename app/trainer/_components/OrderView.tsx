@@ -2,7 +2,6 @@ import { IMAGING_WITH_IMAGES, MASTER_TEST_LIST, searchTests } from '@/app/lib/te
 import { matchOrderSets, COMMON_CORE_TESTS } from '@/app/lib/orderSets'
 import { SectionCard } from './SectionCard'
 import { Badge } from './Badge'
-import { PredictionPanel } from './PredictionPanel'
 import type { CaseData } from '../_lib/types'
 
 /** One selectable test button, shared across the Clinical ordering panels. */
@@ -73,10 +72,9 @@ function SelectedTestsPanel({ selected, toggleTest, locked }: {
 }
 
 export function OrderView({
-  caseData, caseDifficulty, scaffoldingLevel, prediction, predictionConfidence, onLockPrediction,
-  predictionCandidates, caseSearchTests, orderedTests, selectedTests,
+  caseData, caseDifficulty, scaffoldingLevel,
+  caseSearchTests, orderedTests, selectedTests,
   toggleTest, orderTests, orderCustomTest, removeOrderedTest,
-  caseKey, workingTop,
   testSearchQuery, setTestSearchQuery, showSearchDropdown, setShowSearchDropdown,
   customTestInput, setCustomTestInput, locked,
 }: {
@@ -84,16 +82,6 @@ export function OrderView({
   caseDifficulty: string
   /** Interface scaffolding tier (5.3) — drives ordering UI density; defaults to caseDifficulty. */
   scaffoldingLevel?: string
-  prediction: string[] | null
-  predictionConfidence: number | null
-  onLockPrediction: (ranking: string[], confidence: number) => void
-  /**
-   * Foundations ranked-mode candidates (empty at gated difficulties — anti-cueing).
-   * PredictionPanel decides for itself whether it can render: ranked mode needs
-   * two or more of these, free-text mode needs nothing. Do not add an outer
-   * condition here — the panel's own rule is the whole rule.
-   */
-  predictionCandidates: string[]
   /** Advanced: case-specific test names for the search list (names only). */
   caseSearchTests?: Array<{ name: string; category: string }>
   orderedTests: Set<string>
@@ -103,10 +91,6 @@ export function OrderView({
   addOrderedTest: (name: string) => void
   orderCustomTest: () => void
   removeOrderedTest: (name: string) => void
-  /** Stable per-session key so PredictionPanel's local state resets each case. */
-  caseKey: string
-  /** Top of the student's working differential — prefills the open-mode pre-test read. */
-  workingTop?: string
   testSearchQuery: string
   setTestSearchQuery: React.Dispatch<React.SetStateAction<string>>
   showSearchDropdown: boolean
@@ -118,10 +102,6 @@ export function OrderView({
   // Scaffolding tier decides ordering UI density (5.3). Today it equals
   // difficulty; kept as a separate axis so the two can later diverge.
   const scaffold = scaffoldingLevel ?? caseDifficulty
-
-  // Foundations gets the candidate list (training wheels); Clinical/Advanced commit
-  // a free-text leading diagnosis so the answer isn't cued.
-  const predictionOpen = caseDifficulty !== 'Foundations'
 
   // Add several tests to the selection at once (order-set "add all"), skipping
   // any already selected or ordered.
@@ -137,7 +117,6 @@ export function OrderView({
     const allOrdered = (name: string) => orderedTests.has(name)
     return (
       <div className="space-y-4">
-        <PredictionPanel key={caseKey} candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} suggestedLeading={workingTop} onLock={onLockPrediction} />
         <SectionCard title="Laboratory Studies">
           <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {caseData.availableLabs.map(lab => {
@@ -205,7 +184,6 @@ export function OrderView({
 
     return (
       <div className="space-y-4">
-        <PredictionPanel key={caseKey} candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} suggestedLeading={workingTop} onLock={onLockPrediction} />
         <div className="relative">
           <div className="pointer-events-none absolute inset-y-0 left-3 flex items-center">
             <svg className="h-4 w-4 text-ink-tertiary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -367,7 +345,6 @@ export function OrderView({
 
   return (
     <div className="space-y-4">
-      <PredictionPanel key={caseKey} candidates={predictionCandidates} open={predictionOpen} prediction={prediction} confidence={predictionConfidence} suggestedLeading={workingTop} onLock={onLockPrediction} />
       <div className="rounded-md border border-primary-200 bg-primary-50 px-4 py-3">
         <p className="text-xs text-primary-700">
           <span className="font-semibold">Advanced difficulty:</span> no pre-listed lab panels — search and type test names from memory. Imaging modalities are listed below for reference.
