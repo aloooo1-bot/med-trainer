@@ -61,9 +61,29 @@ export interface SessionWithEvents {
   events: SessionEvent[]
 }
 
+/** Just enough to authorise an exam and answer it — see SessionStore.examRegion. */
+export interface ExamRegionRead {
+  userId: string
+  phase: SessionPhase
+  /** undefined when the region does not exist in this case. */
+  finding: string | undefined
+}
+
 export interface SessionStore {
   create(session: TrainerSessionRecord): Promise<void>
   get(id: string): Promise<SessionWithEvents | null>
+  /**
+   * Ownership, phase and ONE region's finding — without the case snapshot or
+   * the event log.
+   *
+   * Examining a region used to go through the full `get`: two queries pulling
+   * ~44KB of case snapshot (every lab result and the whole ground truth, to
+   * read one sentence) plus every event recorded so far (~1.5KB each, and the
+   * exam route reads none of them). The event half meant the cost grew as the
+   * encounter went on, so the sixth exam was slower than the first purely
+   * because of the interview sitting in front of it.
+   */
+  examRegion(id: string, region: string): Promise<ExamRegionRead | null>
   appendEvent(id: string, event: SessionEvent): Promise<void>
   setPhase(id: string, phase: SessionPhase): Promise<void>
   /** Persist snapshot changes (e.g. on-demand generated results merged in). */
@@ -94,6 +114,17 @@ class FileSessionStore implements SessionStore {
       return JSON.parse(await fs.readFile(fp, 'utf8')) as SessionWithEvents
     } catch {
       return null
+    }
+  }
+
+  async examRegion(id: string, region: string): Promise<ExamRegionRead | null> {
+    // One local file read; there is no cheaper slice of a JSON file.
+    const data = await this.get(id)
+    if (!data) return null
+    return {
+      userId: data.session.userId,
+      phase: data.session.phase,
+      finding: data.session.caseData.physicalExam[region],
     }
   }
 
@@ -168,6 +199,42 @@ class SupabaseSessionStore implements SessionStore {
       .eq('session_id', id).order('ts', { ascending: true }).order('id', { ascending: true })
     if (evErr) throw new Error(`session_events read failed: ${evErr.message}`)
     return { session: this.rowToSession(row), events: (events ?? []) as SessionEvent[] }
+  }
+
+  async examRegion(id: string, region: string): Promise<ExamRegionRead | null> {
+    // PostgREST can project a path inside the JSONB column, so the snapshot
+    // stays in the database: ~1.6KB on the wire instead of ~44KB, and no second
+    // query for an event log this route never reads.
+    // supabase-js cannot type a JSON-path projection — the select string blows
+    // its type-instantiation depth limit — so this one query goes through a
+    // loosely typed handle and the shape is checked here instead.
+    const db = this.db as unknown as {
+      from(table: string): {
+        select(columns: string): {
+          eq(column: string, value: string): {
+            maybeSingle(): Promise<{
+              data: Record<string, unknown> | null
+              error: { message: string } | null
+            }>
+          }
+        }
+      }
+    }
+
+    const { data: row, error } = await db
+      .from('trainer_sessions')
+      .select('user_id, phase, case_snapshot->caseData->physicalExam')
+      .eq('id', id)
+      .maybeSingle()
+    if (error) throw new Error(`trainer_sessions read failed: ${error.message}`)
+    if (!row) return null
+
+    const exam = (row.physicalExam ?? {}) as Record<string, string>
+    return {
+      userId: row.user_id as string,
+      phase: row.phase as SessionPhase,
+      finding: exam[region],
+    }
   }
 
   async appendEvent(id: string, event: SessionEvent): Promise<void> {

@@ -1,3 +1,6 @@
+'use client'
+
+import { useState } from 'react'
 import { SectionCard } from './SectionCard'
 import type { CaseData } from '../_lib/types'
 
@@ -13,9 +16,24 @@ export function ExamView({
   /** Server-decided: whether the exam is click-to-reveal for this case. */
   examGated: boolean
   revealedExamRegions?: Set<string>
-  revealExamRegion?: (region: string) => void
+  revealExamRegion?: (region: string) => void | Promise<void>
 }) {
   const isGated = examGated
+  // Examining is a server round trip — the finding is deliberately not in the
+  // browser at gated difficulties. Without a pending state the button sat inert
+  // for the whole trip, which reads as lag rather than loading, and a second
+  // click fired a second request and logged a duplicate exam event.
+  const [pending, setPending] = useState<Set<string>>(new Set())
+
+  const examine = async (region: string) => {
+    if (!revealExamRegion || pending.has(region)) return
+    setPending(prev => new Set(prev).add(region))
+    try {
+      await revealExamRegion(region)
+    } finally {
+      setPending(prev => { const next = new Set(prev); next.delete(region); return next })
+    }
+  }
 
   if (!isGated || !revealedExamRegions || !revealExamRegion) {
     return (
@@ -58,11 +76,23 @@ export function ExamView({
                 </div>
               ) : (
                 <button
-                  onClick={() => revealExamRegion(system)}
-                  className="w-full flex items-center gap-3 rounded-md border border-surface-4 bg-surface-1 p-3 text-left transition-colors hover:border-primary-300 hover:bg-primary-50 cursor-pointer"
+                  onClick={() => void examine(system)}
+                  disabled={pending.has(system)}
+                  aria-busy={pending.has(system)}
+                  className="w-full flex items-center gap-3 rounded-md border border-surface-4 bg-surface-1 p-3 text-left transition-colors hover:border-primary-300 hover:bg-primary-50 cursor-pointer disabled:cursor-wait disabled:opacity-60 disabled:hover:border-surface-4 disabled:hover:bg-surface-1"
                 >
                   <span className="w-36 flex-shrink-0 text-xs font-semibold text-primary-400 uppercase tracking-wide">{system}</span>
-                  <span className="text-sm text-ink-tertiary italic">Click to examine</span>
+                  {pending.has(system) ? (
+                    <span className="flex items-center gap-2 text-sm text-ink-tertiary italic">
+                      <svg className="h-3 w-3 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+                        <circle cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" className="opacity-25" />
+                        <path d="M12 2a10 10 0 0 1 10 10" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
+                      </svg>
+                      Examining…
+                    </span>
+                  ) : (
+                    <span className="text-sm text-ink-tertiary italic">Click to examine</span>
+                  )}
                 </button>
               )}
             </div>

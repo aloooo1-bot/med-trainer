@@ -529,6 +529,9 @@ export default function MedTrainer() {
     setActiveSection('results')
   }
 
+  // Returned promise matters: ExamView awaits it to hold its pending state for
+  // the length of the round trip. Passing a void wrapper made the spinner
+  // resolve instantly and never render.
   const examineRegion = async (region: string) => {
     if (!sessionId || inPresentation) return
     try {
@@ -1084,7 +1087,7 @@ export default function MedTrainer() {
           caseDifficulty={caseDifficulty}
           examGated={sessionMeta.examGated}
           revealedExamRegions={revealedExamRegions}
-          revealExamRegion={(r) => { void examineRegion(r) }}
+          revealExamRegion={examineRegion}
         />
       case 'order':
         return <OrderView
