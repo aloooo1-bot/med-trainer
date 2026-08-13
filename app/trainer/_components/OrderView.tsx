@@ -71,6 +71,43 @@ function SelectedTestsPanel({ selected, toggleTest, locked }: {
   )
 }
 
+/**
+ * Tests already sent to the lab, with a way to take one back.
+ *
+ * Shared by Clinical and Advanced for the same reason SelectedTestsPanel is:
+ * the fixed grids only render their own lists, so a long-tail test reached
+ * through the search box appeared nowhere on the page once ordered — the
+ * pending chip vanished on order and nothing replaced it. Advanced had this
+ * panel from the start; Clinical was left showing ordered state only as an
+ * inline badge inside grids a searched test is not in.
+ */
+function OrderedTestsPanel({ ordered, removeOrderedTest, locked }: {
+  ordered: string[]
+  removeOrderedTest: (name: string) => void
+  locked: boolean
+}) {
+  if (ordered.length === 0) return null
+  return (
+    <SectionCard title={`Ordered Tests (${ordered.length})`}>
+      <div className="space-y-2">
+        {ordered.map(t => (
+          <div key={t} className="flex items-center justify-between rounded-md border border-surface-4 bg-surface-1 px-3 py-2">
+            <span className="text-sm text-ink-primary">{t}</span>
+            <button
+              onClick={() => !locked && removeOrderedTest(t)}
+              disabled={locked}
+              title={`Remove ${t} from your orders`}
+              className="text-ink-tertiary hover:text-critical text-xs transition-colors ml-3 flex-shrink-0 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              ✕
+            </button>
+          </div>
+        ))}
+      </div>
+    </SectionCard>
+  )
+}
+
 export function OrderView({
   caseData, caseDifficulty, scaffoldingLevel,
   caseSearchTests, orderedTests, selectedTests,
@@ -254,6 +291,7 @@ export function OrderView({
         </div>
 
         <SelectedTestsPanel selected={Array.from(selectedTests)} toggleTest={toggleTest} locked={locked} />
+        <OrderedTestsPanel ordered={Array.from(orderedTests)} removeOrderedTest={removeOrderedTest} locked={locked} />
 
         {/* Syndrome order sets — the standard workup for this presentation.
             Add the whole set, or pick individual tests. */}
@@ -438,18 +476,7 @@ export function OrderView({
         </div>
       </SectionCard>
 
-      {orderedList.length > 0 && (
-        <SectionCard title={`Ordered Tests (${orderedList.length})`}>
-          <div className="space-y-2">
-            {orderedList.map(t => (
-              <div key={t} className="flex items-center justify-between rounded-md border border-surface-4 bg-surface-1 px-3 py-2">
-                <span className="text-sm text-ink-primary">{t}</span>
-                <button onClick={() => removeOrderedTest(t)} className="text-ink-tertiary hover:text-critical text-xs transition-colors ml-3 flex-shrink-0">✕</button>
-              </div>
-            ))}
-          </div>
-        </SectionCard>
-      )}
+      <OrderedTestsPanel ordered={orderedList} removeOrderedTest={removeOrderedTest} locked={locked} />
 
       {selectedList.length === 0 && orderedList.length === 0 && (
         <div className="flex flex-col items-center justify-center py-16 text-ink-tertiary">
